@@ -59,7 +59,7 @@ Mỗi Work Group / Change tuân thủ nghiêm ngặt 4 bước:
    - Dev thực thi theo test design đã duyệt.
    - `./syntheprise gate` và `./scripts/test` phải **XANH 100%**.
 4. **Close-out & Lưu Trữ (Thứ tự bắt buộc không được đảo):**
-   - **Bước 4a — State Snapshot trước:** Cập nhật worklog trong `docs/_plans/P<x>/WG-<id>.md` và viết `docs/_states/state_<YYYY-MM-DD>_<slug>.md`.
+   - **Bước 4a — State Snapshot trước:** Cập nhật worklog trong `docs/_plans/P{x}/WG-{id}.md` và viết `docs/_states/state_YYYY-MM-DD_slug.md`.
    - **Bước 4b — Archive:** Di chuyển change vào `docs/_changes/_archive/` và merge delta vào tài liệu canonical.
    - **Bước 4c — Cleanup:** Xóa worktree và branch sau khi đã merge vào `main`.
    - **Bước 4d — Mark Closed:** Đánh dấu hoàn tất và giải phóng session lock.
