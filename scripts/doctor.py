@@ -142,6 +142,12 @@ for p in ROOT.rglob("*"):
         or r.startswith("docs/_research/")
         or r.startswith("docs/_intake/")
         or r.startswith("docs/_requirements/_archive/")
+        or r.startswith("docs/_brd/")
+        or r.startswith("docs/_prd/")
+        or r.startswith("docs/_tech-solutions/")
+        or r.startswith("docs/_playbook/")
+        or r.startswith("docs/_ui-ux_design/")
+        or r == "docs/_plans/beautyai_plan.md"
         or "/_archive/" in r
     ):
         continue
@@ -248,6 +254,11 @@ for p in ROOT.rglob("*.md"):
     if (
         any(part in EXCLUDE_DIRS for part in p.parts)
         or rp.startswith("docs/_guides/")
+        or rp.startswith("docs/_playbook/")
+        or rp.startswith("docs/_brd/")
+        or rp.startswith("docs/_prd/")
+        or rp.startswith("docs/_tech-solutions/")
+        or rp == "docs/_plans/beautyai_plan.md"
         or rp.startswith("docs/_plans/_archive/")
         or rp.startswith("docs/_states/_archive/")
         or rp.startswith("docs/_review/")

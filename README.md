@@ -1,201 +1,106 @@
 ---
-doc: readme
-title: Syntheprise Framework - The Human-Governed Agentic Development Framework.
+doc: project-readme
+title: BeautyAI Platform — Intelligent Skincare & Cosmetics E-Commerce
 status: stable
-precedence: 5
-owner: Delivery / PMO / Architecture
-last_reviewed: 2026-07-26
+precedence: 6
+owner: Delivery / Tech Lead
+last_reviewed: 2026-10-25
 ---
 
-# **Syntheprise Framework -** *The Human-Governed Agentic Development Framework.*
+# BeautyAI Platform — Intelligent Skincare & Cosmetics E-Commerce
 
-**Short name:** Syntheprise Framework
-**Company:** Syntheprise
-**Website:** [www.syntheprise.ai](https://www.syntheprise.ai)
-**Contact:** [tm@syntheprise.ai](mailto:tm@syntheprise.ai)
-**Repo/package name:** `syntheprise-framework`
-**Current implementation:** Syntheprise Framework v6.0.1
-**Template/tooling package:** Syntheprise Framework Starter Kit
-**Company rollout program:** Syntheprise Framework Adoption Program
-**Release zip:** `syntheprise-framework.zip`
+> **Nền tảng thương mại điện tử mỹ phẩm kết hợp phân tích thành phần da liễu thông minh & chấm điểm phù hợp cá nhân hóa.**
 
-> **Open source — licensed under Apache-2.0.** Community use and contributions welcome.
-> See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md) ·
-> Security: [`SECURITY.md`](SECURITY.md) · Conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
-
-Syntheprise Framework is Syntheprise's human-governed software delivery framework
-for building, maintaining, and governing software projects with AI coding agents.
-It standardizes requirements, architecture, QA-first test design, traceability,
-change management, quality gates, and tool adapters for Antigravity, GPT Codex,
-and Claude Code.
-
-Syntheprise Framework is not a prompt collection. It is a governed development framework: documents define the source of truth, humans make decisions, AI accelerates execution, and quality gates provide evidence.
+[![Quality Gate](https://github.com/keplertuyen/beauty_ai/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/keplertuyen/beauty_ai/actions/workflows/quality-gate.yml)
+[![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![React 19](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)](https://react.dev/)
+[![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17-336791?logo=postgresql)](https://www.postgresql.org/)
 
 ---
 
-## Start here
+## 1. Giới thiệu dự án
 
-If you are new to Syntheprise Framework, read these files in order:
+**BeautyAI** là nền tảng thương mại điện tử chuyên sâu về mỹ phẩm và chăm sóc sắc đẹp, giải quyết vấn đề bất đối xứng thông tin giữa thành phần sản phẩm và đặc tính sinh học của từng làn da người dùng:
+- **Phân tích thành phần chuyên sâu (Ingredient Intelligence):** Tự động bóc tách và phân tích các hoạt chất (Active Ingredients), nồng độ, nguy cơ kích ứng, và các cặp thành phần tương xung/tương hỗ theo y văn da liễu.
+- **Điểm số phù hợp cá nhân (Suitability Score — ADR-011):** Tính toán độ tương thích (0–100%) giữa sản phẩm và hồ sơ da (Skin Profile: loại da, độ nhạy cảm, mối quan tâm da) trên từng lượt đọc.
+- **Nguyên lý bất biến (INV-01):** BeautyAI **tuyệt đối không** chấm điểm an toàn/nguy hiểm chung chung (`SafetyScore`, `HazardScore`). Mọi hoạt chất đều phụ thuộc vào nồng độ và sự tương thích với từng nền da cụ thể.
+- **Pipeline AI 7 giai đoạn (ADR-005):** Kết hợp mô hình ML Offline và Gemini 2.5 Flash để bóc tách bảng thành phần phức tạp, đối chiếu từ điển INCI và sinh giải thích khoa học dễ hiểu.
+- **Tích hợp kênh Zalo Mini App / DeepLink (ADR-006):** Chuyển giao giỏ hàng và tư vấn viên tức thời.
+
+---
+
+## 2. Kiến trúc kỹ thuật (Architecture)
+
+Dự án tuân thủ kiến trúc **Clean Architecture** và các quyết định kiến trúc bất biến ([13 ADRs trong `docs/adr/`](docs/adr/)):
 
 ```text
-1. SYNTHEPRISE-FRAMEWORK-OVERVIEW.md
-2. docs/_guides/00-framework-overview.md
-3. docs/_guides/00-quickstart.md
-4. docs/_guides/01-agentic-ai-delivery-process.md
-5. docs/_guides/03-raci-and-prompt-playbook.md
+src/
+├── BeautyAI.Domain/          # Core Domain Entities & Invariants (Thuần C#, 0 dependency)
+├── BeautyAI.Application/     # Use Cases, DTOs, Repository Interfaces (Không phụ thuộc EF/HTTP)
+├── BeautyAI.Infrastructure/  # PostgreSQL (EF Core 10 + Dapper), Adapter Providers bên ngoài
+├── BeautyAI.Api/             # ASP.NET Core 10 Web API, phát hành OpenAPI tự động (ADR-008)
+└── frontend/                 # React 19 + TypeScript + Vite, openapi-fetch an toàn kiểu
+tests/
+├── BeautyAI.ArchitectureTests/ # NetArchTest: Thực thi INV-01, cấm package trái phép, clean seams
+└── BeautyAI.UnitTests/         # Unit Tests nghiệp vụ Domain & Application
 ```
 
-`docs/_guides/00-framework-overview.md` is the complete overview document. It explains what Syntheprise Framework is, why it exists, who uses it, how the repository is organized, how each folder/file group works, how Dev-AI Pair Development operates, what the quality gates enforce, current limitations, and the future roadmap.
+---
+
+## 3. Tài liệu dự án (Documentation)
+
+Toàn bộ tài liệu gốc và đặc tả chi tiết được lưu trữ trong thư mục [`docs/`](docs/):
+
+| Nhóm tài liệu | Đường dẫn | Mô tả |
+|---|---|---|
+| **BRD** | [`docs/_brd/beautyai_brd.md`](docs/_brd/beautyai_brd.md) | Business Requirements Document V1.0 |
+| **PRD** | [`docs/_prd/beautyai_prd.md`](docs/_prd/beautyai_prd.md) | Product Requirements Document v2.0 & SRS baseline |
+| **UI/UX Design** | [`docs/_ui-ux_design/frontend`](docs/_ui-ux_design/frontend) | Bản mẫu giao diện người dùng (Prototype & Flow HTML/CSS) |
+| **Technical Design** | [`docs/_tech-solutions/beautyai_tech_solutions.md`](docs/_tech-solutions/beautyai_tech_solutions.md) | Giải pháp kỹ thuật, lược đồ CSDL & thiết kế hệ thống |
+| **Plan** | [`docs/_plans/beautyai_plan.md`](docs/_plans/beautyai_plan.md) | Kế hoạch tổng thể 9 giai đoạn (P1–P9) |
+| **Playbook** | [`docs/_playbook/beautyai_playbook.md`](docs/_playbook/beautyai_playbook.md) | Sổ tay phân rã 81 nhiệm vụ chi tiết và quy trình thực thi |
+| **Kiến trúc & ADRs** | [`docs/architecture.md`](docs/architecture.md) & [`docs/adr/`](docs/adr/) | 13 Kiến trúc quyết định độc lập (ADR-001 đến ADR-013) |
+| **Hợp đồng API** | [`docs/api-contract.md`](docs/api-contract.md) | Danh mục Endpoint, quy ước REST và mã lỗi |
+| **Hợp đồng Dữ liệu** | [`docs/data-contracts.md`](docs/data-contracts.md) & [`docs/db-schema/schema.sql`](docs/db-schema/schema.sql) | Lược đồ PostgreSQL, bảng chỉ mục và ràng buộc toàn vẹn |
 
 ---
 
-## What Syntheprise Framework provides
+## 4. Hướng dẫn phát triển (Local Development)
 
-Company-ready controls (governance core, all from V5):
+### Yêu cầu môi trường
+- **.NET SDK:** `10.0.401` (được ghim tại `global.json`)
+- **Node.js:** `>= 22.0.0`
+- **Docker & Docker Compose:** Dành cho PostgreSQL 17 và môi trường kiểm thử
 
-1. **Change/Delta Spec model** — every meaningful change is captured under `docs/_changes/<CHANGE-ID>/` with proposal, delta requirements, design, test plan, tasks, review, and archive flow.
-2. **QA-first test design** — QA/BA define acceptance tests before Dev or Dev Agent implementation, reducing confirmation bias.
-3. **Traceability matrix** — business goals, requirements, acceptance criteria, tests, implementation tasks, PRs, and release notes are linked in `docs/traceability.md`.
-4. **Quality gate scripts** — `doctor.py`, traceability checks, doc-drift checks, and protected-action policy create enforceable project hygiene.
-5. **Agent adapters** — tool-specific instructions for Antigravity, GPT Codex, and Claude Code.
-6. **Syntheprise Framework Adoption Program** — rollout, training, pilot checklist, role playbooks, and adoption metrics for company-wide deployment.
-
-DevEx layer added in **v5.3** (see `docs/_guides/08-syntheprise-cli.md`):
-
-7. **`syntheprise` CLI** — one entry point: `init`, `sync`, `gate`, `change`, `onboard`, `dashboard`, `push-tasks`, `upgrade`.
-8. **Runnable per-tool slash-commands** generated from canonical `.agents/` via `syntheprise sync`, with CI drift checks.
-9. **Tier-0 fast lane** for solo/PoC, **brownfield onboarding** (`/onboard-existing` + `reverse-spec`), **Bugfix Spec**, **status dashboard**, and **tracker export** (GitHub/Jira/Linear).
-10. **CI gate on every PR/push** + change-completeness enforcement.
-
----
-
-## Recommended start path (v6.0.1)
-
-For a new project, prefer a certified composable blueprint:
+### Các lệnh điều hành
 
 ```bash
-# from the framework repo
-./syntheprise blueprint list
-./syntheprise new <your-project-repo> --blueprint python-react-rn --tier 1 --adapter all --mode team
-cd <your-project-repo>
+# 1. Khởi động CSDL PostgreSQL cục bộ
+docker compose up -d postgres
+
+# 2. Khởi chạy toàn bộ môi trường phát triển (API + Frontend)
+./scripts/dev
+
+# 3. Biên dịch giải pháp (.NET solution + Frontend bundle)
 ./scripts/build
+
+# 4. Chạy kiểm thử tự động (Unit Tests + 11 Architecture Tests + Frontend check)
 ./scripts/test
-```
 
-To compose a compatible custom solution, use exactly one `--backend`, optional
-`--web`, and optional `--mobile`; review with `--plan` before materializing.
-Certification applies to the five named blueprints, not every compatible
-combination. See
-[`docs/_guides/19-v600-release-and-adoption.md`](docs/_guides/19-v600-release-and-adoption.md).
-
-Solo / PoC fast lane:
-
-```bash
-./syntheprise init my-poc --tier 0 --adapter claude
-cd my-poc && syntheprise change new "first-slice" --type FASTLANE && syntheprise gate
-```
-
-Existing (brownfield) system:
-
-```bash
-syntheprise onboard                        # scaffold docs/_baseline, then run /onboard-existing
-```
-
-Then fill the canonical files (charter → requirements → core-principles → AGENTS →
-architecture → testing-strategy → qa-governance → traceability → plans → adapter).
-Manual `cp -R` still works, but `syntheprise init` applies tiering and generates adapters for you.
-
-After placeholders are replaced, enforce the gate:
-
-```bash
-syntheprise gate                           # doctor --quality-gate + traceability + doc-drift + adapter parity
+# 5. Kiểm tra Quality Gate (Doctor, Lifecycle, Drift, Sync check)
+./syntheprise gate
 ```
 
 ---
 
-## Repository structure
+## 5. Quy trình quản trị & Chất lượng (Governance)
 
-```text
-syntheprise-framework/
-├── syntheprise                              # CLI wrapper (./syntheprise <command>)
-├── VERSION                           # Framework/kit version (source of truth)
-├── AGENTS.md                         # Canonical rules for AI agents
-├── CLAUDE.md                         # Claude Code entry context, delegates to AGENTS.md
-├── README.md                         # Human onboarding
-├── SYNTHEPRISE-FRAMEWORK-OVERVIEW.md        # Complete overview entry point
-├── core-principles.md                # Engineering principles and invariants
-├── project-charter.md                # Project governance, tiering, ownership, scope
-├── requirements.md                   # Source of truth for requirements
-├── docs/
-│   ├── _changes/                     # Change/Delta Spec lifecycle (CHANGE/BUGFIX/FASTLANE templates)
-│   ├── _dashboard/                   # Generated team status dashboard + tracker exports
-│   ├── _baseline/                    # (per-project) brownfield onboarding artifacts
-│   ├── _guides/                      # Syntheprise Framework usage guides (incl. 08-syntheprise-cli)
-│   ├── _plans/                       # Master, phase, and work-group plans
-│   ├── _requirements/                # Optional module requirement templates
-│   ├── _review/                      # Review records
-│   ├── _states/                      # Worklog and state snapshots
-│   ├── adr/                          # Architecture Decision Records
-│   ├── company-rollout/              # Syntheprise Framework Adoption Program materials
-│   ├── architecture.md
-│   ├── qa-governance.md
-│   ├── testing-strategy.md
-│   └── traceability.md
-├── .agents/                          # Agent-neutral workflows, skills, rules (canonical)
-├── .adapters/                        # Antigravity, Codex, Claude Code adapters
-├── .codex/                           # Codex config + generated prompts/
-├── .claude/                          # Claude Code settings + generated commands/ & skills/
-├── scripts/                          # syntheprise CLI + quality gates and validation scripts
-└── tests/                            # Project test home
-```
-
-> `.claude/commands/`, `.codex/prompts/`, and mirrored `.claude/skills/` are
-> **generated** by `syntheprise sync` from `.agents/` — do not edit them by hand.
-
----
-
-## Core operating principle
-
-```text
-AI drafts. Humans decide. Tests prove. Docs govern.
-```
-
-Syntheprise Framework is designed to help Syntheprise scale AI-assisted software delivery without losing professional discipline. The goal is faster delivery with stronger traceability, not faster chaos with prettier markdown.
-
-## Syntheprise Framework v5.4.0 P1 additions
-
-Syntheprise Framework now includes project presets, stronger brownfield onboarding, and stack-aware quality gate examples.
-
-```bash
-./syntheprise preset list
-./syntheprise init ../my-project --preset greenfield-sme-webapp --adapter all
-./syntheprise init ../legacy-project --preset brownfield-modernization --adapter all
-./syntheprise init ../odc-stream --preset odc-light --adapter all
-./syntheprise onboard --scan
-python scripts/doctor.py --quality-gate
-```
-
-Use presets to reduce day-one friction while keeping Syntheprise Framework's core controls: QA-first test design, traceability, change control, security hygiene, and quality gates.
-
-
-## Syntheprise Framework v5.5.0 additions
-
-Field-hardened governance distilled from a large real-world delivery and generalized back into the kit:
-
-- **Worktree isolation & concurrency safety** — per-task `git worktree`, a session lock, a pre-commit guard, and the `worktree` / `close-out` / `update-branch` / `setup-hooks` CLI commands.
-- **Drift-free adapters** — `syntheprise sync` generates a `source-command-<name>` skill for every workflow and generates `CLAUDE.md` as a mirror of `AGENTS.md`.
-- **Change routing** — objective criteria for when a change must go through `docs/_changes/`, an approval-before-execution gate, and an atomic state-snapshot close-out gate.
-- **Release lifecycle** — the `/release-baseline` workflow; product version (git tag + `CHANGELOG.md`) is separated from the kit `VERSION`.
-- **Solo/team modes** — one `project.mode` switch; personas persist, cadence changes.
-- **New contract surfaces** — `docs/tech-stack.md` dependency inventory, governed `docs/_research/` and `docs/_ui-ux_design/` folders, and design-first (`/ux-design`) UI governance.
-
-See [`CHANGELOG.md`](CHANGELOG.md) and [`UPGRADES.md`](UPGRADES.md) for the full list and migration notes.
-
-For onboarding, start with the framework overview:
-
-```text
-SYNTHEPRISE-FRAMEWORK-OVERVIEW.md
-docs/_guides/00-framework-overview.md
-```
-
-Use these files as the first reading path for PM, BA, TA/SA, Dev, QA, DevOps, and new project team members.
+Dự án được quản trị theo quy chuẩn **Syntheprise Framework** với các nguyên tắc nghiêm ngặt:
+- **Worktree Isolation (Rule 12):** Mọi nhánh tính năng đều phát triển trên `git worktree` riêng biệt; nhánh `main` được bảo vệ nguyên vẹn.
+- **Change Lifecycle (Rule 7):** Các thay đổi chạm API, CSDL, logic nghiệp vụ đều được quản lý qua change folder tại `docs/_changes/` và chính sách [`docs/_guides/91-beautyai-change-policy.md`](docs/_guides/91-beautyai-change-policy.md).
+- **CI 5 Jobs ([`.github/workflows/quality-gate.yml`](.github/workflows/quality-gate.yml)):**
+  1. `backend`: .NET 10 build `-warnaserror`, kiểm thử kiến trúc & coverage trên PostgreSQL container.
+  2. `frontend`: Node 22, TypeScript typecheck, build bundle.
+  3. `openapi-drift`: Kiểm tra sai lệch tự động giữa backend OpenAPI và frontend DTO schema.
+  4. `security`: Quét secret và lỗ hổng bảo mật gói phụ thuộc.
+  5. `syntheprise`: Kiểm tra tính toàn vẹn tài liệu, liên kết và hợp đồng hệ thống.

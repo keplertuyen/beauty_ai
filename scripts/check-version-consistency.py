@@ -31,6 +31,9 @@ MARKERS = [
 
 
 def main() -> int:
+    # In an initialized project repo (.syntheprise-project), the product has its own README/versioning.
+    if (ROOT / ".syntheprise-project").exists():
+        return 0
     version = _version()
     problems = []
     checked = 0

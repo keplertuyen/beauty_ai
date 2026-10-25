@@ -1,12 +1,3 @@
----
-doc: ui-prototype-readme
-title: Prototype Giao Diện Tĩnh (HTML/CSS/JS) — BeautyAI Platform
-status: stable
-precedence: 5
-owner: UI/UX Designer persona
-last_reviewed: 2026-10-25
----
-
 # BeautyAI — Prototype Giao Diện (bản cập nhật V1.0)
 
 Thư mục này chứa toàn bộ các trang giao diện của **BeautyAI** dưới dạng HTML/CSS/JS độc lập,
