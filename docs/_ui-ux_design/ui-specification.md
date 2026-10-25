@@ -1,3 +1,12 @@
+---
+doc: ui-specification
+title: Tài Liệu Đặc Tả Giao Diện (UI & Design System Specification) — BeautyAI Platform
+status: draft
+precedence: 5
+owner: UI/UX Designer persona
+last_reviewed: 2026-10-25
+---
+
 # 🌿 BeautyAI — Tài Liệu Đặc Tả Giao Diện (UI & Design System Specification)
 
 > **Phiên bản:** 2.0 (Organic Nature & High Contrast)  

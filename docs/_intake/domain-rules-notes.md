@@ -1,19 +1,5 @@
-# Domain rules notes
+# Domain Rules Notes — BeautyAI Platform
 
-> Business/regulatory facts the agent must NOT guess. Be precise — these become
-> `docs/domain-rules.md`, the source of truth for domain behavior.
-
-## Rules & policies
-- <rule> — <exact behavior / threshold / formula>
-
-## Calculations / formulas
-- <name>: <definition, units, rounding>
-
-## Regulatory / compliance facts
-- <e.g. data retention period, jurisdiction rules>
-
-## Vocabulary / glossary
-- <term> = <meaning in this domain>
-
-> If a rule is uncertain, write "UNCONFIRMED" next to it — the agent will flag it
-> for you rather than assume.
+Trỏ tới tài liệu nguồn:
+- [`docs/_intake/BRD_BeautyAI_V1.0.md`](./BRD_BeautyAI_V1.0.md) §7 (70+ Business Rules `BR-*`) và §17.2 (Bảng 12 quy tắc xung đột hoạt chất).
+- 12 Bất biến cấp hệ thống (`INV-01` đến `INV-12`): được định nghĩa tại `Technical_Design_BeautyAI_V1.0.md` §4.4 và chuyển vào `docs/architecture.md`.

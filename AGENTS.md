@@ -124,7 +124,7 @@ A task is Done only when:
 - Docs/contracts/ADR are updated if behavior or architecture changed.
 - Worklog is updated in the relevant WG plan.
 - **Close-out (same order for every agent — Antigravity, Codex, Claude Code):** when closing a change/session, run in a dedicated worktree (not the primary checkout) and acquire the session lock (`./syntheprise close-out`), then, in order and without skipping:
-  1. **State snapshot first** — update the worklog in the relevant WG plan and write a new state snapshot to `docs/_states/` (name it `state_<YYYY-MM-DD>_<slug>.md`, ISO date — the same format `doctor.py` looks for). The snapshot MUST be written immediately before archive and committed in the **same** commit/PR (atomic — never a trailing PR).
+  1. **State snapshot first** — update the worklog in the relevant WG plan and write a new state snapshot to `docs/_states/` (name it `state_2026-10-25_<slug>.md`, ISO date — the same format `doctor.py` looks for). The snapshot MUST be written immediately before archive and committed in the **same** commit/PR (atomic — never a trailing PR).
   2. **Archive** the change folder (`git mv` → `docs/_changes/_archive/`) and merge accepted deltas into canonical docs.
   3. **Cleanup** — delete the PR branch (local + remote), `git worktree remove`, confirm the primary checkout is on `main` and pulled.
   4. **Persist memory / mark the change CLOSED** (for agents with a memory mechanism), then release the lock (`./syntheprise close-out --release`).

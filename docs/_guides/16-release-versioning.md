@@ -4,7 +4,7 @@ title: Release & Versioning
 status: stable
 precedence: 6
 owner: DevOps / Delivery
-last_reviewed: <YYYY-MM-DD>
+last_reviewed: 2026-10-25
 ---
 
 # Release & Versioning

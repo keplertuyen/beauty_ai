@@ -1,22 +1,6 @@
-# Constraints (non-functional)
+# Constraints — BeautyAI Platform
 
-> Becomes the NFR section of `requirements.md` and informs `docs/security-policy.md`.
-
-## Performance / scale
-- Expected load: <users, requests, data volume>
-- Latency targets: <e.g. p95 < 300ms>
-
-## Security / compliance
-- Sensitive data: <PII? payments? health?>
-- Compliance: <e.g. GDPR, none>
-
-## Availability / reliability
-- Uptime target: <...>
-- Backup/recovery needs: <...>
-
-## Budget / timeline
-- Timeline: <...>
-- Cost constraints: <...>
-
-## Platform / device targets
-- <e.g. web desktop + mobile, iOS only>
+Trỏ tới tài liệu nguồn:
+- [`docs/_intake/BRD_BeautyAI_V1.0.md`](./BRD_BeautyAI_V1.0.md) §2.6 (Ràng buộc nghiệp vụ), §12 (Yêu cầu phi chức năng `NFR-*`).
+- [`docs/_intake/Technical_Design_BeautyAI_V1.0.md`](./Technical_Design_BeautyAI_V1.0.md) §1.2 (Ràng buộc kỹ thuật `CON-01` đến `CON-05`).
+- Mobile React Native nằm trong `apps/mobile`: chỗ dành sẵn cho V2, out-of-scope cho V1.0.

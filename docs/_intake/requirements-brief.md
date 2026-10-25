@@ -1,23 +1,6 @@
-# Requirements brief
+# Requirements Brief — BeautyAI Platform
 
-> Free-form is fine — the agent extracts structure. Fill what you know; leave the rest.
-
-## Product in one sentence
-<What are we building, for whom, to achieve what?>
-
-## Target users / personas
-- <persona> — <what they need>
-
-## Key features (most important first)
-1. <feature> — <why it matters>
-2. <...>
-
-## Priorities / must-haves vs nice-to-haves
-- Must: <...>
-- Later: <...>
-
-## Explicitly out of scope
-- <...>
-
-## Success criteria
-<How will we know this is working / done?>
+Trỏ tới tài liệu nguồn chi tiết:
+- **Tài liệu chính (xương sống yêu cầu chi tiết & NFR & FR M01-M15):** [`docs/_intake/BRD_BeautyAI_V1.0.md`](./BRD_BeautyAI_V1.0.md) (§2, §6, §8, §12, §14, §15).
+- **Tài liệu ngữ cảnh kinh doanh & tầm nhìn:** [`docs/_intake/PRD_BeautyAI_v2.0.md`](./PRD_BeautyAI_v2.0.md) (§1, §2, §3).
+- **Hợp nhất yêu cầu (D2):** Toàn bộ FR (126 FR), BR (70+ BR), NFR và ma trận nghiệm thu được trích xuất vào `requirements.md` và `docs/_requirements/M01.md` đến `M15.md`.

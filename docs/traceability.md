@@ -1,59 +1,67 @@
 ---
-doc: traceability-matrix
-title: Traceability Matrix
-status: stable
+doc: traceability
+title: Ma Trận Truy Xuất Yêu Cầu (Requirements Traceability Matrix) — BeautyAI Platform
+status: draft
 precedence: 2
-owner: pm-qa-lead
-last_reviewed: 2026-07-26
+owner: QA / Tech Lead
+last_reviewed: 2026-10-25
 ---
 
-# Traceability Matrix
+# Ma Trận Truy Xuất Yêu Cầu (Traceability Matrix) — BeautyAI Platform
 
 ## Purpose
-Create a single chain from business intent to verified delivery.
+Tạo chuỗi liên kết xuyên suốt từ mục tiêu kinh doanh đến điều kiện chấp nhận, ca kiểm thử và việc triển khai thực tế (`AGENTS.md §2.8`).
 
 ## Matrix
 | Business Goal | Requirement ID | Acceptance Criteria ID | Test Case ID | Implementation Task / WG | PR / Commit | Release | Status |
 |---|---|---|---|---|---|---|---|
-| BG-001 | FR-001 | AC-001 | TC-001 | WG-P1-01-T1 | PR-001 | R1 | Draft (example) |
-| BG-CSP-01 Safe composability | FR-CSP-001 | AC-CSP-001,002 | TC-CSP-01,02 | CR-2026-014 T4 | b2a439b, 35cd7ee / PR #3 | v6 Phase 1 | Verified |
-| BG-CSP-01 Safe composability | FR-CSP-002 | AC-CSP-003,004 | TC-CSP-03,04 | CR-2026-014 T5,T7 | 35cd7ee / PR #3 | v6 Phase 1 | Verified |
-| BG-CSP-01 Safe composability | FR-CSP-003 | AC-CSP-005,006 | TC-CSP-05,06 | CR-2026-014 T5 | 35cd7ee / PR #3 | v6 Phase 1 | Verified |
-| BG-CSP-02 Machine-readable planning | FR-CSP-006 | AC-CSP-011,012 | TC-CSP-11,12 | CR-2026-014 T6,T7 | 35cd7ee / PR #3 | v6 Phase 1 | Verified |
-| BG-CSP-03 Safe migration | FR-CSP-008 / FR-INIT-01 | AC-CSP-015,016,019 | TC-CSP-17,18,19 | CR-2026-014 T6,T7 | 35cd7ee / PR #3 | v6 Phase 1 | Verified |
-| BG-CSP-04 Runnable pilot | FR-CSP2-001,004 | AC-CSP2-001,002,009,010 | TC-CSP2-01,04 | CR-2026-015 T5,T6 | PR #4 / run 30163014352 | v6 Phase 2 | Verified |
-| BG-CSP-04 Runnable pilot | FR-CSP2-002 | AC-CSP2-003,004,005 | TC-CSP2-02 | CR-2026-015 T4 | PR #4 | v6 Phase 2 | Verified |
-| BG-CSP-05 Contract integrity | FR-CSP2-003 | AC-CSP2-006,007,008 | TC-CSP2-03 | CR-2026-015 T5,T6 | PR #4 / run 30163014352 | v6 Phase 2 | Verified |
-| BG-CSP-06 Operable locally | FR-CSP2-005,006 | AC-CSP2-011..015 | TC-CSP2-05,06 | CR-2026-015 T7,T8 | PR #4 / run 30163014352 | v6 Phase 2 | Verified |
-| BG-GOV-02 Monotonic lifecycle IDs | FR-CHANGE-SEQ-01 | AC-CSP2-016,017 | TC-CSP2-07 | CR-2026-015 T3 | Phase 2 PR | v6 Phase 2 | Verified |
-| BG-CSP-07 Complete technology catalog | FR-CSP3-001 | AC-CSP3-001..003 | TC-CSP3-01,02 | CR-2026-016 T3..T6 | PR #6/#7 / run 30172418504 | v6 Phase 3 | Verified |
-| BG-CSP-08 Generated client portability | FR-CSP3-002 | AC-CSP3-004..006 | TC-CSP3-03 | CR-2026-016 T6,T7 | PR #6/#7 / run 30172418504 | v6 Phase 3 | Verified |
-| BG-CSP-09 Certified blueprint matrix | FR-CSP3-003 | AC-CSP3-007..009 | TC-CSP3-04,05 | CR-2026-016 T8,T9 | PR #6/#7 / run 30172418504 | v6 Phase 3 | Verified |
-| BG-CSP-10 Approved platform semantics | FR-CSP3-004 | AC-CSP3-010..013 | TC-CSP3-06,07 | CR-2026-016 T3,T5,T9 | PR #6/#7 / run 30172418504 | v6 Phase 3 | Verified |
-| BG-CSP-03 Safe migration | FR-CSP3-005 | AC-CSP3-014..016 | TC-CSP3-08,09 | CR-2026-016 T9,T10 | PR #6/#7 / run 30172418504 | v6 Phase 3 | Verified |
-| BG-CSP-11 Sustainable certification | FR-VLC-001,002 | AC-VLC-001..004 | TC-VLC-001..003,009 | CR-2026-017 T3..T5 | PR #9 / run 30182840270 | v6 Phase 4 | Verified |
-| BG-CSP-12 Supply-chain safety | FR-VLC-003 | AC-VLC-005,006 | TC-VLC-004,005 | CR-2026-017 T3,T6 | PR #9 / run 30182840270 | v6 Phase 4 | Verified |
-| BG-CSP-03 Safe migration | FR-VLC-004 | AC-VLC-007,008 | TC-VLC-006,007 | CR-2026-017 T7 | PR #9 / run 30182840270 | v6 Phase 4 | Verified |
-| BG-CSP-13 Operable lifecycle | FR-VLC-005 | AC-VLC-009 | TC-VLC-008 | CR-2026-017 T8 | PR #9 / run 30182840270 | v6 Phase 4 | Verified |
-| BG-CSP-14 Representative adoption | FR-REL-001 | AC-REL-001,002 | TC-REL-001,002 | CR-2026-018 T3 | PR #10 / run 30183528085 | v6.0.0 | Verified |
-| BG-CSP-15 Auditable major release | FR-REL-002 | AC-REL-003,004 | TC-REL-003,004 | CR-2026-018 T4,T7 | PR #10 / run 30183528085 | v6.0.0 | Verified |
-| BG-CSP-16 Safe v6 adoption | FR-REL-003 | AC-REL-005,006 | TC-REL-005,006 | CR-2026-018 T5 | PR #10 | v6.0.0 | Verified |
-| BG-CSP-17 Controlled release | FR-REL-004 | AC-REL-007,008 | TC-REL-007,008 | CR-2026-018 T6,T10 | PR #10 + release baseline | v6.0.0 | Verified readiness |
-| BG-CSP-18 Visible toolchain prerequisites | FR-TPF-001 | AC-TPF-001,002 | TC-TPF-001,002 | CR-2026-019 T3,T5,T7 | PR #12 | v6.0.1 | Verified |
-| BG-CSP-18 Visible toolchain prerequisites | FR-TPF-002 | AC-TPF-003..005 | TC-TPF-003..005 | CR-2026-019 T4,T6 | PR #12 | v6.0.1 | Verified |
-| BG-CSP-18 Visible toolchain prerequisites | FR-TPF-003 | AC-TPF-006,007 | TC-TPF-006,007 | CR-2026-019 T3,T4,T8 | PR #12 | v6.0.1 | Verified |
+| BO-01 Tìm kiếm & Lọc thông minh | FR-AUTH-01 | AC-AUTH-01 | TC-AUTH-01 | WG-P2-01 | — | v1.0 | Ready for implementation |
+| BO-01 Tìm kiếm & Lọc thông minh | FR-CAT-01 | AC-CAT-01 | TC-CAT-01 | WG-P3-01 | — | v1.0 | Ready for implementation |
+| BO-01 Tìm kiếm & Lọc thông minh | FR-CAT-02 | AC-CAT-02 | TC-CAT-02 | WG-P3-01 | — | v1.0 | Ready for implementation |
+| BO-04 Minh bạch thành phần INCI | FR-PDP-01 | AC-PDP-01 | TC-PDP-01 | WG-P3-02 | — | v1.0 | Ready for implementation |
+| BO-04 Minh bạch thành phần INCI | FR-PDP-02 | AC-PDP-02 | TC-PDP-02 | WG-P3-02 | — | v1.0 | Ready for implementation |
+| BO-02 Điểm Phù Hợp theo làn da | FR-PDP-03 | AC-PDP-03 | TC-PDP-03 | WG-P3-02 | — | v1.0 | Ready for implementation |
+| BO-03 Cảnh báo dị ứng cá nhân | FR-SKIN-01 | AC-SKIN-01 | TC-SKIN-01 | WG-P4-01 | — | v1.0 | Ready for implementation |
+| BO-03 Cảnh báo dị ứng cá nhân | FR-SKIN-02 | AC-SKIN-02 | TC-SKIN-02 | WG-P4-01 | — | v1.0 | Ready for implementation |
+| BO-01 Chẩn đoán Skin Quiz 4 tầng | FR-QUIZ-01 | AC-QUIZ-01 | TC-QUIZ-01 | WG-P4-02 | — | v1.0 | Ready for implementation |
+| BO-01 Chẩn đoán Skin Quiz 4 tầng | FR-QUIZ-02 | AC-QUIZ-02 | TC-QUIZ-02 | WG-P4-02 | — | v1.0 | Ready for implementation |
+| BO-02 Xây dựng chu trình Routine | FR-QUIZ-03 | AC-QUIZ-03 | TC-QUIZ-03 | WG-P4-03 | — | v1.0 | Ready for implementation |
+| BO-04 Phân tích thành phần INCI | FR-ING-01 | AC-ING-01 | TC-ING-01 | WG-P5-02 | — | v1.0 | Ready for implementation |
+| BO-03 Phát hiện xung đột hoạt chất | FR-CONF-01 | AC-CONF-01 | TC-CONF-01 | WG-P5-01 | — | v1.0 | Ready for implementation |
+| BO-03 Phát hiện xung đột hoạt chất | FR-CONF-02 | AC-CONF-02 | TC-CONF-02 | WG-P5-01 | — | v1.0 | Ready for implementation |
+| BO-01 So sánh sản phẩm song song | FR-COMP-01 | AC-COMP-01 | TC-COMP-01 | WG-P5-04 | — | v1.0 | Ready for implementation |
+| BO-02 Giỏ hàng & phát hiện xung đột | FR-CART-01 | AC-CART-01 | TC-CART-01 | WG-P6-02 | — | v1.0 | Ready for implementation |
+| BO-02 Voucher đa tầng | FR-VOUCH-01 | AC-VOUCH-01 | TC-VOUCH-01 | WG-P6-03 | — | v1.0 | Ready for implementation |
+| BO-02 Đơn hàng & trừ kho nguyên tử | FR-ORD-01 | AC-ORD-01 | TC-ORD-01 | WG-P6-04 | — | v1.0 | Ready for implementation |
+| BO-02 Thanh toán VNPay & COD | FR-PAY-01 | AC-PAY-01 | TC-PAY-01 | WG-P6-05 | — | v1.0 | Ready for implementation |
+| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-01 | AC-CHAT-01 | TC-CHAT-01 | WG-P7-01 | — | v1.0 | Ready for implementation |
+| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-02 | AC-CHAT-02 | TC-CHAT-02 | WG-P7-02 | — | v1.0 | Ready for implementation |
+| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-03 | AC-CHAT-03 | TC-CHAT-03 | WG-P7-03 | — | v1.0 | Ready for implementation |
+| BO-05 Handoff tư vấn viên Zalo | FR-CHAT-07 | AC-CHAT-07 | TC-CHAT-07 | WG-P7-05 | — | v1.0 | Ready for implementation |
+| BO-07 Quản trị sàn & danh mục | FR-ADM-01 | AC-ADM-01 | TC-ADM-01 | WG-P8-02 | — | v1.0 | Ready for implementation |
+| BO-07 Nhật ký kiểm toán an ninh | FR-ADM-10 | AC-ADM-10 | TC-ADM-10 | WG-P8-01 | — | v1.0 | Ready for implementation |
 
 ## Rules
-- Every Must-level FR must have at least one AC and one test case before implementation starts.
-- Every change request must link to one or more requirements or deltas.
-- Every production release must include only rows with verified status or documented exception.
-- Exceptions require PM + QA Lead + TA/SA approval.
+- Mọi yêu cầu cấp Must bắt buộc có ít nhất 1 AC và 1 Test Case trước khi Dev tiến hành triển khai.
+- Mọi change request bắt buộc liên kết với ít nhất 1 mã yêu cầu hoặc requirement delta.
 
-## Status values
-- Draft
-- Ready for implementation
-- Implemented
-- Verified
-- Released
-- Deferred
-- Exception approved
+---
+
+## 15.3. Truy xuất Mục tiêu kinh doanh → Yêu cầu → Đo lường
+- **BO-01 Tìm đúng sản phẩm nhanh hơn:** `FR-QUIZ-01`→`03`, `FR-CAT-03`→`07` | Đo lường: Tỷ lệ hoàn tất quiz ≥ 70% | Sự kiện: `quiz_started`, `quiz_completed`
+- **BO-02 Chuyển lời khuyên thành đơn hàng:** `FR-QUIZ-06`, `FR-CHAT-06`, `FR-CART-*` | Đo lường: Tỷ lệ Chat-to-Cart ≥ 25% | Sự kiện: `routine_saved`, `add_to_cart_from_chat`
+- **BO-03 Giảm rủi ro mua sai:** `FR-CONF-01`→`04`, `FR-SKIN-03` | Đo lường: 100% giỏ có xung đột được cảnh báo | Sự kiện: `conflict_detected`, `conflict_dismissed`
+- **BO-04 Tăng minh bạch thành phần:** `FR-PDP-02`→`04`, `FR-ING-*`, `FR-ADM-04` | Đo lường: ≥ 90% sản phẩm có hồ sơ INCI | Sự kiện: Truy vấn thành phần, mở PDP
+- **BO-05 Giảm tải hỗ trợ thủ công:** `FR-CHAT-02`→`03`, `FR-CHAT-07` | Đo lường: ≥ 60% hội thoại giải quyết không cần chuyển người | Sự kiện: `chat_session_started`, `handoff_requested`
+- **BO-06 Đảm bảo chất lượng AI:** §14.5 | Đo lường: 100% golden test pass | Sự kiện: Kết quả chạy golden test
+- **BO-07 Vận hành được bởi 1 người:** `FR-ADM-*` | Đo lường: ≤ 2 phút/tác vụ quản trị | Sự kiện: Đo tay trong UAT
+- **BO-08 Hoàn thành cam kết:** Toàn bộ | Đo lường: 100% FR Must có bằng chứng | Sự kiện: Ma trận §15.2
+
+---
+
+## 15.4. Truy xuất Nỗi đau người dùng → Giải pháp
+- **P1 Ma trận INCI không đọc được:** `FR-PDP-02`, `FR-ING-01`→`04`, từ điển tiếng Việt (`BR-ING-04c`) | Persona: PER-01, PER-02
+- **P2 Không biết sản phẩm có phù hợp da mình:** `FR-PDP-03` (Điểm Phù Hợp), `FR-PDP-12` ("người có da giống bạn"), `FR-QUIZ-*` | Persona: PER-01, PER-02
+- **P3 Tự phối hoạt chất gây tổn thương da:** `FR-CONF-01`→`05`, `FR-QUIZ-05` | Persona: PER-01
+- **P4 Không biết mình dị ứng chất nào:** `FR-SKIN-02`→`04` | Persona: PER-02
+- **P5 Rào cản mua mỹ phẩm quốc tế:** Song tệ (`BR-PRICE-*`), nội dung tiếng Việt (`I18N-*`), `FR-CHAT-*` | Persona: PER-03

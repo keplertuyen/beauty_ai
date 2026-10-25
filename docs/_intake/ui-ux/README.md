@@ -1,12 +1,6 @@
-# ui-ux/ — drop your design materials here
+# UI/UX Materials — BeautyAI Platform
 
-Put anything that describes how the product should look and behave:
-
-- Mockups, wireframes, screenshots (PNG/JPG/PDF)
-- Figma/exported design files or links (put links in a `.md` file here)
-- Flow descriptions: "user lands on X, clicks Y, sees Z"
-- Brand notes: colors, tone, references you like
-
-The agent uses these to draft `docs/design-system.md` and to seed
-`docs/_ui-ux_design/`. No particular format is required — describe in plain words
-if you don't have visuals yet.
+Trỏ tới tài liệu nguồn và prototype có sẵn:
+- **Prototype HTML/CSS/JS tĩnh hoàn chỉnh:** nằm tại [`docs/_ui-ux_design/frontend/`](../_ui-ux_design/frontend/).
+- **Quy chuẩn thiết kế:** [`docs/_intake/Technical_Design_BeautyAI_V1.0.md`](./Technical_Design_BeautyAI_V1.0.md) §10 và `docs/design-system.md`.
+- **Nguyên tắc kế thừa (ADR-007):** Giữ nguyên hệ thống thiết kế (Design Tokens, Typography, Palette, CSS classes) từ prototype khi chuyển sang React SPA trong `src/frontend`.

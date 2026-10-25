@@ -4,7 +4,7 @@ title: Requirement Workflow — Triage to Close-out
 status: stable
 precedence: 6
 owner: PM / QA Lead
-last_reviewed: <YYYY-MM-DD>
+last_reviewed: 2026-10-25
 ---
 
 # Requirement Workflow Guide

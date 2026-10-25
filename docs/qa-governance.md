@@ -1,57 +1,56 @@
 ---
 doc: qa-governance
-title: QA Governance — Independent Test Design and Human-Governed Agentic Development Controls
-status: stable
+title: Quản Trị Chất Lượng & QA-First (QA Governance) — BeautyAI Platform
+status: draft
 precedence: 2
-owner: qa-lead
-last_reviewed: 2026-06-17
+owner: QA Lead / PM
+last_reviewed: 2026-10-25
 ---
 
-# QA Governance
+# QUY TRÌNH QUẢN TRỊ CHẤT LƯỢNG (QA GOVERNANCE) — BeautyAI Platform
 
-## Purpose
-Prevent confirmation bias in AI-assisted development by separating test design from implementation.
+> Thực thi nguyên tắc QA-First Delivery (`AGENTS.md §3`): Thiết kế tiêu chí chấp nhận và ma trận test TRƯỚC khi lập trình.
+> Ngưỡng bao phủ bắt buộc: Line ≥ 70%, Branch ≥ 60%.
 
-## Core policy
-For all Must-level behavior and all Tier 1/Tier 2 changes:
+---
 
-1. BA/QA defines acceptance criteria and test cases before Dev implementation.
-2. Dev implements against approved behavior and may add lower-level technical tests.
-3. Dev must not remove, weaken, or rewrite QA acceptance tests without QA approval.
-4. Review must inspect both code and tests.
-5. A task with passing but meaningless tests is not Done.
+## 17.5. Cổng kiểm thử theo tier
 
-## Roles
-| Role | Responsibility |
+Theo `docs/testing-strategy.md` — dự án ở **Tier 1**:
+
+| Cổng | Yêu cầu Tier 1 |
 |---|---|
-| BA | Clarifies business rule and acceptance criteria |
-| QA | Designs test matrix and acceptance test cases |
-| TA/SA | Confirms architectural and non-functional coverage |
-| Dev | Implements code and technical tests |
-| PM | Enforces workflow and status reporting |
-| Reviewer | Checks requirement/test/code alignment |
+| Unit | ✅ Bắt buộc cho mọi logic thay đổi |
+| Contract | ✅ Bắt buộc khi đổi API/DTO/lược đồ |
+| Integration | ✅ Bắt buộc cho lưu trữ, dịch vụ ngoài, tác vụ nền |
+| E2E | ✅ Cho các luồng người dùng quan trọng (8 luồng) |
+| Golden case | ✅ **Bắt buộc** vì có LLM và heuristic |
+| Thủ công khám phá | ✅ Cho giao diện mới; kiểm tra 4 trạng thái |
+| Traceability | ✅ Cho mọi yêu cầu mức Must |
+| Độ phủ | Dòng ≥ 70% · Nhánh ≥ 60% |
 
-## Required test design output
-Each changed behavior needs:
+## 17.6. Báo cáo thực thi (bắt buộc khi đóng change)
 
-- Requirement or change ID.
-- Acceptance criteria using clear GIVEN/WHEN/THEN or WHEN/IF/THEN statements.
-- Happy path test.
-- Edge/negative tests.
-- Data fixture or mock strategy.
-- Automation layer: unit, contract, integration, E2E, golden case, or manual exploratory.
-- Owner and status.
+```markdown
+## Báo cáo thực thi
+- **Ngày chạy:** 2026-11-20
+- **Môi trường:** local macOS 15.1 · .NET 10.0.1 · Node 22.11 · PostgreSQL 17.2
+- **Kết quả theo tầng:**
+  | Tầng | Pass | Fail | Bỏ qua |
+  |---|---|---|---|
+  | Unit | 184 | 0 | 0 |
+  | Integration | 42 | 0 | 0 |
+  | Architecture | 5 | 0 | 0 |
+  | Golden | 22 | 0 | 0 |
+  | E2E | 8 | 0 | 0 |
+  | A11y (axe) | 12 màn hình | 0 nghiêm trọng | — |
+- **Độ phủ:** dòng 76% · nhánh 64%
+- **Bằng chứng:** <đường dẫn CI run>
+- **Khuyết điểm phát hiện:** <mô tả> → <đã sửa / chấp nhận / hoãn>
+```
 
-## Anti-patterns
-- Writing tests only after implementation and only around current code behavior.
-- Testing only happy paths for Must-level behavior.
-- Hiding requirement ambiguity by choosing convenient assumptions.
-- Marking Done when tests pass but traceability is missing.
-- Letting one agent design, implement, and approve the same slice with no independent review.
+> ⚠️ **`docs/testing-strategy.md` của framework:** *"Thiết kế test xanh mà không có bằng chứng chạy thì KHÔNG phải là Done."*
 
-## Minimum gate by tier
-| Tier | Test design requirement |
-|---|---|
-| Tier 0 | Short test note in worklog is acceptable |
-| Tier 1 | Test matrix required for Must requirements |
-| Tier 2 | Test matrix, traceability, review sign-off, regression evidence required |
+---
+
+

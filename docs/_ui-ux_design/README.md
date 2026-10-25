@@ -4,7 +4,7 @@ title: UI/UX Design Artifacts — Version Governance
 status: stable
 precedence: 5
 owner: UI/UX Designer persona
-last_reviewed: <YYYY-MM-DD>
+last_reviewed: 2026-10-25
 ---
 
 # docs/_ui-ux_design/
@@ -17,7 +17,7 @@ last_reviewed: <YYYY-MM-DD>
 
 | Version | Status | Contents |
 |---|---|---|
-| `v1.0/` | **ACTIVE** | `<the current design set — screens, mockups, guideline>` |
+| `v1.0/` | **ACTIVE** | Prototype HTML/CSS/JS tĩnh hoàn chỉnh (22 màn hình và component tokens) |
 
 _Add a row per version. Exactly one row is ACTIVE at any time; older rows become
 `superseded`._

@@ -1,28 +1,16 @@
 ---
 doc: test-matrix-template
-title: Test Matrix Template
-status: template
+title: Mẫu Ma Trận Kiểm Thử Chấp Nhận (Test Matrix Template) — BeautyAI Platform
+status: draft
 precedence: 2
-owner: qa-lead
-last_reviewed: 2026-06-17
+owner: QA Lead
+last_reviewed: 2026-10-25
 ---
 
-# Test Matrix Template
+# MẪU MA TRẬN KIỂM THỬ CHẤP NHẬN (ACCEPTANCE TEST MATRIX)
 
-| Test ID | Requirement / Change ID | Acceptance Criteria | Test Layer | Scenario | Data / Fixture | Expected Result | Automation | Owner | Status |
-|---|---|---|---|---|---|---|---|---|---|
-| TC-001 | FR-001 | AC-001 | Unit / Contract / Integration / E2E | Happy path | Sample fixture | Expected output | Automated / Manual | QA | Draft |
-
-## Test layers
-- Unit: isolated logic.
-- Contract: API/schema/payload compatibility.
-- Integration: service + database/provider boundary.
-- E2E: user journey or business workflow.
-- Golden case: deterministic sample for LLM or non-deterministic behavior.
-- Manual exploratory: only when automation is not viable or not yet cost-effective.
-
-## Required coverage for Must behavior
-- At least one happy path.
-- At least one negative or edge path.
-- Contract coverage if public API or shared payload changes.
-- Regression coverage if defect fix.
+| Mã Test | Yêu cầu (FR/BR) | Tầng kiểm thử | Tên ca kiểm thử | Dữ liệu đầu vào | Kết quả kỳ vọng | Trạng thái |
+|---|---|---|---|---|---|---|
+| `TC-M01-01` | `FR-AUTH-01` | Unit | Đăng ký tài khoản mật khẩu mạnh | Email hợp lệ, pass >=8 ký tự | Tạo tài khoản, mã hóa PBKDF2 | Chưa chạy |
+| `TC-M07-01` | `FR-CONF-01` | Unit | Phát hiện xung đột AHA + Retinol | 2 sản phẩm chứa hoạt chất mạnh | Cảnh báo mức Cao, hướng dẫn tách buổi | Chưa chạy |
+| `TC-INV-01` | `INV-01` | Architecture | Không có thuộc tính SafetyScore | Quét toàn bộ assembly backend | Build test PASS | Chưa chạy |

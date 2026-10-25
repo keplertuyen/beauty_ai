@@ -1,3 +1,12 @@
+---
+doc: beautyai-playbook
+title: Playbook Thực Thi Dự Án — BeautyAI
+status: stable
+precedence: 6
+owner: Trung (Kiến trúc & Chỉ huy) / Antigravity (Thực thi)
+last_reviewed: 2026-10-21
+---
+
 # PLAYBOOK THỰC THI DỰ ÁN — **BeautyAI**
 ## Sổ tay thao tác hằng ngày cho Trung (Kiến trúc & Chỉ huy) + Antigravity (Thực thi)
 
@@ -849,7 +858,7 @@ PHẦN 3 — TẬP CHẠY MỘT VÒNG ĐẦY ĐỦ (đây là phần quan trọn
         AGENTS.md rule 10 yêu cầu CẢ HAI xanh.
   7. ./syntheprise close-out → thực hiện ĐÚNG 4 bước thứ tự của DoD §7:
        a. Cập nhật worklog trong docs/_plans/P1/WG-P1-04.md
-          + viết docs/_states/state_<YYYY-MM-DD>_<slug>.md
+          + viết docs/_states/state_2026-10-25_<slug>.md
           ⚠️ Snapshot phải nằm trong CÙNG commit với archive — nguyên tử,
              không bao giờ là một PR đuôi.
        b. git mv docs/_changes/<CHANGE-ID>/ → docs/_changes/_archive/
@@ -890,7 +899,7 @@ TUYỆT ĐỐI KHÔNG:
 ☐ ĐÃ CHẠY TRỌN MỘT VÒNG: worktree → change new → phê duyệt → gate
   → /test-gate → close-out 4 bước → archive → cleanup → --release  ← bắt buộc
 ☐ docs/_changes/_archive/ có đúng 1 change folder sau bài tập
-☐ docs/_states/ có snapshot tên ĐÚNG định dạng state_<YYYY-MM-DD>_<slug>.md
+☐ docs/_states/ có snapshot tên ĐÚNG định dạng state_2026-10-25_<slug>.md
 ☐ Thử commit trên main → pre-commit hook CHẶN (rồi hoàn tác)  ← kiểm chứng thật
 ☐ Checkout chính đang ở main, sạch, đã pull
 ☐ job syntheprise ở CI gồm đủ 5 lệnh
@@ -932,7 +941,7 @@ git checkout -- README.md
 ☐ 6 test kiến trúc PASS — đã kiểm chứng bằng cách làm chúng đỏ có chủ đích
 ☐ 5 job CI xanh
 ☐ Đã tập trọn một vòng change + close-out (B5 Phần 3)
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_nhom-b-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_nhom-b-xong.md
 ```
 
 ---
@@ -1560,7 +1569,7 @@ WHERE selling_status='DANG_BAN' GROUP BY routine_step ORDER BY 2;"
 ☐ MỌI ngưỡng chất lượng dữ liệu DQ-01…DQ-08 ĐẠT
 ☐ Seeder idempotent · chạy được từ DB rỗng
 ☐ 4 notebook học thuật chạy được
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_nhom-c-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_nhom-c-xong.md
 ```
 
 > 🎉 **Hết nhóm C là hết Phase 1.** Bạn chưa có giao diện nào, nhưng bạn có thứ quý hơn: **dữ liệu sạch, đã kiểm tra chất lượng, với tỷ lệ phủ trung thực**. Từ đây mọi tính năng đều có nền để đứng.
@@ -1966,7 +1975,7 @@ curl -s localhost:5000/swagger/v1/swagger.json \
 ☐ Audit log chỉ ghi thêm
 ☐ Tỷ giá đọc từ system_settings, không viết cứng
 ☐ Coverage backend ≥ 70% dòng / 60% nhánh
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_nhom-d-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_nhom-d-xong.md
 ```
 
 ---
@@ -2227,7 +2236,7 @@ Bước 5 — Thêm job e2e vào CI, chạy sau job backend và frontend.
 ☐ DTO sinh tự động · job openapi-drift ĐÃ KIỂM CHỨNG là chặn được
 ☐ Khung E2E 8 luồng sẵn sàng (skip) · checkA11y hoạt động
 ☐ 5 job CI xanh
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-2-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-2-xong.md
 
 🎉 MỐC: Kết thúc Phase 2 bạn có "bộ xương" hoàn chỉnh —
    API chạy, xác thực hoạt động, frontend có hệ thống thiết kế,
@@ -2529,7 +2538,7 @@ TUYỆT ĐỐI KHÔNG:
 ☐ Dữ liệu thành phần không đầy đủ được GẮN NHÃN, không bị loại
 ☐ Mọi trạng thái lọc ở URL
 ☐ 0 lần dùng từ "an toàn" trong toàn nhóm
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_nhom-f-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_nhom-f-xong.md
 ```
 
 ---
@@ -2891,7 +2900,7 @@ TUYỆT ĐỐI KHÔNG:
 ☐ Gợi ý có lý do · luật mua kèm nói rõ hạn chế dữ liệu
 ☐ Đánh giá nhóm tương tự · cảnh báo nghịch chiều hoạt động
 ☐ 22 golden case PASS · test kiến trúc PASS
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-3-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-3-xong.md
 
 🎉 MỐC: Kết thúc Phase 3, phần KHÁC BIỆT của sản phẩm đã tồn tại và
    chạy được. Nếu phải demo cho ai đó ở thời điểm này, bạn đã có thứ
@@ -3353,7 +3362,7 @@ TUYỆT ĐỐI KHÔNG:
 ☐ Routine Builder: INV-11 được test, nhãn "Tinh chất chuyên biệt"
 ☐ Nhật ký da: 0 câu gán nhân quả · ảnh không ra ngoài
 ☐ Hồ sơ nối vào 7 điểm · E2E-02 PASS
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-4-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-4-xong.md
 
 🎉 MỐC: Vòng khép kín đã hoàn chỉnh. Người dùng tạo hồ sơ → hệ thống
    dùng hồ sơ ở mọi nơi → người dùng thấy giá trị → tạo lý do quay lại.
@@ -3704,7 +3713,7 @@ PHẦN 3 — Rà soát tuân thủ ngôn từ toàn bộ frontend đã làm (Pha
 ☐ Job CI riêng cho GoldenTests, báo rõ case đỏ
 ☐ Rà soát ngôn từ: 0 vi phạm thật trong toàn bộ frontend Phase 2–5
 ☐ Coverage backend ≥ 70/60 · frontend ≥ 70/60
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-5-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-5-xong.md
 ```
 
 🔍 **KIỂM CHỨNG**
@@ -4006,7 +4015,7 @@ TUYỆT ĐỐI KHÔNG:
 ☐ Mọi tổng có dòng giải thích, cộng lại khớp
 ☐ Panel xung đột + checkbox xác nhận gating thanh toán
 ☐ Yêu thích · nhắc trong ứng dụng · 0 email/SMS
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_nhom-j-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_nhom-j-xong.md
 ```
 
 ---
@@ -4375,7 +4384,7 @@ PHẦN 4 — Rà soát: mọi endpoint ghi dữ liệu có kiểm tra quyền s�
 ☐ Trang đơn hàng của tôi hoạt động · "Mua lại" xử lý món hết hàng
 ☐ Test: người dùng A không xem/hủy được đơn của B   ← bắt buộc
 ☐ Coverage backend ≥ 70/60
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-6-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-6-xong.md
 ```
 
 🔍 **KIỂM CHỨNG**
@@ -5102,7 +5111,7 @@ PHẦN 4 — Trang theo dõi (chuẩn bị cho nhóm M):
 ☐ 0 từ vi phạm quảng cáo trong toàn bộ bộ đánh giá  ← bắt buộc
 ☐ 0 persona bác sĩ/chuyên gia
 ☐ Job CI chạy bộ đánh giá offline mỗi lần push, bản thật theo lịch tuần
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-7-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-7-xong.md
 ```
 
 🔍 **KIỂM CHỨNG**
@@ -5576,7 +5585,7 @@ Chạy cả ba trên 3 thiết bị.
 ☐ E2E-08 xác nhận: tắt chia sẻ → KHÔNG gửi hồ sơ (kiểm trong log)
 ☐ E2E-08 xác nhận: xóa dữ liệu là xóa thật trong DB
 ☐ Coverage backend ≥ 70/60 · frontend ≥ 70/60
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-8-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-8-xong.md
 ```
 
 🔍 **KIỂM CHỨNG**
@@ -6072,7 +6081,7 @@ PHẦN 4 — CẮT PHÁT HÀNH qua workflow /release-baseline:
 PHẦN 5 — Đóng dự án:
   1. Cập nhật docs/_plans/MASTER-PLAN.md: mọi phase xong
   2. Ảnh chụp trạng thái cuối:
-     docs/_states/state_<YYYY-MM-DD>_v1.0-hoan-thanh.md   (ngày ISO)
+     docs/_states/state_2026-10-25_v1.0-hoan-thanh.md   (ngày ISO)
   3. ./syntheprise dashboard → cập nhật docs/_dashboard/status.md
   4. docs/_review/retrospective-v1.0.md:
      · Điều gì làm tốt
@@ -6141,7 +6150,7 @@ python scripts/check-change-completeness.py
 
 # PHẦN 15 — NHÓM P: THƯ VIỆN PROMPT MẪU
 
-> 💡 **Cách dùng phần này:** chín prompt dưới đây dùng **hằng ngày**, không phụ thuộc task cụ thể. Sao chép, thay phần trong `<...>`, dán vào Antigravity.
+> 💡 **Cách dùng phần này:** chín prompt dưới đây dùng **hằng ngày**, không phụ thuộc task cụ thể. Sao chép, thay phần trong [dấu ngoặc vuông], dán vào Antigravity.
 
 ---
 
@@ -6209,7 +6218,7 @@ TRƯỚC TIÊN, xác nhận tiền đề:
 
 BƯỚC 1 — ẢNH CHỤP TRẠNG THÁI TRƯỚC (đây là CỔNG, không bỏ được):
   a) Cập nhật worklog trong docs/_plans/<phase>/<WG-id>.md
-  b) Viết docs/_states/state_<YYYY-MM-DD>_<slug>.md
+  b) Viết docs/_states/state_2026-10-25_<slug>.md
      ⚠️ Ngày phải là ISO (vd state_2026-10-28_wg-p1-03-db-schema.md)
         — scripts/doctor.py tìm đúng định dạng này.
      Nội dung:
@@ -6612,7 +6621,7 @@ python scripts/doctor.py --quality-gate
 
 # ĐÓNG PHIÊN — 4 bước, snapshot trước archive (DoD §7)
 ./syntheprise close-out                 # acquire session lock
-#   1. worklog + docs/_states/state_<YYYY-MM-DD>_<slug>.md  (CÙNG commit)
+#   1. worklog + docs/_states/state_2026-10-25_<slug>.md  (CÙNG commit)
 #   2. git mv docs/_changes/<ID>/ docs/_changes/_archive/
 #   3. xóa branch · git worktree remove · về main
 ./syntheprise dashboard                 # cập nhật docs/_dashboard/status.md
@@ -6901,7 +6910,7 @@ thứ hai làm sản phẩm KHÔNG DÙNG ĐƯỢC.
 ☐ Rà soát ngôn từ code mới — 0 vi phạm thật
 ☐ docs/traceability.md — cập nhật
 ☐ docs/_plans/MASTER-PLAN.md — cập nhật
-☐ Ảnh chụp trạng thái: docs/_states/state_<YYYY-MM-DD>_phase-<n>-xong.md
+☐ Ảnh chụp trạng thái: docs/_states/state_2026-10-25_phase-<n>-xong.md
 ☐ Nợ kỹ thuật phát sinh — đã ghi vào docs/_review/
 ☐ Commit + thẻ git nếu là mốc
 ```
