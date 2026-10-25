@@ -37,6 +37,12 @@ last_reviewed: 2026-10-25
 
 ## 7.2. Danh mục endpoint
 
+### Hệ thống & Giám sát (`/health`) — WG-P1-04
+
+| Method | Đường dẫn | Quyền | FR | Ghi chú |
+|---|---|---|---|---|
+| `GET` | `/health` | ALL | — | Trả về `HealthResponse { status: "ok", service: "beautyai-api" }` để kiểm tra độ sẵn sàng và OpenAPI DTO drift check (ADR-008) |
+
 ### Xác thực (`/api/v1/auth`) — C1
 
 | Method | Đường dẫn | Quyền | FR | Ghi chú |

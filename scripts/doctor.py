@@ -126,7 +126,7 @@ for r in REQUIRED:
     if not (ROOT / r).exists():
         errors.append(f"missing required file: {r}")
 
-EXCLUDE_DIRS = {".git", ".venv", "venv", "node_modules", "dist", "build", "coverage", "__pycache__", ".pytest_cache", "worktrees"}
+EXCLUDE_DIRS = {".git", ".venv", "venv", "node_modules", "dist", "build", "coverage", "__pycache__", ".pytest_cache", "worktrees", ".worktrees"}
 
 # Walk files
 for p in ROOT.rglob("*"):

@@ -1,5 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -15,13 +16,16 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors();
+app.MapOpenApi();
 
-app.MapGet("/health", () => Results.Ok(new
-{
-    status = "ok",
-    service = "beautyai-api"
-}));
+app.MapGet("/health", () => Results.Ok(new HealthResponse("ok", "beautyai-api")))
+   .Produces<HealthResponse>(StatusCodes.Status200OK);
 
 app.Run();
 
-public partial class Program { }
+public record HealthResponse(string status, string service);
+
+namespace BeautyAI.Api
+{
+    public partial class Program { }
+}

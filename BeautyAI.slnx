@@ -6,6 +6,7 @@
     <Project Path="src/BeautyAI.Infrastructure/BeautyAI.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/BeautyAI.ArchitectureTests/BeautyAI.ArchitectureTests.csproj" />
     <Project Path="tests/BeautyAI.UnitTests/BeautyAI.UnitTests.csproj" />
   </Folder>
 </Solution>

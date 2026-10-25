@@ -1,70 +1,154 @@
-name: Syntheprise Framework Quality Gate
+name: Syntheprise Quality Gate (5 Jobs)
 
 on:
+  push:
+    branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
     types: [ opened, synchronize, reopened, ready_for_review, converted_to_draft ]
-  push:
-    branches: [ main, develop ]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  quality-gate:
+  backend:
+    name: Backend (.NET 10 & Tests)
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: beautyai
+          POSTGRES_PASSWORD: beautyai_dev_password
+          POSTGRES_DB: beautyai
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Verify adapters are in sync (no drift)
-        run: python scripts/syntheprise_sync.py --check
+      - name: Restore dependencies
+        run: dotnet restore BeautyAI.slnx
 
-      - name: Run Syntheprise Framework quality gate
-        # Project repos (.syntheprise-project) run the strict gate. The framework/kit
-        # repo (.syntheprise-kit) runs framework mode: placeholders allowed, but version
-        # consistency + change-completeness are enforced. Base SHA lets the
-        # doc-drift checker see the PR's committed changes (not the empty
-        # working-tree diff).
-        env:
-          SYNTHEPRISE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: Build solution (-warnaserror)
+        run: dotnet build BeautyAI.slnx --no-restore -warnaserror
+
+      - name: Run Architecture Tests (INV-01 & Clean Architecture)
+        run: dotnet test tests/BeautyAI.ArchitectureTests/BeautyAI.ArchitectureTests.csproj --no-build
+
+      - name: Run Unit Tests & Collect Coverage
+        run: dotnet test BeautyAI.slnx --no-build --collect:"XPlat Code Coverage"
+
+  frontend:
+    name: Frontend (React 19 & TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm --prefix src/frontend ci
+
+      - name: Typecheck and test
+        run: npm --prefix src/frontend run test
+
+      - name: Build frontend
+        run: npm --prefix src/frontend run build
+
+  openapi-drift:
+    name: OpenAPI & DTO Drift Check (ADR-008)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        run: npm --prefix src/frontend ci
+
+      - name: Build API to generate OpenAPI document
+        run: dotnet build src/BeautyAI.Api/BeautyAI.Api.csproj
+
+      - name: Re-generate TypeScript DTO schema
+        run: npm --prefix src/frontend run gen:api
+
+      - name: Check for drift in schema.d.ts
         run: |
-          if [ -f .syntheprise-project ]; then
-            python scripts/doctor.py --quality-gate
-            python scripts/check-lifecycle-consistency.py
-            python scripts/check-doc-drift.py --strict
-          else
-            python scripts/doctor.py --template
-            python scripts/check-version-consistency.py
-            python scripts/check-lifecycle-consistency.py
-            python scripts/check-component-lifecycle.py
-            python scripts/check-workflow-security.py
-            python scripts/check-dependencies.py --strict
-            python scripts/check-secrets.py
-            python scripts/check-traceability.py
-            python scripts/check-doc-drift.py --strict
+          if ! git diff --quiet src/frontend/src/api/schema.d.ts; then
+            echo "::error::API schema drift detected! Chạy 'npm run gen:api' trong src/frontend và commit kết quả."
+            git diff src/frontend/src/api/schema.d.ts
+            exit 1
           fi
+          echo "✓ schema.d.ts is perfectly in sync with backend API OpenAPI specification."
 
-  change-completeness:
+  security:
+    name: Security & Vulnerability Scan
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Draft change folders must be authoring-ready
-        if: github.event.pull_request.draft == true
+
+      - name: Secret Scan (check-secrets.py)
+        run: python scripts/check-secrets.py
+
+      - name: Check NuGet Vulnerable Packages
+        run: dotnet list BeautyAI.slnx package --vulnerable --include-transitive
+
+  syntheprise:
+    name: Syntheprise Quality Gate & Governance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify adapters sync
+        run: ./syntheprise sync --check
+
+      - name: Repo health check (doctor)
+        run: python scripts/doctor.py --quality-gate
+
+      - name: Worktree isolation check
+        run: python scripts/check-worktree-isolation.py
+
+      - name: Run Syntheprise CLI Gate
         env:
           SYNTHEPRISE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: python scripts/check-change-completeness.py
-      - name: Ready change folders must be complete AND merge-ready
-        if: github.event.pull_request.draft == false
+        run: ./syntheprise gate
+
+      - name: Pull Request Change Completeness
+        if: github.event_name == 'pull_request'
         env:
           SYNTHEPRISE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           python scripts/check-change-completeness.py
-          python scripts/check-lifecycle-consistency.py --merge
+          if [ "${{ github.event.pull_request.draft }}" = "false" ]; then
+            python scripts/check-lifecycle-consistency.py --merge
+          fi
