@@ -55,6 +55,7 @@ docs/_data/cleaned/
 logs/
 
 # agent local-only state
+.worktrees/
 CLAUDE.local.md
 .claude/settings.local.json
 .codex/local.toml
