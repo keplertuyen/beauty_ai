@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "stacks": {
+    "angular": {
+      "components": ["web.angular"],
+      "recommended_blueprint": "java-angular-flutter",
+      "blockers": ["Select and verify a backend before composing the v2 stack."]
+    },
+    "dotnet": {
+      "components": ["backend.dotnet"],
+      "recommended_blueprint": "dotnet-react-rn",
+      "blockers": []
+    },
+    "java": {
+      "components": ["backend.java"],
+      "recommended_blueprint": "java-angular-flutter",
+      "blockers": []
+    },
+    "nextjs-fullstack": {
+      "components": ["web.nextjs-web"],
+      "recommended_blueprint": "node-next-rn",
+      "blockers": ["The v6 Next.js component is an external API consumer; migrate BFF routes explicitly."]
+    },
+    "node": {
+      "components": ["backend.node"],
+      "recommended_blueprint": "node-next-rn",
+      "blockers": []
+    },
+    "python-fastapi": {
+      "components": ["backend.python-fastapi"],
+      "recommended_blueprint": "python-react-rn",
+      "blockers": []
+    },
+    "react-native": {
+      "components": ["mobile.react-native-expo"],
+      "recommended_blueprint": "python-react-rn",
+      "blockers": ["Select and verify a backend before composing the v2 stack."]
+    },
+    "react-vite": {
+      "components": ["web.react-vite"],
+      "recommended_blueprint": "python-react-rn",
+      "blockers": ["Select and verify a backend before composing the v2 stack."]
+    },
+    "rust": {
+      "components": ["backend.rust"],
+      "recommended_blueprint": "rust-react-rn",
+      "blockers": []
+    }
+  }
+}

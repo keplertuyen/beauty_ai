@@ -1,0 +1,16 @@
+---
+description: Continuously update a work-group plan with tasks, outputs, tech and decisions.
+---
+
+# /worklog
+
+**Purpose:** keep `docs/_plans/P<n>/WG-<id>.md` live and roll status to the Master.
+**Inputs:** work just done on the WG.
+**Files to read:** the WG plan; `MASTER-PLAN.md`.
+**Steps:**
+1. Update the Tasks table (status, output, tech, commit).
+2. Append local decisions to the Decision log; if cross-WG/phase, open an ADR (`/adr`) and link.
+3. Append a dated worklog entry (done / blockers / next).
+4. Update task-level status in the WG plan, then roll the **official** WG/Phase status up to `MASTER-PLAN.md` (the single status board). The Phase plan holds no status.
+**Output artifact:** updated WG plan + Master status board.
+**Forbidden:** duplicating the status board across files.

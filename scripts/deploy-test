@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# scripts/deploy-test — Deploy local test container stack (Postgres + API + Web)
+set -euo pipefail
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${project_root}"
+
+echo "==> [deploy-test] Khởi động PostgreSQL và build container API & Web..."
+docker compose --profile app up -d --build
+
+echo "==> [deploy-test] Đang kiểm tra sức khỏe hệ thống..."
+for i in $(seq 1 30); do
+  if curl -sf http://localhost:5000/health | grep -q '"status":"ok"'; then
+    echo "==> [deploy-test] Sức khỏe API OK!"
+    echo "==> API: http://localhost:5000"
+    echo "==> Web: http://localhost:5173"
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "==> [deploy-test] Lỗi: API không phản hồi sau 30s!" >&2
+docker compose logs api
+exit 1

@@ -1,0 +1,16 @@
+---
+description: Create or update the project Master Plan (roadmap + single status board).
+---
+
+# /master-plan
+
+**Purpose:** maintain `docs/_plans/MASTER-PLAN.md` — phases, scope, deliverables, status.
+**Inputs:** project goals; current tier; any scope change.
+**Files to read:** `requirements.md`, `docs/architecture.md` (staged model), existing `MASTER-PLAN.md`.
+**Steps:**
+1. Ground phases in real scope (link, don't restate spec).
+2. Fill/refresh the phase table: objective, scope in/out, deliverables, exit criteria, owner, status, target.
+3. Keep STATUS only here. Record scope/sequence changes in the plan change log.
+**Output artifact:** updated `MASTER-PLAN.md`.
+**Approval gate:** human confirms phase breakdown before phase work starts.
+**Forbidden:** defining architecture/spec here; duplicating requirements.

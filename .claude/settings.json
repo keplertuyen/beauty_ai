@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/doctor.py*)",
+      "Bash(python scripts/check-traceability.py*)",
+      "Bash(python scripts/check-doc-drift.py*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(python scripts/check-secrets.py*)",
+      "Bash(python scripts/check-dependencies.py*)",
+      "Bash(python scripts/check-coverage.py*)",
+      "Bash(./syntheprise*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Bash(rm -rf /)",
+      "Bash(curl *|*sh*)",
+      "Bash(wget *|*sh*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/protected-action-policy.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/check-doc-drift.py\" --changed-only",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/scripts/check-secrets.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

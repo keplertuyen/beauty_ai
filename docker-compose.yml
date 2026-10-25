@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: beautyai
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-beautyai_dev_secret}
+      POSTGRES_DB: beautyai
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beautyai"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: src/BeautyAI.Api/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=beautyai;Username=beautyai;Password=${POSTGRES_PASSWORD:-beautyai_dev_secret}
+      CORS_ORIGINS: http://localhost:5000,http://localhost:5173
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    profiles: ["app"]
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - api

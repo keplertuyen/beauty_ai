@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BeautyAI.Api/BeautyAI.Api.csproj" />
+    <Project Path="src/BeautyAI.Application/BeautyAI.Application.csproj" />
+    <Project Path="src/BeautyAI.Domain/BeautyAI.Domain.csproj" />
+    <Project Path="src/BeautyAI.Infrastructure/BeautyAI.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BeautyAI.UnitTests/BeautyAI.UnitTests.csproj" />
+  </Folder>
+</Solution>

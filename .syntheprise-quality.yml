@@ -1,0 +1,13 @@
+# Syntheprise Framework project quality gate configuration.
+project:
+  mode: solo   # team = review/sign-off from distinct roles; solo = one person per-role
+coverage:
+  line_threshold: 70
+  branch_threshold: 60
+security:
+  secret_scan: true
+  dependency_policy: warn-on-unpinned
+  dependency_check: true
+stacks:
+  node_react: true
+  dotnet: true

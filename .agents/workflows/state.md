@@ -1,0 +1,15 @@
+---
+description: Write an end-of-session project state snapshot.
+---
+
+# /state
+
+**Purpose:** freeze a point-in-time snapshot in `docs/_states/`.
+**Inputs:** the session's progress.
+**Files to read:** prior snapshot; current WG plans.
+**Steps:**
+1. Summarize: completed, in-progress, current architecture pointer, tech debt, next steps.
+2. Write `docs/_states/<project>_state_<YYYY-MM-DD>.md` from the STATE template.
+3. Archive any previous "current" snapshot to `_states/_archive/`.
+**Output artifact:** a state snapshot file.
+**Forbidden:** keeping two "current" snapshots.

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# syntheprise — root wrapper for the Syntheprise Framework CLI.
+set -euo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY="/opt/homebrew/bin/python3"
+if [ ! -x "$PY" ]; then
+  PY="$(command -v python3)"
+fi
+exec "$PY" "$DIR/scripts/syntheprise.py" "$@"

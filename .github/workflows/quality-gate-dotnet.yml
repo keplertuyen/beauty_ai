@@ -1,0 +1,42 @@
+name: Syntheprise Framework Quality Gate - .NET
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "**/*.cs"
+      - "**/*.csproj"
+      - "**/*.sln"
+      - "docs/**"
+      - ".agents/**"
+      - "scripts/**"
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore and test
+        # Build the project's own code only. Exclude presets/ (stack-pack template
+        # skeletons are not built in place on the framework repo) and node_modules.
+        run: |
+          if ls *.sln >/dev/null 2>&1 || find . -path ./presets -prune -o -path ./node_modules -prune -o -name "*.csproj" -print | grep -q .; then dotnet restore && dotnet test --no-restore; fi
+      - name: Syntheprise Framework gate
+        # On the framework repo itself, placeholders are expected (--template).
+        # In an initialized project repo, drop a `.syntheprise-project` marker file and
+        # this job enforces the full quality gate as a blocker.
+        run: |
+          if [ -f .syntheprise-project ]; then
+            python scripts/doctor.py --quality-gate
+          else
+            python scripts/doctor.py --template
+          fi
+          python scripts/check-secrets.py
+          python scripts/check-dependencies.py
+          python scripts/check-coverage.py

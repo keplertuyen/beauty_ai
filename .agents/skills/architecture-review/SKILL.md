@@ -1,0 +1,16 @@
+---
+name: architecture-review
+description: Run a Solution-Architect review of a design or change before it is committed or a tier is graduated.
+---
+
+# Skill: architecture-review
+
+**When:** before merging a structural change, or before graduating a tier (project-charter.md §4).
+
+**Checklist:**
+- Does the change respect the precedence ladder and the Contracts? Any requirement-vs-architecture drift?
+- Is complexity matched to the current tier (no over-engineering)? Staged-deployment honored?
+- Edge cases, scalability bottlenecks, failure modes, security implications considered?
+- Any structural decision that needs an ADR (`/adr`)?
+
+**Output:** a short review (verdict + blockers/should-fix/minor) saved to `docs/_review/` using the REVIEW template; flag conflicts for a human.

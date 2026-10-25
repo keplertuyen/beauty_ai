@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+before="$(python3 "${project_root}/scripts/hash-generated.py")"
+"${project_root}/scripts/generate-clients"
+after="$(python3 "${project_root}/scripts/hash-generated.py")"
+
+if [[ "${before}" != "${after}" ]]; then
+  echo "generated API client drift detected; run scripts/generate-clients" >&2
+  exit 1
+fi
+
+echo "generated API client is current"

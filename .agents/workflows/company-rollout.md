@@ -1,0 +1,18 @@
+---
+description: Plan and execute an organization-wide rollout of this kit across teams.
+---
+
+# /company-rollout
+
+**Purpose:** support organization rollout, training, and adoption measurement.
+
+**Inputs:** project list, team roster, current delivery process, target rollout date.
+
+**Steps:**
+1. Classify projects by Tier 0/1/2 and greenfield/brownfield/client-delivery.
+2. Select pilot projects.
+3. Assign PM/BA/TA/QA/Dev champions.
+4. Use `the Syntheprise Framework Adoption Program training plan` and `the Syntheprise Framework Adoption Program adoption metrics`.
+5. Collect weekly feedback and fold it into the next kit revision.
+
+**Output:** rollout plan and adoption dashboard input.

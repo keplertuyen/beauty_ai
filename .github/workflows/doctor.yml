@@ -1,0 +1,19 @@
+name: Syntheprise Framework V5 Doctor
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run Syntheprise Framework template health check
+        run: python scripts/doctor.py --template

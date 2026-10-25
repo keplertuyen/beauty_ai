@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Syntheprise Stack Pilot",
+    "slug": "syntheprise-stack-pilot",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.example.syntheprisepilot"
+    }
+  }
+}

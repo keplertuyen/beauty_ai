@@ -1,0 +1,24 @@
+# Normalize line endings: repo stores LF, checkout native.
+* text=auto eol=lf
+
+# Scripts and config must stay LF even on Windows checkouts.
+*.py   text eol=lf
+*.sh   text eol=lf
+syntheprise   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.md   text eol=lf
+
+# Treat these as binary (no diff/merge munging).
+*.png  binary
+*.jpg  binary
+*.webp binary
+*.pdf  binary
+
+# Mark generated adapter files so GitHub language stats ignore them and reviewers
+# know not to hand-edit them (regenerate with `syntheprise sync`).
+.claude/commands/**  linguist-generated=true
+.codex/prompts/**    linguist-generated=true
+.claude/skills/**    linguist-generated=true
+docs/_dashboard/**   linguist-generated=true

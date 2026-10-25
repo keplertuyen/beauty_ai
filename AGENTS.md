@@ -1,0 +1,146 @@
+---
+doc: agents-constitution
+title: AGENTS.md — Syntheprise Framework Constitution
+status: stable
+precedence: 1
+owner: tech-lead
+last_reviewed: 2026-07-24
+---
+
+# AGENTS.md — Syntheprise Framework Constitution
+
+> Supreme operational law for AI coding agents in this repository. Applies to Antigravity, GPT Codex, Claude Code, and compatible agents. When agent reasoning conflicts with the docs, the docs win.
+
+## 0. Conflict-arbitration ladder
+**Lower number wins. `0` is highest authority.**
+
+0. `core-principles.md` + `.agents/rules/` — design philosophy, non-negotiables, safety guardrails.
+1. `AGENTS.md` + `.agents/agents.md` — project constitution and AI team model.
+2. Contracts: `docs/architecture.md`, `docs/data-contracts.md`, `docs/api-contract.md`, `docs/design-system.md`, `docs/security-policy.md`, `docs/testing-strategy.md`, `docs/llm-policy.md`, `docs/tech-stack.md` — source of truth for technical behavior, contracts, and the third-party dependency inventory.
+3. Requirements: `requirements.md`, `docs/_requirements/`, active `docs/_changes/*/requirements-delta.md` — FR/NFR and business rules only.
+4. `docs/domain-rules.md` — domain/regulatory facts.
+5. Working memory: `docs/_plans/`, `docs/_states/`, `docs/_ui-ux_design/` — informational and design artifacts; never overrides contracts.
+6. Informational: `README.md`, `CHANGELOG.md`, `docs/_review/`, `docs/glossary.md`, `docs/_guides/`, `docs/_research/`, the Syntheprise Framework Adoption Program package.
+
+A `status: superseded` document is dead. Follow its `superseded_by` field. `project-charter.md` is governance/meta and does not override runtime source-of-truth docs; it is not in this ladder.
+
+## 1. Project summary & stack
+- Product: fill this after project kickoff.
+- Current tier: Tier 0 / Tier 1 / Tier 2. See `project-charter.md`.
+- Operating mode: `solo` | `team` — declared once in `.syntheprise-quality.yml` (`project.mode`, default `team`). Personas exist in both modes; only cadence changes. See `.agents/agents.md`.
+- Stack: fill canonical stack in `docs/architecture.md`; third-party inventory in `docs/tech-stack.md`.
+- Owner: fill delivery owner and client owner.
+- Default UI language: fill per project.
+- Versioning: the product version (git tag + `CHANGELOG.md`, driven by `/release-baseline`) is separate from the Syntheprise Framework kit version (`VERSION`). See `docs/_guides/16-release-versioning.md`.
+
+## 2. Invariant rules
+0. Obey `.agents/rules/safety.md` — no destructive or out-of-scope actions without explicit approval; never expose secrets.
+1. Follow `core-principles.md`: no yes-man behavior, SOLID thinking, secure-by-default, simple-but-efficient.
+2. No silent stack, datastore, auth, deployment, or schema change. Create/update an ADR in `docs/adr/` first.
+3. Secrets stay in `.env` or approved secret stores. Never commit, print, log, or summarize secrets. A secret that appears in chat or any non-secure location is treated as compromised — stop and instruct rotation (see `.agents/rules/safety.md`).
+4. UTF-8 only. Store time in UTC ISO-8601 unless the product contract says otherwise.
+5. External providers sit behind an abstraction/adapter interface with timeout, retry, and failure handling. Source libraries must not be imported outside the adapter layer; call-sites resolve providers via a factory/resolver and use only the public interface; providers return normalized shapes and contain no business logic. Adding a source = one adapter + one matrix line, with no call-site change. An optional CI/pre-commit guard (`scripts/check-provider-abstraction.py` + allowlist) can enforce this seam. See `.agents/rules/provider-abstraction.md`.
+6. Requirements must not define architecture. Architecture must not invent business requirements.
+7. Active change requests must use `docs/_changes/<change-id>/` until archived. A change MUST be routed through `docs/_changes/` if it satisfies **any one** of these criteria (not all): (1) changes a contract surface — API/event signature, response schema, or DB column/table; (2) introduces a new heuristic, threshold, or magic constant in a production path; (3) changes cache / retry / fallback / rate-limit semantics; (4) changes the frequency or fan-out of external calls; (5) edits any contract file (`*-contract.md`, `*-policy.md`, or the docs listed at ladder level 2/4); (6) touches authentication, authorization, secrets, or PII flow; (7) changes more than ~30 lines of non-test, non-doc code. When in doubt, open the change folder first. `.agents/rules/change-management.md` is the canonical home of this rule; this list mirrors it.
+8. Must-level behavior requires traceability: requirement → acceptance criteria → test case → task/PR.
+9. Approval before execution. Before running any implementation plan or Delta Spec, present the plan, surface trade-offs and edge cases, and proceed only on the user's explicit confirmation. Never edit code ahead of approval. Criteria distinguishing a small bug fix from a behavior change are in rule 7.
+10. Auto-commit & PR after gates pass. Once a task/slice is complete, `./syntheprise gate` (the CLI quality gate) is green, and the `/test-gate` workflow passes, the agent may proactively branch, commit (Conventional Commits), and open a PR (e.g. `gh pr create`). Note: `test-gate` is a workflow/skill (it runs the project's own tests, which are stack-specific), not an `./syntheprise` subcommand. This never overrides rule 9 or the protected-action list in `.agents/rules/safety.md`.
+11. Release baseline. A product release is cut only via the `/release-baseline` workflow (deploy → migrate → smoke check → semver tag → CHANGELOG). Creating or pushing a tag is an owner-confirmed protected action (`.agents/rules/safety.md`). See `docs/_guides/16-release-versioning.md`.
+12. Worktree isolation & concurrency safety. The primary checkout is reserved for `main`; any task with git-writing steps (branch, commit, close-out, archive, rebase, merge, push, PR) runs in its own `git worktree`. No two sessions run a multi-step git-writing sequence (e.g. close-out) concurrently on the same checkout — serialize via the session lock. Applies to every agent. Enforced by `scripts/check-worktree-isolation.py` (pre-commit) + `scripts/session_lock.py` + `./syntheprise worktree` / `update-branch` / `close-out`. Owner escape hatch: `SYNTHEPRISE_ALLOW_PRIMARY_BRANCH=1`. See `.agents/rules/worktree-isolation.md`.
+
+## 3. QA-first delivery rule
+For any new or changed behavior:
+
+1. BA/QA or QA Agent designs acceptance criteria and test matrix before Dev implementation.
+2. Dev Agent implements against the approved tests and requirements.
+3. Dev Agent may add technical/unit tests, but must not weaken or rewrite acceptance tests to make incorrect code pass.
+4. Review Agent or human reviewer checks both code diff and test diff.
+5. `/quality-gate` and `/test-gate` must pass before Done.
+
+## 4. Change/Delta Spec rule
+Do not directly modify canonical requirements/contracts for a non-trivial change. Use:
+
+```text
+docs/_changes/<CHANGE-ID>/
+  proposal.md
+  requirements-delta.md
+  design.md
+  test-plan.md
+  tasks.md
+  review.md
+```
+
+After implementation and verification, archive the change by merging accepted deltas into canonical docs and moving the folder to `docs/_changes/_archive/`.
+
+## 5. Context map
+| Task | Read first |
+|---|---|
+| Project rules / agent behavior | `AGENTS.md`, `.agents/rules/`, `.agents/agents.md` |
+| Change request | `docs/_changes/<CHANGE-ID>/proposal.md`, `requirements-delta.md`, `tasks.md` |
+| Architecture / storage / auth / deployment | `docs/architecture.md`, `docs/data-contracts.md`, relevant ADRs |
+| Functional requirements | `requirements.md`, `docs/_requirements/`, `docs/domain-rules.md` |
+| API behavior | `docs/api-contract.md` |
+| UI behavior | `docs/design-system.md` |
+| UI/UX design artifacts | `docs/_ui-ux_design/`, `docs/design-system.md`, `.agents/rules/ui-ux-standards.md` |
+| AI/LLM behavior | `docs/llm-policy.md` |
+| Third-party libraries & platforms | `docs/tech-stack.md` |
+| Testing | `docs/testing-strategy.md`, `docs/qa-governance.md`, `docs/test-matrix-template.md` |
+| Traceability | `docs/traceability.md` |
+| Release / deploy / versioning | `docs/_guides/16-release-versioning.md`, `CHANGELOG.md` |
+| Plans/status | `docs/_plans/`, `docs/_states/`, `docs/_dashboard/status.md` |
+| Solution research / trade-off notes | `docs/_research/` |
+| New-project bootstrap (`syntheprise new` → fill intake → `syntheprise kickoff`) | `docs/_intake/` (created per project), `docs/_guides/18-project-initializer.md`, `.agents/workflows/kickoff.md` |
+| Brownfield onboarding | `docs/_baseline/`, `.agents/workflows/onboard-existing.md`, skill `reverse-spec` |
+| CLI / commands | `docs/_guides/08-syntheprise-cli.md`, `./syntheprise` |
+
+## 6. Canonical docs/ folder taxonomy
+Each folder has one authoritative role ("one fact, one home"). These folders are part of the framework and must exist:
+
+| Folder | Role |
+|---|---|
+| `docs/_changes/` | Change/Delta Spec lifecycle (CHANGE, BUGFIX, FASTLANE) + `_archive/`. |
+| `docs/_dashboard/` | Status dashboard generated by `./syntheprise dashboard` (committed snapshots). |
+| `docs/_guides/` | Syntheprise Framework process/usage guides. |
+| `docs/_plans/` | Master, phase, and work-group plans. |
+| `docs/_requirements/` | Module-level requirements, user stories, use cases. |
+| `docs/_research/` | Solution research and trade-off notes (always commit, never bulk-delete). |
+| `docs/_review/` | Review and audit records. |
+| `docs/_states/` | State snapshots and worklog memory. |
+| `docs/_ui-ux_design/` | Versioned UI/UX design artifacts (see the folder README). |
+| `docs/adr/` | Architecture Decision Records. |
+
+`scripts/doctor.py` checks that every folder declared here exists (constitution drift).
+
+Projects scaffolded with `syntheprise new` additionally get a per-project intake inbox (`_intake/` under `docs/`) and stack code. Those are project artifacts created on demand, not framework folders, so they are not part of this must-exist taxonomy.
+
+## 7. Definition of Done
+A task is Done only when:
+
+- Requirement or change ID is linked.
+- Acceptance criteria exist for changed behavior.
+- Test design exists before implementation for Must-level behavior.
+- Code, tests, lint/type checks are green.
+- Traceability matrix is updated.
+- Docs/contracts/ADR are updated if behavior or architecture changed.
+- Worklog is updated in the relevant WG plan.
+- **Close-out (same order for every agent — Antigravity, Codex, Claude Code):** when closing a change/session, run in a dedicated worktree (not the primary checkout) and acquire the session lock (`./syntheprise close-out`), then, in order and without skipping:
+  1. **State snapshot first** — update the worklog in the relevant WG plan and write a new state snapshot to `docs/_states/` (name it `state_<YYYY-MM-DD>_<slug>.md`, ISO date — the same format `doctor.py` looks for). The snapshot MUST be written immediately before archive and committed in the **same** commit/PR (atomic — never a trailing PR).
+  2. **Archive** the change folder (`git mv` → `docs/_changes/_archive/`) and merge accepted deltas into canonical docs.
+  3. **Cleanup** — delete the PR branch (local + remote), `git worktree remove`, confirm the primary checkout is on `main` and pulled.
+  4. **Persist memory / mark the change CLOSED** (for agents with a memory mechanism), then release the lock (`./syntheprise close-out --release`).
+
+  Never archive/cleanup/persist-memory before the state snapshot exists. The snapshot is a gate for the archive step.
+- Reviewer confirms tests are meaningful, not only passing.
+
+## 8. Tool-specific adapters
+- Antigravity: `.adapters/antigravity/`, `.agents/workflows/`, `.agents/skills/`, `.agents/rules/` (read natively).
+- GPT Codex: `.adapters/codex/`, `.codex/config.toml`, `.codex/agents/`, `.codex/prompts/` (generated), `AGENTS.md`.
+- Claude Code: `.adapters/claude-code/`, `CLAUDE.md`, `.claude/settings.json`, `.claude/commands/` & `.claude/skills/` (generated).
+
+Slash-commands and skills under `.claude/commands/`, `.codex/prompts/`, and
+`.claude/skills/` — **and the `CLAUDE.md` file itself** — are **generated by `syntheprise sync`**
+from the canonical `.agents/` and `AGENTS.md`.
+Do not edit generated files; edit the source in `.agents/` or `AGENTS.md` and re-run `syntheprise sync`.
+CI fails on drift (`syntheprise sync --check`).
+
+`AGENTS.md` remains the canonical project instruction file. Tool-specific files are adapters; they must not contradict this file.

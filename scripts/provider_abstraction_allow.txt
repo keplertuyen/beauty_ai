@@ -1,0 +1,11 @@
+# Provider-abstraction guard allowlist (used by scripts/check-provider-abstraction.py).
+# This guard is an OPTIONAL, opt-in example template — see the header of that
+# script. Paths listed here are exempt from the seam check.
+# Keep this list MINIMAL and documented — every entry is a deliberate,
+# reviewed exception, not a place to hide new leaks.
+#
+# Format: one repo-relative path per line ('#' starts a comment).
+
+# Example: the composition root is the single intended place where concrete
+# providers are assembled/wired, so it is exempt. Adjust to your project.
+# src/main.py

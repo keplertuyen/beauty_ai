@@ -1,0 +1,21 @@
+---
+description: Design acceptance tests before Dev implementation to prevent confirmation bias.
+---
+
+# /qa-test-design
+
+**Purpose:** create QA-owned test intent before implementation.
+
+**Inputs:** requirement IDs, acceptance criteria, change folder, or bug report.
+
+**Steps:**
+1. Map each Must requirement or delta to acceptance criteria.
+2. Create test cases for happy path, edge path, and negative path.
+3. Assign test layer: unit, contract, integration, E2E, golden case, manual exploratory.
+4. Record test data, fixture, mock, and automation status.
+5. Update `docs/traceability.md` or the change `test-plan.md`.
+6. Flag ambiguous AC and stop for BA clarification if needed.
+
+**Output:** test matrix/test plan approved or ready for QA review.
+
+**Forbidden:** designing tests only to match already-written code.

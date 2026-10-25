@@ -1,0 +1,14 @@
+---
+description: Export a change's tasks to a GitHub/Jira/Linear import file, preserving traceability IDs.
+---
+
+# /push-tasks
+
+**Purpose:** turn `tasks.md` of a change into tracker issues without losing the requirement/AC link.
+**Inputs:** a change id (active or archived).
+**Steps:**
+1. Run `syntheprise push-tasks <change-id> --to github|jira|linear`.
+2. Review the generated import file under `docs/_dashboard/`.
+3. Import it into the tracker (or let a CI step post it). Keep the issue keys back in the change `tasks.md` for two-way traceability.
+**Output artifact:** `docs/_dashboard/tracker-<tool>-<change-id>.{json,csv}`.
+**Safety:** the command never sends data over the network; it only writes a file for a human to import.

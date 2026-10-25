@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chủ — Mỹ Phẩm Thông Minh & Chăm Sóc Da AI — BeautyAI Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/vite.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <header class="navbar">
+      <div class="navbar-inner">
+        <!-- Logo -->
+        <a href="index.html" class="navbar-logo">
+          <span style="font-size:1.4rem;">✨</span>
+          <span class="logo-text">Beauty<span class="logo-accent">AI</span></span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="nav-links" style="display:flex; align-items:center; gap:24px; margin-left:24px;">
+          <a href="products.html" class="nav-link ">Sản phẩm</a>
+          
+          <!-- Dropdown: Khám phá -->
+          <div class="nav-dropdown">
+            <a href="#" class="nav-link" style="display:flex; align-items:center; gap:4px;">
+              Khám phá <span style="font-size:0.7rem;">▼</span>
+            </a>
+            <div class="dropdown-menu">
+              <a href="skin-quiz.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🧪</span>
+                <div>
+                  <span class="dropdown-item-title">Skin Quiz</span>
+                  <span class="dropdown-item-desc">Chẩn đoán da & xây dựng routine</span>
+                </div>
+              </a>
+              <a href="ingredient-analyzer.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🔬</span>
+                <div>
+                  <span class="dropdown-item-title">Phân tích thành phần</span>
+                  <span class="dropdown-item-desc">Giải nghĩa INCI &amp; kiểm tra hoạt chất kỵ nhau</span>
+                </div>
+              </a>
+              <a href="compare.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">⚖️</span>
+                <div>
+                  <span class="dropdown-item-title">So sánh sản phẩm</span>
+                  <span class="dropdown-item-desc">Đối chiếu trực quan side-by-side</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Dropdown: Hỗ trợ -->
+          <div class="nav-dropdown">
+            <a href="#" class="nav-link" style="display:flex; align-items:center; gap:4px;">
+              Hỗ trợ <span style="font-size:0.7rem;">▼</span>
+            </a>
+            <div class="dropdown-menu">
+              <a href="expert-consult.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">💬</span>
+                <div>
+                  <span class="dropdown-item-title">Trợ lý tư vấn sản phẩm</span>
+                  <span class="dropdown-item-desc">Lumi — gợi ý theo hồ sơ da của bạn</span>
+                </div>
+              </a>
+              <a href="support.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🛟</span>
+                <div>
+                  <span class="dropdown-item-title">Trung tâm hỗ trợ</span>
+                  <span class="dropdown-item-desc">Chính sách &amp; câu hỏi thường gặp</span>
+                </div>
+              </a>
+              <a href="methodology.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">📐</span>
+                <div>
+                  <span class="dropdown-item-title">Cách chúng tôi tính điểm</span>
+                  <span class="dropdown-item-desc">Phương pháp &amp; giới hạn, nói rõ ràng</span>
+                </div>
+              </a>
+              <a href="ranking-criteria.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🧭</span>
+                <div>
+                  <span class="dropdown-item-title">Tiêu chí xếp hạng</span>
+                  <span class="dropdown-item-desc">Vì sao sản phẩm này hiện trước</span>
+                </div>
+              </a>
+              <a href="privacy-policy.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🔒</span>
+                <div>
+                  <span class="dropdown-item-title">Dữ liệu cá nhân của bạn</span>
+                  <span class="dropdown-item-desc">Thu thập gì, gửi cho ai, lưu bao lâu</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Right action icons -->
+        <div style="margin-left:auto; display:flex; align-items:center; gap:16px;">
+          <!-- Currency Toggle -->
+          <div style="display:flex; background:rgba(74,55,40,0.06); padding:3px; border-radius:20px; gap:2px;">
+            <button onclick="setCurrency('VND')" class="currency-toggle-btn currency-btn" data-curr="VND">₫ VND</button>
+            <button onclick="setCurrency('USD')" class="currency-toggle-btn currency-btn" data-curr="USD">$ USD</button>
+          </div>
+
+          <!-- Search icon -->
+          <a href="products.html" class="nav-icon-btn" title="Tìm kiếm" style="color:var(--text-primary); text-decoration:none; font-size:1.1rem;">
+            🔍
+          </a>
+
+          <!-- Wishlist icon -->
+          <a href="wishlist.html" class="nav-icon-btn" title="Yêu thích" style="color:var(--text-primary); text-decoration:none; font-size:1.1rem; position:relative;">
+            ❤️
+            <span style="position:absolute; top:-6px; right:-8px; background:var(--accent); color:#FFF; font-size:0.65rem; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">3</span>
+          </a>
+
+          <!-- Cart Drawer trigger -->
+          <button class="cart-open-trigger nav-icon-btn" title="Giỏ hàng" style="background:none; border:none; cursor:pointer; color:var(--text-primary); font-size:1.1rem; position:relative;">
+            🛍️
+            <span class="cart-badge-count" style="position:absolute; top:-6px; right:-8px; background:var(--primary); color:#FFF; font-size:0.65rem; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">2</span>
+          </button>
+
+          <!-- User Menu -->
+          <div class="nav-dropdown">
+            <button class="nav-icon-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem;" title="Tài khoản">
+              👤
+            </button>
+            <div class="dropdown-menu" style="left:auto; right:0;">
+              <a href="profile.html" class="dropdown-item">
+                <span>📋</span>
+                <div>
+                  <span class="dropdown-item-title">Hồ sơ & Digital Skin ID</span>
+                  <span class="dropdown-item-desc">Loại da, dị ứng, lịch sử đơn</span>
+                </div>
+              </a>
+              <a href="admin.html" class="dropdown-item">
+                <span>📊</span>
+                <div>
+                  <span class="dropdown-item-title">Admin Dashboard</span>
+                  <span class="dropdown-item-desc">Thống kê doanh thu & tỷ giá</span>
+                </div>
+              </a>
+              <div style="border-top:1px solid var(--border-subtle); margin:6px 0;"></div>
+              <a href="#" class="dropdown-item auth-open-trigger">
+                <span>🔑</span>
+                <div>
+                  <span class="dropdown-item-title">Đăng nhập / Đăng ký</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══ CART DRAWER OVERLAY ══ -->
+    <div id="cartDrawerOverlay" class="modal-overlay"></div>
+    <div id="cartDrawerPanel" class="cart-drawer-panel">
+      <div style="padding:20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:1.2rem; display:flex; align-items:center; gap:8px;">
+          <span>🛍️</span> Giỏ hàng của bạn
+        </h3>
+        <button id="cartDrawerCloseBtn" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--text-muted);">✕</button>
+      </div>
+      
+      <div id="cartDrawerItemsList" style="flex:1; overflow-y:auto; padding:0 20px;">
+        <!-- Dynamic items via main.js -->
+      </div>
+
+      <div style="padding:20px; border-top:1px solid var(--border-subtle); background:#FAFAFA;">
+        <div style="display:flex; justify-content:space-between; font-weight:600; font-size:1rem; margin-bottom:16px;">
+          <span>Tạm tính:</span>
+          <span id="cartDrawerSubtotal" style="color:var(--primary); font-size:1.15rem;">0₫</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <a href="checkout.html" class="btn btn-primary" style="text-align:center; text-decoration:none; padding:12px; font-weight:600; border-radius:10px; background:var(--primary); color:#FFF; display:block;">
+            Tiến hành thanh toán →
+          </a>
+          <a href="cart.html" style="text-align:center; font-size:0.9rem; color:var(--text-secondary); text-decoration:none; padding:6px;">
+            Xem chi tiết giỏ hàng & áp voucher
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AUTH MODAL OVERLAY ══ -->
+    <div id="authModalOverlay" class="modal-overlay">
+      <div style="background:#FFF; width:100%; max-width:440px; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.2); padding:32px; position:relative; margin:20px;">
+        <button id="authModalCloseBtn" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--text-muted);">✕</button>
+        
+        <div style="text-align:center; margin-bottom:24px;">
+          <h3 style="margin:0 0 6px 0; font-size:1.4rem;">Beauty<span style="color:var(--accent);">AI</span> Account</h3>
+          <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">Cá nhân hóa chu trình chăm sóc da cùng AI</p>
+        </div>
+
+        <div style="display:flex; border-bottom:1px solid var(--border-subtle); margin-bottom:20px;">
+          <button class="auth-tab-btn active" data-tab="login" onclick="switchAuthTab('login')" style="flex:1; padding:10px; border:none; background:none; font-weight:600; cursor:pointer; border-bottom:2px solid var(--primary);">Đăng nhập</button>
+          <button class="auth-tab-btn" data-tab="register" onclick="switchAuthTab('register')" style="flex:1; padding:10px; border:none; background:none; font-weight:600; cursor:pointer; color:var(--text-muted);">Đăng ký</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="authLoginForm">
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Email</label>
+            <input type="email" placeholder="ban@gmail.com" value="demo@beautyai.vn" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Mật khẩu</label>
+            <input type="password" value="••••••••" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <button onclick="closeAuthModal(); showToast('Đăng nhập thành công! Chào bạn 👋');" class="btn btn-primary" style="width:100%; padding:12px; border-radius:10px; background:var(--primary); color:#FFF; border:none; font-weight:600; cursor:pointer;">
+            Đăng nhập ngay
+          </button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="authRegisterForm" style="display:none;">
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Họ tên</label>
+            <input type="text" placeholder="Nguyễn Thị An" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Loại da của bạn</label>
+            <select style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+              <option>Da dầu (Oily)</option>
+              <option>Da khô (Dry)</option>
+              <option>Da hỗn hợp (Combination)</option>
+              <option>Da nhạy cảm (Sensitive)</option>
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Email</label>
+            <input type="email" placeholder="an@gmail.com" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Mật khẩu</label>
+            <input type="password" placeholder="Tối thiểu 6 ký tự" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <button onclick="closeAuthModal(); showToast('Tạo tài khoản thành công! 🎉');" class="btn btn-primary" style="width:100%; padding:12px; border-radius:10px; background:var(--primary); color:#FFF; border:none; font-weight:600; cursor:pointer;">
+            Tạo tài khoản mới
+          </button>
+        </div>
+      </div>
+    </div>
+    
+<main class="main-content">
+
+  <!-- Hero Section -->
+  <section class="home-hero" style="background:var(--gradient-hero); padding:60px 0; border-bottom:1px solid var(--border-subtle);">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:40px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:320px;">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(74,55,40,0.08); padding:6px 16px; border-radius:20px; font-size:0.85rem; font-weight:600; margin-bottom:16px;">
+          <span>✨</span> Thế Hệ Mỹ Phẩm Thông Minh
+        </div>
+        <h1 class="display-font" style="font-size:3rem; line-height:1.2; margin:0 0 20px 0; color:var(--text-primary);">
+          Khoa Học Làn Da &<br><span style="color:var(--accent); font-style:italic;">Mỹ Phẩm Cá Nhân Hóa</span>
+        </h1>
+        <p style="font-size:1.1rem; line-height:1.6; color:var(--text-secondary); margin-bottom:32px; max-width:540px;">
+          Hệ thống gợi ý đa mô hình AI kết hợp phân tích chuyên sâu bảng thành phần INCI từ 8,494 sản phẩm Sephora và hơn 1.1 triệu đánh giá thực tế.
+        </p>
+        <div style="display:flex; gap:16px; flex-wrap:wrap;">
+          <a href="products.html" class="btn btn-primary" style="padding:14px 28px; font-weight:600; border-radius:12px; background:var(--primary); color:#FFF; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            Khám phá 8,494 sản phẩm →
+          </a>
+          <a href="skin-quiz.html" class="btn" style="padding:14px 28px; font-weight:600; border-radius:12px; background:#FFF; border:1px solid var(--border-subtle); color:var(--text-primary); text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            <span>🧪</span> Làm Skin Quiz 4 tầng
+          </a>
+        </div>
+      </div>
+      <div style="flex:1; min-width:320px; display:flex; justify-content:center;">
+        <div style="position:relative; width:100%; max-width:440px;">
+          <img src="assets/hero.png" alt="BeautyAI Hero" style="width:100%; border-radius:24px; box-shadow:0 25px 60px rgba(74,55,40,0.18); object-fit:cover;">
+          <div style="position:absolute; bottom:-16px; left:-16px; background:#FFFFFF; padding:16px 20px; border-radius:16px; box-shadow:0 12px 30px rgba(0,0,0,0.12); display:flex; align-items:center; gap:14px;">
+            <div style="background:#EAF3ED; color:#2E6F4E; width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem;">✓</div>
+            <div>
+              <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase;">Kiểm chứng an toàn</div>
+              <div style="font-weight:700; font-size:1rem; color:var(--text-primary);">Zero Toxic Actives</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Strip -->
+  <section class="section container">
+    <div style="text-align:center; margin-bottom:32px;">
+      <h2 class="display-font" style="font-size:2rem; margin:0 0 8px 0;">Danh Mục Mỹ Phẩm Nổi Bật</h2>
+      <p style="color:var(--text-muted); margin:0;">Phân loại theo tiêu chuẩn ngành hàng cao cấp Sephora</p>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:16px;">
+      <a href="products.html?category=Moisturizers" style="text-decoration:none; text-align:center; padding:20px; background:#FFF; border-radius:16px; border:1px solid var(--border-subtle); transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2.4rem; margin-bottom:8px;">🧴</div>
+        <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Moisturizers</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">Kem dưỡng ẩm</div>
+      </a>
+      <a href="products.html?category=Serums" style="text-decoration:none; text-align:center; padding:20px; background:#FFF; border-radius:16px; border:1px solid var(--border-subtle); transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2.4rem; margin-bottom:8px;">💧</div>
+        <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Serums</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">Tinh chất chuyên biệt</div>
+      </a>
+      <a href="products.html?category=Cleansers" style="text-decoration:none; text-align:center; padding:20px; background:#FFF; border-radius:16px; border:1px solid var(--border-subtle); transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2.4rem; margin-bottom:8px;">🫧</div>
+        <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Cleansers</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">Sữa rửa mặt</div>
+      </a>
+      <a href="products.html?category=Sunscreen" style="text-decoration:none; text-align:center; padding:20px; background:#FFF; border-radius:16px; border:1px solid var(--border-subtle); transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2.4rem; margin-bottom:8px;">☀️</div>
+        <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Sunscreen</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">Chống nắng</div>
+      </a>
+      <a href="products.html?category=Face+Masks" style="text-decoration:none; text-align:center; padding:20px; background:#FFF; border-radius:16px; border:1px solid var(--border-subtle); transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2.4rem; margin-bottom:8px;">🎭</div>
+        <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Face Masks</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">Mặt nạ dưỡng</div>
+      </a>
+      <a href="products.html?category=Eye+Creams" style="text-decoration:none; text-align:center; padding:20px; background:#FFF; border-radius:16px; border:1px solid var(--border-subtle); transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="font-size:2.4rem; margin-bottom:8px;">👁️</div>
+        <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Eye Creams</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">Kem mắt</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="section container" style="background:#FFF; padding:48px; border-radius:24px; border:1px solid var(--border-subtle); margin-bottom:60px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; flex-wrap:wrap; gap:16px;">
+      <div>
+        <span style="font-size:0.85rem; font-weight:700; color:var(--accent); text-transform:uppercase;">Tuyển Chọn Hàng Đầu</span>
+        <h2 class="display-font" style="font-size:2rem; margin:4px 0 0 0;">Sản Phẩm Đánh Giá Cao Nhất</h2>
+      </div>
+      <a href="products.html" style="font-weight:600; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:6px;">
+        Xem tất cả 8,494 sản phẩm →
+      </a>
+    </div>
+
+    <!-- Product Grid -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:24px;">
+      <!-- Product 1 -->
+      <div class="product-card" style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="position:relative; background:#F2ECE2; padding-top:100%; overflow:hidden;">
+          <img src="https://www.sephora.com/productimages/sku/s2031391-main-zoom.jpg" alt="The Ordinary" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+          <span style="position:absolute; top:12px; left:12px; background:#2E6F4E; color:#FFF; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:6px;">Clean + Vegan</span>
+        </div>
+        <div style="padding:16px; flex:1; display:flex; flex-direction:column;">
+          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">The Ordinary</div>
+          <a href="product-detail.html" style="font-size:0.95rem; font-weight:700; color:var(--text-primary); text-decoration:none; margin:4px 0 8px 0; line-height:1.4;">Niacinamide 10% + Zinc 1% Oil Control Serum</a>
+          <div style="display:flex; align-items:center; gap:6px; font-size:0.85rem; margin-bottom:12px;">
+            <span style="color:#D97706;">★ 4.6</span>
+            <span style="color:var(--text-muted);">(2,450)</span>
+          </div>
+          <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:1.15rem; font-weight:700; color:var(--primary);" data-price-usd="10.80">$10.80</div>
+            <button onclick="addToCart('P427417', 'Niacinamide 10% + Zinc 1%', 'The Ordinary', 10.80, 'https://www.sephora.com/productimages/sku/s2031391-main-zoom.jpg')" class="btn" style="padding:8px 14px; background:var(--primary); color:#FFF; border:none; border-radius:8px; font-weight:600; cursor:pointer;">+ Thêm</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-card" style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="position:relative; background:#F2ECE2; padding-top:100%; overflow:hidden;">
+          <img src="https://www.sephora.com/productimages/sku/s1966258-main-zoom.jpg" alt="LANEIGE" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+          <span style="position:absolute; top:12px; left:12px; background:var(--accent); color:#FFF; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:6px;">Bestseller</span>
+        </div>
+        <div style="padding:16px; flex:1; display:flex; flex-direction:column;">
+          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">LANEIGE</div>
+          <a href="product-detail.html" style="font-size:0.95rem; font-weight:700; color:var(--text-primary); text-decoration:none; margin:4px 0 8px 0; line-height:1.4;">Lip Sleeping Mask Intense Hydration Vitamin C</a>
+          <div style="display:flex; align-items:center; gap:6px; font-size:0.85rem; margin-bottom:12px;">
+            <span style="color:#D97706;">★ 4.8</span>
+            <span style="color:var(--text-muted);">(14,200)</span>
+          </div>
+          <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:1.15rem; font-weight:700; color:var(--primary);" data-price-usd="24.00">$24.00</div>
+            <button onclick="addToCart('P420652', 'Lip Sleeping Mask', 'LANEIGE', 24.00, 'https://www.sephora.com/productimages/sku/s1966258-main-zoom.jpg')" class="btn" style="padding:8px 14px; background:var(--primary); color:#FFF; border:none; border-radius:8px; font-weight:600; cursor:pointer;">+ Thêm</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product-card" style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="position:relative; background:#F2ECE2; padding-top:100%; overflow:hidden;">
+          <img src="https://www.sephora.com/productimages/sku/s2031375-main-zoom.jpg" alt="The Ordinary" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+          <span style="position:absolute; top:12px; left:12px; background:#2E6F4E; color:#FFF; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:6px;">Clean at Sephora</span>
+        </div>
+        <div style="padding:16px; flex:1; display:flex; flex-direction:column;">
+          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">The Ordinary</div>
+          <a href="product-detail.html" style="font-size:0.95rem; font-weight:700; color:var(--text-primary); text-decoration:none; margin:4px 0 8px 0; line-height:1.4;">Hyaluronic Acid 2% + B5 Hydrating Serum</a>
+          <div style="display:flex; align-items:center; gap:6px; font-size:0.85rem; margin-bottom:12px;">
+            <span style="color:#D97706;">★ 4.5</span>
+            <span style="color:var(--text-muted);">(3,100)</span>
+          </div>
+          <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:1.15rem; font-weight:700; color:var(--primary);" data-price-usd="8.90">$8.90</div>
+            <button onclick="addToCart('P427419', 'Hyaluronic Acid 2% + B5', 'The Ordinary', 8.90, 'https://www.sephora.com/productimages/sku/s2031375-main-zoom.jpg')" class="btn" style="padding:8px 14px; background:var(--primary); color:#FFF; border:none; border-radius:8px; font-weight:600; cursor:pointer;">+ Thêm</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="product-card" style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="position:relative; background:#F2ECE2; padding-top:100%; overflow:hidden;">
+          <img src="https://www.sephora.com/productimages/sku/s2210722-main-zoom.jpg" alt="The Ordinary Peeling" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
+          <span style="position:absolute; top:12px; left:12px; background:#EA580C; color:#FFF; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:6px;">High Active</span>
+        </div>
+        <div style="padding:16px; flex:1; display:flex; flex-direction:column;">
+          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-weight:600;">The Ordinary</div>
+          <a href="product-detail.html" style="font-size:0.95rem; font-weight:700; color:var(--text-primary); text-decoration:none; margin:4px 0 8px 0; line-height:1.4;">AHA 30% + BHA 2% Exfoliating Peeling Solution</a>
+          <div style="display:flex; align-items:center; gap:6px; font-size:0.85rem; margin-bottom:12px;">
+            <span style="color:#D97706;">★ 4.7</span>
+            <span style="color:var(--text-muted);">(8,900)</span>
+          </div>
+          <div style="margin-top:auto; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:1.15rem; font-weight:700; color:var(--primary);" data-price-usd="9.50">$9.50</div>
+            <button onclick="addToCart('P442563', 'AHA 30% + BHA 2% Peeling', 'The Ordinary', 9.50, 'https://www.sephora.com/productimages/sku/s2210722-main-zoom.jpg')" class="btn" style="padding:8px 14px; background:var(--primary); color:#FFF; border:none; border-radius:8px; font-weight:600; cursor:pointer;">+ Thêm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Highlights Strip -->
+  <section class="section container" style="margin-bottom:60px;">
+    <div style="background:linear-gradient(135deg, #4A3728, #36271C); color:#FFF; border-radius:24px; padding:48px; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:32px;">
+      <div>
+        <div style="font-size:2rem; margin-bottom:12px;">🤖</div>
+        <h3 style="font-size:1.3rem; margin:0 0 8px 0;">Skin Quiz 4 Tầng</h3>
+        <p style="color:#C8BCB0; font-size:0.95rem; line-height:1.6; margin:0;">
+          Lọc chính xác danh mục, đối chiếu từ khóa loại da (+3đ), giải quyết vấn đề da (+2đ) và lọc ngân sách thông minh.
+        </p>
+        <a href="skin-quiz.html" style="color:#FDF2F8; font-weight:600; text-decoration:none; display:inline-block; margin-top:12px;">Làm Quiz ngay →</a>
+      </div>
+      <div>
+        <div style="font-size:2rem; margin-bottom:12px;">🔬</div>
+        <h3 style="font-size:1.3rem; margin:0 0 8px 0;">Phân Tích Bảng INCI</h3>
+        <p style="color:#C8BCB0; font-size:0.95rem; line-height:1.6; margin:0;">
+          Giải nghĩa từng thành phần INCI bằng tiếng Việt, kèm trạng thái pháp lý theo CosIng (EU) và Điểm Phù Hợp tính riêng cho hồ sơ da của bạn.
+        </p>
+        <a href="ingredient-analyzer.html" style="color:#FDF2F8; font-weight:600; text-decoration:none; display:inline-block; margin-top:12px;">Tra cứu hoạt chất →</a>
+      </div>
+      <div>
+        <div style="font-size:2rem; margin-bottom:12px;">⚠️</div>
+        <h3 style="font-size:1.3rem; margin:0 0 8px 0;">Smart Conflict Detector</h3>
+        <p style="color:#C8BCB0; font-size:0.95rem; line-height:1.6; margin:0;">
+          Tự động phát hiện các cặp chất kỵ nhau trong giỏ hàng (BHA + Retinol, AHA + Vitamin C) bảo vệ làn da của bạn.
+        </p>
+        <a href="cart.html" style="color:#FDF2F8; font-weight:600; text-decoration:none; display:inline-block; margin-top:12px;">Xem giỏ hàng →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+    <!-- ══ FOOTER ══ -->
+    <footer class="footer">
+      <div class="footer-inner container">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span style="font-size:1.2rem;">✨</span>
+            <span class="logo-text">Beauty<span class="logo-accent">AI</span></span>
+          </a>
+          <p class="footer-desc">
+            Nền tảng thương mại điện tử mỹ phẩm tích hợp trợ lý AI và lớp minh bạch thành phần — giúp bạn hiểu rõ mình đang bôi gì lên da.
+          </p>
+          <div style="display:flex; gap:12px; margin-top:16px;">
+            <span style="background:rgba(74,55,40,0.08); padding:8px 12px; border-radius:20px; font-size:0.8rem; font-weight:600;">🌿 Clean Beauty</span>
+            <span style="background:rgba(74,55,40,0.08); padding:8px 12px; border-radius:20px; font-size:0.8rem; font-weight:600;">🤖 Multi-Engine AI</span>
+            <span style="background:rgba(74,55,40,0.08); padding:8px 12px; border-radius:20px; font-size:0.8rem; font-weight:600;">💵 Song tệ VND/USD</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Khám phá</h4>
+          <ul class="footer-links">
+            <li><a href="products.html">📦 Tất cả sản phẩm</a></li>
+            <li><a href="skin-quiz.html">🧪 Skin Quiz 4 tầng</a></li>
+            <li><a href="ingredient-analyzer.html">🔬 Phân tích thành phần</a></li>
+            <li><a href="compare.html">⚖️ So sánh mỹ phẩm</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Hỗ trợ & Chăm sóc</h4>
+          <ul class="footer-links">
+            <li><a href="expert-consult.html">💬 Trợ lý tư vấn sản phẩm Lumi</a></li>
+            <li><a href="support.html">🛟 Trung tâm trợ giúp & FAQ</a></li>
+            <li><a href="profile.html">📋 Quản lý Digital Skin ID</a></li>
+            <li><a href="cart.html">🛍️ Kiểm tra giỏ hàng</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Minh bạch &amp; Pháp lý</h4>
+          <ul class="footer-links">
+            <li><a href="methodology.html">📐 Cách chúng tôi tính điểm</a></li>
+            <li><a href="ranking-criteria.html">🧭 Tiêu chí xếp hạng</a></li>
+            <li><a href="privacy-policy.html">🔒 Dữ liệu cá nhân của bạn</a></li>
+          </ul>
+          <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.6; margin:14px 0 10px 0;">
+            Danh mục tham khảo gồm 8.494 sản phẩm và mẫu đánh giá từ dữ liệu Sephora
+            (người dùng quốc tế) — <strong>phục vụ mục đích học thuật, phi thương mại</strong>.
+            Phần lớn sản phẩm chưa có số công bố mỹ phẩm tại Việt Nam và không được bán tại Việt Nam.
+          </p>
+          <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.55; margin:0 0 10px 0;">
+            Thông tin trên nền tảng chỉ mang tính tham khảo về sản phẩm mỹ phẩm, không thay thế
+            ý kiến của bác sĩ da liễu.
+          </p>
+          <div style="font-size:0.78rem; color:var(--text-muted);">
+            © 2026 BeautyAI Platform.
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="js/main.js"></script>
+    </body>
+    </html>
+    

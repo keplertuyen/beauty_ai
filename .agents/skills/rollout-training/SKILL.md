@@ -1,0 +1,19 @@
+---
+name: rollout-training
+description: Prepare organization-wide rollout plans, role training, and adoption metrics for the Syntheprise Framework kit.
+---
+
+# Skill: rollout-training
+
+## When to use
+Use when preparing project/team adoption of the kit.
+
+## Procedure
+1. Classify teams and projects by tier and delivery model.
+2. Select training modules from `the Syntheprise Framework Adoption Program training plan`.
+3. Assign champions: PM, BA, TA/SA, QA Lead, Dev Lead.
+4. Define adoption metrics from `the Syntheprise Framework Adoption Program adoption metrics`.
+5. Produce a 2–4 week pilot plan before broad rollout.
+
+## Output
+A rollout checklist, training schedule, and adoption measurement plan.

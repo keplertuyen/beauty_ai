@@ -1,0 +1,17 @@
+{
+  "name": "beauty-ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "src/frontend"
+  ],
+  "scripts": {
+    "dev": "./scripts/dev",
+    "build": "./scripts/build",
+    "test": "./scripts/test",
+    "deploy-test": "./scripts/deploy-test"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

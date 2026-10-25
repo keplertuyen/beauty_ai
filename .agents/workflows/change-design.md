@@ -1,0 +1,18 @@
+---
+description: Produce technical design and implementation tasks for an approved change.
+---
+
+# /change-design
+
+**Purpose:** turn an approved change proposal into implementable design and tasks.
+
+**Inputs:** `docs/_changes/<CHANGE-ID>/proposal.md`, `requirements-delta.md`.
+
+**Steps:**
+1. Read canonical contracts and relevant ADRs.
+2. Fill `design.md` with affected components, alternatives, rollout, rollback, and ADR need.
+3. Fill `tasks.md` with traceable tasks.
+4. Identify schema/API/security/test impacts.
+5. Request ADR if stack, schema, datastore, auth, deployment, or shared contract changes.
+
+**Output:** a design and task plan ready for `/qa-test-design`.

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cách chúng tôi tính điểm — BeautyAI Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/vite.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ══ NAVBAR ══ -->
+    <header class="navbar">
+      <div class="navbar-inner">
+        <!-- Logo -->
+        <a href="index.html" class="navbar-logo">
+          <span style="font-size:1.4rem;">✨</span>
+          <span class="logo-text">Beauty<span class="logo-accent">AI</span></span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="nav-links" style="display:flex; align-items:center; gap:24px; margin-left:24px;">
+          <a href="products.html" class="nav-link ">Sản phẩm</a>
+          
+          <!-- Dropdown: Khám phá -->
+          <div class="nav-dropdown">
+            <a href="#" class="nav-link" style="display:flex; align-items:center; gap:4px;">
+              Khám phá <span style="font-size:0.7rem;">▼</span>
+            </a>
+            <div class="dropdown-menu">
+              <a href="skin-quiz.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🧪</span>
+                <div>
+                  <span class="dropdown-item-title">Skin Quiz</span>
+                  <span class="dropdown-item-desc">Chẩn đoán da & xây dựng routine</span>
+                </div>
+              </a>
+              <a href="ingredient-analyzer.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🔬</span>
+                <div>
+                  <span class="dropdown-item-title">Phân tích thành phần</span>
+                  <span class="dropdown-item-desc">Giải nghĩa INCI &amp; kiểm tra hoạt chất kỵ nhau</span>
+                </div>
+              </a>
+              <a href="compare.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">⚖️</span>
+                <div>
+                  <span class="dropdown-item-title">So sánh sản phẩm</span>
+                  <span class="dropdown-item-desc">Đối chiếu trực quan side-by-side</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Dropdown: Hỗ trợ -->
+          <div class="nav-dropdown">
+            <a href="#" class="nav-link" style="display:flex; align-items:center; gap:4px;">
+              Hỗ trợ <span style="font-size:0.7rem;">▼</span>
+            </a>
+            <div class="dropdown-menu">
+              <a href="expert-consult.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">💬</span>
+                <div>
+                  <span class="dropdown-item-title">Trợ lý tư vấn sản phẩm</span>
+                  <span class="dropdown-item-desc">Lumi — gợi ý theo hồ sơ da của bạn</span>
+                </div>
+              </a>
+              <a href="support.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🛟</span>
+                <div>
+                  <span class="dropdown-item-title">Trung tâm hỗ trợ</span>
+                  <span class="dropdown-item-desc">Chính sách &amp; câu hỏi thường gặp</span>
+                </div>
+              </a>
+              <a href="methodology.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">📐</span>
+                <div>
+                  <span class="dropdown-item-title">Cách chúng tôi tính điểm</span>
+                  <span class="dropdown-item-desc">Phương pháp &amp; giới hạn, nói rõ ràng</span>
+                </div>
+              </a>
+              <a href="ranking-criteria.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🧭</span>
+                <div>
+                  <span class="dropdown-item-title">Tiêu chí xếp hạng</span>
+                  <span class="dropdown-item-desc">Vì sao sản phẩm này hiện trước</span>
+                </div>
+              </a>
+              <a href="privacy-policy.html" class="dropdown-item">
+                <span style="font-size:1.2rem;">🔒</span>
+                <div>
+                  <span class="dropdown-item-title">Dữ liệu cá nhân của bạn</span>
+                  <span class="dropdown-item-desc">Thu thập gì, gửi cho ai, lưu bao lâu</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Right action icons -->
+        <div style="margin-left:auto; display:flex; align-items:center; gap:16px;">
+          <!-- Currency Toggle -->
+          <div style="display:flex; background:rgba(74,55,40,0.06); padding:3px; border-radius:20px; gap:2px;">
+            <button onclick="setCurrency('VND')" class="currency-toggle-btn currency-btn" data-curr="VND">₫ VND</button>
+            <button onclick="setCurrency('USD')" class="currency-toggle-btn currency-btn" data-curr="USD">$ USD</button>
+          </div>
+
+          <!-- Search icon -->
+          <a href="products.html" class="nav-icon-btn" title="Tìm kiếm" style="color:var(--text-primary); text-decoration:none; font-size:1.1rem;">
+            🔍
+          </a>
+
+          <!-- Wishlist icon -->
+          <a href="wishlist.html" class="nav-icon-btn" title="Yêu thích" style="color:var(--text-primary); text-decoration:none; font-size:1.1rem; position:relative;">
+            ❤️
+            <span style="position:absolute; top:-6px; right:-8px; background:var(--accent); color:#FFF; font-size:0.65rem; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">3</span>
+          </a>
+
+          <!-- Cart Drawer trigger -->
+          <button class="cart-open-trigger nav-icon-btn" title="Giỏ hàng" style="background:none; border:none; cursor:pointer; color:var(--text-primary); font-size:1.1rem; position:relative;">
+            🛍️
+            <span class="cart-badge-count" style="position:absolute; top:-6px; right:-8px; background:var(--primary); color:#FFF; font-size:0.65rem; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">2</span>
+          </button>
+
+          <!-- User Menu -->
+          <div class="nav-dropdown">
+            <button class="nav-icon-btn" style="background:none; border:none; cursor:pointer; font-size:1.1rem;" title="Tài khoản">
+              👤
+            </button>
+            <div class="dropdown-menu" style="left:auto; right:0;">
+              <a href="profile.html" class="dropdown-item">
+                <span>📋</span>
+                <div>
+                  <span class="dropdown-item-title">Hồ sơ & Digital Skin ID</span>
+                  <span class="dropdown-item-desc">Loại da, dị ứng, lịch sử đơn</span>
+                </div>
+              </a>
+              <a href="admin.html" class="dropdown-item">
+                <span>📊</span>
+                <div>
+                  <span class="dropdown-item-title">Admin Dashboard</span>
+                  <span class="dropdown-item-desc">Thống kê doanh thu & tỷ giá</span>
+                </div>
+              </a>
+              <div style="border-top:1px solid var(--border-subtle); margin:6px 0;"></div>
+              <a href="#" class="dropdown-item auth-open-trigger">
+                <span>🔑</span>
+                <div>
+                  <span class="dropdown-item-title">Đăng nhập / Đăng ký</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══ CART DRAWER OVERLAY ══ -->
+    <div id="cartDrawerOverlay" class="modal-overlay"></div>
+    <div id="cartDrawerPanel" class="cart-drawer-panel">
+      <div style="padding:20px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:1.2rem; display:flex; align-items:center; gap:8px;">
+          <span>🛍️</span> Giỏ hàng của bạn
+        </h3>
+        <button id="cartDrawerCloseBtn" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--text-muted);">✕</button>
+      </div>
+      
+      <div id="cartDrawerItemsList" style="flex:1; overflow-y:auto; padding:0 20px;">
+        <!-- Dynamic items via main.js -->
+      </div>
+
+      <div style="padding:20px; border-top:1px solid var(--border-subtle); background:#FAFAFA;">
+        <div style="display:flex; justify-content:space-between; font-weight:600; font-size:1rem; margin-bottom:16px;">
+          <span>Tạm tính:</span>
+          <span id="cartDrawerSubtotal" style="color:var(--primary); font-size:1.15rem;">0₫</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <a href="checkout.html" class="btn btn-primary" style="text-align:center; text-decoration:none; padding:12px; font-weight:600; border-radius:10px; background:var(--primary); color:#FFF; display:block;">
+            Tiến hành thanh toán →
+          </a>
+          <a href="cart.html" style="text-align:center; font-size:0.9rem; color:var(--text-secondary); text-decoration:none; padding:6px;">
+            Xem chi tiết giỏ hàng & áp voucher
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AUTH MODAL OVERLAY ══ -->
+    <div id="authModalOverlay" class="modal-overlay">
+      <div style="background:#FFF; width:100%; max-width:440px; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.2); padding:32px; position:relative; margin:20px;">
+        <button id="authModalCloseBtn" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--text-muted);">✕</button>
+        
+        <div style="text-align:center; margin-bottom:24px;">
+          <h3 style="margin:0 0 6px 0; font-size:1.4rem;">Beauty<span style="color:var(--accent);">AI</span> Account</h3>
+          <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">Cá nhân hóa chu trình chăm sóc da cùng AI</p>
+        </div>
+
+        <div style="display:flex; border-bottom:1px solid var(--border-subtle); margin-bottom:20px;">
+          <button class="auth-tab-btn active" data-tab="login" onclick="switchAuthTab('login')" style="flex:1; padding:10px; border:none; background:none; font-weight:600; cursor:pointer; border-bottom:2px solid var(--primary);">Đăng nhập</button>
+          <button class="auth-tab-btn" data-tab="register" onclick="switchAuthTab('register')" style="flex:1; padding:10px; border:none; background:none; font-weight:600; cursor:pointer; color:var(--text-muted);">Đăng ký</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="authLoginForm">
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Email</label>
+            <input type="email" placeholder="ban@gmail.com" value="demo@beautyai.vn" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Mật khẩu</label>
+            <input type="password" value="••••••••" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <button onclick="closeAuthModal(); showToast('Đăng nhập thành công! Chào bạn 👋');" class="btn btn-primary" style="width:100%; padding:12px; border-radius:10px; background:var(--primary); color:#FFF; border:none; font-weight:600; cursor:pointer;">
+            Đăng nhập ngay
+          </button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="authRegisterForm" style="display:none;">
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Họ tên</label>
+            <input type="text" placeholder="Nguyễn Thị An" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Loại da của bạn</label>
+            <select style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+              <option>Da dầu (Oily)</option>
+              <option>Da khô (Dry)</option>
+              <option>Da hỗn hợp (Combination)</option>
+              <option>Da nhạy cảm (Sensitive)</option>
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Email</label>
+            <input type="email" placeholder="an@gmail.com" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;">Mật khẩu</label>
+            <input type="password" placeholder="Tối thiểu 6 ký tự" style="width:100%; padding:10px 14px; border:1px solid #DDD; border-radius:10px; box-sizing:border-box;">
+          </div>
+          <button onclick="closeAuthModal(); showToast('Tạo tài khoản thành công! 🎉');" class="btn btn-primary" style="width:100%; padding:12px; border-radius:10px; background:var(--primary); color:#FFF; border:none; font-weight:600; cursor:pointer;">
+            Tạo tài khoản mới
+          </button>
+        </div>
+      </div>
+    </div>
+    
+<main class="main-content">
+
+
+<div class="container section" style="max-width:860px;">
+  <div style="margin-bottom:36px;">
+    <a href="index.html" style="font-size:0.85rem; color:var(--text-muted); text-decoration:none;">← Về trang chủ</a>
+    <h1 class="display-font" style="font-size:2.4rem; margin:14px 0 8px 0;">Cách chúng tôi tính điểm</h1>
+    <p style="color:var(--text-secondary); margin:0; font-size:1.02rem; line-height:1.7;">
+      Chúng tôi công khai toàn bộ phương pháp — cả những gì nó <strong>không</strong> làm được.
+      Một chỉ số mà bạn không kiểm chứng được thì không đáng tin.
+    </p>
+  </div>
+
+  <!-- ══ VÌ SAO KHÔNG CÓ "ĐIỂM AN TOÀN" ══ -->
+  <div style="background:#FDF6F4; border:1px solid rgba(184,93,59,0.22); border-radius:18px; padding:28px; margin-bottom:28px;">
+    <h2 style="margin:0 0 14px 0; font-size:1.3rem;">Vì sao BeautyAI không chấm điểm "an toàn / nguy hiểm"</h2>
+    <p style="margin:0 0 14px 0; color:var(--text-secondary); line-height:1.75;">
+      Nhiều ứng dụng chấm điểm mỹ phẩm theo thang "nguy hại" từ 1 đến 10. Chúng tôi <strong>đã quyết định không làm vậy</strong>,
+      vì cách tiếp cận đó có một lỗi căn bản: nó <strong>bỏ qua nồng độ và mức phơi nhiễm</strong>.
+    </p>
+    <p style="margin:0 0 14px 0; color:var(--text-secondary); line-height:1.75;">
+      Trong độc chất học có một nguyên lý nền tảng: <em>liều lượng mới tạo nên độc tính</em>. Một thành phần
+      có thể hoàn toàn an toàn ở nồng độ 0,5% và gây vấn đề ở 50%. Chấm điểm thành phần mà không biết nồng độ
+      trong công thức cụ thể là chấm điểm một thứ không tồn tại.
+    </p>
+    <p style="margin:0; color:var(--text-secondary); line-height:1.75;">
+      Hệ quả thực tế của lỗi này: một lotion đơn giản có thể được điểm cao hơn một kem chống nắng được bào chế tốt,
+      chỉ vì kem chống nắng chứa một thành phần bị gắn cờ. Điều đó <strong>không giúp bạn chọn đúng sản phẩm</strong> —
+      nó chỉ làm bạn lo lắng không đúng chỗ.
+    </p>
+  </div>
+
+  <!-- ══ THAY VÀO ĐÓ, CHÚNG TÔI LÀM GÌ ══ -->
+  <h2 style="font-size:1.4rem; margin:0 0 18px 0;">Thay vào đó, chúng tôi làm ba việc</h2>
+
+  <div style="display:flex; flex-direction:column; gap:18px; margin-bottom:40px;">
+    <div style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; padding:24px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <span style="background:var(--primary); color:#FFF; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0;">1</span>
+        <h3 style="margin:0; font-size:1.1rem;">Điểm Phù Hợp — tính riêng cho hồ sơ da của bạn</h3>
+      </div>
+      <p style="margin:0; color:var(--text-secondary); line-height:1.7;">
+        Đây là chỉ số <strong>tương đối theo từng người</strong>, không phải thuộc tính của sản phẩm.
+        Cùng một sản phẩm, bạn và người khác sẽ thấy điểm khác nhau — và đó là điều đúng đắn, vì "phù hợp"
+        vốn là quan hệ giữa sản phẩm và làn da cụ thể.
+      </p>
+    </div>
+
+    <div style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; padding:24px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <span style="background:var(--primary); color:#FFF; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0;">2</span>
+        <h3 style="margin:0; font-size:1.1rem;">Minh bạch thành phần — thành phần đó <em>làm gì</em></h3>
+      </div>
+      <p style="margin:0; color:var(--text-secondary); line-height:1.7;">
+        Danh pháp INCI và trạng thái pháp lý của chúng tôi lấy từ <strong>CosIng</strong> — cơ sở dữ liệu
+        chính thức của Ủy ban châu Âu về thành phần mỹ phẩm, bao gồm các phụ lục về chất bị cấm và chất
+        bị hạn chế nồng độ. Phần diễn giải tiếng Việt do chúng tôi tự biên soạn và rà soát, hiện phủ
+        150–200 hoạt chất phổ biến nhất.
+      </p>
+    </div>
+
+    <div style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; padding:24px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <span style="background:var(--primary); color:#FFF; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0;">3</span>
+        <h3 style="margin:0; font-size:1.1rem;">Phát hiện xung đột — có phân cấp bằng chứng</h3>
+      </div>
+      <p style="margin:0 0 12px 0; color:var(--text-secondary); line-height:1.7;">
+        Mỗi quy tắc xung đột trong hệ thống bắt buộc có <strong>cấp bằng chứng</strong> và <strong>URL nguồn gốc</strong>.
+        Quy tắc không có nguồn không được đưa vào hệ thống.
+      </p>
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="text-align:left; color:var(--text-muted); border-bottom:1px solid var(--border-subtle);">
+            <th style="padding:8px 0;">Cấp</th><th style="padding:8px;">Nghĩa là</th><th style="padding:8px;">Mức hiển thị tối đa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #F0EDE8;">
+            <td style="padding:10px 0; font-weight:700;">A</td>
+            <td style="padding:10px;">Có nghiên cứu định lượng đã bình duyệt</td>
+            <td style="padding:10px;"><span style="background:#B85D3B; color:#FFF; font-size:0.72rem; font-weight:700; padding:2px 9px; border-radius:999px;">CAO</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #F0EDE8;">
+            <td style="padding:10px 0; font-weight:700;">B</td>
+            <td style="padding:10px;">Cơ chế sinh/hóa học vững, thiếu dữ liệu định lượng</td>
+            <td style="padding:10px;"><span style="background:#D97706; color:#FFF; font-size:0.72rem; font-weight:700; padding:2px 9px; border-radius:999px;">LƯU Ý</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 0; font-weight:700;">C</td>
+            <td style="padding:10px;">Hợp lý về lý thuyết, hoặc là huyền thoại đang bị phản bác</td>
+            <td style="padding:10px;"><span style="background:var(--text-muted); color:#FFF; font-size:0.72rem; font-weight:700; padding:2px 9px; border-radius:999px;">THÔNG TIN</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin:14px 0 0 0; font-size:0.85rem; color:var(--text-secondary); line-height:1.65;">
+        Hiện tại, <strong>chỉ có duy nhất một cặp</strong> đạt mức cảnh báo đỏ:
+        <strong>Retinoid + Benzoyl Peroxide</strong>. Sự tiết chế này là có chủ đích — nếu chúng tôi
+        cảnh báo đỏ sáu cặp, bạn sẽ bỏ qua tất cả.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ CÔNG THỨC ĐIỂM PHÙ HỢP ══ -->
+  <h2 style="font-size:1.4rem; margin:0 0 8px 0;">Công thức Điểm Phù Hợp</h2>
+  <p style="margin:0 0 18px 0; color:var(--text-secondary); line-height:1.7;">
+    Điểm thô được cộng dồn từ các yếu tố dưới đây, rồi chuẩn hóa về thang 0–100 trong nhóm sản phẩm
+    cùng một bước routine. Không có yếu tố ẩn nào.
+  </p>
+
+  <div style="background:#FFF; border:1px solid var(--border-subtle); border-radius:16px; overflow:hidden; margin-bottom:28px;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+      <thead>
+        <tr style="background:#FAF7F2; text-align:left; color:var(--text-secondary);">
+          <th style="padding:12px 20px;">Yếu tố</th><th style="padding:12px 20px; text-align:right;">Điểm</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-top:1px solid #F0EDE8; background:#FDF6F4;">
+          <td style="padding:12px 20px;"><strong>Chứa thành phần trong danh sách dị ứng của bạn</strong><br><span style="font-size:0.8rem; color:var(--text-muted);">Loại khỏi gợi ý trên thực tế — không có điểm cộng nào bù lại được</span></td>
+          <td style="padding:12px 20px; text-align:right; font-weight:800; color:#B85D3B;">−1000</td>
+        </tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Khớp loại da chính của bạn</td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#2E6F4E;">+3</td></tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Mỗi vấn đề da của bạn được sản phẩm giải quyết</td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#2E6F4E;">+2</td></tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Mỗi hoạt chất phù hợp vấn đề da <span style="font-size:0.8rem; color:var(--text-muted);">(tối đa +6)</span></td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#2E6F4E;">+2</td></tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Trong ngân sách bạn đặt cho bước routine đó</td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#2E6F4E;">+1</td></tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Người có hồ sơ da tương đồng đánh giá ≥ 4,0 <span style="font-size:0.8rem; color:var(--text-muted);">(cần ≥ 5 đánh giá)</span></td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#2E6F4E;">+1</td></tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Bạn khai da nhạy cảm &amp; sản phẩm chứa cồn khô</td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#B85D3B;">−2</td></tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Bạn khai da nhạy cảm &amp; sản phẩm chứa hương liệu</td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#B85D3B;">−2</td></tr>
+        <tr style="border-top:1px solid #F0EDE8;"><td style="padding:12px 20px;">Dữ liệu thành phần chưa đầy đủ <span style="font-size:0.8rem; color:var(--text-muted);">(phủ dưới 50%)</span><br><span style="font-size:0.8rem; color:var(--text-muted);">Chúng tôi trừ điểm để phản ánh mức độ chắc chắn, thay vì giả vờ biết</span></td><td style="padding:12px 20px; text-align:right; font-weight:700; color:#B85D3B;">−1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ GIỚI HẠN CỦA PHƯƠNG PHÁP ══ -->
+  <div style="background:#FFFCF5; border:1px solid #F0E6D2; border-radius:18px; padding:28px; margin-bottom:28px;">
+    <h2 style="margin:0 0 14px 0; font-size:1.3rem;">Giới hạn của phương pháp này</h2>
+    <ul style="margin:0; padding-left:20px; color:var(--text-secondary); line-height:1.8;">
+      <li><strong>Chúng tôi không biết nồng độ chính xác</strong> của từng thành phần trong công thức — nhà sản xuất không công bố. Chúng tôi chỉ biết <em>thứ tự xuất hiện</em>, vốn mang thông tin về nồng độ tương đối.</li>
+      <li><strong>Không phủ hết mọi thành phần.</strong> Từ điển của chúng tôi hiện phủ 150–200 hoạt chất phổ biến nhất. Phần còn lại được ghi rõ là <em>chưa phân tích</em> — chúng tôi không gán giá trị mặc định.</li>
+      <li><strong>Chỉ số Comedogenic là thang tham khảo cộng đồng</strong>, bắt nguồn từ thử nghiệm trên tai thỏ. Giá trị dự đoán trên da người rất hạn chế, nên chúng tôi không dùng nó để xếp hạng sản phẩm.</li>
+      <li><strong>Đánh giá cộng đồng đến từ người dùng quốc tế</strong> (nguồn dữ liệu Sephora), phục vụ mục đích tham khảo và học thuật. Làn da và khí hậu có thể khác với bạn.</li>
+      <li><strong>Luật "thường được mua cùng" là xấp xỉ.</strong> Dữ liệu nguồn không có thông tin giỏ hàng thật, nên chúng tôi suy ra từ các sản phẩm cùng được một người đánh giá.</li>
+      <li><strong>Đây không phải tư vấn y khoa.</strong> Nếu bạn có tình trạng da kéo dài, đau, viêm nặng hoặc đang dùng thuốc theo chỉ định, hãy tham khảo bác sĩ da liễu.</li>
+    </ul>
+  </div>
+
+  <div style="display:flex; gap:12px; flex-wrap:wrap;">
+    <a href="ranking-criteria.html" class="btn btn-primary" style="text-decoration:none; padding:12px 22px; background:var(--primary); color:#FFF; border-radius:11px; font-weight:600;">Xem tiêu chí xếp hạng →</a>
+    <a href="privacy-policy.html" style="text-decoration:none; padding:12px 22px; border:1px solid var(--border-subtle); border-radius:11px; font-weight:600; color:var(--text-primary);">Chính sách dữ liệu cá nhân</a>
+  </div>
+</div>
+
+
+</main>
+
+    <!-- ══ FOOTER ══ -->
+    <footer class="footer">
+      <div class="footer-inner container">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span style="font-size:1.2rem;">✨</span>
+            <span class="logo-text">Beauty<span class="logo-accent">AI</span></span>
+          </a>
+          <p class="footer-desc">
+            Nền tảng thương mại điện tử mỹ phẩm tích hợp trợ lý AI và lớp minh bạch thành phần — giúp bạn hiểu rõ mình đang bôi gì lên da.
+          </p>
+          <div style="display:flex; gap:12px; margin-top:16px;">
+            <span style="background:rgba(74,55,40,0.08); padding:8px 12px; border-radius:20px; font-size:0.8rem; font-weight:600;">🌿 Clean Beauty</span>
+            <span style="background:rgba(74,55,40,0.08); padding:8px 12px; border-radius:20px; font-size:0.8rem; font-weight:600;">🤖 Multi-Engine AI</span>
+            <span style="background:rgba(74,55,40,0.08); padding:8px 12px; border-radius:20px; font-size:0.8rem; font-weight:600;">💵 Song tệ VND/USD</span>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Khám phá</h4>
+          <ul class="footer-links">
+            <li><a href="products.html">📦 Tất cả sản phẩm</a></li>
+            <li><a href="skin-quiz.html">🧪 Skin Quiz 4 tầng</a></li>
+            <li><a href="ingredient-analyzer.html">🔬 Phân tích thành phần</a></li>
+            <li><a href="compare.html">⚖️ So sánh mỹ phẩm</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Hỗ trợ & Chăm sóc</h4>
+          <ul class="footer-links">
+            <li><a href="expert-consult.html">💬 Trợ lý tư vấn sản phẩm Lumi</a></li>
+            <li><a href="support.html">🛟 Trung tâm trợ giúp & FAQ</a></li>
+            <li><a href="profile.html">📋 Quản lý Digital Skin ID</a></li>
+            <li><a href="cart.html">🛍️ Kiểm tra giỏ hàng</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Minh bạch &amp; Pháp lý</h4>
+          <ul class="footer-links">
+            <li><a href="methodology.html">📐 Cách chúng tôi tính điểm</a></li>
+            <li><a href="ranking-criteria.html">🧭 Tiêu chí xếp hạng</a></li>
+            <li><a href="privacy-policy.html">🔒 Dữ liệu cá nhân của bạn</a></li>
+          </ul>
+          <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.6; margin:14px 0 10px 0;">
+            Danh mục tham khảo gồm 8.494 sản phẩm và mẫu đánh giá từ dữ liệu Sephora
+            (người dùng quốc tế) — <strong>phục vụ mục đích học thuật, phi thương mại</strong>.
+            Phần lớn sản phẩm chưa có số công bố mỹ phẩm tại Việt Nam và không được bán tại Việt Nam.
+          </p>
+          <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.55; margin:0 0 10px 0;">
+            Thông tin trên nền tảng chỉ mang tính tham khảo về sản phẩm mỹ phẩm, không thay thế
+            ý kiến của bác sĩ da liễu.
+          </p>
+          <div style="font-size:0.78rem; color:var(--text-muted);">
+            © 2026 BeautyAI Platform.
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="js/main.js"></script>
+    </body>
+    </html>
+    

@@ -1,0 +1,61 @@
+{
+  "blueprint": "dotnet-react-rn",
+  "certification": "certified",
+  "components": [
+    "backend.dotnet",
+    "web.react-vite",
+    "mobile.react-native-expo",
+    "contract.openapi-http",
+    "infra.compose-local"
+  ],
+  "contracts": {
+    "provides": [
+      "health-endpoint",
+      "http-api",
+      "local-orchestration",
+      "openapi-client-angular",
+      "openapi-client-dart",
+      "openapi-client-typescript",
+      "openapi-contract"
+    ],
+    "requires": [
+      "http-api",
+      "openapi-client-typescript",
+      "openapi-contract"
+    ]
+  },
+  "overlay_files": [
+    ".github/workflows/stack-pilot.yml",
+    "docs/_guides/dotnet-react-rn.md",
+    "openapitools.json",
+    "package-lock.json",
+    "package.json",
+    "packages/api-client/.gitignore",
+    "packages/api-client/.npmignore",
+    "packages/api-client/.openapi-generator/FILES",
+    "packages/api-client/.openapi-generator/VERSION",
+    "packages/api-client/.openapi-generator-ignore",
+    "packages/api-client/package.json",
+    "packages/api-client/src/apis/HealthApi.ts",
+    "packages/api-client/src/apis/index.ts",
+    "packages/api-client/src/index.ts",
+    "packages/api-client/src/models/HealthResponse.ts",
+    "packages/api-client/src/models/index.ts",
+    "packages/api-client/src/runtime.ts",
+    "packages/api-client/tsconfig.esm.json",
+    "packages/api-client/tsconfig.json",
+    "scripts/build",
+    "scripts/check-generated-clients",
+    "scripts/dev",
+    "scripts/generate-clients",
+    "scripts/hash-generated.py",
+    "scripts/normalize-generated.py",
+    "scripts/test"
+  ],
+  "ports": [
+    5173,
+    8080,
+    8081
+  ],
+  "schema_version": 1
+}

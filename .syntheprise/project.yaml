@@ -1,0 +1,5 @@
+# Syntheprise Framework machine-readable project descriptor (v5.8 kernel).
+schema_version: 1
+kind: project
+mode: solo
+# providers_dir: src/providers   # v5.10: adapter seam dir scanned by `syntheprise integrations`

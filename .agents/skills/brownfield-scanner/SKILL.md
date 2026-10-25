@@ -1,0 +1,17 @@
+---
+name: brownfield-scanner
+description: Scan an existing codebase and produce evidence-backed Syntheprise Framework baseline artifacts.
+---
+# Brownfield Scanner Skill
+
+Use this skill during `/onboard-existing` or `syntheprise onboard --scan`.
+
+## Procedure
+1. Inventory languages, entrypoints, tests, dependencies, data stores, CI, and integrations.
+2. Record evidence paths. Never invent architecture facts.
+3. Mark unknown behavior as risk, not assumption.
+4. Identify missing tests and high-risk modules.
+5. Recommend the first safe characterization-test slice.
+
+## Output
+Update `system-scan.md`, `codebase-map.md`, `integration-map.md`, and `risk-map.md` in the selected baseline folder.

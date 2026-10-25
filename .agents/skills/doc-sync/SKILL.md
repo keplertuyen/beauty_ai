@@ -1,0 +1,16 @@
+---
+name: doc-sync
+description: Keep docs consistent — one fact one place, supersede by deletion, update on contract change.
+---
+
+# Skill: doc-sync
+
+**When:** whenever behavior or a contract changes, or content moves.
+
+**Rules:**
+1. One fact, one place — update the authoritative doc; others link, never restate.
+2. Supersede by deletion: remove stale content, leave a one-line pointer; archive retired docs with `status: superseded`.
+3. Never blind find-replace across a long doc; edit section by section and review the diff.
+4. After changes, bump `last_reviewed`; if a decision is structural, open an ADR.
+
+**Output:** updated docs + (if needed) a new ADR; note in the WG worklog.

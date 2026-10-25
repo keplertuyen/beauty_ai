@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${project_root}"
+
+export DOTNET_CLI_HOME="${DOTNET_CLI_HOME:-$HOME}"
+export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
+export PATH="${DOTNET_ROOT}:${PATH}"
+
+echo "==> Running .NET unit tests..."
+dotnet test BeautyAI.slnx --no-build
+
+echo "==> Running Frontend tests..."
+npm --prefix src/frontend run test
+
+echo "==> Tests passed!"

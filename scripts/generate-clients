@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+generated_dir="${project_root}/packages/api-client"
+temporary_dir="$(mktemp -d)"
+
+cleanup() {
+  rm -rf -- "${temporary_dir}"
+}
+trap cleanup EXIT
+
+case "${generated_dir}" in
+  "${project_root}/packages/api-client") ;;
+  *) echo "unsafe generated output path" >&2; exit 2 ;;
+esac
+
+docker run --rm \
+  --user "$(id -u):$(id -g)" \
+  --volume "${project_root}/contracts:/contracts:ro" \
+  --volume "${temporary_dir}:/output" \
+  openapitools/openapi-generator-cli:v7.22.0 generate \
+  --input-spec /contracts/openapi.yaml \
+  --generator-name typescript-fetch \
+  --output /output \
+  --openapi-generator-ignore-list README.md \
+  --additional-properties npmName=@syntheprise/api-client,npmVersion=0.1.0,supportsES6=true,withInterfaces=true,useSingleRequestParameter=true \
+  --global-property apiDocs=false,modelDocs=false,apiTests=false,modelTests=false
+
+python3 "${project_root}/scripts/normalize-generated.py" "${temporary_dir}"
+mkdir -p "${generated_dir}"
+find "${generated_dir}" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+cp -R "${temporary_dir}/." "${generated_dir}/"

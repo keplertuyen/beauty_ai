@@ -1,0 +1,41 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+
+  - repo: local
+    hooks:
+      - id: worktree-isolation
+        name: Worktree isolation & concurrency safety
+        entry: python3 scripts/check-worktree-isolation.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: syntheprise-secret-scan
+        name: Syntheprise Framework secret scan
+        entry: python3 scripts/check-secrets.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # --- Stack-specific hooks (opt-in) --------------------------------------
+  # Add linters/formatters/schema validators for your stack below, e.g. ruff
+  # for Python, eslint/prettier for Node, or a JSON-schema fixture validator.
+  # These are intentionally left out of the generic kit so the default config
+  # stays stack-agnostic. Example:
+  #
+  # - repo: https://github.com/astral-sh/ruff-pre-commit
+  #   rev: v0.6.9
+  #   hooks:
+  #     - id: ruff
+  #       args: [--fix]
+  #     - id: ruff-format

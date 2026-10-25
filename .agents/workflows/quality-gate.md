@@ -1,0 +1,20 @@
+---
+description: Run V5 quality checks before a task, change, or release is marked Done.
+---
+
+# /quality-gate
+
+**Purpose:** enforce documentation, traceability, test, and safety gates.
+
+**Inputs:** current branch, changed files, requirement/change IDs.
+
+**Steps:**
+1. Run `python scripts/doctor.py --quality-gate` when the project has been initialized.
+2. Run relevant test/lint/type commands from `AGENTS.md` or project scripts.
+3. Check `docs/traceability.md` for changed Must behavior.
+4. Check active change folder review checklist when working under `docs/_changes/`.
+5. Report blocking issues first; do not hide warnings.
+
+**Output:** pass/fail quality summary with exact next actions.
+
+**Forbidden:** marking Done with failing tests, missing traceability, or unapproved destructive/security changes.

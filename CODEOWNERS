@@ -1,0 +1,19 @@
+# CODEOWNERS — default reviewers for Syntheprise Framework.
+# GitHub requests these owners automatically on every PR.
+# Docs: https://docs.github.com/articles/about-code-owners
+
+# Default owner for everything
+*                       @trmn-ai
+
+# Constitution & guardrails — highest authority, review carefully
+/AGENTS.md              @trmn-ai
+/core-principles.md     @trmn-ai
+/.agents/rules/         @trmn-ai
+
+# CLI, gates and CI — break the build for everyone if wrong
+/scripts/               @trmn-ai
+/.github/               @trmn-ai
+
+# Generated adapters are produced by `syntheprise sync`; edit the source in .agents/
+/.claude/commands/      @trmn-ai
+/.codex/prompts/        @trmn-ai

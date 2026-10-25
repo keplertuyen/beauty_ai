@@ -1,0 +1,17 @@
+---
+description: Review a change against the plan, contracts, security and safety rules before commit.
+---
+
+# /review
+
+**Purpose:** gate a change before merge.
+**Inputs:** the diff / changeset.
+**Files to read:** approved plan, `AGENTS.md` §2, relevant Contracts, `.agents/rules/safety.md`.
+**Steps:**
+1. Diff vs the approved plan and invariants.
+2. Check: tests present & green, lint clean, no contract/architecture violation, docs updated (skill `doc-sync`).
+3. Run skill `security-review` for auth/data/LLM changes.
+4. Report findings by severity.
+**Output artifact:** review notes + a suggested Conventional Commit message.
+**Approval gate:** block on Must-level issues.
+**Forbidden:** approving with failing tests or undocumented contract changes.

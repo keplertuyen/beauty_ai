@@ -1,0 +1,70 @@
+name: Syntheprise Framework Quality Gate
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [ opened, synchronize, reopened, ready_for_review, converted_to_draft ]
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify adapters are in sync (no drift)
+        run: python scripts/syntheprise_sync.py --check
+
+      - name: Run Syntheprise Framework quality gate
+        # Project repos (.syntheprise-project) run the strict gate. The framework/kit
+        # repo (.syntheprise-kit) runs framework mode: placeholders allowed, but version
+        # consistency + change-completeness are enforced. Base SHA lets the
+        # doc-drift checker see the PR's committed changes (not the empty
+        # working-tree diff).
+        env:
+          SYNTHEPRISE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ -f .syntheprise-project ]; then
+            python scripts/doctor.py --quality-gate
+            python scripts/check-lifecycle-consistency.py
+            python scripts/check-doc-drift.py --strict
+          else
+            python scripts/doctor.py --template
+            python scripts/check-version-consistency.py
+            python scripts/check-lifecycle-consistency.py
+            python scripts/check-component-lifecycle.py
+            python scripts/check-workflow-security.py
+            python scripts/check-dependencies.py --strict
+            python scripts/check-secrets.py
+            python scripts/check-traceability.py
+            python scripts/check-doc-drift.py --strict
+          fi
+
+  change-completeness:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Draft change folders must be authoring-ready
+        if: github.event.pull_request.draft == true
+        env:
+          SYNTHEPRISE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python scripts/check-change-completeness.py
+      - name: Ready change folders must be complete AND merge-ready
+        if: github.event.pull_request.draft == false
+        env:
+          SYNTHEPRISE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          python scripts/check-change-completeness.py
+          python scripts/check-lifecycle-consistency.py --merge

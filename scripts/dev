@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# scripts/dev — khởi động môi trường phát triển (Postgres + API watch + Vite dev)
+set -euo pipefail
+project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${project_root}"
+
+export DOTNET_CLI_HOME="${DOTNET_CLI_HOME:-$HOME}"
+export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
+export PATH="${DOTNET_ROOT}:${PATH}"
+
+echo "==> Khởi động PostgreSQL..."
+docker compose up -d postgres
+
+until docker compose exec -T postgres pg_isready -U beautyai >/dev/null 2>&1; do
+  echo "Đang chờ PostgreSQL..."; sleep 1
+done
+
+echo "==> PostgreSQL sẵn sàng. Khởi động API và Frontend..."
+trap 'kill $(jobs -p) 2>/dev/null || true' EXIT
+dotnet watch --project src/BeautyAI.Api run &
+npm --prefix src/frontend run dev &
+wait

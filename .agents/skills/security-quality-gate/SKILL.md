@@ -1,0 +1,20 @@
+---
+name: security-quality-gate
+description: Run Syntheprise Framework secret, dependency, and protected-action checks before merge or release.
+---
+# Security Quality Gate Skill
+
+Use before accepting AI-generated code or release candidates.
+
+## Checks
+- No secrets, tokens, private keys, or production credentials are committed.
+- Dependencies are pinned or reviewed.
+- High-risk shell actions are blocked or explicitly approved.
+- Security/privacy impact is reflected in the change review.
+
+Run:
+```bash
+python scripts/check-secrets.py
+python scripts/check-dependencies.py
+python scripts/protected-action-policy.py --self-test
+```

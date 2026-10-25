@@ -1,0 +1,63 @@
+# secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# OS / archive metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX/
+Thumbs.db
+desktop.ini
+.Rhistory
+
+# .NET artifacts
+bin/
+obj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Node / web build / deps
+node_modules/
+dist/
+build/
+coverage/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# local database volume
+*.db
+*.sqlite
+/data/
+
+# Large raw/cleaned dataset files (>100MB, keep local only - Question 7)
+docs/_data/cleaned/
+
+# logs
+*.log
+logs/
+
+# agent local-only state
+CLAUDE.local.md
+.claude/settings.local.json
+.codex/local.toml
+.agent-local/
+.local/
+Library/

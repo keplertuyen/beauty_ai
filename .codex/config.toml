@@ -1,0 +1,12 @@
+# Project-scoped Codex configuration for Syntheprise Framework - The Human-Governed Agentic Development Framework. V5.
+# Keep provider credentials and personal preferences in ~/.codex/config.toml, not here.
+
+project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", "GEMINI.md"]
+project_doc_max_bytes = 65536
+
+# Keep this repo conservative by default. Adjust after project initialization.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Optional: point Codex to a compact supplemental instruction file if needed.
+# model_instructions_file = "../AGENTS.md"
