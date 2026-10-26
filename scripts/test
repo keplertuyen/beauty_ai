@@ -4,9 +4,14 @@ set -euo pipefail
 project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${project_root}"
 
-export DOTNET_CLI_HOME="${DOTNET_CLI_HOME:-$HOME}"
-export DOTNET_ROOT="${DOTNET_ROOT:-$HOME/.dotnet}"
-export PATH="${DOTNET_ROOT}:${PATH}"
+export DOTNET_CLI_HOME="${DOTNET_CLI_HOME:-/tmp}"
+if [ -d "/opt/homebrew/opt/dotnet/libexec" ]; then
+  export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"
+  export PATH="/opt/homebrew/opt/dotnet/bin:${PATH}"
+elif [ -d "${HOME}/.dotnet" ]; then
+  export DOTNET_ROOT="${HOME}/.dotnet"
+  export PATH="${DOTNET_ROOT}:${PATH}"
+fi
 
 echo "==> Running .NET unit tests..."
 dotnet test BeautyAI.slnx --no-build
