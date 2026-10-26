@@ -18,29 +18,31 @@ last_reviewed: 2026-10-26
 
 ---
 
-## ▸ Nhiệm vụ 1.1 — Khởi tạo PostgreSQL Schema & Seed Data Mỹ Phẩm
+## ▸ Nhiệm vụ 1.1 — Khởi tạo PostgreSQL Schema & Nạp Dữ Liệu Sản Phẩm Mỹ Phẩm
 
-- **Mục tiêu:** Thiết lập 10 bảng CSDL trong PostgreSQL 17 và nạp bộ dữ liệu ban đầu gồm 10 thương hiệu, 50 sản phẩm, 150 thành phần INCI và 12 cặp quy tắc xung đột.
+- **Mục tiêu:** Thiết lập 10 bảng CSDL trong PostgreSQL 17 (chuẩn hóa cột `code` ánh xạ Sephora) và nạp dữ liệu danh mục, thương hiệu, sản phẩm mỹ phẩm từ dataset có sẵn kèm 12 cặp quy tắc xung đột.
 - **Tệp liên quan:**
   - `docs/db-schema/schema_phase_1.sql`
+  - `docs/_data/cleaned/products_cleaned.csv` (8.495 sản phẩm Sephora thật)
   - `src/BeautyAI.Infrastructure/Persistence/AppDbContext.cs`
-  - `src/BeautyAI.Infrastructure/Persistence/DbInitializer.cs`
+  - `src/BeautyAI.Infrastructure/Persistence/DbInitializer.cs` hoặc `scripts/seed_products.py`
 
 ### Các bước thực hiện chi tiết:
-1. Tạo tệp migration SQL `docs/db-schema/schema_phase_1.sql` chứa toàn bộ 10 bảng CSDL đã được đặc tả trong Technical Solutions Phase 1.
+1. Tạo tệp migration SQL `docs/db-schema/schema_phase_1.sql` chứa toàn bộ 10 bảng CSDL đã được cập nhật cột `code VARCHAR(50) UNIQUE` trong bảng `products` và `product_code VARCHAR(50)` trong bảng `reviews`.
 2. Thực thi script tạo bảng vào PostgreSQL Docker đang chạy trên máy Mac:
    ```bash
    docker compose exec -T postgres psql -U beautyai -d beautyai -f /dev/stdin < docs/db-schema/schema_phase_1.sql
    ```
-3. Tạo class `DbInitializer.cs` trong `BeautyAI.Infrastructure/Persistence/` để seed dữ liệu:
-   - 10 thương hiệu nổi tiếng (Paula's Choice, The Ordinary, La Roche-Posay, Cerave, Klairs, Cosrx, Some By Mi, v.v.).
-   - 50 sản phẩm mỹ phẩm thông dụng thuộc các nhóm: Sữa rửa mặt, Nước cân bằng/Tẩy da chết, Serum đặc trị, Kem dưỡng ẩm, Kem chống nắng. Mỗi sản phẩm có chuỗi thành phần `ingredient_list_raw` chuẩn từ bao bì thật.
-   - 150 hoạt chất trong bảng `ingredients` có đầy đủ nhãn tiếng Việt và chỉ số kích ứng/bít tắc.
+3. Tạo class `DbInitializer.cs` hoặc script ETL đọc trực tiếp từ `docs/_data/cleaned/products_cleaned.csv` để nạp:
+   - Các thương hiệu nổi tiếng (Paula's Choice, The Ordinary, La Roche-Posay, CeraVe, Klairs, Cosrx, Some By Mi, v.v.).
+   - 100 - 500 sản phẩm mỹ phẩm Skincare phổ biến nhất có chuỗi thành phần `ingredient_list_raw` chuẩn thật, quy đổi giá USD sang VNĐ (`price_vnd = price_usd * 25000`).
+   - Bóc tách chuỗi thành phần INCI nạp vào bảng `ingredients` và `product_ingredients`.
    - 12 cặp quy tắc xung đột hoạt chất trong bảng `conflict_rules` (Retinol + BHA, Benzoyl Peroxide + Retinol, v.v.).
+   - Nạp 1 tài khoản Admin (`admin@beautyai.vn` / `Admin@123456`) và 3 Persona khách hàng mẫu có Digital Skin ID thiết lập sẵn.
 
 ### ✅ Xong khi:
 - [ ] 10 bảng CSDL được tạo thành công với đầy đủ khóa chính, khóa ngoại, ràng buộc CHECK và giá trị mặc định.
-- [ ] Bảng `products` có tối thiểu 50 bản ghi.
+- [ ] Bảng `products` có tối thiểu 100 bản ghi sản phẩm thật từ dataset kèm mã `code`.
 - [ ] Bảng `conflict_rules` có đủ 12 cặp quy tắc y khoa.
 
 ### 🔍 Lệnh kiểm chứng:
@@ -59,23 +61,24 @@ SELECT 'conflict_rules', count(*) FROM conflict_rules;"
 
 ## ▸ Nhiệm vụ 1.2 — Xử lý & Đánh Chỉ Mục Tập Mẫu 1 Triệu Đánh Giá (1M Reviews)
 
-- **Mục tiêu:** Nạp tập dữ liệu đánh giá sản phẩm lớn vào bảng `reviews` và đánh chỉ mục kép B-Tree đảm bảo truy vấn lọc theo loại da dưới **50ms**.
+- **Mục tiêu:** Nạp tập dữ liệu đánh giá sản phẩm lớn từ file dataset thật vào bảng `reviews` và đánh chỉ mục kép B-Tree đảm bảo truy vấn lọc theo loại da dưới **50ms**.
 - **Tệp liên quan:**
-  - `docs/_data/processed/`
+  - `docs/_data/cleaned/reviews_cleaned.csv` (1.094.197 dòng đánh giá thật)
   - `scripts/import_reviews.py` hoặc console command C#.
 
 ### Các bước thực hiện chi tiết:
-1. Kiểm tra tập dữ liệu đánh giá tại `docs/_data/processed/`.
-2. Tạo script import dữ liệu sử dụng lệnh `COPY` của PostgreSQL hoặc batch insert (1.000 records/lần) để nạp dữ liệu vào bảng `reviews`:
-   - Các cột: `product_id`, `author_name`, `rating`, `skin_type`, `skin_concerns`, `content`, `created_at`.
+1. Đọc tệp đánh giá nguồn tại `docs/_data/cleaned/reviews_cleaned.csv`.
+2. Tạo script import dữ liệu sử dụng lệnh `COPY` của PostgreSQL hoặc batch insert (5.000 records/lần) để nạp dữ liệu vào bảng `reviews`:
+   - Các cột: `product_id` (ánh xạ qua `products.code`), `product_code`, `author_name`, `rating`, `skin_type` (chuẩn hóa sang `Combination`, `Dry`, `Oily`, `Normal`, `Unknown`), `content`, `created_at`.
 3. Đánh chỉ mục kép B-Tree trên bảng `reviews`:
    ```sql
    CREATE INDEX IF NOT EXISTS idx_reviews_product_skin ON reviews(product_id, skin_type);
    CREATE INDEX IF NOT EXISTS idx_reviews_product_rating ON reviews(product_id, rating);
+   CREATE INDEX IF NOT EXISTS idx_reviews_product_code ON reviews(product_code);
    ```
 
 ### ✅ Xong khi:
-- [ ] Bảng `reviews` nạp đầy đủ các bản ghi đánh giá.
+- [ ] Bảng `reviews` nạp đầy đủ các bản ghi đánh giá tương ứng với các sản phẩm có trong hệ thống.
 - [ ] Chỉ mục B-Tree được tạo và kích hoạt thành công.
 
 ### 🔍 Lệnh kiểm chứng:

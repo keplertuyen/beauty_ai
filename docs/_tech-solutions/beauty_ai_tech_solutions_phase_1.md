@@ -147,6 +147,7 @@ CREATE TABLE brands (
 -- ============================================================================
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL, -- Mã sản phẩm gốc từ Sephora dataset (VD: 'P473671')
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     brand_id INT REFERENCES brands(id) ON DELETE CASCADE,
@@ -160,6 +161,7 @@ CREATE TABLE products (
     stock_quantity INT DEFAULT 100 NOT NULL CHECK (stock_quantity >= 0),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+CREATE INDEX idx_products_code ON products(code);
 CREATE INDEX idx_products_slug ON products(slug);
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_brand ON products(brand_id);
@@ -190,18 +192,20 @@ CREATE TABLE conflict_rules (
 CREATE TABLE reviews (
     id BIGSERIAL PRIMARY KEY,
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
+    product_code VARCHAR(50), -- Mã ánh xạ trực tiếp từ Sephora dataset ('P473671')
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     author_name VARCHAR(255) DEFAULT 'Khách hàng BeautyAI' NOT NULL,
     rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal')),
+    skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal', 'Unknown')),
     skin_concerns VARCHAR(255),
     content TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
--- CHỈ MỤC B-TREE KÉP TỐI ƯU TRUY VẤN LỌC REVIEW 1M DƯỚI 50MS
+-- CHỈ MỤC B-TREE TỐI ƯU TRUY VẤN LỌC REVIEW 1M DƯỚI 50MS
 CREATE INDEX idx_reviews_product_skin ON reviews(product_id, skin_type);
 CREATE INDEX idx_reviews_product_rating ON reviews(product_id, rating);
+CREATE INDEX idx_reviews_product_code ON reviews(product_code);
 
 -- ============================================================================
 -- 9. BẢNG ĐƠN HÀNG & CHI TIẾT ĐƠN HÀNG (ORDERS & ORDER_ITEMS)
@@ -248,7 +252,22 @@ CREATE TABLE saved_routines (
 
 ---
 
-# 3. SEED DỮ LIỆU MẪU: 12 BỘ QUY TẮC XUNG ĐỘT HOẠT CHẤT KHOA HỌC
+# 3. CHIẾN LƯỢC DỮ LIỆU & SEEDING (DATA INGESTION & SEED STRATEGY)
+
+Hệ thống tận dụng trực tiếp bộ dữ liệu thực tế có sẵn trong thư mục `docs/_data/cleaned/`:
+
+### 3.1. Nguồn Dữ Liệu Thực Tế Khai Thác
+1. **Sản phẩm & Thương hiệu (`docs/_data/cleaned/products_cleaned.csv`)**:
+   - Gồm 8.495 sản phẩm mỹ phẩm thật từ Sephora (2.420 sản phẩm chuyên mục Skincare).
+   - ETL nạp vào bảng `brands`, `categories`, và `products` (chuẩn hóa giá tiền sang VNĐ với tỷ giá 1 USD = 25.000 VNĐ, lưu mã gốc vào cột `code`).
+   - Bóc tách chuỗi `ingredients` phân tách bằng dấu phẩy để nạp vào bảng `ingredients` và `product_ingredients`.
+2. **Đánh giá Khách hàng (`docs/_data/cleaned/reviews_cleaned.csv`)**:
+   - Gồm **1.094.197 dòng đánh giá thật** có phân loại da (`skin_type`: `combination`, `dry`, `oily`, `normal`, `unknown`).
+   - ETL chuẩn hóa `INITCAP(skin_type)` thành (`Combination`, `Dry`, `Oily`, `Normal`, `Unknown`) và nạp vào bảng `reviews` liên kết theo `product_code` / `product_id`.
+3. **Quy tắc mua kèm Routine (`docs/_data/cleaned/apriori_rules.csv`)**:
+   - Gồm 15.259 luật kết hợp Apriori (`antecedent -> consequent`) hỗ trợ gợi ý routine và sản phẩm mua kèm.
+
+### 3.2. 12 Bộ Quy Tắc Xung Đột Hoạt Chất Y Khoa (Curated Conflict Rules)
 
 Hệ thống được nạp sẵn 12 bộ quy tắc xung đột chuẩn y văn da liễu phục vụ kiểm tra tức thì trong giỏ hàng:
 
