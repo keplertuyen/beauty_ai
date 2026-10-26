@@ -1,12 +1,3 @@
----
-doc: chuc-nang-phase-1-do-an
-title: Đặc Tả Phạm Vi Chức Năng Phase 1 (Đồ Án Tốt Nghiệp — BeautyAI)
-status: stable
-precedence: 3
-owner: User / Product Owner
-last_reviewed: 2026-10-26
----
-
 # ĐẶC TẢ PHẠM VI CHỨC NĂNG PHASE 1 (ĐỒ ÁN TỐT NGHIỆP — BEAUTYAI)
 
 > **Mục tiêu:** Hoàn thiện và đóng gói toàn bộ hệ thống BeautyAI trong vòng **1 tháng (4 tuần)** phục vụ bảo vệ đồ án tốt nghiệp.

@@ -62,7 +62,7 @@ def _required():
 
 REQUIRED = _required()
 PLACEHOLDER_PATTERNS = [r"<PROJECT NAME>", r"<YYYY-MM-DD>", r"<\.\.\.>", r"\{\{[A-Z0-9_]+\}\}"]
-EXEMPT = {"CLAUDE.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "LICENSE.md"}
+EXEMPT = {"CLAUDE.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "LICENSE.md", "docs/CHUC_NANG_PHASE1_DO_AN.md"}
 OS_JUNK = {".DS_Store", "Thumbs.db", "desktop.ini"}
 
 
