@@ -1,0 +1,180 @@
+/* 📞 SupportCenter Page Styles */
+
+.sc-page {
+  padding-top: var(--spacing-3xl);
+  padding-bottom: var(--spacing-3xl);
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% -20%, rgba(143, 117, 95, 0.08) 0%, transparent 60%);
+}
+
+.sc-hero {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  animation: fadeInDown 0.4s ease;
+}
+
+.sc-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 40px;
+  align-items: start;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 992px) {
+  .sc-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+  }
+}
+
+.sc-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.sc-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* FAQ Collapsible Items */
+.sc-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.sc-faq-item {
+  padding: 20px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  user-select: none;
+  border: 1px solid var(--glass-border);
+}
+
+.sc-faq-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+
+.sc-faq-open {
+  border-color: var(--primary);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.sc-faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.sc-faq-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sc-faq-answer {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  border-top: 1px dashed var(--glass-border);
+  padding-top: 14px;
+  animation: slideDown 0.25s ease;
+}
+
+/* Contact Column */
+.sc-contact-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.sc-contact-info {
+  padding: var(--spacing-xl);
+}
+
+.sc-contact-heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  margin-bottom: var(--spacing-lg);
+  position: relative;
+}
+
+.sc-contact-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--gradient-primary);
+}
+
+.sc-contact-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sc-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.sc-contact-item svg {
+  flex-shrink: 0;
+}
+
+.sc-form-card {
+  padding: var(--spacing-xl);
+}
+
+.sc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sc-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 6px;
+  transition: all var(--transition-base);
+}
+
+.sc-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* Animations */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
