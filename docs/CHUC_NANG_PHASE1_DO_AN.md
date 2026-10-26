@@ -268,28 +268,20 @@
 # KẾ HOẠCH HÀNH ĐỘNG 4 TUẦN (SPRINT ROADMAP)
 
 ```mermaid
-gantt
-    title Kế hoạch 4 tuần hoàn thành đồ án BeautyAI
-    dateFormat  YYYY-MM-DD
-    section Tuần 1: CSDL & Dữ liệu
-    Database Schema & Auth JWT             :active, 2026-10-26, 3d
-    Seed 100 Sản phẩm & 15 Cặp Xung đột    :active, 2026-10-28, 2d
-    Import mẫu Dataset 1M Reviews          :2026-10-29, 2d
-    Digital Skin ID & Allergy Blacklist    :2026-10-30, 2d
-    section Tuần 2: Frontend & Core INCI
-    Ghép UI So sánh & Wishlist sẵn có     :2026-11-02, 2d
-    Catalog + Lọc "An toàn cho da tôi"     :2026-11-04, 2d
-    PDP + Bảng INCI + Cảnh báo dị ứng đỏ  :2026-11-05, 3d
-    Công cụ dán & phân tích INCI tự do     :2026-11-07, 2d
-    section Tuần 3: E-Commerce & Conflict
-    Giỏ hàng + Conflict Detector           :2026-11-09, 3d
-    Luồng Checkout COD & Quản lý đơn       :2026-11-12, 2d
-    Tích hợp Review phân loại theo da      :2026-11-13, 2d
-    section Tuần 4: AI, Quiz & Đóng gói
-    Skin Quiz & Chat-to-Cart Routine       :2026-11-16, 2d
-    Trợ lý AI Gemini Chatbot               :2026-11-18, 2d
-    Admin Dashboard tinh gọn               :2026-11-20, 2d
-    Test End-to-End & Chuẩn bị Báo cáo     :2026-11-21, 2d
+flowchart LR
+    subgraph W1["Tuần 1: CSDL & Dữ liệu"]
+        T11["Database & Auth"] --> T12["Seed 100 SP & Xung đột"] --> T13["Import 1M Reviews"] --> T14["Digital Skin ID"]
+    end
+    subgraph W2["Tuần 2: Frontend & INCI"]
+        T21["Ghép UI So sánh/Wishlist"] --> T22["Catalog & Lọc an toàn"] --> T23["PDP & Bảng INCI"] --> T24["Tool dán INCI"]
+    end
+    subgraph W3["Tuần 3: E-Commerce & Conflict"]
+        T31["Giỏ hàng & Conflict"] --> T32["Checkout COD"] --> T33["Review theo loại da"]
+    end
+    subgraph W4["Tuần 4: AI & Đóng gói"]
+        T41["Skin Quiz & Chat-to-Cart"] --> T42["Gemini Chatbot"] --> T43["Admin tinh gọn"] --> T44["Test & Báo cáo"]
+    end
+    W1 --> W2 --> W3 --> W4
 ```
 
 ### Chi tiết phân bổ công việc theo tuần:

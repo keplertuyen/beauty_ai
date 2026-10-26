@@ -13,31 +13,23 @@ last_reviewed: 2026-10-26
 
 ---
 
-## 1. Bản Đồ Tiến Độ Tổng Thể (Gantt Roadmap)
+## 1. Bản Đồ Tiến Độ Tổng Thể (Roadmap)
 
 ```mermaid
-gantt
-    title Kế Hoạch 30 Ngày Hoàn Thành BeautyAI Phase 1 (MVP)
-    dateFormat  YYYY-MM-DD
-    section Tuần 1: CSDL, Dữ liệu & Auth
-    T1.1 CSDL PostgreSQL & Seed Data       :active, 2026-10-26, 2d
-    T1.2 Import & Index 1M Reviews         :2026-10-28, 2d
-    T1.3 Backend Auth & Digital Skin ID    :2026-10-30, 3d
-    section Tuần 2: Ghép UI & Core INCI
-    T2.1 Tích hợp React UI sẵn có          :2026-11-02, 2d
-    T2.2 Catalog & Lọc "An toàn cho da"    :2026-11-04, 2d
-    T2.3 PDP + Bảng INCI + Cảnh báo đỏ     :2026-11-05, 2d
-    T2.4 Công cụ Dán & Phân tích INCI      :2026-11-07, 2d
-    section Tuần 3: E-Commerce & Conflict
-    T3.1 Giỏ hàng & Smart Conflict         :2026-11-09, 3d
-    T3.2 Thanh toán COD & Quản lý đơn      :2026-11-12, 2d
-    T3.3 So sánh & Wishlist                :2026-11-13, 1d
-    T3.4 Lọc Đánh giá theo loại da (1M)    :2026-11-14, 2d
-    section Tuần 4: AI, Quiz, Admin & Launch
-    T4.1 Skin Quiz & Chat-to-Cart Routine  :2026-11-16, 2d
-    T4.2 Trợ lý AI Gemini Chatbot          :2026-11-18, 2d
-    T4.3 Admin Dashboard tinh gọn          :2026-11-20, 2d
-    T4.4 End-to-End Test & Đóng gói Demo   :2026-11-22, 3d
+flowchart LR
+    subgraph W1["Tuần 1: CSDL & Auth"]
+        T11["T1.1 CSDL & Seed Data"] --> T12["T1.2 Import 1M Reviews"] --> T13["T1.3 Backend Auth & Skin ID"]
+    end
+    subgraph W2["Tuần 2: Frontend & INCI"]
+        T21["T2.1 Ghép React UI"] --> T22["T2.2 Catalog & Lọc an toàn"] --> T23["T2.3 PDP & INCI"] --> T24["T2.4 Tool INCI"]
+    end
+    subgraph W3["Tuần 3: E-Commerce & Conflict"]
+        T31["T3.1 Giỏ hàng & Conflict"] --> T32["T3.2 COD Checkout"] --> T33["T3.3 Lọc review 1M"]
+    end
+    subgraph W4["Tuần 4: AI & Launch"]
+        T41["T4.1 Skin Quiz & Routine"] --> T42["T4.2 Gemini Chatbot"] --> T43["T4.3 Admin"] --> T44["T4.4 Tổng duyệt Demo"]
+    end
+    W1 --> W2 --> W3 --> W4
 ```
 
 ---
