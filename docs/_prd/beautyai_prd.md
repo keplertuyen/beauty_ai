@@ -2835,3 +2835,4 @@ Tiêu chí cuối (`ma_san_pham ↑`) đảm bảo kết quả **không bao gi�
 ---
 
 *Hết tài liệu `BRD_BeautyAI_V1.0`.*
+ 
