@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-BeautyAI Phase 1 — Database Seeder & ETL Script
-Extracts Brands, Categories, Products, and INCI Ingredients from products_cleaned.csv
-Seeds Conflict Rules and Demo Persona Users.
+BeautyAI Phase 1 — Global Database Seeder & ETL Script (English & USD)
+Extracts Brands, Categories, Products, and INCI Ingredients from products_cleaned.csv.
+Seeds 12 Medical Conflict Rules, Demo Users, and Unified Digital Skin ID in English & USD.
 """
 
 import csv
 import re
 import sys
-import subprocess
 from pathlib import Path
 
 def slugify(text: str) -> str:
@@ -44,7 +43,7 @@ def main():
                 row['_loves'] = loves
                 skincare_products.append(row)
 
-    # Sort by popularity (loves_count) and take top 300 Skincare products
+    # Sort by popularity (loves_count) and select top 300 Skincare products
     skincare_products.sort(key=lambda x: x['_loves'], reverse=True)
     selected_products = skincare_products[:300]
     print(f"Selected top {len(selected_products)} Skincare products.")
@@ -72,7 +71,7 @@ def main():
 
     sql_lines = []
     sql_lines.append("-- ============================================================================")
-    sql_lines.append("-- BEAUTYAI PHASE 1 SEED DATA")
+    sql_lines.append("-- BEAUTYAI PHASE 1 SEED DATA (GLOBAL ENGLISH & USD)")
     sql_lines.append("-- ============================================================================\n")
 
     # 1. Brands
@@ -95,118 +94,117 @@ def main():
         )
     sql_lines.append("")
 
-    # 3. Conflict Rules (12 Curated Rules)
+    # 3. Active Ingredient Conflict Rules (12 Standard Medical Rules in English)
     sql_lines.append("-- 3. CONFLICT RULES")
     rules = [
         ("Retinol", "Salicylic Acid (BHA)", "Warning",
-         "Phá vỡ hàng rào bảo vệ da, gây bong tróc nặng và bỏng rát.",
-         "Dùng BHA tối 2-4-6, Retinol tối 3-5-7."),
+         "Disrupts skin barrier, causing severe flaking, redness, and irritation.",
+         "Use BHA on Mon-Wed-Fri evenings, and Retinol on Tue-Thu-Sat evenings."),
         ("Retinol", "Glycolic Acid (AHA)", "Warning",
-         "Kích ứng mạnh, bào mòn lớp sừng bề mặt da.",
-         "Dùng AHA sáng hoặc cách ngày, Retinol dùng buổi tối."),
+         "Excessive exfoliation leading to micro-tears and compromised moisture barrier.",
+         "Use AHA in the morning or alternate nights with Retinol."),
         ("Benzoyl Peroxide", "Retinol", "Contraindication",
-         "Benzoyl Peroxide oxy hóa làm mất hoạt tính của Retinol.",
-         "Dùng Benzoyl Peroxide buổi sáng, Retinol buổi tối."),
+         "Benzoyl Peroxide oxidizes Retinol, neutralizing the efficacy of both actives.",
+         "Apply Benzoyl Peroxide in the morning and Retinol in the evening."),
         ("Vitamin C (L-Ascorbic Acid)", "Salicylic Acid (BHA)", "Warning",
-         "pH quá thấp làm da quá tải acid, gây đỏ rát châm chích.",
-         "Dùng Vitamin C buổi sáng trước kem chống nắng, BHA buổi tối."),
+         "Cumulative low pH overload causes skin flushing, stinging, and redness.",
+         "Use Vitamin C in the morning before sunscreen; apply BHA in the evening."),
         ("Vitamin C (L-Ascorbic Acid)", "Glycolic Acid (AHA)", "Warning",
-         "Môi trường acid quá mạnh gây bỏng rát da nhạy cảm.",
-         "Dùng Vitamin C buổi sáng, AHA buổi tối."),
+         "Strong acid combination destabilizes sensitive skin barrier.",
+         "Apply Vitamin C in the morning and AHA in the evening."),
         ("Vitamin C (L-Ascorbic Acid)", "Niacinamide", "Warning",
-         "Có thể tương tác tạo phức Niacin làm ửng đỏ da tạm thời ở nồng độ cao.",
-         "Thoa cách nhau 20 phút hoặc chia sáng (Vit C) / tối (Niacinamide)."),
+         "High-concentration pure ascorbic acid may interact with niacinamide causing temporary facial flushing.",
+         "Wait 20 minutes between applications or split: Vitamin C in AM, Niacinamide in PM."),
         ("Benzoyl Peroxide", "Vitamin C (L-Ascorbic Acid)", "Contraindication",
-         "Benzoyl Peroxide là chất oxy hóa mạnh, triệt tiêu tác dụng của Vitamin C.",
-         "Tách riêng Benzoyl Peroxide buổi tối và Vitamin C buổi sáng."),
+         "Strong oxidizing agent Benzoyl Peroxide rapidly degrades Vitamin C.",
+         "Use Vitamin C in the morning and Benzoyl Peroxide in the evening."),
         ("Retinol", "Vitamin C (L-Ascorbic Acid)", "Warning",
-         "Cả hai đều là hoạt chất đặc trị mạnh, pH hoạt động chênh lệch dễ gây kích ứng.",
-         "Vitamin C buổi sáng chống oxy hóa, Retinol buổi tối tái tạo da."),
+         "Simultaneous application of potent actives with divergent pH triggers irritation.",
+         "Use Vitamin C in the morning for antioxidant protection; apply Retinol at night."),
         ("Glycolic Acid (AHA)", "Salicylic Acid (BHA)", "Warning",
-         "Nguy cơ tẩy da chết quá đà (Over-exfoliation) nếu dùng cùng lúc.",
-         "Không thoa chung nếu da nhạy cảm; chia xen kẽ ngày."),
+         "Over-exfoliation hazard if combined at high percentages.",
+         "Do not layer together if prone to sensitivity; alternate on different days."),
         ("Hydroquinone", "Benzoyl Peroxide", "Contraindication",
-         "Có thể gây sạm đen da tạm thời do phản ứng kết tủa.",
-         "Tuyệt đối không dùng chung trong cùng chu trình."),
+         "May produce temporary dark staining on the skin due to chemical oxidation.",
+         "Do not use together in the same skincare routine."),
         ("Copper Peptides", "Vitamin C (L-Ascorbic Acid)", "Warning",
-         "Ion đồng oxy hóa acid ascorbic, làm mất tác dụng của cả hai hoạt chất.",
-         "Dùng Peptide buổi sáng, Vitamin C buổi tối (hoặc ngược lại)."),
+         "Copper ions oxidize ascorbic acid, rendering both ingredients inactive.",
+         "Use Copper Peptides in AM and Vitamin C in PM (or vice versa)."),
         ("Retinol", "Scrub", "Warning",
-         "Tổn thương vi mô kết hợp bong sừng gây viêm da tiếp xúc.",
-         "Không dùng scrub dạng hạt vật lý khi đang treatment Retinol.")
+         "Physical micro-tears combined with cellular turnover cause severe contact dermatitis.",
+         "Avoid physical facial scrubs while using topical retinoids.")
     ]
     for r in rules:
         sql_lines.append(
-            f"INSERT INTO conflict_rules (active_ingredient_a, active_ingredient_b, severity, reason_vi, recommendation_vi) VALUES "
+            f"INSERT INTO conflict_rules (active_ingredient_a, active_ingredient_b, severity, reason, recommendation) VALUES "
             f"({escape_sql(r[0])}, {escape_sql(r[1])}, {escape_sql(r[2])}, {escape_sql(r[3])}, {escape_sql(r[4])});"
         )
     sql_lines.append("")
 
-    # 4. Users (Admin + 3 Persona Users)
-    # BCrypt hash for 'Admin@123456' and 'Password@123'
-    # $2a$11$qR6m.N7b4a2e8yJ/Q5B7/.xN5gU3s1qW2e4r6t8y0u2i4o6p8a0s2 (dummy valid hash or BCrypt format)
-    # Using a valid standard BCrypt hash:
-    # $2a$11$w1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2d4
-    sql_lines.append("-- 4. DEMO USERS & DIGITAL SKIN ID")
+    # 4. Demo Users & Unified Digital Skin ID (1. Skin Type -> 2. Allergy Blacklist -> 3. Concerns & Goals)
+    sql_lines.append("-- 4. DEMO USERS & UNIFIED DIGITAL SKIN ID")
     sql_lines.append(
         "INSERT INTO users (email, password_hash, full_name, phone, role) VALUES "
-        "('admin@beautyai.vn', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'Quản Trị Viên BeautyAI', '0901234567', 'Admin'), "
-        "('trang.nguyen@example.com', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'Nguyễn Thu Trang', '0912345678', 'Customer'), "
-        "('maianh.tran@example.com', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'Trần Mai Anh', '0923456789', 'Customer'), "
-        "('long.le@example.com', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'Lê Hoàng Long', '0934567890', 'Customer') "
+        "('admin@beautyai.com', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'System Administrator', '+1-555-0199', 'Admin'), "
+        "('trang.nguyen@example.com', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'Thu Trang Nguyen', '+1-555-0101', 'Customer'), "
+        "('maianh.tran@example.com', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'Mai Anh Tran', '+1-555-0102', 'Customer'), "
+        "('long.le@example.com', '$2a$11$8k1hSjYQ4bF9k5E8aO.Wf.uX9iP7qL2m4y6r8t0u2i4o6p8a0s2', 'Hoang Long Le', '+1-555-0103', 'Customer') "
         "ON CONFLICT (email) DO NOTHING;"
     )
 
+    # Persona 1: Oily/Acne-prone skin, Allergic to Alcohol Denat
     sql_lines.append(
         "INSERT INTO skin_profiles (user_id, skin_type, skin_concerns, primary_goal, budget_level) "
-        "SELECT id, 'Oily', ARRAY['Acne', 'Pores'], 'Giảm mụn và kiểm soát dầu thừa', 'Medium' "
+        "SELECT id, 'Oily', ARRAY['Acne', 'Pores'], 'Blemish reduction and sebum control', 'Medium' "
         "FROM users WHERE email = 'trang.nguyen@example.com' ON CONFLICT (user_id) DO NOTHING;"
     )
     sql_lines.append(
         "INSERT INTO user_allergies (user_id, ingredient_name, note) "
-        "SELECT id, 'Alcohol Denat', 'Gây khô căng rát da khi dùng cồn khô' "
+        "SELECT id, 'Alcohol Denat', 'Causes severe dryness and skin barrier tightness' "
         "FROM users WHERE email = 'trang.nguyen@example.com';"
     )
 
+    # Persona 2: Dry/Sensitive skin, Allergic to Fragrance/Parfum
     sql_lines.append(
         "INSERT INTO skin_profiles (user_id, skin_type, skin_concerns, primary_goal, budget_level) "
-        "SELECT id, 'Dry', ARRAY['Sensitivity', 'Dehydration'], 'Phục hồi hàng rào ẩm và làm dịu da nhạy cảm', 'High' "
+        "SELECT id, 'Dry', ARRAY['Sensitivity', 'Dehydration'], 'Barrier repair and calming irritation', 'High' "
         "FROM users WHERE email = 'maianh.tran@example.com' ON CONFLICT (user_id) DO NOTHING;"
     )
     sql_lines.append(
         "INSERT INTO user_allergies (user_id, ingredient_name, note) "
-        "SELECT id, 'Fragrance/Parfum', 'Dị ứng hương liệu nhân tạo gây ngứa đỏ' "
+        "SELECT id, 'Fragrance/Parfum', 'Synthetic fragrance triggers contact dermatitis and redness' "
         "FROM users WHERE email = 'maianh.tran@example.com';"
     )
 
+    # Persona 3: Combination/Aging skin
     sql_lines.append(
         "INSERT INTO skin_profiles (user_id, skin_type, skin_concerns, primary_goal, budget_level) "
-        "SELECT id, 'Combination', ARRAY['Aging', 'DarkSpots'], 'Chống lão hóa và mờ thâm nám vùng chữ T', 'Medium' "
+        "SELECT id, 'Combination', ARRAY['Aging', 'DarkSpots'], 'Anti-aging and dark spot brightening in T-zone', 'Medium' "
         "FROM users WHERE email = 'long.le@example.com' ON CONFLICT (user_id) DO NOTHING;"
     )
     sql_lines.append("")
 
-    # 5. Products & Ingredients
+    # 5. Products & INCI Ingredients
     sql_lines.append("-- 5. PRODUCTS & INGREDIENTS")
 
     known_active_ingredients = {
-        'salicylic acid': ('Salicylic Acid (BHA)', 'Tẩy tế bào chết sâu trong lỗ chân lông, giảm viêm mụn', True, 0, 1),
-        'glycolic acid': ('Glycolic Acid (AHA)', 'Bong sừng bề mặt, làm sáng đều màu da', True, 0, 2),
-        'lactic acid': ('Lactic Acid (AHA)', 'Tẩy da chết nhẹ nhàng kết hợp cấp ẩm', True, 0, 1),
-        'niacinamide': ('Niacinamide (Vitamin B3)', 'Kiểm soát dầu nhờn, củng cố hàng rào bảo vệ da, mờ thâm', True, 0, 0),
-        'retinol': ('Retinol', 'Kích thích tăng sinh collagen, chống lão hóa, mờ nếp nhăn', True, 0, 2),
-        'ascorbic acid': ('Vitamin C (L-Ascorbic Acid)', 'Chống oxy hóa mạnh mẽ, dưỡng sáng da, mờ thâm mụn', True, 0, 2),
-        'sodium hyaluronate': ('Hyaluronic Acid', 'Cấp nước đa tầng, ngậm nước cho tế bào da', False, 0, 0),
-        'ceramide np': ('Ceramide NP', 'Phục hồi lipid gian bào, khóa ẩm hàng rào da', False, 0, 0),
-        'centella asiatica extract': ('Chiết xuất Rau má', 'Làm dịu kích ứng, kháng viêm, phục hồi da tổn thương', False, 0, 0),
-        'panthenol': ('Vitamin B5 (Panthenol)', 'Làm dịu da tức thì, thúc đẩy tái tạo tế bào', False, 0, 0),
-        'benzoyl peroxide': ('Benzoyl Peroxide', 'Tiêu diệt vi khuẩn P.acnes gây mụn bọc mụn viêm', True, 0, 2),
-        'alcohol denat': ('Cồn khô (Alcohol Denat)', 'Dung môi tạo cảm giác khô ráo, có thể gây khô căng da', False, 0, 2),
-        'parfum': ('Hương liệu (Fragrance/Parfum)', 'Tạo mùi thơm, nguy cơ kích ứng cho da nhạy cảm', False, 0, 2),
-        'fragrance': ('Hương liệu (Fragrance/Parfum)', 'Tạo mùi thơm, nguy cơ kích ứng cho da nhạy cảm', False, 0, 2)
+        'salicylic acid': ('Exfoliating', 'Penetrates deep into pores to dissolve excess sebum and clear acne lesions', True, 0, 1),
+        'glycolic acid': ('Exfoliating', 'Alpha hydroxy acid that loosens dead surface cells to reveal radiant skin', True, 0, 2),
+        'lactic acid': ('Exfoliating', 'Gentle alpha hydroxy acid providing mild exfoliation with natural hydration', True, 0, 1),
+        'niacinamide': ('Active', 'Vitamin B3 that strengthens lipid barrier, minimizes pore appearance, and balances oil', True, 0, 0),
+        'retinol': ('Active', 'Gold-standard vitamin A derivative promoting cellular turnover and collagen synthesis', True, 0, 2),
+        'ascorbic acid': ('Antioxidant', 'Pure L-ascorbic acid providing powerful environmental defense and hyperpigmentation fading', True, 0, 2),
+        'sodium hyaluronate': ('Hydrating', 'Multi-molecular hyaluronic acid holding up to 1000x its weight in water', False, 0, 0),
+        'ceramide np': ('Hydrating', 'Essential skin-identical lipid that locks in moisture and reinforces barrier defense', False, 0, 0),
+        'centella asiatica extract': ('Soothing', 'Botanical extract rich in madecassoside that calms redness and repairs compromised skin', False, 0, 0),
+        'panthenol': ('Soothing', 'Pro-vitamin B5 delivering instant soothing relief and wound healing acceleration', False, 0, 0),
+        'benzoyl peroxide': ('Active', 'Antimicrobial agent that eradicates acne-causing bacteria deep within pores', True, 0, 2),
+        'alcohol denat': ('Other', 'Drying solvent used for quick-dry feel, potential irritant for dry/sensitive barriers', False, 0, 2),
+        'parfum': ('Other', 'Synthetic fragrance blend, common sensitizing agent for reactive skin', False, 0, 2),
+        'fragrance': ('Other', 'Synthetic fragrance blend, common sensitizing agent for reactive skin', False, 0, 2)
     }
 
-    ingredient_map = {} # cleaned_name -> dict
+    ingredient_map = {}
 
     for p in selected_products:
         code = p.get('product_id', '').strip()
@@ -218,13 +216,12 @@ def main():
         try:
             price_usd = float(p.get('price_usd') or 0)
         except ValueError:
-            price_usd = 20.0
-        price_vnd = int(price_usd * 25000)
-        if price_vnd <= 0:
-            price_vnd = 250000
+            price_usd = 28.0
+        if price_usd <= 0:
+            price_usd = 25.0
 
-        desc = p.get('highlights', '').strip() or f"Sản phẩm {name} chính hãng từ thương hiệu {b_name}."
-        img_url = f"https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80" # placeholder standard
+        desc = p.get('highlights', '').strip() or f"Authentic {name} from {b_name}."
+        img_url = "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80"
         raw_ingredients = p.get('ingredients', '').strip()
 
         # Target skin types determination
@@ -238,22 +235,21 @@ def main():
             skin_types = "ARRAY['Dry', 'Sensitive', 'Normal']"
 
         sql_lines.append(
-            f"INSERT INTO products (code, name, slug, brand_id, category_id, price_vnd, volume_ml, description, image_url, ingredient_list_raw, target_skin_types, stock_quantity) "
+            f"INSERT INTO products (code, name, slug, brand_id, category_id, price_usd, volume_ml, description, image_url, ingredient_list_raw, target_skin_types, stock_quantity) "
             f"VALUES ("
             f"{escape_sql(code)}, "
             f"{escape_sql(name)}, "
             f"{escape_sql(slug)}, "
             f"(SELECT id FROM brands WHERE name = {escape_sql(b_name)} LIMIT 1), "
             f"(SELECT id FROM categories WHERE name = {escape_sql(c_name)} LIMIT 1), "
-            f"{price_vnd}, 50, {escape_sql(desc)}, {escape_sql(img_url)}, {escape_sql(raw_ingredients)}, "
+            f"{price_usd:.2f}, 50, {escape_sql(desc)}, {escape_sql(img_url)}, {escape_sql(raw_ingredients)}, "
             f"{skin_types}, 100"
-            f") ON CONFLICT (code) DO NOTHING;"
+            f") ON CONFLICT (code) DO UPDATE SET price_usd = EXCLUDED.price_usd;"
         )
 
         # Parse individual ingredients
-        # Split by comma or period
         raw_list = [i.strip() for i in re.split(r'[,.]', raw_ingredients) if len(i.strip()) > 1]
-        for pos, ing_raw in enumerate(raw_list[:40]): # top 40 ingredients per product
+        for pos, ing_raw in enumerate(raw_list[:40]):
             ing_clean = ing_raw.lower()
             ing_clean = re.sub(r'\(.*?\)', '', ing_clean).strip()
             if not ing_clean or len(ing_clean) < 2:
@@ -269,8 +265,8 @@ def main():
                 if active_info:
                     ingredient_map[ing_clean] = {
                         'inci': ing_clean,
-                        'name_vi': active_info[0],
-                        'desc_vi': active_info[1],
+                        'function_group': active_info[0],
+                        'description': active_info[1],
                         'is_active': active_info[2],
                         'comedo': active_info[3],
                         'irritation': active_info[4]
@@ -278,16 +274,16 @@ def main():
                 else:
                     ingredient_map[ing_clean] = {
                         'inci': ing_clean,
-                        'name_vi': ing_clean.capitalize(),
-                        'desc_vi': 'Thành phần dưỡng chất trong công thức',
+                        'function_group': 'Other',
+                        'description': 'Formulation stabilizing, texturizing, or emollient compound.',
                         'is_active': False,
                         'comedo': 0,
                         'irritation': 0
                     }
 
             sql_lines.append(
-                f"INSERT INTO ingredients (inci_name, common_name_vi, description_vi, is_active_ingredient, comedogenic_rating, irritation_rating) "
-                f"VALUES ({escape_sql(ingredient_map[ing_clean]['inci'])}, {escape_sql(ingredient_map[ing_clean]['name_vi'])}, {escape_sql(ingredient_map[ing_clean]['desc_vi'])}, "
+                f"INSERT INTO ingredients (inci_name, function_group, description, is_active_ingredient, comedogenic_rating, irritation_rating) "
+                f"VALUES ({escape_sql(ingredient_map[ing_clean]['inci'])}, {escape_sql(ingredient_map[ing_clean]['function_group'])}, {escape_sql(ingredient_map[ing_clean]['description'])}, "
                 f"{ingredient_map[ing_clean]['is_active']}, {ingredient_map[ing_clean]['comedo']}, {ingredient_map[ing_clean]['irritation']}) "
                 f"ON CONFLICT (inci_name) DO NOTHING;"
             )
@@ -305,7 +301,7 @@ def main():
         f.write(sql_content)
 
     print(f"Generated {len(sql_lines)} SQL lines into {output_sql_path}.")
-    print(f"Total Unique Ingredients extracted: {len(ingredient_map)}")
+    print(f"Total Unique Ingredients: {len(ingredient_map)}")
     print(f"Total Brands: {len(brands)}")
     print(f"Total Categories: {len(categories)}")
 

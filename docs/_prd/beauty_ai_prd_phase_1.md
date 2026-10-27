@@ -47,6 +47,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 | Module / Tính năng | Phạm vi Phase 1 (MVP — 30 Ngày) | Phạm vi Phase 2 (Mở rộng — 6 Tháng) |
 |---|---|---|
+| **Ngôn ngữ & Tiền tệ** | **English & USD ($)** nguyên bản theo Sephora US dataset (8.495 SP, 1.09M Reviews). | Bản địa hóa Tiếng Việt (i18n), Chuyển đổi song tệ (VND/USD). |
 | **Xác thực & Tài khoản** | Đăng ký, Đăng nhập Email/Password chuẩn, JWT an toàn, Đổi mật khẩu, Cập nhật Profile. | Đăng nhập Google/Facebook OAuth, Quên mật khẩu qua email token SMTP. |
 | **Hồ sơ da & Dị ứng** | Digital Skin ID (Loại da, nhạy cảm, 5 vấn đề da), Allergy Blacklist cá nhân hóa, Cảnh báo dị ứng đỏ. | Lịch sử biến đổi da theo thời gian, Đánh giá mức độ nhạy cảm qua camera phân tích ảnh. |
 | **Danh mục & Tìm kiếm** | Danh mục 2 cấp, Tìm kiếm từ khóa/hoạt chất, Lọc loại da/giá, Sắp xếp, Công tắc *"An toàn cho da tôi"*. | Lọc theo chứng nhận Vegan/Cruelty-Free, Tìm kiếm bằng giọng nói / hình ảnh. |
@@ -111,7 +112,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ### FR-CAT-01 [Must-Have] Duyệt danh mục sản phẩm phân trang
 - **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** tôi mở trang danh mục `/products`, **When** trang tải xong, **Then** hệ thống hiển thị lưới sản phẩm phân trang (mặc định 16 hoặc 24 sản phẩm/trang). Mỗi thẻ sản phẩm hiển thị: Ảnh đại diện, Tên thương hiệu, Tên sản phẩm, Giá bán niêm yết (VNĐ), Điểm đánh giá sao trung bình, Nút thả tim yêu thích và Nút thêm vào giỏ.
+  - `AC-01.1` **Given** tôi mở trang danh mục `/products`, **When** trang tải xong, **Then** hệ thống hiển thị lưới sản phẩm phân trang (mặc định 16 hoặc 24 sản phẩm/trang). Mỗi thẻ sản phẩm hiển thị: Ảnh đại diện, Tên thương hiệu, Tên sản phẩm, Giá bán niêm yết (USD $), Điểm đánh giá sao trung bình, Nút thả tim yêu thích và Nút thêm vào giỏ.
   - `AC-01.2` **Given** tôi bấm chuyển sang trang 2 hoặc đổi số lượng hiển thị, **When** danh sách tải mới, **Then** toàn bộ các bộ lọc đang chọn (loại da, khoảng giá) và từ khóa tìm kiếm vẫn được giữ nguyên vẹn trên URL.
 
 ### FR-CAT-02 [Must-Have] Tìm kiếm sản phẩm đa năng
@@ -146,7 +147,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ### FR-PDP-01 [Must-Have] Hiển thị thông tin tổng quan sản phẩm
 - **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** tôi mở trang `/products/{slug}`, **When** trang tải xong, **Then** hiển thị đầy đủ: Ảnh sản phẩm chất lượng cao (có chức năng zoom/xem ảnh phóng to), Tên thương hiệu, Tên sản phẩm, Dung tích (ml/g), Giá bán chuẩn VNĐ, Tình trạng còn hàng/hết hàng, Nút số lượng và Nút *"Thêm vào giỏ hàng"*.
+  - `AC-01.1` **Given** tôi mở trang `/products/{slug}`, **When** trang tải xong, **Then** hiển thị đầy đủ: Ảnh sản phẩm chất lượng cao (có chức năng zoom/xem ảnh phóng to), Tên thương hiệu, Tên sản phẩm, Dung tích (ml/g), Giá bán chuẩn USD ($), Tình trạng còn hàng/hết hàng, Nút số lượng và Nút *"Thêm vào giỏ hàng"*.
 
 ### FR-PDP-02 [Must-Have] Bảng thành phần INCI chuẩn hóa có nhãn tiếng Việt
 - **Mô tả:** Toàn bộ bảng thành phần hóa học được bóc tách và giải nghĩa khoa học rõ ràng.
@@ -290,7 +291,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 ### FR-COMP-02 [Must-Have] Bảng so sánh thông số, thành phần & Match Score
 - **Điều kiện chấp nhận:**
   - `AC-02.1` **Given** tôi bấm *"So sánh ngay"*, **When** trang `/compare` hiển thị, **Then** xuất hiện bảng so sánh song song đa cột (Side-by-side Table):
-    - Dòng 1: Hình ảnh, tên, giá bán VNĐ, dung tích, xuất xứ thương hiệu.
+    - Dòng 1: Hình ảnh, tên, giá bán USD ($), dung tích, xuất xứ thương hiệu.
     - Dòng 2: **Điểm tương thích Match Score** theo hồ sơ da của người xem (ví dụ: SP A đạt 88%, SP B đạt 70%).
     - Dòng 3: Danh sách các hoạt chất chính và điểm khác biệt về công năng.
     - Dòng 4: Cảnh báo dị ứng: Đánh dấu đỏ trực tiếp lên cột sản phẩm nào có chứa chất dị ứng của người xem.
@@ -384,11 +385,11 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ### FR-ADM-01 [Must-Have] Bảng điều khiển KPI kinh doanh (Dashboard)
 - **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** tài khoản `ADMIN` truy cập `/admin`, **When** trang tải xong, **Then** hiển thị 4 thẻ số liệu thống kê trực quan: Tổng số sản phẩm đang bán, Tổng số đơn hàng phát sinh, Tổng doanh thu lũy kế (VNĐ), và Tổng số tài khoản khách hàng.
+  - `AC-01.1` **Given** tài khoản `ADMIN` truy cập `/admin`, **When** trang tải xong, **Then** hiển thị 4 thẻ số liệu thống kê trực quan: Tổng số sản phẩm đang bán, Tổng số đơn hàng phát sinh, Tổng doanh thu lũy kế (USD $), và Tổng số tài khoản khách hàng.
 
 ### FR-ADM-02 [Must-Have] Quản lý sản phẩm & Nhập chuỗi thành phần INCI (CRUD)
 - **Điều kiện chấp nhận:**
-  - `AC-02.1` **Given** trang Quản lý sản phẩm, **When** Admin bấm *"Thêm sản phẩm mới"*, **Then** Admin có thể nhập: Tên sản phẩm, Thương hiệu, Danh mục, Giá bán VNĐ, Dung tích, Tồn kho, Link ảnh và đặc biệt là **Ô dán chuỗi thành phần INCI thô**.
+  - `AC-02.1` **Given** trang Quản lý sản phẩm, **When** Admin bấm *"Thêm sản phẩm mới"*, **Then** Admin có thể nhập: Tên sản phẩm, Thương hiệu, Danh mục, Giá bán USD ($), Dung tích, Tồn kho, Link ảnh và đặc biệt là **Ô dán chuỗi thành phần INCI thô**.
   - `AC-02.2` **Given** Admin dán chuỗi INCI thô và bấm lưu, **Then** hệ thống tự động bóc tách và tạo liên kết trong bảng `product_ingredients`.
   - `AC-02.3` **Given** sản phẩm đã có, **When** Admin chỉnh sửa giá hoặc tồn kho, **Then** thông tin được cập nhật tức thì trên trang Catalog ngoài website.
 
@@ -410,7 +411,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
    - Ngăn chặn SQL Injection thông qua việc sử dụng 100% Parameterized Queries trong EF Core và Dapper.
 3. **Bất biến kiến trúc & nghiệp vụ (Invariants - NFR-INV):**
    - **INV-01 (Bất biến tối cao):** Hệ thống **tuyệt đối không** chứa bất kỳ thuộc tính hay chỉ số nào mang tên `SafetyScore`, `HazardScore`, `DangerLevel`. Mọi chỉ số đánh giá đều là `SuitabilityScore` (Điểm tương thích cá nhân hóa).
-   - **INV-02:** Toàn bộ hệ thống chạy chuẩn duy nhất một loại tiền tệ là **VNĐ**.
+   - **INV-02:** Toàn bộ hệ thống chạy chuẩn duy nhất một loại tiền tệ là **USD ($)** trong Phase 1 (đồng bộ 100% với Sephora dataset); tính năng chuyển đổi song tệ (VND/USD) và bản địa hóa Tiếng Việt (i18n) thuộc Phase 2.
 4. **Tính khả dụng & Trải nghiệm (Usability - NFR-UI):**
    - Giao diện web chuẩn Responsive mượt mà trên cả máy tính bàn (Desktop) và điện thoại di động (Mobile).
    - Bảng so sánh sản phẩm hỗ trợ cuộn ngang mượt mà khi xem trên màn hình nhỏ.

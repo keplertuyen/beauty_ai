@@ -8,7 +8,7 @@ export DOTNET_CLI_HOME="${DOTNET_CLI_HOME:-/tmp}"
 if [ -d "/opt/homebrew/opt/dotnet/libexec" ]; then
   export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"
   export PATH="/opt/homebrew/opt/dotnet/bin:${PATH}"
-elif [ -d "${HOME}/.dotnet" ]; then
+elif [ -n "${HOME:-}" ] && [ -d "${HOME}/.dotnet" ]; then
   export DOTNET_ROOT="${HOME}/.dotnet"
   export PATH="${DOTNET_ROOT}:${PATH}"
 fi

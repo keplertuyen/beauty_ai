@@ -122,7 +122,7 @@ flowchart LR
 |---|---|---|---|---|
 | **T3.1** | **Giỏ hàng & Smart Conflict Detector (USP)** | 14 giờ | `Cart.jsx` & `ConflictDetectorService` | Quét tự động giỏ hàng; Khung cảnh báo viền cam nổi bật khi có cặp kỵ nhau (vd: Retinol + BHA); Đưa ra lời khuyên chia lịch sáng/tối; Checkbox xác nhận mua tiếp. |
 | **T3.2** | **Thanh toán COD & Quản lý Voucher** | 10 giờ | `Checkout.jsx` & API `POST /api/v1/orders` | Form nhập địa chỉ nhận hàng; Áp dụng mã `BEAUTYAI10` (-10%) và `FREESHIP`; Tạo đơn hàng COD và hiển thị trang cảm ơn Thank You. |
-| **T3.3** | **Lịch sử đơn hàng cá nhân** | 6 giờ | `Profile.jsx` & API my-orders | Danh sách các đơn hàng đã đặt, mã đơn, tổng tiền VNĐ, danh sách sản phẩm và trạng thái đơn. |
+| **T3.3** | **Lịch sử đơn hàng cá nhân** | 6 giờ | `Profile.jsx` & API my-orders | Danh sách các đơn hàng đã đặt, mã đơn, tổng tiền USD ($), danh sách sản phẩm và trạng thái đơn. |
 | **T3.4** | **Tích hợp Reviews 1M trên trang PDP** | 10 giờ | Bảng `reviews` đã đánh chỉ mục B-Tree | Hiển thị điểm sao trung bình; Tab lọc đánh giá theo loại da (*"Xem người có DA DẦU nói gì"*); Ưu tiên bài viết cùng loại da với khách. |
 
 🎯 **MỐC QUALITY GATE 3 (Cuối Tuần 3):**

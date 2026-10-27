@@ -151,21 +151,21 @@ CREATE TABLE brands (
 );
 
 -- ============================================================================
--- 6. BẢNG SẢN PHẨM & LIÊN KẾT THÀNH PHẦN (PRODUCTS & PRODUCT_INGREDIENTS)
+-- 5. BẢNG SẢN PHẨM & LIÊN KẾT THÀNH PHẦN (PRODUCTS & PRODUCT_INGREDIENTS)
 -- ============================================================================
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
-    code VARCHAR(50) UNIQUE NOT NULL, -- Mã sản phẩm gốc từ Sephora dataset (VD: 'P473671')
+    code VARCHAR(50) UNIQUE NOT NULL, -- Original Sephora Product Code (e.g. 'P473671')
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     brand_id INT REFERENCES brands(id) ON DELETE CASCADE,
     category_id INT REFERENCES categories(id) ON DELETE CASCADE,
-    price_vnd BIGINT NOT NULL CHECK (price_vnd >= 0),
+    price_usd NUMERIC(10, 2) NOT NULL CHECK (price_usd >= 0),
     volume_ml INT,
     description TEXT,
     image_url VARCHAR(500),
-    ingredient_list_raw TEXT NOT NULL, -- Chuỗi thành phần nguyên bản từ bao bì
-    target_skin_types VARCHAR(50)[] NOT NULL, -- Mảng PostgreSQL: ARRAY['Oily', 'Combination']
+    ingredient_list_raw TEXT NOT NULL, -- Raw INCI ingredient string from packaging
+    target_skin_types VARCHAR(50)[] NOT NULL, -- ARRAY['Oily', 'Combination']
     stock_quantity INT DEFAULT 100 NOT NULL CHECK (stock_quantity >= 0),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -177,32 +177,32 @@ CREATE INDEX idx_products_brand ON products(brand_id);
 CREATE TABLE product_ingredients (
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
-    position_order INT NOT NULL, -- Thứ tự xuất hiện trong bảng thành phần
+    position_order INT NOT NULL,
     PRIMARY KEY (product_id, ingredient_id)
 );
 CREATE INDEX idx_prod_ing_ingredient ON product_ingredients(ingredient_id);
 
 -- ============================================================================
--- 7. BẢNG QUY TẮC XUNG ĐỘT HOẠT CHẤT (CONFLICT_RULES)
+-- 6. BẢNG QUY TẮC XUNG ĐỘT HOẠT CHẤT (CONFLICT_RULES)
 -- ============================================================================
 CREATE TABLE conflict_rules (
     id SERIAL PRIMARY KEY,
     active_ingredient_a VARCHAR(255) NOT NULL,
     active_ingredient_b VARCHAR(255) NOT NULL,
     severity VARCHAR(50) DEFAULT 'Warning' NOT NULL, -- 'Warning', 'Contraindication'
-    reason_vi TEXT NOT NULL,
-    recommendation_vi TEXT NOT NULL
+    reason TEXT NOT NULL,
+    recommendation TEXT NOT NULL
 );
 
 -- ============================================================================
--- 8. BẢNG ĐÁNH GIÁ SẢN PHẨM (REVIEWS) — TỐI ƯU CHO 1 TRIỆU RECORDS
+-- 7. BẢNG ĐÁNH GIÁ SẢN PHẨM (REVIEWS) — TỐI ƯU CHO 1 TRIỆU RECORDS
 -- ============================================================================
 CREATE TABLE reviews (
     id BIGSERIAL PRIMARY KEY,
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
-    product_code VARCHAR(50), -- Mã ánh xạ trực tiếp từ Sephora dataset ('P473671')
+    product_code VARCHAR(50), -- Sephora code for direct ETL mapping
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
-    author_name VARCHAR(255) DEFAULT 'Khách hàng BeautyAI' NOT NULL,
+    author_name VARCHAR(255) DEFAULT 'BeautyAI Shopper' NOT NULL,
     rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
     skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal', 'Unknown')),
     skin_concerns VARCHAR(255),
@@ -216,7 +216,7 @@ CREATE INDEX idx_reviews_product_rating ON reviews(product_id, rating);
 CREATE INDEX idx_reviews_product_code ON reviews(product_code);
 
 -- ============================================================================
--- 9. BẢNG ĐƠN HÀNG & CHI TIẾT ĐƠN HÀNG (ORDERS & ORDER_ITEMS)
+-- 8. BẢNG ĐƠN HÀNG & CHI TIẾT ĐƠN HÀNG (ORDERS & ORDER_ITEMS)
 -- ============================================================================
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
@@ -228,9 +228,9 @@ CREATE TABLE orders (
     notes TEXT,
     payment_method VARCHAR(50) DEFAULT 'COD' NOT NULL,
     order_status VARCHAR(50) DEFAULT 'Pending' NOT NULL CHECK (order_status IN ('Pending', 'Delivering', 'Completed', 'Cancelled')),
-    subtotal_vnd BIGINT NOT NULL,
-    discount_vnd BIGINT DEFAULT 0,
-    total_amount_vnd BIGINT NOT NULL,
+    subtotal_usd NUMERIC(10, 2) NOT NULL CHECK (subtotal_usd >= 0),
+    discount_usd NUMERIC(10, 2) DEFAULT 0,
+    total_amount_usd NUMERIC(10, 2) NOT NULL CHECK (total_amount_usd >= 0),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 CREATE INDEX idx_orders_user ON orders(user_id);
@@ -241,7 +241,7 @@ CREATE TABLE order_items (
     order_id INT REFERENCES orders(id) ON DELETE CASCADE,
     product_id INT REFERENCES products(id) ON DELETE RESTRICT,
     product_name VARCHAR(255) NOT NULL,
-    unit_price_vnd BIGINT NOT NULL,
+    unit_price_usd NUMERIC(10, 2) NOT NULL CHECK (unit_price_usd >= 0),
     quantity INT NOT NULL CHECK (quantity > 0)
 );
 
@@ -376,28 +376,28 @@ public record UpdateDigitalSkinIdRequest(
 public record AddAllergyRequest(string IngredientName, string? Note);
 
 // 3. Product & INCI DTOs
-public record ProductSummaryDto(int Id, string Name, string Slug, string BrandName, long PriceVnd, string? ImageUrl, int? MatchScore, bool HasAllergyWarning);
+public record ProductSummaryDto(int Id, string Name, string Slug, string BrandName, decimal PriceUsd, string? ImageUrl, int? MatchScore, bool HasAllergyWarning);
 public record ProductDetailDto(
     int Id, string Name, string Slug, string BrandName, string CategoryName,
-    long PriceVnd, int? VolumeMl, string? Description, string? ImageUrl,
+    decimal PriceUsd, int? VolumeMl, string? Description, string? ImageUrl,
     int? MatchScore, bool HasAllergyWarning, List<string> AllergyViolations,
     List<ProductIngredientDto> Ingredients, FunctionDistributionDto FunctionDistribution
 );
-public record ProductIngredientDto(int Id, string InciName, string VietnameseName, string FunctionGroup, int IrritancyRating, int ComedogenicRating, bool IsAllergy);
+public record ProductIngredientDto(int Id, string InciName, string FunctionGroup, string? Description, int IrritancyRating, int ComedogenicRating, bool IsAllergy);
 public record FunctionDistributionDto(int MoisturizingPercent, int ActiveTreatmentPercent, int SoothingPercent, int OtherPercent);
 
 // 4. Conflict DTOs
 public record CheckConflictRequest(List<int> ProductIds);
-public record ConflictAlertDto(string ProductAName, string ProductBName, string IngredientAName, string IngredientBName, string Severity, string ReasonVi, string RecommendationVi);
+public record ConflictAlertDto(string ProductAName, string ProductBName, string IngredientAName, string IngredientBName, string Severity, string Reason, string Recommendation);
 
-// 5. Routine DTOs (Tạo tự động từ Digital Skin ID)
+// 5. Routine DTOs (Generated from Digital Skin ID)
 public record GenerateRoutineRequest(string? SkinType, string? BudgetLevel);
-public record RoutineResultDto(List<ProductSummaryDto> AmRoutine, List<ProductSummaryDto> PmRoutine, long TotalCostVnd, List<ConflictAlertDto> InternalConflicts);
+public record RoutineResultDto(List<ProductSummaryDto> AmRoutine, List<ProductSummaryDto> PmRoutine, decimal TotalCostUsd, List<ConflictAlertDto> InternalConflicts);
 
 // 6. Order DTOs
 public record CreateOrderItemRequest(int ProductId, int Quantity);
 public record CreateOrderRequest(string RecipientName, string RecipientPhone, string ShippingAddress, string? Notes, string? CouponCode, List<CreateOrderItemRequest> Items);
-public record OrderSummaryDto(int Id, string OrderCode, string OrderStatus, long TotalAmountVnd, DateTime CreatedAtUtc, List<string> ProductNames);
+public record OrderSummaryDto(int Id, string OrderCode, string OrderStatus, decimal TotalAmountUsd, DateTime CreatedAtUtc, List<string> ProductNames);
 
 // 7. Review DTOs
 public record ReviewDto(long Id, string AuthorName, int Rating, string SkinType, string? SkinConcerns, string? Content, DateTime CreatedAtUtc);
@@ -444,25 +444,26 @@ public class GeminiSkincareProvider : IAiSkincareProvider
 }
 ```
 
-## 6.2. Mẫu System Prompt chuẩn hóa cho Gemini API
+## 6.2. Mẫu System Prompt chuẩn hóa cho Gemini API (Global English)
 ```text
-Bạn là Trợ lý Chuyên gia Da liễu AI của sàn thương mại điện tử BeautyAI.
-Nhiệm vụ của bạn là tư vấn chu trình dưỡng da và gợi ý mỹ phẩm khoa học.
+You are the AI Dermatology & Skincare Advisor for the BeautyAI e-commerce platform.
+Your mission is to provide evidence-based skincare routine guidance and product recommendations.
 
-[HỒ SƠ DA CỦA KHÁCH HÀNG HIỆN TẠI]
-- Loại da: {SkinType}
-- Da nhạy cảm: {IsSensitive}
-- Mối quan tâm chính: {Concerns}
-- DANH SÁCH DỊ ỨNG (ALLERGY BLACKLIST): {AllergyList}
+[CURRENT USER DIGITAL SKIN ID]
+- Skin Type: {SkinType}
+- Allergy Blacklist (STRICT PROHIBITION): {AllergyList}
+- Primary Skin Concerns: {Concerns}
+- Primary Skincare Goal: {PrimaryGoal}
+- Budget Level: {BudgetLevel}
 
-[DANH MỤC SẢN PHẨM SÀN ĐANG CÓ BÁN]
+[AVAILABLE IN-STOCK PRODUCT CATALOG]
 {ProductsJson}
 
-[QUY TẮC RÀNG BUỘC Y KHOA TUYỆT ĐỐI]
-1. Tuyệt đối KHÔNG đề xuất bất kỳ sản phẩm nào có chứa hoạt chất trong DANH SÁCH DỊ ỨNG của khách.
-2. Tuyệt đối KHÔNG chẩn đoán hoặc kê đơn điều trị các bệnh da liễu nặng (viêm da mủ, chàm bội nhiễm, vảy nến, nấm da). Khi gặp từ khóa bệnh lý, hãy ân cần khuyên khách hàng đến khám tại bệnh viện da liễu.
-3. Khi gợi ý sản phẩm, BẮT BUỘC chỉ chọn các sản phẩm nằm trong [DANH MỤC SẢN PHẨM SÀN ĐANG CÓ BÁN] ở trên, nêu rõ tên sản phẩm và mức giá VNĐ.
-4. Giữ giọng văn thân thiện, đồng cảm, khoa học và dễ hiểu.
+[STRICT MEDICAL & ETHICAL GUARDRAILS]
+1. ZERO-ALLERGY TOLERANCE: Absolutely NEVER recommend any product containing ingredients listed in the user's Allergy Blacklist.
+2. MEDICAL BOUNDARY: Never diagnose or prescribe treatments for severe clinical dermatological conditions (cystic acne conglobata, infected eczema, psoriasis, fungal infections). Advise consulting a board-certified dermatologist when encountering clinical pathology.
+3. GROUNDING CONSTRAINT: ONLY recommend products from the [AVAILABLE IN-STOCK PRODUCT CATALOG] above, displaying the exact product name and price in USD ($).
+4. Tone: Empathetic, scientific, objective, and clear.
 ```
 
 ---
