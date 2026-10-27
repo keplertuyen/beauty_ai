@@ -4,19 +4,31 @@ title: Chính Sách Bảo Mật & Bảo Vệ Dữ Liệu Cá Nhân (Security Pol
 status: draft
 precedence: 2
 owner: Security Lead / Tech Lead
-last_reviewed: 2026-10-25
+last_reviewed: 2026-10-27
 ---
 
 # CHÍNH SÁCH BẢO MẬT & BẢO VỆ DỮ LIỆU — BeautyAI Platform
 
-> Nguồn chân lý về luồng xác thực cookie httpOnly, mã hóa mật khẩu PBKDF2, kiểm soát truy cập RBAC, header bảo mật và bảo vệ dữ liệu PII da liễu theo Nghị định 13/2023/NĐ-CP (Precedence 2 — Contracts).
+> Nguồn chân lý về luồng xác thực JWT Bearer Token, mã hóa mật khẩu PBKDF2 HMAC-SHA256 chuẩn OWASP, kiểm soát truy cập RBAC, header bảo mật và bảo vệ dữ liệu PII da liễu theo Nghị định 13/2023/NĐ-CP (Precedence 2 — Contracts).
 > Bắt buộc tuân thủ: INV-04, INV-07, INV-08.
 
 ---
 
 # 11. THIẾT KẾ BẢO MẬT & XÁC THỰC
 
-## 11.1. Luồng xác thực
+## 11.1. Luồng xác thực & Băm Mật Khẩu
+Hệ thống sử dụng thuật toán băm mật khẩu chuẩn OWASP PBKDF2 qua interface `IPasswordHasher` / `Pbkdf2PasswordHasher`:
+- **Thuật toán băm**: PBKDF2 với HMAC-SHA256.
+- **Số vòng lặp (Iterations)**: 600.000 vòng (khuyến nghị chính thức của OWASP cho HMAC-SHA256).
+- **Muối ngẫu nhiên (Salt)**: 128-bit (16 bytes) tạo bằng bộ sinh số ngẫu nhiên mật mã (`RandomNumberGenerator.GetBytes`).
+- **Khóa dẫn xuất (Key)**: 256-bit (32 bytes).
+- **Định dạng lưu trữ**: `pbkdf2:sha256:600000:<salt_base64>:<key_base64>`.
+- **So sánh mật khẩu an toàn**: Sử dụng `CryptographicOperations.FixedTimeEquals` chống tấn công đo thời gian (Timing Attacks).
+
+Cơ chế Token được cấp qua `IJwtTokenGenerator` / `JwtTokenGenerator`:
+- Ký bằng thuật toán `HmacSha256` với khóa bí mật `JWT_SECRET` (tối thiểu 256-bit).
+- Claims chuẩn: `sub` (UserId), `email`, `name`, `role` (Customer/Admin), `jti`.
+- Thời hạn hiệu lực: 7 ngày (`JWT_EXPIRATION_DAYS`).
 
 ```text
 ┌─ ĐĂNG KÝ ────────────────────────────────────────────────────────┐

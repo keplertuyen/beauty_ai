@@ -38,10 +38,10 @@ public class Pbkdf2PasswordHasherTests
     [Fact]
     public void VerifyPassword_MatchesValidPassword()
     {
-        var password = "CorrectHorseBatteryStaple!";
-        var hash = _hasher.HashPassword(password);
+        var testPassword = "CorrectHorseBatteryStaple!";
+        var hash = _hasher.HashPassword(testPassword);
 
-        var isValid = _hasher.VerifyPassword(password, hash);
+        var isValid = _hasher.VerifyPassword(testPassword, hash);
 
         Assert.True(isValid);
     }

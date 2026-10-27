@@ -4,7 +4,7 @@ title: Hợp Đồng Giao Diện Lập Trình (API Contract & Endpoints) — Bea
 status: draft
 precedence: 2
 owner: SA / Backend Lead
-last_reviewed: 2026-10-25
+last_reviewed: 2026-10-27
 ---
 
 # HỢP ĐỒNG API & DANH MỤC ENDPOINT — BeautyAI Platform
@@ -16,21 +16,21 @@ last_reviewed: 2026-10-25
 
 # 7. HỢP ĐỒNG API
 
-> **Nguồn chân lý cuối cùng là tệp `openapi.json` sinh từ code** (ADR-008). Bảng dưới là hợp đồng thiết kế; khi code đã tồn tại, OpenAPI thắng, và tài liệu này phải được cập nhật trong cùng change.
+> **Nguồn chân lý cuối cùng là tệp `docs/api/BeautyAI.Api.json` sinh từ code** (ADR-008). Bảng dưới là hợp đồng thiết kế; khi code đã tồn tại, OpenAPI thắng, và tài liệu này phải được cập nhật trong cùng change.
 
 ## 7.1. Quy ước chung
 
 | Hạng mục | Quy ước |
 |---|---|
 | **Tiền tố** | `/api/v1/...` |
-| **Xác thực** | Cookie xác thực httpOnly (ADR-004). Yêu cầu từ frontend dùng `credentials: 'include'` |
-| **Chống CSRF** | Token CSRF trong header `X-CSRF-TOKEN` cho mọi phương thức `POST`/`PUT`/`PATCH`/`DELETE` |
-| **Định dạng lỗi** | `{ "error": { "code": "VOUCHER_MIN_ORDER_NOT_MET", "message": "Đơn hàng cần tối thiểu 500.000₫ để dùng mã này.", "details": { "required": 500000, "current": 320000 } } }` — theo `docs/api-contract.md §1` của framework |
+| **Xác thực** | JWT Bearer Token trong header `Authorization: Bearer <token>` (cấp khi Register/Login, hạn 7 ngày) |
+| **Chống CSRF** | Token CSRF trong header `X-CSRF-TOKEN` cho mọi phương thức `POST`/`PUT`/`PATCH`/`DELETE` khi dùng Cookie |
+| **Định dạng lỗi** | `{ "message": "Thông điệp lỗi chi tiết" }` |
 | **Mã lỗi** | Chuỗi hằng, viết HOA_GẠCH_DƯỚI, **ổn định** (frontend dựa vào `code`, không dựa vào `message`) |
 | **Phân trang** | `?page=1&pageSize=24`, **tối đa `pageSize=100`** (`NFR-SCALE-03`). Phản hồi: `{ "items": [...], "page", "pageSize", "totalItems", "totalPages" }` |
 | **Sắp xếp** | `?sort=relevance\|rating\|loves\|price_asc\|price_desc\|newest` |
-| **Tiền tệ** | Mọi giá trị tiền trong phản hồi trả **cả hai**: `priceUsd` (số thập phân) và `priceVnd` (số nguyên đã làm tròn theo `BR-PRICE-02`). Frontend chọn hiển thị theo tiền tệ đang chọn — **không** gọi lại API khi đổi tiền tệ |
-| **Thời gian** | ISO-8601 UTC, vd `2026-10-21T05:30:00Z` (`BR-DATA-02`) |
+| **Tiền tệ** | Mọi giá trị tiền trong phản hồi giai đoạn Phase 1 dùng chuẩn USD (`priceUsd`). Hỗ trợ hiển thị VNĐ quy đổi ở giao diện |
+| **Thời gian** | ISO-8601 UTC, vd `2026-10-27T06:30:00Z` (`BR-DATA-02`) |
 | **Idempotency** | `POST /orders` và các thao tác tạo quan trọng nhận header `Idempotency-Key` (`NFR-REL-02`) |
 | **Giới hạn tần suất** | `429` kèm header `Retry-After` (`NFR-SEC-07`) |
 | **Không bao giờ trả về** | `passwordHash`, `securityStamp`, bí mật, dấu vết ngăn xếp (`NFR-SEC-06`, `INV-08`) |
@@ -43,11 +43,23 @@ last_reviewed: 2026-10-25
 |---|---|---|---|---|
 | `GET` | `/health` | ALL | — | Trả về `HealthResponse { status: "ok", service: "beautyai-api" }` để kiểm tra độ sẵn sàng và OpenAPI DTO drift check (ADR-008) |
 
-### Xác thực (`/api/v1/auth`) — C1
+### Xác thực & Tài khoản (`/api/v1/auth`) — C1
 
 | Method | Đường dẫn | Quyền | FR | Ghi chú |
 |---|---|---|---|---|
-| `POST` | `/auth/register` | GUEST | `FR-AUTH-01` | Hợp nhất giỏ tạm nếu có `cartToken` |
+| `POST` | `/api/v1/auth/register` | GUEST | `FR-AUTH-01` | Đăng ký tài khoản, băm mật khẩu PBKDF2 (HMAC-SHA256, 600k vòng lặp), tự tạo Skin Profile rỗng, trả JWT |
+| `POST` | `/api/v1/auth/login` | GUEST | `FR-AUTH-02` | Đăng nhập tài khoản, xác thực mật khẩu qua PBKDF2, trả JWT |
+| `GET` | `/api/v1/auth/me` | CUSTOMER/ADMIN | `FR-AUTH-05` | Lấy thông tin tài khoản hiện tại kèm trọn bộ hồ sơ Digital Skin ID thống nhất |
+| `PUT` | `/api/v1/auth/profile` | CUSTOMER/ADMIN | `FR-AUTH-05` | Cập nhật họ tên, số điện thoại, địa chỉ nhận hàng |
+
+### Hồ sơ Digital Skin ID Thống Nhất (`/api/v1/skin-profile`) — C4
+
+| Method | Đường dẫn | Quyền | FR | Ghi chú |
+|---|---|---|---|---|
+| `GET` | `/api/v1/skin-profile` | CUSTOMER/ADMIN | `FR-SKIN-01` | Lấy trọn bộ hồ sơ Digital Skin ID: 1. Loại da ➔ 2. Blacklist Dị ứng ➔ 3. Vấn đề da & Mục tiêu |
+| `PUT` | `/api/v1/skin-profile` | CUSTOMER/ADMIN | `FR-SKIN-01` | Cập nhật đồng bộ toàn bộ hồ sơ Digital Skin ID và danh sách dị ứng trong 1 transaction |
+| `POST` | `/api/v1/skin-profile/allergies` | CUSTOMER/ADMIN | `FR-SKIN-02` | Thêm một hoạt chất dị ứng vào Blacklist cá nhân kèm ghi chú triệu chứng |
+| `DELETE` | `/api/v1/skin-profile/allergies/{id}` | CUSTOMER/ADMIN | `FR-SKIN-02` | Xóa hoạt chất dị ứng khỏi Blacklist cá nhân |
 | `POST` | `/auth/login` | GUEST | `FR-AUTH-02` | Thông báo lỗi **không** tiết lộ email tồn tại |
 | `POST` | `/auth/logout` | CUSTOMER/ADMIN | `FR-AUTH-03` | |
 | `GET` | `/auth/me` | CUSTOMER/ADMIN | `FR-AUTH-05` | Trả về profile cơ bản + `mustChangePassword` |

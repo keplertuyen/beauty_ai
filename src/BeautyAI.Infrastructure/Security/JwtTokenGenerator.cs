@@ -47,8 +47,8 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
 
-        return tokenHandler.WriteToken(token);
+        return tokenHandler.WriteToken(securityToken);
     }
 }

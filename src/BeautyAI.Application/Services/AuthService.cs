@@ -70,10 +70,10 @@ public class AuthService : IAuthService
         };
         await _skinProfileRepository.CreateAsync(defaultProfile, ct);
 
-        var token = _jwtTokenGenerator.GenerateToken(createdUser);
+        var jwtToken = _jwtTokenGenerator.GenerateToken(createdUser);
 
         return new AuthResponse(
-            token,
+            jwtToken,
             createdUser.Email,
             createdUser.FullName,
             createdUser.Role.ToString()
@@ -94,10 +94,10 @@ public class AuthService : IAuthService
         if (!user.IsActive)
             throw new UnauthorizedAccessException("User account is inactive.");
 
-        var token = _jwtTokenGenerator.GenerateToken(user);
+        var jwtToken = _jwtTokenGenerator.GenerateToken(user);
 
         return new AuthResponse(
-            token,
+            jwtToken,
             user.Email,
             user.FullName,
             user.Role.ToString()
