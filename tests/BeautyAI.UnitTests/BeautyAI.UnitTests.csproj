@@ -20,5 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/BeautyAI.Domain/BeautyAI.Domain.csproj" />
     <ProjectReference Include="../../src/BeautyAI.Application/BeautyAI.Application.csproj" />
+    <ProjectReference Include="../../src/BeautyAI.Infrastructure/BeautyAI.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

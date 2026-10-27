@@ -123,9 +123,9 @@ LIMIT 10;"
    - `DELETE /api/v1/skin-profile/allergies/{id}`: Gỡ bỏ thành phần khỏi Blacklist.
 
 ### ✅ Xong khi:
-- [ ] Test đăng ký tài khoản mới thành công qua Swagger UI hoặc Postman.
-- [ ] Thêm được chất dị ứng vào Blacklist và xem lại danh sách trả về đúng mã HTTP 200/201.
-- [ ] Mật khẩu trong bảng `users` được băm kín, không thể dịch ngược.
+- [x] Test đăng ký tài khoản mới thành công qua Swagger UI hoặc Postman/cURL.
+- [x] Thêm được chất dị ứng vào Blacklist và xem lại danh sách trả về đúng mã HTTP 200/201.
+- [x] Mật khẩu trong bảng `users` được băm kín bằng PBKDF2 HMAC-SHA256 (600.000 vòng lặp), không thể dịch ngược.
 
 ### 🔍 Lệnh kiểm chứng:
 ```bash
