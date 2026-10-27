@@ -18,18 +18,31 @@ CREATE TABLE IF NOT EXISTS users (
 );
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
--- 2. HỒ SƠ DIGITAL SKIN ID (SKIN_PROFILES)
+-- 2. HỒ SƠ DIGITAL SKIN ID THỐNG NHẤT (SKIN_PROFILES & USER_ALLERGIES)
+-- Khối thống nhất theo thứ tự y khoa:
+-- 1. Cơ địa nền tảng (Loại da)
+-- 2. Vùng cấm kỵ an toàn (Blacklist Dị ứng)
+-- 3. Nhu cầu cải thiện (Vấn đề da, Mục tiêu & Ngân sách)
 CREATE TABLE IF NOT EXISTS skin_profiles (
     id SERIAL PRIMARY KEY,
     user_id INT UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-    skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal')),
+    skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal', 'Sensitive')),
     skin_concerns VARCHAR(50)[] NOT NULL, -- ARRAY['Acne', 'Aging', 'DarkSpots', 'Pores', 'Sensitivity', 'Dehydration']
     primary_goal VARCHAR(255),
     budget_level VARCHAR(50) DEFAULT 'Medium' NOT NULL CHECK (budget_level IN ('Low', 'Medium', 'High')),
-    last_quiz_completed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_skin_profiles_user ON skin_profiles(user_id);
+
+-- Bảng chi tiết con: Hoạt chất dị ứng thuộc khối Digital Skin ID (Chuẩn 3NF)
+CREATE TABLE IF NOT EXISTS user_allergies (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    ingredient_name VARCHAR(255) NOT NULL,
+    note VARCHAR(500),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_user_allergies_user ON user_allergies(user_id);
 
 -- 3. DANH MỤC THÀNH PHẦN HOẠT CHẤT (INGREDIENTS)
 CREATE TABLE IF NOT EXISTS ingredients (
@@ -43,17 +56,7 @@ CREATE TABLE IF NOT EXISTS ingredients (
 );
 CREATE INDEX IF NOT EXISTS idx_ingredients_inci ON ingredients(inci_name);
 
--- 4. DANH SÁCH HOẠT CHẤT DỊ ỨNG CỦA NGƯỜI DÙNG (USER_ALLERGIES — BLACKLIST)
-CREATE TABLE IF NOT EXISTS user_allergies (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    ingredient_name VARCHAR(255) NOT NULL,
-    note VARCHAR(500),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_user_allergies_user ON user_allergies(user_id);
-
--- 5. DANH MỤC SẢN PHẨM & THƯƠNG HIỆU (CATEGORIES & BRANDS)
+-- 4. DANH MỤC SẢN PHẨM & THƯƠNG HIỆU (CATEGORIES & BRANDS)
 CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,

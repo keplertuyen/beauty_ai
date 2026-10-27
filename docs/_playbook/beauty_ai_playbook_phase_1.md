@@ -95,28 +95,30 @@ LIMIT 10;"
 
 ---
 
-## ▸ Nhiệm vụ 1.3 — Xây dựng Backend Auth & Digital Skin ID API
+## ▸ Nhiệm vụ 1.3 — Xây dựng Backend Auth & Digital Skin ID API Thống Nhất
 
-- **Mục tiêu:** Xây dựng toàn bộ các API xác thực, phân quyền RBAC và quản lý hồ sơ da / Allergy Blacklist.
+- **Mục tiêu:** Xây dựng toàn bộ các API xác thực, phân quyền RBAC và quản lý hồ sơ Digital Skin ID thống nhất theo thứ tự y khoa: 1. Loại da ➔ 2. Blacklist Dị ứng ➔ 3. Vấn đề da & Mục tiêu.
 - **Tệp liên quan:**
+  - `src/BeautyAI.Application/DTOs/SkinProfileDto.cs`
   - `src/BeautyAI.Application/Services/IAuthService.cs`
   - `src/BeautyAI.Application/Services/ISkinProfileService.cs`
   - `src/BeautyAI.Infrastructure/Services/AuthService.cs`
+  - `src/BeautyAI.Infrastructure/Services/SkinProfileService.cs`
   - `src/BeautyAI.Api/Controllers/AuthController.cs`
   - `src/BeautyAI.Api/Controllers/SkinProfileController.cs`
 
 ### Các bước thực hiện chi tiết:
 1. Cài đặt thuật toán băm mật khẩu an toàn PBKDF2 (HMAC-SHA256, 600,000 vòng lặp) kèm Salt ngẫu nhiên trong `AuthService.cs`.
 2. Viết logic sinh và xác thực JSON Web Token (JWT) chứa Claim `NameIdentifier`, `Email`, `Role`.
-3. Cài đặt các API:
+3. Cài đặt các API Auth:
    - `POST /api/v1/auth/register`: Đăng ký, băm mật khẩu, lưu CSDL, trả về Token và Profile.
    - `POST /api/v1/auth/login`: Xác thực thông tin đăng nhập, trả về Token.
-   - `GET /api/v1/auth/me`: Lấy thông tin tài khoản hiện tại kèm Skin ID.
+   - `GET /api/v1/auth/me`: Lấy thông tin tài khoản hiện tại kèm Digital Skin ID thống nhất.
    - `PUT /api/v1/auth/profile`: Cập nhật họ tên, số điện thoại, địa chỉ nhận hàng.
-4. Cài đặt các API Digital Skin ID:
-   - `PUT /api/v1/skin-profile`: Cập nhật loại da (`Oily`, `Dry`...), da nhạy cảm và mảng vấn đề da.
-   - `GET /api/v1/skin-profile/allergies`: Lấy danh sách thành phần dị ứng cá nhân.
-   - `POST /api/v1/skin-profile/allergies`: Thêm một thành phần vào Allergy Blacklist.
+4. Cài đặt các API Digital Skin ID Thống Nhất:
+   - `GET /api/v1/skin-profile`: Lấy trọn bộ hồ sơ Digital Skin ID bao gồm Loại da, Blacklist Dị ứng, Vấn đề da, Mục tiêu và Ngân sách.
+   - `PUT /api/v1/skin-profile`: Cập nhật đồng bộ toàn bộ hồ sơ Digital Skin ID trong 1 transaction.
+   - `POST /api/v1/skin-profile/allergies`: Thêm nhanh một thành phần vào Allergy Blacklist kèm ghi chú triệu chứng.
    - `DELETE /api/v1/skin-profile/allergies/{id}`: Gỡ bỏ thành phần khỏi Blacklist.
 
 ### ✅ Xong khi:
@@ -312,33 +314,32 @@ LIMIT 10;"
 
 ---
 
-# TUẦN 4: TRỢ LÝ AI, SKIN QUIZ, ADMIN & LAUNCH (NGÀY 23 – 30)
+# TUẦN 4: TRỢ LÝ AI GEMINI, ROUTINE GENERATOR, ADMIN & LAUNCH (NGÀY 23 – 30)
 
 ---
 
-## ▸ Nhiệm vụ 4.1 — Skin Quiz 4 Bước & Tính Năng "Chat-to-Cart" Routine
+## ▸ Nhiệm vụ 4.1 — Sinh Chu Trình Routine AM/PM & Tính Năng "Chat-to-Cart"
 
-- **Mục tiêu:** Chẩn đoán tình trạng da, sinh chu trình Routine AM/PM và hỗ trợ thêm cả chu trình vào giỏ chỉ với 1 click.
+- **Mục tiêu:** Tự động sinh chu trình Routine AM/PM dựa trên Digital Skin ID và hỗ trợ thêm cả chu trình vào giỏ hàng chỉ với 1 click.
 - **Tệp liên quan:**
   - `src/BeautyAI.Domain/Services/RoutineGeneratorService.cs`
-  - `src/BeautyAI.Api/Controllers/ToolsController.cs`
-  - `src/frontend/src/pages/SkinQuiz.jsx`
+  - `src/BeautyAI.Api/Controllers/RoutineController.cs`
+  - `src/frontend/src/pages/RoutineView.jsx`
 
 ### Các bước thực hiện chi tiết:
 1. Cài đặt `RoutineGeneratorService` trong Domain layer:
-   - Nhận kết quả 4 câu hỏi chẩn đoán da.
+   - Nhận thông tin từ Digital Skin ID (Loại da, Blacklist dị ứng, Vấn đề da, Ngân sách).
    - Sinh chu trình AM: Làm sạch ➔ Dưỡng ẩm ➔ **Kem chống nắng (Bắt buộc)**.
    - Sinh chu trình PM: Tẩy trang ➔ Sữa rửa mặt ➔ Serum đặc trị ➔ Kem khóa ẩm.
    - Đảm bảo 100% sản phẩm không chứa chất dị ứng và không xung đột nhau.
-2. Xây dựng endpoint `POST /api/v1/tools/skin-quiz` trả về chu trình Routine.
-3. Trên giao diện `SkinQuiz.jsx`:
-   - Render 4 câu hỏi trực quan với hình ảnh minh họa sinh động.
-   - Màn hình kết quả hiển thị chu trình AM/PM phân tầng.
-   - Tạo nút bấm nổi bật: *"🛒 Thêm toàn bộ chu trình vào giỏ hàng"*. Bấm nút sẽ đưa trọn bộ 3–5 sản phẩm vào giỏ hàng ngay lập tức.
+2. Xây dựng endpoint `POST /api/v1/routines/generate` trả về chu trình Routine.
+3. Trên giao diện `RoutineView.jsx`:
+   - Màn hình kết quả hiển thị chu trình AM/PM phân tầng rõ ràng.
+   - Tạo nút bấm nổi bật: *"🛒 Thêm toàn bộ chu trình vào giỏ hàng"*. Bấm nút sẽ đưa trọn bộ các sản phẩm vào giỏ hàng ngay lập tức.
    - Cung cấp nút *"Lưu chu trình này"* vào CSDL bảng `saved_routines`.
 
 ### ✅ Xong khi:
-- [ ] Hoàn thành Quiz ➔ Chu trình hiển thị hợp lý, có kem chống nắng buổi sáng.
+- [ ] Chu trình AM/PM được sinh tự động chuẩn xác, có kem chống nắng buổi sáng và không chứa hoạt chất trong Blacklist.
 - [ ] Bấm *"Thêm toàn bộ chu trình vào giỏ hàng"* ➔ Giỏ hàng có đủ các sản phẩm của chu trình.
 
 ---
@@ -398,8 +399,8 @@ LIMIT 10;"
      ```
   2. Thực hiện kịch bản demo mẫu từ A đến Z:
      - Bước 1: Khách hàng đăng ký tài khoản mới.
-     - Bước 2: Làm Skin Quiz ➔ Chẩn đoán ra Da dầu mụn, nhạy cảm ➔ Tạo Routine có kem chống nắng ➔ Bấm Chat-to-Cart.
-     - Bước 3: Vào trang cá nhân thêm `Alcohol Denat` vào Allergy Blacklist.
+     - Bước 2: Thiết lập Digital Skin ID thống nhất: 1. Chọn Da dầu ➔ 2. Thêm Alcohol Denat vào Blacklist dị ứng ➔ 3. Chọn vấn đề Mụn & Ngân sách.
+     - Bước 3: Xem Routine AM/PM tự động được sinh ra (chuẩn y khoa, né hoàn toàn cồn khô) ➔ Bấm Chat-to-Cart.
      - Bước 4: Ra Catalog bật toggle *"An toàn cho da tôi"* ➔ Sản phẩm có cồn lập tức bị ẩn.
      - Bước 5: Xem PDP ➔ Thấy bảng thành phần có màu sắc và lọc review từ những người Da dầu.
      - Bước 6: Mở công cụ Phân tích INCI tự do dán bảng thành phần bao bì bất kỳ.

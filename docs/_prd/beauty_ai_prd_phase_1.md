@@ -37,7 +37,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 | Vai trò (Actor) | Mã vai trò | Mô tả & Trách nhiệm chính |
 |---|---|---|
-| **Khách vãng lai** | `GUEST` | Khách chưa đăng nhập; có thể duyệt danh mục, tìm kiếm, xem chi tiết sản phẩm, sử dụng công cụ phân tích INCI tự do và làm Skin Quiz chẩn đoán da. |
+| **Khách vãng lai** | `GUEST` | Khách chưa đăng nhập; có thể duyệt danh mục, tìm kiếm, xem chi tiết sản phẩm, sử dụng công cụ phân tích INCI tự do và thiết lập nhanh hồ sơ Digital Skin ID tạm thời. |
 | **Khách hàng** | `CUSTOMER` | Người dùng đã đăng ký tài khoản; sở hữu Digital Skin ID, quản lý Allergy Blacklist, nhận cảnh báo dị ứng cá nhân hóa, quản lý giỏ hàng, đặt hàng COD và lưu chu trình Routine. |
 | **Quản trị viên sàn** | `ADMIN` | Quản lý danh mục, thương hiệu, CRUD sản phẩm & nhập liệu bảng thành phần INCI, cập nhật trạng thái đơn hàng và theo dõi chỉ số KPI kinh doanh. |
 
@@ -53,7 +53,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 | **Trang chi tiết (PDP)** | Bảng INCI phân màu, Match Score %, Biểu đồ công năng, Cảnh báo dị ứng đỏ, Lọc 1M reviews theo loại da. | Modal phân tích trọng số thuật toán chi tiết, Gợi ý sản phẩm mua kèm bằng thuật toán Apriori. |
 | **Phân tích INCI** | Dán bảng thành phần thô bất kỳ, bóc tách dấu phẩy, tra cứu từ điển CSDL, đối chiếu dị ứng. | Chụp ảnh bao bì OCR tự động nhận diện chữ, Bách khoa toàn thư thành phần Wikipedia. |
 | **Xung đột hoạt chất** | Quét giỏ hàng tự động, phát hiện 12 cặp kỵ nhau, cảnh báo viền cam kèm hướng dẫn chia lịch Sáng/Tối. | Admin UI tự tạo quy tắc xung đột mới, Quét sản phẩm khách đang dùng ở nhà. |
-| **Skin Quiz & Routine** | Quiz 4 câu chẩn đoán ➔ Routine AM/PM ➔ Nút **Chat-to-Cart** thêm cả bộ vào giỏ hàng. | Xuất Routine ra file PDF, Chia sẻ chu trình lên mạng xã hội, So sánh các lần làm quiz cũ. |
+| **Digital Skin ID & Routine** | Thiết lập Hồ sơ Digital Skin ID 1 chạm (Loại da ➔ Dị ứng ➔ Vấn đề & Mục tiêu), Tự động sinh Routine AM/PM, Nút **Chat-to-Cart** thêm cả bộ vào giỏ. | **Skin Quiz trắc nghiệm chẩn đoán loại da nâng cao**, Xuất Routine ra file PDF, Chia sẻ chu trình lên mạng xã hội. |
 | **So sánh & Wishlist** | Khay so sánh Drawer, Bảng so sánh 2-4 sản phẩm (thông số, hoạt chất, Match Score), Quản lý Wishlist. | Tự động gợi ý sản phẩm đối trọng để so sánh, Thông báo đẩy khi Wishlist giảm giá. |
 | **Giỏ hàng & Đơn hàng** | Quản lý giỏ hàng, Áp dụng voucher cơ bản (`BEAUTYAI10`, `FREESHIP`), Checkout COD, Lịch sử đơn hàng. | Cart drawer trượt ngang, Voucher đa tầng (sàn + shop), Khách tự hủy đơn / Mua lại đơn cũ. |
 | **Trợ lý AI** | Gemini API Flash, Grounding sản phẩm sàn, Cá nhân hóa Skin ID, Guardrail an toàn y tế. | Chuyển giao hội thoại sang Zalo OA tư vấn viên, Lưu trữ và phân tích tâm lý khách hàng nhiều phiên. |
@@ -162,7 +162,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 - **Quy tắc nghiệp vụ:** `BR-ALGO-01`, `ADR-011`.
 - **Điều kiện chấp nhận:**
   - `AC-03.1` **Given** tôi đã đăng nhập và có Digital Skin ID (ví dụ: Da dầu, Có mụn), **When** xem trang PDP, **Then** hệ thống tính toán và hiển thị thanh đo **Match Score** theo phần trăm (ví dụ: *"92% Phù hợp với làn da của bạn"*).
-  - `AC-03.2` **Given** tôi là khách vãng lai chưa có Skin ID, **When** xem trang PDP, **Then** vị trí Match Score hiển thị lời mời: *"Làm Skin Quiz ngay để xem độ phù hợp của sản phẩm với làn da bạn"*.
+  - `AC-03.2` **Given** tôi là khách vãng lai chưa có Skin ID, **When** xem trang PDP, **Then** vị trí Match Score hiển thị lời mời: *"Thiết lập Digital Skin ID ngay để xem độ phù hợp của sản phẩm với làn da bạn"*.
 
 ### FR-PDP-04 [Must-Have — USP] Banner đỏ cảnh báo dị ứng cá nhân trên PDP
 - **Mô tả:** Cảnh báo nổi bật tức thì để bảo vệ người dùng không mua nhầm sản phẩm chứa chất mình dị ứng.
@@ -205,41 +205,40 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ### FR-SKIN-03 [Must-Have] Cảnh báo dị ứng đồng bộ xuyên suốt hệ thống
 - **Điều kiện chấp nhận:**
-  - `AC-03.1` **Given** tài khoản của tôi có chất dị ứng $X$, **When** tôi duyệt web ở bất kỳ đâu (Thẻ sản phẩm ngoài Catalog, PDP, Giỏ hàng, Kết quả Routine Quiz hay Khung chat AI), **Then** bất kỳ sản phẩm nào chứa chất $X$ đều phải hiển thị biểu tượng/cảnh báo dị ứng rõ ràng, không bỏ sót bất kỳ vị trí nào.
+  - `AC-03.1` **Given** tài khoản của tôi có chất dị ứng $X$, **When** tôi duyệt web ở bất kỳ đâu (Thẻ sản phẩm ngoài Catalog, PDP, Giỏ hàng, Kết quả Routine hay Khung chat AI), **Then** bất kỳ sản phẩm nào chứa chất $X$ đều phải hiển thị biểu tượng/cảnh báo dị ứng rõ ràng, không bỏ sót bất kỳ vị trí nào.
 
 ---
 
-## 4.5. Module 05 — Skin Quiz & Routine Builder (Chat-to-Cart) (M05: Quiz & Routine) (Core USP)
+## 4.5. Module 05 — Thiết Lập Hồ Sơ Digital Skin ID Thống Nhất & Routine Builder (Chat-to-Cart) (M05: Skin Profile & Routine) (Core USP)
 
-### FR-QUIZ-01 [Must-Have] Bộ câu hỏi chẩn đoán da khoa học (4 Bước)
-- **Mô tả:** Bài khảo sát nhanh giúp người dùng chưa biết loại da của mình có thể tự chẩn đoán chính xác trong 60 giây.
+### FR-SKIN-01 [Must-Have] Thiết lập hồ sơ Digital Skin ID trực tiếp 1 chạm (Direct Setup)
+- **Mô tả:** Người dùng tự khai báo nhanh hồ sơ da của mình chỉ trong 30 giây theo luồng logic y khoa: Cơ địa ➔ Vùng cấm kỵ an toàn (Dị ứng) ➔ Nhu cầu cải thiện.
 - **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** tôi mở trang `/skin-quiz`, **When** bắt đầu làm quiz, **Then** hệ thống lần lượt hiển thị 4 câu hỏi chẩn đoán:
-    - **Câu 1 (Xác định loại da):** *"Sau khi rửa mặt 30 phút mà không thoa gì, da mặt bạn có cảm giác như thế nào?"* (A: Đổ dầu toàn mặt; B: Căng rát, khô khốc; C: Vùng chữ T đổ dầu, 2 má khô; D: Mềm mại, dễ chịu).
-    - **Câu 2 (Vấn đề ưu tiên):** *"Tình trạng nào trên da khiến bạn bận tâm nhất hiện nay?"* (Mụn, Thâm sạm, Lỗ chân lông, Lão hóa).
-    - **Câu 3 (Độ nhạy cảm):** *"Da bạn có thường xuyên bị ửng đỏ, ngứa hoặc châm chích khi đổi thời tiết/mỹ phẩm không?"* (Có / Không).
-    - **Câu 4 (Ngân sách):** *"Khoảng ngân sách dự kiến cho trọn bộ chu trình dưỡng da?"* (Dưới 1 triệu, 1-2 triệu, Trên 2 triệu).
-  - `AC-01.2` **Given** tôi hoàn thành câu 4 và bấm *"Xem kết quả chẩn đoán"*, **Then** hệ thống tự động cập nhật kết quả này vào Digital Skin ID của tôi (nếu đã đăng nhập) và hiển thị trang kết quả Routine.
+  - `AC-01.1` **Given** tôi vào trang thiết lập hồ sơ da `/skin-profile`, **When** màn hình hiển thị, **Then** hiển thị form 1 trang duy nhất với đúng 3 bước theo thứ tự y khoa:
+    - **Bước 1 (Cơ địa nền tảng — Loại da):** 5 thẻ lựa chọn trực quan: `Oily` (Da dầu), `Dry` (Da khô), `Combination` (Hỗn hợp), `Normal` (Da thường), `Sensitive` (Da nhạy cảm).
+    - **Bước 2 (Vùng cấm kỵ an toàn — Blacklist Dị ứng):** Khung quản lý hoạt chất dị ứng cá nhân, cho phép nhập tên hoặc chọn nhanh các chất kích ứng phổ biến (`Alcohol Denat` / Cồn khô, `Fragrance/Parfum` / Hương liệu, `Paraben`, `BHA`, `Sulfate`...) kèm ô ghi chú triệu chứng (VD: *"gây mẩn đỏ châm chích"*).
+    - **Bước 3 (Nhu cầu cải thiện — Vấn đề da & Mục tiêu):** Chọn các vấn đề da ưu tiên (`Acne`, `Aging`, `DarkSpots`, `Pores`, `Sensitivity`, `Dehydration`), Mục tiêu chăm sóc (`Primary Goal`: Giảm mụn, Chống lão hóa, Cấp ẩm...) và Mức ngân sách dự kiến (`Low`: < 500k, `Medium`: 500k-1.5tr, `High`: > 1.5tr).
+  - `AC-01.2` **Given** tôi bấm *"Lưu hồ sơ Digital Skin ID"*, **Then** toàn bộ dữ liệu (Loại da, Blacklist dị ứng, Vấn đề da, Mục tiêu) được lưu đồng thời vào CSDL trong một transaction duy nhất, và hệ thống tự động cập nhật lại Match Score % của toàn bộ sản phẩm trên sàn.
 
-### FR-QUIZ-02 [Must-Have] Xây dựng chu trình Routine chuẩn AM/PM
-- **Quy tắc nghiệp vụ:** Bắt buộc có Kem chống nắng vào buổi sáng (`BR-QUIZ-01`).
+### FR-ROUTINE-02 [Must-Have] Tự động sinh chu trình Routine chuẩn AM/PM
+- **Quy tắc nghiệp vụ:** Bắt buộc có Kem chống nắng vào buổi sáng (`BR-ROUTINE-01`).
 - **Điều kiện chấp nhận:**
-  - `AC-02.1` **Given** kết quả chẩn đoán, **When** màn hình Routine hiển thị, **Then** chia làm 2 tab rõ ràng:
+  - `AC-02.1` **Given** hồ sơ Digital Skin ID đã lưu, **When** màn hình gợi ý Routine hiển thị, **Then** chia làm 2 tab rõ ràng:
     - **Chu trình Buổi Sáng (AM Routine):** 1. Sữa rửa mặt dịu nhẹ ➔ 2. Serum/Dưỡng ẩm ➔ **3. Kem chống nắng phổ rộng (BẮT BUỘC)**.
     - **Chu trình Buổi Tối (PM Routine):** 1. Nước tẩy trang ➔ 2. Sữa rửa mặt ➔ 3. Serum đặc trị vấn đề da ➔ 4. Kem dưỡng khóa ẩm phục hồi.
   - `AC-02.2` **Given** các sản phẩm được thuật toán đề xuất trong Routine, **Then** 100% sản phẩm này phải:
     1. Tuyệt đối không chứa chất nằm trong Allergy Blacklist của người dùng.
     2. Không xung đột hoạt chất với nhau giữa các bước trong cùng một buổi.
-    3. Nằm trong khoảng ngân sách mà người dùng đã chọn ở Câu 4.
+    3. Nằm trong khoảng ngân sách mà người dùng đã chọn ở Bước 3.
 
-### FR-QUIZ-03 [Must-Have — USP] Tính năng "Chat-to-Cart" (Thêm trọn bộ Routine vào giỏ)
-- **Mô tả:** Tính năng "Wow" giúp chuyển đổi mua sắm tức thì chỉ với một cú nhấp chuột.
+### FR-ROUTINE-03 [Must-Have — USP] Tính năng "Chat-to-Cart" (Thêm trọn bộ Routine vào giỏ)
+- **Mô tả:** Tính năng chuyển đổi mua sắm tức thì chỉ với một cú nhấp chuột.
 - **Điều kiện chấp nhận:**
-  - `AC-03.1` **Given** màn hình kết quả Routine đang hiển thị danh sách 4 sản phẩm được gợi ý, **When** tôi bấm nút lớn: *"🛒 Thêm toàn bộ chu trình vào giỏ hàng"*, **Then** toàn bộ 4 sản phẩm lập tức được thêm vào giỏ hàng cùng một lúc, hệ thống hiện thông báo thành công và chuyển hướng tôi đến giỏ hàng để kiểm tra.
+  - `AC-03.1` **Given** màn hình kết quả Routine đang hiển thị danh sách sản phẩm gợi ý, **When** tôi bấm nút lớn: *"🛒 Thêm toàn bộ chu trình vào giỏ hàng"*, **Then** toàn bộ các sản phẩm lập tức được thêm vào giỏ hàng cùng một lúc, hệ thống hiện thông báo thành công và chuyển hướng đến giỏ hàng để kiểm tra.
 
-### FR-QUIZ-04 [Should-Have] Lưu chu trình vào hồ sơ cá nhân
+### FR-ROUTINE-04 [Should-Have] Lưu chu trình vào hồ sơ cá nhân
 - **Điều kiện chấp nhận:**
-  - `AC-04.1` **Given** tôi đã làm xong Quiz, **When** tôi bấm *"Lưu chu trình này"*, **Then** chu trình được lưu vào CSDL bảng `saved_routines` để tôi có thể xem lại bất kỳ lúc nào trong trang cá nhân mà không cần làm lại quiz.
+  - `AC-04.1` **Given** chu trình Routine được gợi ý, **When** tôi bấm *"Lưu chu trình này"*, **Then** chu trình được lưu vào CSDL bảng `saved_routines` để tôi có thể xem lại bất kỳ lúc nào trong trang cá nhân mà không cần thiết lập lại.
 
 ---
 

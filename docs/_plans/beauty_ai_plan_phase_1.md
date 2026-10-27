@@ -22,12 +22,12 @@ last_reviewed: 2026-10-26
    - Digital Skin ID & Allergy Blacklist hoạt động trên mọi trang.
    - Smart Conflict Detector quét chính xác 12 cặp hoạt chất kỵ nhau trong giỏ hàng.
    - INCI Analyzer bóc tách văn bản bao bì tự do chính xác.
-   - Skin Quiz 4 câu chẩn đoán ➔ Tạo Routine AM/PM ➔ Nút bấm **Chat-to-Cart** thêm cả bộ vào giỏ hàng.
+   - Thiết lập Digital Skin ID 1 chạm (Loại da ➔ Dị ứng ➔ Vấn đề & Mục tiêu) ➔ Tự động sinh Routine AM/PM ➔ Nút bấm **Chat-to-Cart** thêm cả bộ vào giỏ.
    - Trợ lý AI Gemini tư vấn chuẩn y khoa, grounding 100% sản phẩm có trong sàn.
 2. **Hiệu năng & Dữ liệu lớn:**
    - Nạp thành công tập mẫu dataset 1 triệu đánh giá; thời gian truy vấn lọc theo loại da trên trang PDP dưới **50ms**.
 3. **Luồng E-Commerce hoàn chỉnh:**
-   - Khách vãng lai ➔ Đăng ký tài khoản ➔ Làm Quiz ➔ Duyệt Catalog ➔ Xem PDP ➔ Thêm giỏ hàng cảnh báo xung đột ➔ Đặt hàng COD ➔ Admin duyệt đơn.
+   - Khách vãng lai ➔ Đăng ký tài khoản ➔ Thiết lập Digital Skin ID (kèm Blacklist Dị ứng) ➔ Duyệt Catalog ➔ Xem PDP ➔ Thêm giỏ hàng cảnh báo xung đột ➔ Đặt hàng COD ➔ Admin duyệt đơn.
 4. **Chất lượng mã nguồn:**
    - Toàn bộ 11 bài kiểm thử kiến trúc `BeautyAI.ArchitectureTests` và unit tests XANH 100%.
    - `./syntheprise gate` đạt trạng thái **Clean** (0 lỗi, 0 cảnh báo).
@@ -63,7 +63,7 @@ flowchart LR
     end
 
     subgraph W4["TUẦN 4: AI, ADMIN & LAUNCH (40h)"]
-        T41["T4.1 Skin Quiz & Chat-to-Cart (12h)"] --> T42["T4.2 Trợ lý Gemini AI Chatbot (10h)"]
+        T41["T4.1 Routine Generator & Chat-to-Cart (12h)"] --> T42["T4.2 Trợ lý Gemini AI Chatbot (10h)"]
         T42 --> T43["T4.3 Admin Dashboard tinh gọn (10h)"]
         T43 --> T44["T4.4 Tổng duyệt Demo & Slide (8h)"]
     end
@@ -131,13 +131,13 @@ flowchart LR
 
 ---
 
-## 3.4. SPRINT 4: TRỢ LÝ AI, SKIN QUIZ, ADMIN & TỔNG DUYỆT DEMO (40 Giờ)
+## 3.4. SPRINT 4: TRỢ LÝ AI GEMINI, ROUTINE GENERATOR, ADMIN & TỔNG DUYỆT DEMO (40 Giờ)
 - **Thời gian:** Ngày 23 đến Ngày 30.
-- **Mục tiêu:** Hoàn thiện 2 tính năng "Wow" (Skin Quiz Chat-to-Cart và Gemini AI Chatbot), trang Admin Console và đóng gói kịch bản bảo vệ đồ án.
+- **Mục tiêu:** Hoàn thiện 2 tính năng "Wow" (Routine Generator Chat-to-Cart và Gemini AI Chatbot), trang Admin Console và đóng gói kịch bản bảo vệ đồ án.
 
 | Mã Task | Tên nhiệm vụ | Thời lượng | Đầu vào kỹ thuật | Đầu ra nghiệm thu |
 |---|---|---|---|---|
-| **T4.1** | **Skin Quiz 4 Bước & Nút "Chat-to-Cart"** | 12 giờ | `SkinQuiz.jsx` & Domain Routine Generator | Bài khảo sát 4 câu trực quan; Thuật toán sinh Routine AM/PM; Nút **Chat-to-Cart** thêm cả bộ vào giỏ trong 1 click; Lưu routine vào hồ sơ. |
+| **T4.1** | **Routine Generator & Nút "Chat-to-Cart"** | 12 giờ | `RoutineView.jsx` & Domain Routine Generator | Thuật toán sinh Routine AM/PM tự động từ Digital Skin ID; Nút **Chat-to-Cart** thêm cả bộ vào giỏ trong 1 click; Lưu routine vào `saved_routines`. |
 | **T4.2** | **Tích hợp Trợ lý Da liễu AI (Gemini API)** | 10 giờ | `GeminiSkincareProvider` trong Infrastructure | Khung chat AI; Grounding danh mục sản phẩm của sàn; Cá nhân hóa theo Skin ID; Rào chắn y tế không chẩn đoán bệnh nặng. |
 | **T4.3** | **Admin Dashboard tinh gọn** | 10 giờ | `AdminDashboard.jsx` & API Admin | 4 thẻ KPI tổng quan; CRUD sản phẩm & ô nhập chuỗi thành phần INCI; Đổi trạng thái đơn hàng (`Pending` ➔ `Delivering` ➔ `Completed`). |
 | **T4.4** | **Tổng duyệt Demo, Slide & Launch PROD** | 8 giờ | Toàn bộ hệ thống | Kiểm tra `./syntheprise gate` Clean; Chạy thử nghiệm kịch bản Happy Path Demo từ A đến Z; Chuẩn bị slide và tài liệu thuyết minh. |

@@ -90,18 +90,36 @@ CREATE TABLE users (
 CREATE INDEX idx_users_email ON users(email);
 
 -- ============================================================================
--- 2. BẢNG HỒ SƠ DA SỐ (SKIN_PROFILES) — DIGITAL SKIN ID
+-- 2. HỒ SƠ DIGITAL SKIN ID THỐNG NHẤT (SKIN_PROFILES & USER_ALLERGIES)
+-- ============================================================================
+-- Khối thống nhất theo thứ tự y khoa:
+-- 1. Cơ địa nền tảng (Loại da)
+-- 2. Vùng cấm kỵ an toàn (Blacklist Dị ứng)
+-- 3. Nhu cầu cải thiện (Vấn đề da, Mục tiêu & Ngân sách)
 -- ============================================================================
 CREATE TABLE skin_profiles (
-    user_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal')),
-    is_sensitive BOOLEAN DEFAULT FALSE NOT NULL,
-    concerns JSONB NOT NULL DEFAULT '[]', -- Mảng JSON: ["Acne", "Aging", "Pores", "Pigmentation"]
+    id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal', 'Sensitive')),
+    skin_concerns VARCHAR(50)[] NOT NULL, -- ARRAY['Acne', 'Aging', 'DarkSpots', 'Pores', 'Sensitivity', 'Dehydration']
+    primary_goal VARCHAR(255),
+    budget_level VARCHAR(50) DEFAULT 'Medium' NOT NULL CHECK (budget_level IN ('Low', 'Medium', 'High')),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+CREATE INDEX idx_skin_profiles_user ON skin_profiles(user_id);
+
+-- Bảng chi tiết con: Hoạt chất dị ứng thuộc khối Digital Skin ID (Chuẩn 3NF)
+CREATE TABLE user_allergies (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    ingredient_name VARCHAR(255) NOT NULL,
+    note VARCHAR(500),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE INDEX idx_user_allergies_user ON user_allergies(user_id);
 
 -- ============================================================================
--- 3. BẢNG TỪ ĐIỂN THÀNH PHẦN HOÁ HỌC (INGREDIENTS) — INCI DICTIONARY
+-- 3. TỪ ĐIỂN THÀNH PHẦN HOÁ HỌC (INGREDIENTS — INCI DICTIONARY)
 -- ============================================================================
 CREATE TABLE ingredients (
     id SERIAL PRIMARY KEY,
@@ -116,17 +134,7 @@ CREATE TABLE ingredients (
 CREATE INDEX idx_ingredients_inci ON ingredients(inci_name);
 
 -- ============================================================================
--- 4. BẢNG DANH SÁCH ĐEN DỊ ỨNG (USER_ALLERGIES) — ALLERGY BLACKLIST
--- ============================================================================
-CREATE TABLE user_allergies (
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (user_id, ingredient_id)
-);
-
--- ============================================================================
--- 5. BẢNG DANH MỤC & THƯƠNG HIỆU (CATEGORIES & BRANDS)
+-- 4. BẢNG DANH MỤC & THƯƠNG HIỆU (CATEGORIES & BRANDS)
 -- ============================================================================
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
@@ -345,12 +353,27 @@ namespace BeautyAI.Application.DTOs;
 public record RegisterRequest(string Email, string Password, string FullName, string? Phone);
 public record LoginRequest(string Email, string Password);
 public record AuthResponse(string Token, string Email, string FullName, string Role);
-public record UserProfileDto(int Id, string Email, string FullName, string? Phone, string? ShippingAddress, SkinProfileDto? SkinProfile);
+public record UserProfileDto(int Id, string Email, string FullName, string? Phone, string? ShippingAddress, DigitalSkinIdDto? SkinProfile);
 
-// 2. Skin Profile DTOs
-public record SkinProfileDto(string SkinType, bool IsSensitive, List<string> Concerns, List<IngredientItemDto> Allergies);
-public record UpdateSkinProfileRequest(string SkinType, bool IsSensitive, List<string> Concerns);
-public record AddAllergyRequest(int IngredientId);
+// 2. Digital Skin ID DTOs (Khối thống nhất theo thứ tự y khoa)
+public record AllergyItemDto(int Id, string IngredientName, string? Note);
+public record DigitalSkinIdDto(
+    int UserId, 
+    string FullName, 
+    string SkinType,                 // 1. Cơ địa nền tảng
+    List<AllergyItemDto> Allergies,  // 2. Vùng cấm kỵ an toàn (Blacklist Dị ứng)
+    List<string> SkinConcerns,       // 3. Nhu cầu cải thiện: Vấn đề da
+    string PrimaryGoal,              // 3. Mục tiêu dưỡng da
+    string BudgetLevel               // 3. Ngân sách
+);
+public record UpdateDigitalSkinIdRequest(
+    string SkinType, 
+    List<string> AllergyNames, 
+    List<string> SkinConcerns, 
+    string PrimaryGoal, 
+    string BudgetLevel
+);
+public record AddAllergyRequest(string IngredientName, string? Note);
 
 // 3. Product & INCI DTOs
 public record ProductSummaryDto(int Id, string Name, string Slug, string BrandName, long PriceVnd, string? ImageUrl, int? MatchScore, bool HasAllergyWarning);
@@ -367,8 +390,8 @@ public record FunctionDistributionDto(int MoisturizingPercent, int ActiveTreatme
 public record CheckConflictRequest(List<int> ProductIds);
 public record ConflictAlertDto(string ProductAName, string ProductBName, string IngredientAName, string IngredientBName, string Severity, string ReasonVi, string RecommendationVi);
 
-// 5. Quiz & Routine DTOs
-public record QuizSubmitRequest(int Q1SkinFeeling, int Q2Concern, bool Q3IsSensitive, int Q4Budget);
+// 5. Routine DTOs (Tạo tự động từ Digital Skin ID)
+public record GenerateRoutineRequest(string? SkinType, string? BudgetLevel);
 public record RoutineResultDto(List<ProductSummaryDto> AmRoutine, List<ProductSummaryDto> PmRoutine, long TotalCostVnd, List<ConflictAlertDto> InternalConflicts);
 
 // 6. Order DTOs
@@ -452,16 +475,17 @@ Nhiệm vụ của bạn là tư vấn chu trình dưỡng da và gợi ý mỹ 
 | | `POST` | `/api/v1/auth/login` | `200 OK` | Đăng nhập nhận JWT Token |
 | | `GET` | `/api/v1/auth/me` | `200 OK` | Lấy thông tin tài khoản hiện tại |
 | | `PUT` | `/api/v1/auth/profile` | `200 OK` | Cập nhật họ tên, SĐT, địa chỉ |
-| **Skin ID** | `PUT` | `/api/v1/skin-profile` | `200 OK` | Cập nhật loại da, vấn đề da |
-| | `GET` | `/api/v1/skin-profile/allergies` | `200 OK` | Lấy danh sách hoạt chất dị ứng |
+| **Digital Skin ID** | `GET` | `/api/v1/skin-profile` | `200 OK` | Lấy trọn bộ hồ sơ Digital Skin ID thống nhất (kèm danh sách dị ứng) |
+| | `PUT` | `/api/v1/skin-profile` | `200 OK` | Cập nhật hồ sơ da (Loại da, Dị ứng, Vấn đề da, Mục tiêu, Ngân sách) |
 | | `POST` | `/api/v1/skin-profile/allergies` | `201 Created` | Thêm chất dị ứng vào Blacklist |
 | | `DELETE` | `/api/v1/skin-profile/allergies/{id}` | `204 No Content` | Xóa chất dị ứng khỏi Blacklist |
 | **Catalog** | `GET` | `/api/v1/products` | `200 OK` | Lọc danh mục, tìm kiếm, toggle an toàn |
 | | `GET` | `/api/v1/products/{slug}` | `200 OK` | Chi tiết sản phẩm, INCI, Match Score |
 | | `GET` | `/api/v1/products/{id}/reviews` | `200 OK` | Lọc 1M reviews theo loại da |
-| **Tools** | `POST` | `/api/v1/tools/analyze-inci` | `200 OK` | Dán văn bản bóc tách bảng thành phần |
+| **Tools & Routine**| `POST` | `/api/v1/tools/analyze-inci` | `200 OK` | Dán văn bản bóc tách bảng thành phần |
 | | `POST` | `/api/v1/tools/check-conflict` | `200 OK` | Quét xung đột hoạt chất trong giỏ |
-| | `POST` | `/api/v1/tools/skin-quiz` | `200 OK` | Tính Routine AM/PM từ bài test 4 câu |
+| | `POST` | `/api/v1/routines/generate` | `200 OK` | Tự động sinh chu trình Routine AM/PM từ Digital Skin ID |
+| | `POST` | `/api/v1/routines/save` | `201 Created` | Lưu chu trình vào hồ sơ cá nhân |
 | **Orders** | `POST` | `/api/v1/orders` | `201 Created` | Đặt hàng thanh toán COD |
 | | `GET` | `/api/v1/orders/my-orders` | `200 OK` | Xem lịch sử các đơn hàng đã đặt |
 | **AI** | `POST` | `/api/v1/ai/consult` | `200 OK` | Chat tư vấn mỹ phẩm với Gemini API |
