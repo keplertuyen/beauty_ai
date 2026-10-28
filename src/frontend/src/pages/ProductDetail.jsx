@@ -374,13 +374,17 @@ export default function ProductDetail() {
   /* ── LOADING ── */
   if (loadingProduct) {
     return (
-      <div className="pd-loading-wrapper">
-        <div className="pd-loading-inner">
-          <div className="pd-skeleton pd-skeleton-image" />
-          <div className="pd-skeleton-info">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="pd-skeleton pd-skeleton-line" style={{ width: `${90 - i * 12}%` }} />
-            ))}
+      <div className="pd-page">
+        <div className="container">
+          <div className="pd-loading-wrapper">
+            <div className="pd-loading-inner">
+              <div className="pd-skeleton pd-skeleton-image" />
+              <div className="pd-skeleton-info">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="pd-skeleton pd-skeleton-line" style={{ width: `${90 - i * 12}%` }} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -389,12 +393,15 @@ export default function ProductDetail() {
 
   if (!product) {
     return (
-      <div className="pd-not-found">
-        <span className="pd-not-found-icon">🔍</span>
-        <h2>{t('pd_not_found', 'Không tìm thấy sản phẩm')}</h2>
-        <button className="btn btn-primary" onClick={() => navigate('/products')}>
-          {t('pd_back_list', 'Quay lại danh sách')}
-        </button>
+      <div className="pd-page">
+        <div className="container">
+          <div className="pd-not-found">
+            <h2>{t('pd_not_found', 'Product Not Found')}</h2>
+            <button className="btn btn-primary" onClick={() => navigate('/products')}>
+              {t('pd_back_list', 'Back to Catalog')}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

@@ -124,7 +124,6 @@ public class ProductRepository : IProductRepository
         return await _context.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
-            .Include(p => p.Reviews)
             .Include(p => p.ProductIngredients)
                 .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking()
@@ -136,7 +135,6 @@ public class ProductRepository : IProductRepository
         return await _context.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
-            .Include(p => p.Reviews)
             .Include(p => p.ProductIngredients)
                 .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking()

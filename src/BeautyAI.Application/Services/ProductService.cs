@@ -120,7 +120,7 @@ public class ProductService : IProductService
             ))
             .ToList() ?? new List<ProductIngredientDto>();
 
-        var rating = product.Reviews.Any() ? (decimal)product.Reviews.Average(r => r.Rating) : 5.0m;
+        var (rating, reviewsCount) = await _productRepository.GetProductReviewStatsAsync(product.Id, cancellationToken);
 
         return new ProductDetailDto(
             Id: product.Id,
@@ -134,8 +134,8 @@ public class ProductService : IProductService
             Description: product.Description,
             ImageUrl: product.ImageUrl,
             IngredientListRaw: product.IngredientListRaw,
-            Rating: Math.Round(rating, 1),
-            ReviewsCount: product.Reviews.Count,
+            Rating: rating,
+            ReviewsCount: reviewsCount,
             TargetSkinTypes: product.TargetSkinTypes ?? Array.Empty<string>(),
             StockQuantity: product.StockQuantity,
             Ingredients: ingredientsDto,

@@ -1140,7 +1140,7 @@
 
 /* ── Skeletons & Not Found ─────────────────────────────────── */
 .pd-loading-wrapper {
-  padding: 60px 0;
+  padding: 40px 0;
 }
 
 .pd-loading-inner {
@@ -1153,6 +1153,17 @@
   .pd-loading-inner {
     grid-template-columns: 1fr;
   }
+}
+
+.pd-skeleton {
+  background: linear-gradient(90deg, rgba(230, 224, 215, 0.7) 25%, rgba(245, 241, 235, 0.9) 50%, rgba(230, 224, 215, 0.7) 75%);
+  background-size: 200% 100%;
+  animation: pdShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes pdShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .pd-skeleton-image {
