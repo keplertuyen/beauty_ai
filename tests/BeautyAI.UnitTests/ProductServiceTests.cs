@@ -46,6 +46,22 @@ public class ProductServiceTests
 
         public Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(int productId, CancellationToken cancellationToken = default) =>
             Task.FromResult((5.0m, 0));
+
+        public Task<IReadOnlyList<Product>> GetSimilarProductsAsync(
+            int productId,
+            int categoryId,
+            IEnumerable<string>? allergyBlacklist,
+            int limit = 4,
+            CancellationToken cancellationToken = default)
+        {
+            var list = Products.Where(p => p.Id != productId && p.CategoryId == categoryId).AsEnumerable();
+            if (allergyBlacklist != null && allergyBlacklist.Any())
+            {
+                var allergens = allergyBlacklist.Select(a => a.ToLowerInvariant()).ToList();
+                list = list.Where(p => !allergens.Any(a => p.IngredientListRaw.ToLowerInvariant().Contains(a)));
+            }
+            return Task.FromResult((IReadOnlyList<Product>)list.Take(limit).ToList());
+        }
     }
 
     private class FakeSkinProfileRepository : ISkinProfileRepository
@@ -171,5 +187,60 @@ public class ProductServiceTests
         Assert.NotNull(detail);
         Assert.Equal("Soothing Cleanser", detail.Name);
         Assert.Equal(28.00m, detail.PriceUsd);
+    }
+
+    [Fact]
+    public async Task GetSimilarProductsAsync_FiltersOutAllergens_AndExcludesCurrentProduct()
+    {
+        var productRepo = new FakeProductRepository();
+        productRepo.Products.AddRange(new[]
+        {
+            new Product
+            {
+                Id = 1,
+                Code = "P001",
+                Name = "Origin Serum",
+                Slug = "origin-serum",
+                CategoryId = 2,
+                PriceUsd = 40.00m,
+                IngredientListRaw = "Water, Niacinamide"
+            },
+            new Product
+            {
+                Id = 2,
+                Code = "P002",
+                Name = "Allergenic Serum",
+                Slug = "allergenic-serum",
+                CategoryId = 2,
+                PriceUsd = 35.00m,
+                IngredientListRaw = "Water, Fragrance"
+            },
+            new Product
+            {
+                Id = 3,
+                Code = "P003",
+                Name = "Safe Similar Serum",
+                Slug = "safe-similar-serum",
+                CategoryId = 2,
+                PriceUsd = 42.00m,
+                IngredientListRaw = "Water, Hyaluronic Acid"
+            }
+        });
+
+        var skinProfileRepo = new FakeSkinProfileRepository
+        {
+            Allergies = new List<UserAllergy>
+            {
+                new() { UserId = 10, IngredientName = "Fragrance" }
+            }
+        };
+
+        var service = new ProductService(productRepo, skinProfileRepo);
+        var similar = await service.GetSimilarProductsAsync("1", currentUserId: 10, limit: 4);
+
+        Assert.NotNull(similar);
+        Assert.Single(similar);
+        Assert.Equal(3, similar[0].Id);
+        Assert.Equal("Safe Similar Serum", similar[0].Name);
     }
 }

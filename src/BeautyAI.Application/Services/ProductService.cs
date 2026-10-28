@@ -145,6 +145,66 @@ public class ProductService : IProductService
         );
     }
 
+    public async Task<IReadOnlyList<ProductSummaryDto>> GetSimilarProductsAsync(
+        string idOrCodeOrSlug,
+        int? currentUserId = null,
+        int limit = 6,
+        CancellationToken cancellationToken = default)
+    {
+        Product? product = null;
+
+        if (int.TryParse(idOrCodeOrSlug, out var id))
+        {
+            product = await _productRepository.GetProductByIdAsync(id, cancellationToken);
+        }
+
+        product ??= await _productRepository.GetProductByCodeOrSlugAsync(idOrCodeOrSlug, cancellationToken);
+
+        if (product == null)
+            return Array.Empty<ProductSummaryDto>();
+
+        SkinProfile? skinProfile = null;
+        List<string>? allergyNames = null;
+
+        if (currentUserId.HasValue)
+        {
+            skinProfile = await _skinProfileRepository.GetByUserIdAsync(currentUserId.Value, cancellationToken);
+            var allergies = await _skinProfileRepository.GetAllergiesByUserIdAsync(currentUserId.Value, cancellationToken);
+            allergyNames = allergies.Select(a => a.IngredientName).ToList();
+        }
+
+        var similarProducts = await _productRepository.GetSimilarProductsAsync(
+            product.Id,
+            product.CategoryId,
+            allergyNames,
+            limit,
+            cancellationToken);
+
+        return similarProducts.Select(p =>
+        {
+            var match = SuitabilityScoreCalculator.Calculate(p, skinProfile, allergyNames);
+            var rating = p.Reviews.Any() ? (decimal)p.Reviews.Average(r => r.Rating) : 5.0m;
+
+            return new ProductSummaryDto(
+                Id: p.Id,
+                Code: p.Code,
+                Name: p.Name,
+                Slug: p.Slug,
+                BrandName: p.Brand?.Name ?? "Unknown Brand",
+                CategoryName: p.Category?.Name ?? "General Skincare",
+                PriceUsd: p.PriceUsd,
+                VolumeMl: p.VolumeMl,
+                ImageUrl: p.ImageUrl,
+                Rating: Math.Round(rating, 1),
+                ReviewsCount: p.Reviews.Count,
+                TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
+                SuitabilityScore: match.SuitabilityScore,
+                HasAllergyWarning: match.HasAllergyWarning,
+                MatchedAllergen: match.MatchedAllergen
+            );
+        }).ToList();
+    }
+
     public async Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default)
     {
         var categories = await _productRepository.GetCategoriesAsync(cancellationToken);

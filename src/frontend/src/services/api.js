@@ -59,7 +59,7 @@ export const updateCurrencySettings = (data) => API.put('/products/settings/curr
 // ==========================================
 // 4. RECOMMENDATIONS & ROUTINE
 // ==========================================
-export const getSimilarProducts = (id, top_k = 10) => API.get(`/recommendations/similar/${id}`, { params: { top_k } });
+export const getSimilarProducts = (id, limit = 6) => API.get(`/products/${id}/similar`, { params: { limit } });
 export const getFrequentlyBoughtTogether = (id, top_k = 4) => API.get(`/recommendations/frequently-bought-together/${id}`, { params: { top_k } });
 export const getTrending = (top_k = 12) => API.get('/recommendations/trending', { params: { top_k } });
 export const getFeatured = (top_k = 8) => API.get('/recommendations/featured', { params: { top_k } });

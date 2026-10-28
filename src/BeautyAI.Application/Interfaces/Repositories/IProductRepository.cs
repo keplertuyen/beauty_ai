@@ -18,6 +18,13 @@ public interface IProductRepository
 
     Task<IReadOnlyList<Brand>> GetBrandsAsync(CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<Product>> GetSimilarProductsAsync(
+        int productId,
+        int categoryId,
+        IEnumerable<string>? allergyBlacklist,
+        int limit = 6,
+        CancellationToken cancellationToken = default);
+
     Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(
         int productId,
         CancellationToken cancellationToken = default);

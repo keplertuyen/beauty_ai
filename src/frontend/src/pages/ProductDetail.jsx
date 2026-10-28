@@ -4,8 +4,8 @@ import {
   Heart, Share2, ShoppingBag, Star, ChevronRight,
   Truck, Package, FlaskConical, Info, MessageSquare,
   ThumbsUp, ThumbsDown, Send, ChevronDown, ChevronUp,
-  CheckCircle, Copy, Check, QrCode, ShieldCheck,
-  RefreshCw, Plus, Minus, X, ExternalLink
+  CheckCircle, Copy, Check, QrCode, ShieldCheck, ShieldAlert, CheckCircle2,
+  RefreshCw, Plus, Minus, X, ExternalLink, Sun, Moon, Clock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
@@ -23,6 +23,47 @@ import { translateHighlight } from '../utils/highlightTranslator';
 import './ProductDetail.css';
 
 /* ── helpers ─────────────────────────────────── */
+function getRoutineInfo(categoryName) {
+  const cat = (categoryName || '').toLowerCase();
+  if (cat.includes('cleanser') || cat.includes('wash')) {
+    return { step: 'Step 1: Cleanse', time: 'AM & PM', tip: 'Use as the foundational first step to remove impurities without stripping skin barrier.' };
+  }
+  if (cat.includes('toner')) {
+    return { step: 'Step 2: Tone & Balance', time: 'AM & PM', tip: 'Apply directly onto clean skin to restore hydration and prep skin for serums.' };
+  }
+  if (cat.includes('serum') || cat.includes('essence') || cat.includes('peeling') || cat.includes('treatment')) {
+    const isNightOnly = cat.includes('peel') || cat.includes('retinol') || cat.includes('aha') || cat.includes('bha') || cat.includes('exfoliat');
+    return { step: 'Step 3: Treat & Target', time: isNightOnly ? 'PM Only' : 'AM & PM', tip: 'Dispense 3-4 drops and gently press into skin before heavier moisturizers.' };
+  }
+  if (cat.includes('eye')) {
+    return { step: 'Step 4a: Eye Care', time: 'AM & PM', tip: 'Gently pat a rice-grain amount around orbital eye contours with your ring finger.' };
+  }
+  if (cat.includes('sunscreen') || cat.includes('sun')) {
+    return { step: 'Step 5: Sun Protection', time: 'AM Only', tip: 'Apply generously as the final morning step 15 minutes prior to sun exposure.' };
+  }
+  if (cat.includes('mask')) {
+    return { step: 'Weekly Special Treatment', time: 'PM (2–3x / week)', tip: 'Apply an even layer on cleansed skin, leaving on according to formula guidance.' };
+  }
+  if (cat.includes('oil')) {
+    return { step: 'Step 5: Seal & Nourish', time: 'PM', tip: 'Warm 2 drops in palms and press over moisturizer to lock in moisture and nourish lipid barrier.' };
+  }
+  return { step: 'Step 4: Moisturize & Barrier', time: 'AM & PM', tip: 'Massage evenly onto face and neck to seal in hydration and reinforce skin barrier.' };
+}
+
+function getIngredientStats(ingredients) {
+  if (!Array.isArray(ingredients) || ingredients.length === 0) return [];
+  const counts = {};
+  ingredients.forEach(i => {
+    const group = i.functionGroup || 'Other';
+    counts[group] = (counts[group] || 0) + 1;
+  });
+  return Object.entries(counts)
+    .filter(([k]) => k !== 'Other')
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([label, count]) => ({ label, count }));
+}
+
 const CATEGORY_EMOJI = {
   'Moisturizers': '🧴',
   'Serums & Essences': '💧',
@@ -358,20 +399,37 @@ export default function ProductDetail() {
     );
   }
 
+  const productId = product.id ?? product.product_id;
+  const productName = product.name ?? product.product_name ?? 'Beauty Product';
+  const brandName = product.brandName ?? product.brand_name ?? (typeof product.brand === 'string' ? product.brand : product.brand?.name) ?? 'BeautyAI Brand';
+  const categoryName = product.categoryName ?? product.primary_category ?? (typeof product.category === 'string' ? product.category : product.category?.name) ?? 'Skincare';
   const price = parseFloat(product.priceUsd ?? product.price_usd ?? product.price) || 0;
   const salePrice = product.salePriceUsd ? parseFloat(product.salePriceUsd) : (product.sale_price_usd ? parseFloat(product.sale_price_usd) : null);
-  const rating = parseFloat(product.rating) || 0;
-  const reviewCount = reviews.length;
+  const rating = parseFloat(product.rating) || 5.0;
+  const reviewCount = product.reviewsCount ?? reviews.length;
+  const volumeMl = product.volumeMl ? `${product.volumeMl} ml` : (product.size || null);
+  const suitabilityScore = product.suitabilityScore ?? product.suitability_score;
+  const hasAllergyWarning = product.hasAllergyWarning || product.has_allergy_warning;
+  const matchedAllergen = product.matchedAllergen || product.matched_allergen;
+  const structuredIngredients = Array.isArray(product.ingredients) && product.ingredients.length > 0 && typeof product.ingredients[0] === 'object'
+    ? product.ingredients
+    : [];
+  const rawIngredients = parseIngredients(
+    product.ingredientListRaw ||
+    (Array.isArray(product.ingredients) && typeof product.ingredients[0] === 'string' ? product.ingredients : null) ||
+    product.ingredients_clean ||
+    ''
+  );
+  const routine = getRoutineInfo(categoryName);
   const loves = (() => {
     const baseLoves = parseInt(product?.loves_count) || 0;
     if (initialInWishlist === null || !product) return baseLoves;
-    const currentIn = isInWishlist(product.product_id);
+    const currentIn = isInWishlist(productId);
     if (currentIn && !initialInWishlist) return baseLoves + 1;
     if (!currentIn && initialInWishlist) return Math.max(0, baseLoves - 1);
     return baseLoves;
   })();
   const highlights = parseHighlights(product.highlights_clean || product.highlights);
-  const ingredients = parseIngredients(product.ingredients_clean || product.ingredients);
   const breakdown = ratingBreakdown();
 
   return (
@@ -380,19 +438,19 @@ export default function ProductDetail() {
 
         {/* ── Breadcrumb Navigation ─────────────────────── */}
         <nav className="pd-breadcrumb" aria-label="Breadcrumb">
-          <Link to="/">{t('pd_breadcrumb_home', 'Trang chủ')}</Link>
+          <Link to="/">{t('pd_breadcrumb_home', 'Home')}</Link>
           <ChevronRight size={14} />
-          <Link to="/products">{t('nav_products', 'Sản phẩm')}</Link>
-          {product.primary_category && (
+          <Link to="/products">{t('nav_products', 'Products')}</Link>
+          {categoryName && (
             <>
               <ChevronRight size={14} />
-              <Link to={`/products?category=${encodeURIComponent(product.primary_category)}`}>
-                {t('cat_' + product.primary_category, product.primary_category)}
+              <Link to={`/products?category=${encodeURIComponent(categoryName)}`}>
+                {categoryName}
               </Link>
             </>
           )}
           <ChevronRight size={14} />
-          <span className="pd-breadcrumb-current">{product.product_name}</span>
+          <span className="pd-breadcrumb-current">{productName}</span>
         </nav>
 
         {/* ── PART 1 & 2: HERO PURCHASE GRID ────────────── */}
@@ -405,7 +463,7 @@ export default function ProductDetail() {
               <div className="pd-visual-box">
                 <img
                   src={getProductImage(product, 800)}
-                  alt={product.product_name}
+                  alt={productName}
                   className="pd-visual-real-img"
                   loading="eager"
                   referrerPolicy="no-referrer"
@@ -416,7 +474,7 @@ export default function ProductDetail() {
                   }}
                 />
                 <span className="pd-visual-emoji" style={{ display: 'none' }}>
-                  {getCategoryEmoji(product.primary_category)}
+                  {getCategoryEmoji(categoryName)}
                 </span>
 
                 {/* Badges Stack */}
@@ -439,7 +497,7 @@ export default function ProductDetail() {
                 <div className="pd-visual-actions">
                   <button
                     className={`pd-action-btn ${inWishlist ? 'active' : ''}`}
-                    onClick={() => toggleWishlistItem(product.product_id)}
+                    onClick={() => toggleWishlistItem(productId)}
                     aria-label={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
                     title={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
                   >
@@ -468,7 +526,7 @@ export default function ProductDetail() {
                 </button>
               </div>
 
-              {/* Trust Checklist (Cam kết chất lượng) */}
+              {/* Trust Checklist */}
               <div className="pd-trust-checklist">
                 <div className="pd-trust-item">
                   <div className="pd-trust-icon-wrap">
@@ -506,17 +564,48 @@ export default function ProductDetail() {
           {/* ── PART 2: PRIMARY BUY BOX (RIGHT) ────────── */}
           <div className="pd-part-buybox">
             <div className="pd-buybox-card">
+              {/* Allergy Alert Banner (Core USP) */}
+              {hasAllergyWarning && (
+                <div className="pd-allergy-warning-box">
+                  <div className="pd-allergy-warning-top">
+                    <ShieldAlert size={22} color="#DC2626" style={{ flexShrink: 0, marginTop: 2 }} />
+                    <div>
+                      <h4>Safety Allergy Warning</h4>
+                      <p>
+                        This product contains <strong>{matchedAllergen}</strong>, which matches your personal <strong>Allergy Blacklist</strong>.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="pd-allergy-warning-action">
+                    <Link
+                      to={`/products?safeForMe=true&category=${encodeURIComponent(categoryName)}`}
+                      className="btn btn-sm pd-allergy-safe-btn"
+                    >
+                      <ShieldCheck size={14} /> Find Safe Alternatives
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Suitability Score Match Pill (When Safe) */}
+              {!hasAllergyWarning && suitabilityScore !== null && suitabilityScore !== undefined && (
+                <div className="pd-suitability-match-pill">
+                  <CheckCircle2 size={16} color="#10B981" />
+                  <span>{suitabilityScore}% Match For Your Skin Profile</span>
+                </div>
+              )}
+
               {/* Brand & Title */}
               <div className="pd-buybox-header">
-                {product.brand_name && (
+                {brandName && (
                   <Link
-                    to={`/products?brand=${encodeURIComponent(product.brand_name)}`}
+                    to={`/products?brand=${encodeURIComponent(brandName)}`}
                     className="pd-buybox-brand"
                   >
-                    {product.brand_name}
+                    {brandName}
                   </Link>
                 )}
-                <h1 className="pd-buybox-title">{product.product_name}</h1>
+                <h1 className="pd-buybox-title">{productName}</h1>
               </div>
 
               {/* Rating & Social Proof */}
@@ -527,12 +616,12 @@ export default function ProductDetail() {
                   className="pd-buybox-review-link"
                   onClick={() => setActiveTab('reviews')}
                 >
-                  ({reviewCount.toLocaleString()} {t('pd_rating', 'đánh giá')})
+                  ({reviewCount.toLocaleString()} {t('pd_rating', 'reviews')})
                 </button>
                 {loves > 0 && (
                   <div className="pd-buybox-loves">
                     <Heart size={14} fill="#E11D48" color="#E11D48" />
-                    <span>{loves.toLocaleString()} {t('pd_loves', 'yêu thích')}</span>
+                    <span>{loves.toLocaleString()} {t('pd_loves', 'loves')}</span>
                   </div>
                 )}
               </div>
@@ -550,27 +639,27 @@ export default function ProductDetail() {
                     </>
                   )}
                 </div>
-                <div className="pd-buybox-tax-hint">{formatDualPrice(salePrice || price)} · {t('pd_tax_included')}</div>
+                <div className="pd-buybox-tax-hint">{formatPrice(salePrice || price)} · {t('pd_tax_included')}</div>
               </div>
 
               {/* 3-Column Quick Specs Card */}
               <div className="pd-specs-grid">
                 <div className="pd-spec-box">
-                  <span className="pd-spec-label">{t('prod_category', 'Danh mục')}</span>
-                  <span className="pd-spec-val" title={product.primary_category || '-'}>
-                    {product.primary_category ? (t('cat_' + product.primary_category) || product.primary_category) : t('pd_spec_care')}
+                  <span className="pd-spec-label">{t('prod_category', 'Category')}</span>
+                  <span className="pd-spec-val" title={categoryName}>
+                    {categoryName}
                   </span>
                 </div>
                 <div className="pd-spec-box">
-                  <span className="pd-spec-label">{t('pd_size', 'Dung tích')}</span>
-                  <span className="pd-spec-val" title={product.size || '-'}>
-                    {product.size || t('pd_spec_standard')}
+                  <span className="pd-spec-label">{t('pd_size', 'Size')}</span>
+                  <span className="pd-spec-val" title={volumeMl || 'Standard Size'}>
+                    {volumeMl || 'Standard Size'}
                   </span>
                 </div>
                 <div className="pd-spec-box">
-                  <span className="pd-spec-label">{t('pd_skin_type', 'Phù hợp da')}</span>
-                  <span className="pd-spec-val" title={product.skin_type || t('pd_spec_all_skin')}>
-                    {product.skin_type ? (t('skin_type_' + product.skin_type.toLowerCase()) || product.skin_type) : t('pd_spec_all_skin')}
+                  <span className="pd-spec-label">{t('pd_skin_type', 'Target Skin')}</span>
+                  <span className="pd-spec-val" title={product.targetSkinTypes?.join(', ') || 'All Skin Types'}>
+                    {product.targetSkinTypes?.length > 0 ? product.targetSkinTypes.join(', ') : 'All Skin Types'}
                   </span>
                 </div>
               </div>
@@ -598,10 +687,10 @@ export default function ProductDetail() {
 
                 <button
                   className="btn btn-primary pd-cta-btn"
-                  onClick={() => addItemToCart(product.product_id, quantity)}
+                  onClick={() => addItemToCart(productId, quantity)}
                 >
                   <ShoppingBag size={18} />
-                  <span>{t('prod_add_to_cart', 'Thêm vào giỏ hàng')} · {formatPrice((salePrice || price) * quantity)}</span>
+                  <span>{t('prod_add_to_cart', 'Add to Bag')} · {formatPrice((salePrice || price) * quantity)}</span>
                 </button>
               </div>
 
@@ -628,7 +717,7 @@ export default function ProductDetail() {
               onClick={() => setActiveTab('info')}
             >
               <Info size={16} />
-              <span>{t('pd_tab_info', 'Mô tả & Công dụng')}</span>
+              <span>{t('pd_tab_info', 'Description & Routine')}</span>
             </button>
 
             <button
@@ -638,7 +727,7 @@ export default function ProductDetail() {
               onClick={() => setActiveTab('ingredients')}
             >
               <FlaskConical size={16} />
-              <span>{t('pd_tab_ingredients', 'Bảng thành phần')}</span>
+              <span>{t('pd_tab_ingredients', 'INCI Ingredients')} ({structuredIngredients.length || rawIngredients.length})</span>
             </button>
 
             <button
@@ -648,12 +737,12 @@ export default function ProductDetail() {
               onClick={() => setActiveTab('reviews')}
             >
               <MessageSquare size={16} />
-              <span>{t('pd_tab_reviews', 'Đánh giá người dùng')} ({reviewCount})</span>
+              <span>{t('pd_tab_reviews', 'Customer Reviews')} ({reviewCount})</span>
             </button>
           </div>
 
           <div className="pd-tab-panel">
-            {/* TAB 1: MÔ TẢ & CÔNG DỤNG */}
+            {/* TAB 1: MÔ TẢ & CÔNG DỤNG & ROUTINE */}
             {activeTab === 'info' && (
               <div className="pd-tab-info-content animate-fadeIn">
                 {highlights.length > 0 && (
@@ -673,16 +762,29 @@ export default function ProductDetail() {
                   </div>
                 )}
 
+                {/* Routine Positioning Card */}
+                <div className="pd-routine-card">
+                  <div className="pd-routine-header">
+                    <span className="pd-routine-step-badge">{routine.step}</span>
+                    <span className="pd-routine-time-badge">
+                      {routine.time.includes('AM') && <Sun size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
+                      {routine.time.includes('PM') && <Moon size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
+                      {routine.time}
+                    </span>
+                  </div>
+                  <p className="pd-routine-tip">{routine.tip}</p>
+                </div>
+
                 {product.description && (
                   <div className="pd-desc-block">
-                    <h3 className="pd-block-heading">{t('pd_description', 'Mô tả chi tiết')}</h3>
+                    <h3 className="pd-block-heading">{t('pd_description', 'Product Description')}</h3>
                     <p className="pd-desc-text">{product.description}</p>
                   </div>
                 )}
 
                 {product.how_to_use && (
                   <div className="pd-how-block">
-                    <h3 className="pd-block-heading">{t('pd_how_to_use', 'Hướng dẫn sử dụng')}</h3>
+                    <h3 className="pd-block-heading">{t('pd_how_to_use', 'How to Use')}</h3>
                     <div className="pd-how-box">
                       <p>{product.how_to_use}</p>
                     </div>
@@ -691,49 +793,103 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* TAB 2: THÀNH PHẦN & AI SAFETY */}
+            {/* TAB 2: THÀNH PHẦN INCI & PHÂN NHÓM CÔNG NĂNG */}
             {activeTab === 'ingredients' && (
               <div className="pd-tab-ingredients-content animate-fadeIn">
                 <div className="pd-ingredients-top">
                   <div>
                     <h3 className="pd-block-heading" style={{ marginBottom: 4 }}>
-                      {t('pd_tab_ingredients', 'Thành phần')} ({ingredients.length})
+                      Full INCI Ingredient List ({structuredIngredients.length || rawIngredients.length})
                     </h3>
                     <p className="pd-block-subtext">
-                      {t('pd_formula_note')}
+                      Ingredients are listed in order of concentration according to cosmetic INCI guidelines.
                     </p>
                   </div>
 
-                  {ingredients.length > 0 && (
+                  {(structuredIngredients.length > 0 || rawIngredients.length > 0) && (
                     <Link
-                      to={`/ingredient-analyzer?ingredients=${encodeURIComponent(ingredients.join(', '))}&product_name=${encodeURIComponent(product.product_name || '')}&brand_name=${encodeURIComponent(product.brand_name || '')}&category=${encodeURIComponent(product.primary_category || product.category || '')}`}
-                      state={{
-                        ingredients: ingredients.join(', '),
-                        product_name: product.product_name,
-                        brand_name: product.brand_name,
-                        category: product.primary_category || product.category || '',
-                      }}
+                      to={`/ingredient-analyzer?ingredients=${encodeURIComponent(
+                        structuredIngredients.length > 0
+                          ? structuredIngredients.map(i => i.inciName).join(', ')
+                          : rawIngredients.join(', ')
+                      )}&product_name=${encodeURIComponent(productName)}&brand_name=${encodeURIComponent(brandName)}&category=${encodeURIComponent(categoryName)}`}
                       className="btn btn-secondary btn-sm pd-ai-analyze-btn"
                     >
                       <FlaskConical size={15} />
-                      <span>{t('pd_ai_analyze')}</span>
+                      <span>Deep Formula Analysis</span>
                       <ExternalLink size={13} />
                     </Link>
                   )}
                 </div>
 
-                {ingredients.length > 0 ? (
+                {/* Structured INCI Table */}
+                {structuredIngredients.length > 0 ? (
+                  <>
+                    <div className="pd-inci-summary-bar">
+                      {getIngredientStats(structuredIngredients).map((stat, idx) => (
+                        <span key={idx} className="pd-inci-summary-tag">
+                          {stat.label}: <strong>{stat.count}</strong>
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="pd-inci-table-wrapper">
+                      <table className="pd-inci-table">
+                        <thead>
+                          <tr>
+                            <th style={{ width: 40 }}>#</th>
+                            <th>INCI Name</th>
+                            <th>Function Group</th>
+                            <th style={{ width: 120 }}>Comedogenic</th>
+                            <th style={{ width: 110 }}>Irritation</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {structuredIngredients.map((ing, idx) => {
+                            const isAllergen = matchedAllergen &&
+                              ing.inciName.toLowerCase().includes(matchedAllergen.toLowerCase());
+                            return (
+                              <tr key={ing.id || idx} className={isAllergen ? 'pd-allergen-row' : ''}>
+                                <td>{ing.positionOrder || (idx + 1)}</td>
+                                <td>
+                                  <strong>{ing.inciName}</strong>
+                                  {ing.isActiveIngredient && <span className="pd-active-tag">Active</span>}
+                                  {isAllergen && (
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, marginLeft: 6, color: '#DC2626', fontSize: '0.75rem', fontWeight: 700 }}>
+                                      <ShieldAlert size={12} /> Blacklist Match
+                                    </span>
+                                  )}
+                                </td>
+                                <td>
+                                  <span className={`pd-func-badge ${ing.functionGroup ? ing.functionGroup.toLowerCase() : 'other'}`}>
+                                    {ing.functionGroup || 'Other'}
+                                  </span>
+                                </td>
+                                <td>{ing.comedogenicRating !== null && ing.comedogenicRating !== undefined ? `${ing.comedogenicRating} / 5` : '0 (Safe)'}</td>
+                                <td>{ing.irritationRating !== null && ing.irritationRating !== undefined ? `${ing.irritationRating} / 5` : '0 (Low)'}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : rawIngredients.length > 0 ? (
                   <div className="pd-ingredient-tag-cloud">
-                    {ingredients.map((ing, i) => (
-                      <span key={i} className="pd-ingredient-pill">
-                        {ing}
-                      </span>
-                    ))}
+                    {rawIngredients.map((ing, i) => {
+                      const isAllergen = matchedAllergen && ing.toLowerCase().includes(matchedAllergen.toLowerCase());
+                      return (
+                        <span key={i} className={`pd-ingredient-pill ${isAllergen ? 'pd-allergen-pill' : ''}`}>
+                          {ing}
+                          {isAllergen && ' ⚠️ (Allergy Blacklist)'}
+                        </span>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="pd-empty-block">
                     <span className="pd-empty-icon">🧪</span>
-                    <p>{t('pd_no_ingredients', 'Thông tin thành phần chưa có')}</p>
+                    <p>No ingredient information available for this product.</p>
                   </div>
                 )}
               </div>
@@ -781,7 +937,7 @@ export default function ProductDetail() {
                     }}
                   >
                     <MessageSquare size={15} />
-                    <span>{t('pd_write_review', 'Viết đánh giá của bạn')}</span>
+                    <span>{t('pd_write_review', 'Write a Review')}</span>
                     {showReviewForm ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                   </button>
                 </div>
@@ -789,10 +945,10 @@ export default function ProductDetail() {
                 {/* Review Form */}
                 {showReviewForm && (
                   <form className="pd-review-form animate-scaleIn" onSubmit={handleSubmitReview}>
-                    <h4 className="pd-review-form-title">{t('pd_write_review_title', '✍️ Viết đánh giá của bạn')}</h4>
+                    <h4 className="pd-review-form-title">{t('pd_write_review_title', 'Share Your Review')}</h4>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_satisfaction_prompt')}</label>
+                      <label className="pd-form-label">{t('pd_satisfaction_prompt', 'Rate this product *')}</label>
                       <StarRating
                         value={reviewForm.rating}
                         size={28}
@@ -802,26 +958,26 @@ export default function ProductDetail() {
                     </div>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_skin_type', 'Loại da của bạn')}</label>
+                      <label className="pd-form-label">{t('pd_skin_type', 'Your Skin Type')}</label>
                       <select
                         className="form-select"
                         value={reviewForm.skin_type}
                         onChange={(e) => setReviewForm((f) => ({ ...f, skin_type: e.target.value }))}
                       >
                         <option value="">{t('pd_select_skintype')}</option>
-                        <option value="Da thường">{t('skin_type_normal')}</option>
-                        <option value="Da khô">{t('skin_type_dry')}</option>
-                        <option value="Da dầu">{t('skin_type_oily')}</option>
-                        <option value="Da hỗn hợp">{t('skin_type_combination')}</option>
-                        <option value="Da nhạy cảm">{t('skin_type_sensitive')}</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Dry">Dry</option>
+                        <option value="Oily">Oily</option>
+                        <option value="Combination">Combination</option>
+                        <option value="Sensitive">Sensitive</option>
                       </select>
                     </div>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_review_text_label', 'Nội dung chia sẻ *')}</label>
+                      <label className="pd-form-label">{t('pd_review_text_label', 'Your Review *')}</label>
                       <textarea
                         className="form-textarea"
-                        placeholder={t('pd_review_text_placeholder', 'Chia sẻ cảm nhận chân thực của bạn về hiệu quả sản phẩm...')}
+                        placeholder={t('pd_review_text_placeholder', 'Share your honest experience and results with this formula...')}
                         rows={4}
                         value={reviewForm.review_text}
                         onChange={(e) => setReviewForm((f) => ({ ...f, review_text: e.target.value }))}
@@ -829,21 +985,21 @@ export default function ProductDetail() {
                     </div>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_review_recommend_ask', 'Bạn có đề xuất sản phẩm này cho người khác?')}</label>
+                      <label className="pd-form-label">{t('pd_review_recommend_ask', 'Would you recommend this product to others?')}</label>
                       <div className="pd-rec-toggle-group">
                         <button
                           type="button"
                           className={`pd-rec-btn ${reviewForm.is_recommended ? 'active-yes' : ''}`}
                           onClick={() => setReviewForm((f) => ({ ...f, is_recommended: true }))}
                         >
-                          <ThumbsUp size={15} /> {t('pd_recommend_yes')}
+                          <ThumbsUp size={15} /> {t('pd_recommend_yes', 'Yes')}
                         </button>
                         <button
                           type="button"
                           className={`pd-rec-btn ${!reviewForm.is_recommended ? 'active-no' : ''}`}
                           onClick={() => setReviewForm((f) => ({ ...f, is_recommended: false }))}
                         >
-                          <ThumbsDown size={15} /> {t('pd_recommend_no')}
+                          <ThumbsDown size={15} /> {t('pd_recommend_no', 'No')}
                         </button>
                       </div>
                     </div>
@@ -854,11 +1010,11 @@ export default function ProductDetail() {
                         className="btn btn-secondary"
                         onClick={() => setShowReviewForm(false)}
                       >
-                        {t('pd_cancel', 'Hủy')}
+                        {t('pd_cancel', 'Cancel')}
                       </button>
                       <button type="submit" className="btn btn-primary" disabled={submitting}>
                         <Send size={15} />
-                        {submitting ? t('pd_submitting') : t('pd_submit_review', 'Gửi đánh giá')}
+                        {submitting ? t('pd_submitting') : t('pd_submit_review', 'Submit Review')}
                       </button>
                     </div>
                   </form>
@@ -868,7 +1024,7 @@ export default function ProductDetail() {
                 {loadingReviews ? (
                   <div className="loading-container">
                     <div className="loading-spinner" />
-                    <span>{t('pd_loading_reviews', 'Đang tải danh sách đánh giá...')}</span>
+                    <span>{t('pd_loading_reviews', 'Loading customer reviews...')}</span>
                   </div>
                 ) : reviews.length > 0 ? (
                   <div className="pd-reviews-list">
@@ -879,7 +1035,7 @@ export default function ProductDetail() {
                 ) : (
                   <div className="pd-empty-block">
                     <span className="pd-empty-icon">💬</span>
-                    <p>{t('pd_no_reviews', 'Chưa có đánh giá nào. Hãy là người đầu tiên trải nghiệm!')}</p>
+                    <p>{t('pd_no_reviews', 'No reviews yet. Be the first to share your experience!')}</p>
                   </div>
                 )}
               </div>
@@ -888,44 +1044,23 @@ export default function ProductDetail() {
         </div>
 
         {/* ── PART 4: DISCOVERY RAILS (BOTTOM) ────────────── */}
-        {/* 1. Apriori Co-purchase Recommendations */}
-        {frequentlyBought.length > 0 && (
-          <section className="pd-discovery-section pd-apriori-section">
-            <div className="pd-discovery-header">
-              <div className="pd-discovery-title-wrap">
-                <span className="pd-discovery-badge">Apriori AI Mining</span>
-                <h2 className="pd-discovery-title">
-                  {t('pd_frequently_bought_together', 'Thường được mua & kết hợp cùng')}
-                </h2>
-              </div>
-            </div>
-            <div className="pd-discovery-grid">
-              {frequentlyBought.map((prod) => (
-                <div key={prod.product_id} className="pd-discovery-card-wrap">
-                  <ProductCard product={prod} />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* 2. Content-Based Similar Recommendations */}
+        {/* Similar Products in Category */}
         {similar.length > 0 && (
           <section className="pd-discovery-section">
             <div className="pd-discovery-header">
               <div className="pd-discovery-title-wrap">
-                <span className="pd-discovery-badge">TF-IDF Matching</span>
+                <span className="pd-discovery-badge">Category Match</span>
                 <h2 className="pd-discovery-title">
-                  {t('pd_similar_title', 'Sản phẩm tương tự bạn có thể thích')}
+                  {t('pd_similar_title', 'Similar Products You May Like')}
                 </h2>
               </div>
-              <Link to="/products" className="btn btn-secondary btn-sm">
-                {t('home_view_all', 'Xem tất cả')}
+              <Link to={`/products?category=${encodeURIComponent(categoryName)}`} className="btn btn-secondary btn-sm">
+                {t('home_view_all', 'View All')}
               </Link>
             </div>
             <div className="pd-discovery-grid">
-              {similar.slice(0, 4).map((prod) => (
-                <div key={prod.product_id} className="pd-discovery-card-wrap">
+              {similar.slice(0, 6).map((prod) => (
+                <div key={prod.id ?? prod.product_id} className="pd-discovery-card-wrap">
                   <ProductCard product={prod} />
                 </div>
               ))}

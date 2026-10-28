@@ -1184,3 +1184,231 @@
 .pd-not-found-icon {
   font-size: 4rem;
 }
+
+/* ── Core USP: Red Allergy Warning Banner on PDP ── */
+.pd-allergy-warning-box {
+  background: #FFF1F2;
+  border: 2px solid #F43F5E;
+  border-radius: var(--radius-lg, 16px);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.3s ease;
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.08);
+}
+
+.pd-allergy-warning-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pd-allergy-warning-top h4 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #BE123C;
+}
+
+.pd-allergy-warning-top p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #9F1239;
+  line-height: 1.45;
+}
+
+.pd-allergy-warning-action {
+  display: flex;
+  justify-content: flex-start;
+  margin-left: 34px;
+}
+
+.pd-allergy-safe-btn {
+  background: #E11D48 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  font-weight: 600 !important;
+  padding: 7px 16px !important;
+  border-radius: var(--radius-full, 9999px) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 0.82rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.pd-allergy-safe-btn:hover {
+  background: #BE123C !important;
+  transform: translateY(-1px);
+}
+
+/* ── Core USP: Suitability Score Match Pill ── */
+.pd-suitability-match-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full, 9999px);
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #065F46;
+  font-weight: 700;
+  font-size: 0.85rem;
+  align-self: flex-start;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.08);
+}
+
+/* ── Routine Positioning Card ── */
+.pd-routine-card {
+  background: #FDFBF9;
+  border: 1px solid rgba(74, 55, 40, 0.12);
+  border-radius: var(--radius-md, 12px);
+  padding: 16px 20px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pd-routine-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pd-routine-step-badge {
+  background: var(--primary, #4A3728);
+  color: #FFFFFF;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.pd-routine-time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #FEF3C7;
+  color: #92400E;
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.pd-routine-tip {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6B5E55;
+  line-height: 1.45;
+}
+
+/* ── Structured INCI Table ── */
+.pd-inci-summary-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.pd-inci-summary-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full, 9999px);
+  background: #FFFFFF;
+  border: 1px solid rgba(74, 55, 40, 0.12);
+  font-size: 0.8rem;
+  color: #4A3728;
+  font-weight: 600;
+}
+
+.pd-inci-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid rgba(74, 55, 40, 0.1);
+  border-radius: 12px;
+  background: #FFFFFF;
+  margin-top: 14px;
+}
+
+.pd-inci-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  text-align: left;
+}
+
+.pd-inci-table th {
+  background: #F8F5F2;
+  padding: 12px 14px;
+  color: #4A3728;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(74, 55, 40, 0.1);
+  white-space: nowrap;
+}
+
+.pd-inci-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(74, 55, 40, 0.06);
+  color: #2D2520;
+}
+
+.pd-inci-table tr:hover {
+  background: #FAF7F4;
+}
+
+.pd-inci-table tr.pd-allergen-row {
+  background: #FFF1F2 !important;
+}
+
+.pd-inci-table tr.pd-allergen-row td {
+  color: #9F1239;
+  font-weight: 600;
+}
+
+.pd-func-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #F2ECE2;
+  color: #4A3728;
+}
+
+.pd-func-badge.hydrating {
+  background: #E0F2FE;
+  color: #0369A1;
+}
+
+.pd-func-badge.soothing {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.pd-func-badge.antioxidant {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.pd-func-badge.exfoliating {
+  background: #F3E8FF;
+  color: #7E22CE;
+}
+
+.pd-active-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #10B981;
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}

@@ -159,6 +159,47 @@ public class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Product>> GetSimilarProductsAsync(
+        int productId,
+        int categoryId,
+        IEnumerable<string>? allergyBlacklist,
+        int limit = 6,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .Include(p => p.Reviews)
+            .Include(p => p.ProductIngredients)
+                .ThenInclude(pi => pi.Ingredient)
+            .AsNoTracking()
+            .Where(p => p.Id != productId && p.CategoryId == categoryId);
+
+        if (allergyBlacklist != null && allergyBlacklist.Any())
+        {
+            var allergens = allergyBlacklist
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Select(a => a.Trim().ToLower())
+                .ToList();
+
+            if (allergens.Any())
+            {
+                query = query.Where(p => !p.ProductIngredients.Any(pi =>
+                    pi.Ingredient != null && allergens.Contains(pi.Ingredient.InciName.ToLower())));
+
+                foreach (var allergen in allergens)
+                {
+                    query = query.Where(p => !p.IngredientListRaw.ToLower().Contains(allergen));
+                }
+            }
+        }
+
+        return await query
+            .OrderByDescending(p => p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 5.0)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(
         int productId,
         CancellationToken cancellationToken = default)

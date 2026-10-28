@@ -83,6 +83,20 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
+    [HttpGet("{id}/similar")]
+    public async Task<IActionResult> GetSimilar(string id, [FromQuery] int limit = 6, CancellationToken cancellationToken = default)
+    {
+        int? currentUserId = null;
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out var parsedId))
+        {
+            currentUserId = parsedId;
+        }
+
+        var recommendations = await _productService.GetSimilarProductsAsync(id, currentUserId, limit, cancellationToken);
+        return Ok(new { recommendations });
+    }
+
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken = default)
     {

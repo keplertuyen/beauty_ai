@@ -14,6 +14,12 @@ public interface IProductService
         int? currentUserId = null,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<ProductSummaryDto>> GetSimilarProductsAsync(
+        string idOrCodeOrSlug,
+        int? currentUserId = null,
+        int limit = 6,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<BrandDto>> GetBrandsAsync(CancellationToken cancellationToken = default);
