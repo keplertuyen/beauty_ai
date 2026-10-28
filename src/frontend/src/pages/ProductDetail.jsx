@@ -12,7 +12,6 @@ import { useApp } from '../context/AppContext';
 import {
   getProduct,
   getSimilarProducts,
-  getFrequentlyBoughtTogether,
   getReviews,
   addReview,
   getProductQrCode
@@ -180,7 +179,6 @@ export default function ProductDetail() {
 
   const [product, setProduct] = useState(null);
   const [similar, setSimilar] = useState([]);
-  const [frequentlyBought, setFrequentlyBought] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loadingProduct, setLoadingProduct] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(false);
@@ -193,15 +191,15 @@ export default function ProductDetail() {
   const [qrData, setQrData] = useState(null);
   const [loadingQr, setLoadingQr] = useState(false);
 
-  // Helper to map English skin type to Vietnamese used in review options
+  // Helper to map English skin type for review options
   const getInitialSkinType = useCallback((userSkinType) => {
     if (!userSkinType) return '';
     const map = {
-      'normal': 'Da thường',
-      'dry': 'Da khô',
-      'oily': 'Da dầu',
-      'combination': 'Da hỗn hợp',
-      'sensitive': 'Da nhạy cảm'
+      'normal': 'Normal',
+      'dry': 'Dry',
+      'oily': 'Oily',
+      'combination': 'Combination',
+      'sensitive': 'Sensitive'
     };
     return map[userSkinType.toLowerCase()] || '';
   }, []);
@@ -252,16 +250,12 @@ export default function ProductDetail() {
     
     getProduct(id)
       .then((res) => setProduct(res.data))
-      .catch(() => toast.error(t('pd_not_found', 'Không tìm thấy sản phẩm')))
+      .catch(() => toast.error(t('pd_not_found', 'Product not found')))
       .finally(() => setLoadingProduct(false));
 
     getSimilarProducts(id, 8)
       .then((res) => setSimilar(res.data?.recommendations || []))
       .catch(() => setSimilar([]));
-
-    getFrequentlyBoughtTogether(id, 4)
-      .then((res) => setFrequentlyBought(res.data?.recommendations || []))
-      .catch(() => setFrequentlyBought([]));
 
     setLoadingReviews(true);
     getReviews(id)
@@ -291,10 +285,10 @@ export default function ProductDetail() {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
-      toast.success(t('pd_share_link', 'Đã sao chép liên kết!'));
+      toast.success(t('pd_share_link', 'Link copied to clipboard!'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error(t('pd_share_fail', 'Không thể sao chép'));
+      toast.error(t('pd_share_fail', 'Failed to copy link'));
     }
   };
 
@@ -306,10 +300,10 @@ export default function ProductDetail() {
       window.dispatchEvent(new CustomEvent('open-auth-modal'));
       return;
     }
-    if (!reviewForm.rating) { toast.error(t('pd_err_stars', 'Vui lòng chọn số sao')); return; }
-    if (!reviewForm.review_text.trim()) { toast.error(t('pd_err_content', 'Vui lòng nhập nội dung đánh giá')); return; }
+    if (!reviewForm.rating) { toast.error(t('pd_err_stars', 'Please select a star rating')); return; }
+    if (!reviewForm.review_text.trim()) { toast.error(t('pd_err_content', 'Please enter your review text')); return; }
     if (reviewForm.review_text.trim().length < 10) {
-      toast.error(t('pd_err_content_len', 'Nội dung đánh giá phải có tối thiểu 10 ký tự'));
+      toast.error(t('pd_err_content_len', 'Review text must be at least 10 characters'));
       return;
     }
     setSubmitting(true);
@@ -323,7 +317,7 @@ export default function ProductDetail() {
         skin_type: reviewForm.skin_type,
         is_recommended: reviewForm.is_recommended ? 1 : 0
       });
-      toast.success(t('pd_review_success', 'Đã gửi đánh giá! 🌟'));
+      toast.success(t('pd_review_success', 'Review submitted successfully!'));
       setShowReviewForm(false);
       setReviewForm({
         reviewer_name: '',
@@ -336,7 +330,7 @@ export default function ProductDetail() {
       const res = await getReviews(id);
       setReviews(res.data?.reviews || res.data || []);
     } catch (err) {
-      toast.error(err.response?.data?.detail || t('pd_review_failed', 'Không thể gửi đánh giá'));
+      toast.error(err.response?.data?.detail || t('pd_review_failed', 'Failed to submit review'));
     } finally {
       setSubmitting(false);
     }
@@ -487,16 +481,16 @@ export default function ProductDetail() {
                 {/* Badges Stack */}
                 <div className="pd-visual-badges">
                   {product.clean_at_sephora == 1 && (
-                    <span className="badge badge-clean">{t('badge_clean', '🌿 Clean tại Sephora')}</span>
+                    <span className="badge badge-clean">{t('badge_clean', '🌿 Clean at Sephora')}</span>
                   )}
                   {product.new == 1 && (
-                    <span className="badge badge-new">{t('badge_new', 'MỚI')}</span>
+                    <span className="badge badge-new">{t('badge_new', 'NEW')}</span>
                   )}
                   {salePrice && (
-                    <span className="badge badge-sale">{t('badge_sale', 'GIẢM GIÁ')}</span>
+                    <span className="badge badge-sale">{t('badge_sale', 'SALE')}</span>
                   )}
                   {product.limited_edition == 1 && !salePrice && (
-                    <span className="badge badge-warning">{t('badge_limited', 'GIỚI HẠN')}</span>
+                    <span className="badge badge-warning">{t('badge_limited', 'LIMITED')}</span>
                   )}
                 </div>
 

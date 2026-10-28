@@ -70,6 +70,28 @@ public class ProductServiceTests
             }
             return Task.FromResult((IReadOnlyList<Product>)list.Take(limit).ToList());
         }
+
+        public Task<(IReadOnlyList<Review> Items, int TotalCount)> GetProductReviewsAsync(
+            int productId,
+            string? skinType = null,
+            int page = 1,
+            int pageSize = 10,
+            CancellationToken cancellationToken = default)
+        {
+            var reviews = new List<Review>
+            {
+                new()
+                {
+                    Id = 1,
+                    ProductId = productId,
+                    AuthorName = "Jane Doe",
+                    Rating = 5,
+                    SkinType = "Combination",
+                    Content = "Leaves my skin feeling deeply cleansed and soft!"
+                }
+            };
+            return Task.FromResult(((IReadOnlyList<Review>)reviews, reviews.Count));
+        }
     }
 
     private class FakeSkinProfileRepository : ISkinProfileRepository
@@ -250,5 +272,29 @@ public class ProductServiceTests
         Assert.Single(similar);
         Assert.Equal(3, similar[0].Id);
         Assert.Equal("Safe Similar Serum", similar[0].Name);
+    }
+
+    [Fact]
+    public async Task GetProductReviewsAsync_ReturnsPaginatedReviews()
+    {
+        var productRepo = new FakeProductRepository();
+        productRepo.Products.Add(new Product
+        {
+            Id = 1,
+            Code = "P001",
+            Name = "Cleanser",
+            Slug = "cleanser",
+            IngredientListRaw = "Water, Glycerin"
+        });
+
+        var skinProfileRepo = new FakeSkinProfileRepository();
+        var service = new ProductService(productRepo, skinProfileRepo);
+
+        var result = await service.GetProductReviewsAsync("1", skinType: "Combination", page: 1, pageSize: 5);
+
+        Assert.NotNull(result);
+        Assert.Single(result.Items);
+        Assert.Equal("Jane Doe", result.Items[0].AuthorName);
+        Assert.Equal("Combination", result.Items[0].SkinType);
     }
 }

@@ -65,6 +65,17 @@ public record BrandDto(
     string? OriginCountry
 );
 
+public record ProductReviewDto(
+    long Id,
+    int ProductId,
+    string AuthorName,
+    int Rating,
+    string SkinType,
+    string? SkinConcerns,
+    string? Content,
+    DateTime CreatedAt
+);
+
 public record ProductFilterParams(
     string? Query = null,
     string? Category = null,

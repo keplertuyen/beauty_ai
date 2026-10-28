@@ -231,4 +231,35 @@ public class ProductRepository : IProductRepository
             s => s.ProductId,
             s => (Math.Round(s.AvgRating, 1), s.Count));
     }
+
+    public async Task<(IReadOnlyList<Review> Items, int TotalCount)> GetProductReviewsAsync(
+        int productId,
+        string? skinType = null,
+        int page = 1,
+        int pageSize = 10,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Reviews
+            .AsNoTracking()
+            .Where(r => r.ProductId == productId);
+
+        if (!string.IsNullOrWhiteSpace(skinType) &&
+            !string.Equals(skinType, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(r => r.SkinType.ToLower() == skinType.Trim().ToLower());
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var validPage = Math.Max(1, page);
+        var validPageSize = Math.Clamp(pageSize, 1, 50);
+
+        var items = await query
+            .OrderByDescending(r => r.Id)
+            .Skip((validPage - 1) * validPageSize)
+            .Take(validPageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
 }

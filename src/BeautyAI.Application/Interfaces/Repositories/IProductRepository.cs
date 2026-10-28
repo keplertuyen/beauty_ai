@@ -32,4 +32,11 @@ public interface IProductRepository
     Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
         IEnumerable<int> productIds,
         CancellationToken cancellationToken = default);
+
+    Task<(IReadOnlyList<Review> Items, int TotalCount)> GetProductReviewsAsync(
+        int productId,
+        string? skinType = null,
+        int page = 1,
+        int pageSize = 10,
+        CancellationToken cancellationToken = default);
 }

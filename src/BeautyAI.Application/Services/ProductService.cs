@@ -237,4 +237,64 @@ public class ProductService : IProductService
             OriginCountry: b.OriginCountry
         )).ToList();
     }
+
+    public async Task<PagedResult<ProductReviewDto>> GetProductReviewsAsync(
+        string idOrCodeOrSlug,
+        string? skinType = null,
+        int page = 1,
+        int pageSize = 10,
+        CancellationToken cancellationToken = default)
+    {
+        int productId = 0;
+        if (int.TryParse(idOrCodeOrSlug, out var parsedId))
+        {
+            productId = parsedId;
+        }
+        else
+        {
+            var product = await _productRepository.GetProductByCodeOrSlugAsync(idOrCodeOrSlug, cancellationToken);
+            if (product != null)
+                productId = product.Id;
+        }
+
+        if (productId <= 0)
+        {
+            return new PagedResult<ProductReviewDto>(
+                Items: Array.Empty<ProductReviewDto>(),
+                Total: 0,
+                Page: page,
+                PageSize: pageSize,
+                Pages: 0
+            );
+        }
+
+        var (items, totalCount) = await _productRepository.GetProductReviewsAsync(
+            productId,
+            skinType,
+            page,
+            pageSize,
+            cancellationToken);
+
+        var dtos = items.Select(r => new ProductReviewDto(
+            Id: r.Id,
+            ProductId: r.ProductId,
+            AuthorName: r.AuthorName,
+            Rating: r.Rating,
+            SkinType: r.SkinType,
+            SkinConcerns: r.SkinConcerns,
+            Content: r.Content,
+            CreatedAt: r.CreatedAtUtc
+        )).ToList();
+
+        var validPageSize = pageSize > 0 ? pageSize : 10;
+        var pages = (int)Math.Ceiling((double)totalCount / validPageSize);
+
+        return new PagedResult<ProductReviewDto>(
+            Items: dtos,
+            Total: totalCount,
+            Page: page,
+            PageSize: validPageSize,
+            Pages: pages
+        );
+    }
 }

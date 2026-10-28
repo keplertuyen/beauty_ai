@@ -18,17 +18,22 @@ last_reviewed: 2026-10-26
 # 1. TỔNG QUAN NGUỒN LỰC & MỤC TIÊU DỰ ÁN
 
 ## 1.1. Mục tiêu định lượng cần đạt (Sprint Objectives & KPIs)
-1. **Hoàn thiện 100% 5 tính năng USP cốt lõi:**
-   - Digital Skin ID & Allergy Blacklist hoạt động trên mọi trang.
+1. **Ngôn ngữ & Tiền tệ chuẩn hóa:**
+   - 100% tiếng Anh (English) và tiền tệ USD ($) cho toàn bộ hệ thống Phase 1 (MVP). Không đa ngôn ngữ hoặc VNĐ nhằm đảm bảo tính chuẩn xác của dữ liệu mỹ phẩm quốc tế INCI và Sephora.
+   - Thanh điều hướng tinh gọn: Tập trung hoàn thiện 5 USP cốt lõi (Digital Skin ID, Allergy Blacklist, INCI Analyzer, Routine Builder, Chat-to-Cart); dọn các nút phân tán (Skin Quiz, Product Compare).
+2. **Hoàn thiện 100% 5 tính năng USP cốt lõi:**
+   - Digital Skin ID & Allergy Blacklist hoạt động trên mọi trang với Banner đỏ cảnh báo dị ứng nổi bật.
    - Smart Conflict Detector quét chính xác 12 cặp hoạt chất kỵ nhau trong giỏ hàng.
    - INCI Analyzer bóc tách văn bản bao bì tự do chính xác.
    - Thiết lập Digital Skin ID 1 chạm (Loại da ➔ Dị ứng ➔ Vấn đề & Mục tiêu) ➔ Tự động sinh Routine AM/PM ➔ Nút bấm **Chat-to-Cart** thêm cả bộ vào giỏ.
    - Trợ lý AI Gemini tư vấn chuẩn y khoa, grounding 100% sản phẩm có trong sàn.
-2. **Hiệu năng & Dữ liệu lớn:**
-   - Nạp thành công tập mẫu dataset 1 triệu đánh giá; thời gian truy vấn lọc theo loại da trên trang PDP dưới **50ms**.
-3. **Luồng E-Commerce hoàn chỉnh:**
+3. **Hiệu năng & Dữ liệu lớn (High Performance & Scale):**
+   - Loại bỏ hoàn toàn Cartesian explosion trong EF Core: Thời gian tải danh mục Catalog giảm từ **33.584ms xuống 80ms** (nhanh gấp 410 lần); trang chi tiết sản phẩm PDP đạt **12ms**.
+   - Endpoint `GET /api/v1/products/{id}/reviews` tích hợp B-Tree index giúp truy vấn phân trang đánh giá thực tế trong vòng **< 15ms**.
+   - Lộ trình mở rộng hợp nhất 3 tầng kiến trúc (Taxonomy ➔ AI Guardrails ➔ Dynamic UI) sẵn sàng tiếp nhận 8.494 sản phẩm và 1.094.197 reviews.
+4. **Luồng E-Commerce hoàn chỉnh:**
    - Khách vãng lai ➔ Đăng ký tài khoản ➔ Thiết lập Digital Skin ID (kèm Blacklist Dị ứng) ➔ Duyệt Catalog ➔ Xem PDP ➔ Thêm giỏ hàng cảnh báo xung đột ➔ Đặt hàng COD ➔ Admin duyệt đơn.
-4. **Chất lượng mã nguồn:**
+5. **Chất lượng mã nguồn:**
    - Toàn bộ 11 bài kiểm thử kiến trúc `BeautyAI.ArchitectureTests` và unit tests XANH 100%.
    - `./syntheprise gate` đạt trạng thái **Clean** (0 lỗi, 0 cảnh báo).
 

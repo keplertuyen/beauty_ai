@@ -97,6 +97,25 @@ public class ProductsController : ControllerBase
         return Ok(new { recommendations });
     }
 
+    [HttpGet("{id}/reviews")]
+    public async Task<IActionResult> GetReviews(
+        string id,
+        [FromQuery(Name = "skin_type")] string? skinType = null,
+        [FromQuery] int page = 1,
+        [FromQuery(Name = "per_page")] int perPage = 10,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _productService.GetProductReviewsAsync(id, skinType, page, perPage, cancellationToken);
+        return Ok(new
+        {
+            reviews = result.Items,
+            total = result.Total,
+            page = result.Page,
+            per_page = result.PageSize,
+            pages = result.Pages
+        });
+    }
+
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken = default)
     {

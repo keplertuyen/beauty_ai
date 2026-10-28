@@ -602,7 +602,7 @@ export default function Products() {
 
             {/* ─ Smart Filter: Free-From Exclusions (FR-04.2) ─ */}
             <div className="filter-section">
-              <div className="filter-title">{lang === 'en' ? 'Free From (Safe Filter)' : 'Không chứa (Loại trừ)'}</div>
+              <div className="filter-title">Free From (Safe Filter)</div>
               <div className="rating-options">
                 {FREE_FROM_OPTIONS.map(opt => (
                   <label key={opt.value} className="filter-option rating-option">
@@ -735,8 +735,8 @@ export default function Products() {
             {!loading && products.length > 0 && (
               <>
                 <div className="product-grid">
-                  {products.map(product => (
-                    <ProductCard key={product.product_id} product={product} />
+                  {products.map((product, idx) => (
+                    <ProductCard key={product.id ?? product.product_id ?? idx} product={product} />
                   ))}
                 </div>
 

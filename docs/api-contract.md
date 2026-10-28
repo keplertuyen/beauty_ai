@@ -74,6 +74,7 @@ last_reviewed: 2026-10-27
 | `GET` | `/api/v1/products` | ALL | `FR-CAT-01` | Lọc sản phẩm Phase 1 (`query`, `category`, `brand`, `skinType`, `min_price`, `max_price`, `min_rating`, `sort_by`, `safe_for_me`, `page`, `per_page`) |
 | `GET` | `/api/v1/products/{id}` | ALL | `FR-PDP-01` | Chi tiết sản phẩm theo ID hoặc Slug hoặc Code |
 | `GET` | `/api/v1/products/{id}/similar` | ALL | `FR-PDP-08` | Sản phẩm tương tự cùng danh mục (loại trừ dị ứng của user) |
+| `GET` | `/api/v1/products/{id}/reviews` | ALL | `FR-REV-01` | Danh sách đánh giá sản phẩm (lọc skin_type, phân trang) |
 | `GET` | `/api/v1/products/categories` | ALL | `FR-CAT-02` | Danh sách danh mục sản phẩm |
 | `GET` | `/api/v1/products/brands` | ALL | `FR-CAT-04` | Danh sách thương hiệu mỹ phẩm |
 | `GET` | `/catalog/products` | ALL | `FR-CAT-01`, `04`→`10` | |

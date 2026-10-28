@@ -23,4 +23,11 @@ public interface IProductService
     Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<BrandDto>> GetBrandsAsync(CancellationToken cancellationToken = default);
+
+    Task<PagedResult<ProductReviewDto>> GetProductReviewsAsync(
+        string idOrCodeOrSlug,
+        string? skinType = null,
+        int page = 1,
+        int pageSize = 10,
+        CancellationToken cancellationToken = default);
 }
