@@ -42,9 +42,15 @@ public class ProductService : IProductService
             filteringBlacklist,
             cancellationToken);
 
+        var productIds = items.Select(p => p.Id).ToList();
+        var reviewStats = await _productRepository.GetProductsReviewStatsAsync(productIds, cancellationToken);
+
         var summaryItems = items.Select(p =>
         {
             var matchResult = SuitabilityScoreCalculator.Calculate(p, skinProfile, allergyNames);
+            var (rating, reviewsCount) = reviewStats.TryGetValue(p.Id, out var stat)
+                ? stat
+                : (5.0m, 0);
 
             return new ProductSummaryDto(
                 Id: p.Id,
@@ -56,8 +62,8 @@ public class ProductService : IProductService
                 PriceUsd: p.PriceUsd,
                 VolumeMl: p.VolumeMl,
                 ImageUrl: p.ImageUrl,
-                Rating: p.Reviews.Any() ? (decimal)p.Reviews.Average(r => r.Rating) : 5.0m,
-                ReviewsCount: p.Reviews.Count,
+                Rating: rating,
+                ReviewsCount: reviewsCount,
                 TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
                 SuitabilityScore: matchResult.SuitabilityScore,
                 HasAllergyWarning: matchResult.HasAllergyWarning,
@@ -180,10 +186,15 @@ public class ProductService : IProductService
             limit,
             cancellationToken);
 
+        var similarIds = similarProducts.Select(p => p.Id).ToList();
+        var reviewStats = await _productRepository.GetProductsReviewStatsAsync(similarIds, cancellationToken);
+
         return similarProducts.Select(p =>
         {
             var match = SuitabilityScoreCalculator.Calculate(p, skinProfile, allergyNames);
-            var rating = p.Reviews.Any() ? (decimal)p.Reviews.Average(r => r.Rating) : 5.0m;
+            var (rating, reviewsCount) = reviewStats.TryGetValue(p.Id, out var stat)
+                ? stat
+                : (5.0m, 0);
 
             return new ProductSummaryDto(
                 Id: p.Id,
@@ -195,8 +206,8 @@ public class ProductService : IProductService
                 PriceUsd: p.PriceUsd,
                 VolumeMl: p.VolumeMl,
                 ImageUrl: p.ImageUrl,
-                Rating: Math.Round(rating, 1),
-                ReviewsCount: p.Reviews.Count,
+                Rating: rating,
+                ReviewsCount: reviewsCount,
                 TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
                 SuitabilityScore: match.SuitabilityScore,
                 HasAllergyWarning: match.HasAllergyWarning,

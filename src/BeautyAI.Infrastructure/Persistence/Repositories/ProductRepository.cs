@@ -22,9 +22,6 @@ public class ProductRepository : IProductRepository
         var query = _context.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
-            .Include(p => p.Reviews)
-            .Include(p => p.ProductIngredients)
-                .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking();
 
         // 1. Text Search (Query)
@@ -167,9 +164,6 @@ public class ProductRepository : IProductRepository
         var query = _context.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
-            .Include(p => p.Reviews)
-            .Include(p => p.ProductIngredients)
-                .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking()
             .Where(p => p.Id != productId && p.CategoryId == categoryId);
 
@@ -193,7 +187,7 @@ public class ProductRepository : IProductRepository
         }
 
         return await query
-            .OrderByDescending(p => p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 5.0)
+            .OrderByDescending(p => p.Id)
             .Take(limit)
             .ToListAsync(cancellationToken);
     }
@@ -212,5 +206,29 @@ public class ProductRepository : IProductRepository
 
         var avg = (decimal)reviews.Average();
         return (Math.Round(avg, 1), reviews.Count);
+    }
+
+    public async Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
+        IEnumerable<int> productIds,
+        CancellationToken cancellationToken = default)
+    {
+        var ids = productIds.Distinct().ToList();
+        if (ids.Count == 0)
+            return new Dictionary<int, (decimal AverageRating, int ReviewsCount)>();
+
+        var stats = await _context.Reviews
+            .Where(r => ids.Contains(r.ProductId))
+            .GroupBy(r => r.ProductId)
+            .Select(g => new
+            {
+                ProductId = g.Key,
+                AvgRating = (decimal)g.Average(r => r.Rating),
+                Count = g.Count()
+            })
+            .ToListAsync(cancellationToken);
+
+        return stats.ToDictionary(
+            s => s.ProductId,
+            s => (Math.Round(s.AvgRating, 1), s.Count));
     }
 }

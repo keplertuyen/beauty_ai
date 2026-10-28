@@ -47,6 +47,14 @@ public class ProductServiceTests
         public Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(int productId, CancellationToken cancellationToken = default) =>
             Task.FromResult((5.0m, 0));
 
+        public Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
+            IEnumerable<int> productIds,
+            CancellationToken cancellationToken = default)
+        {
+            var dict = productIds.Distinct().ToDictionary(id => id, id => (5.0m, 0));
+            return Task.FromResult(dict);
+        }
+
         public Task<IReadOnlyList<Product>> GetSimilarProductsAsync(
             int productId,
             int categoryId,

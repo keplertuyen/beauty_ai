@@ -28,4 +28,8 @@ public interface IProductRepository
     Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(
         int productId,
         CancellationToken cancellationToken = default);
+
+    Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
+        IEnumerable<int> productIds,
+        CancellationToken cancellationToken = default);
 }
