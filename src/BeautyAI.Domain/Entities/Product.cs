@@ -7,6 +7,7 @@ public class Product : BaseEntity<int>
     public required string Slug { get; set; }
     public int BrandId { get; set; }
     public int CategoryId { get; set; }
+    public string Department { get; set; } = "Skincare";
     public decimal PriceUsd { get; set; }
     public int? VolumeMl { get; set; }
     public string? Description { get; set; }

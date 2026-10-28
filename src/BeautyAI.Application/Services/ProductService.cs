@@ -67,7 +67,8 @@ public class ProductService : IProductService
                 TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
                 SuitabilityScore: matchResult.SuitabilityScore,
                 HasAllergyWarning: matchResult.HasAllergyWarning,
-                MatchedAllergen: matchResult.MatchedAllergen
+                MatchedAllergen: matchResult.MatchedAllergen,
+                Department: p.Department ?? "Skincare"
             );
         }).ToList();
 
@@ -147,7 +148,8 @@ public class ProductService : IProductService
             Ingredients: ingredientsDto,
             SuitabilityScore: matchResult.SuitabilityScore,
             HasAllergyWarning: matchResult.HasAllergyWarning,
-            MatchedAllergen: matchResult.MatchedAllergen
+            MatchedAllergen: matchResult.MatchedAllergen,
+            Department: product.Department ?? "Skincare"
         );
     }
 

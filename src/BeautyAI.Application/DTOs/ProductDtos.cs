@@ -15,7 +15,8 @@ public record ProductSummaryDto(
     string[] TargetSkinTypes,
     int? SuitabilityScore,
     bool HasAllergyWarning,
-    string? MatchedAllergen = null
+    string? MatchedAllergen = null,
+    string Department = "Skincare"
 );
 
 public record ProductDetailDto(
@@ -37,7 +38,8 @@ public record ProductDetailDto(
     IReadOnlyList<ProductIngredientDto> Ingredients,
     int? SuitabilityScore,
     bool HasAllergyWarning,
-    string? MatchedAllergen = null
+    string? MatchedAllergen = null,
+    string Department = "Skincare"
 );
 
 public record ProductIngredientDto(

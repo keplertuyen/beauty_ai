@@ -11,7 +11,7 @@ from pathlib import Path
 import argparse, re, sys
 
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDE_DIRS = {'.git', '.venv', 'venv', 'node_modules', 'dist', 'build', 'coverage', '__pycache__', '.pytest_cache'}
+EXCLUDE_DIRS = {'.git', '.venv', 'venv', 'node_modules', 'dist', 'build', 'coverage', '__pycache__', '.pytest_cache', 'bin', 'obj', 'data'}
 EXCLUDE_SUFFIXES = {'.zip', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.pdf', '.lock', '.csv'}
 ALLOW_FILES = {'.env.example'}
 PATTERNS = [

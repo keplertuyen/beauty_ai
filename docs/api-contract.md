@@ -71,7 +71,7 @@ last_reviewed: 2026-10-27
 
 | Method | Đường dẫn | Quyền | FR | Mô tả Phase 1 |
 |---|---|---|---|---|
-| `GET` | `/api/v1/products` | ALL | `FR-CAT-01` | Lọc sản phẩm Phase 1 (`query`, `category`, `brand`, `skinType`, `min_price`, `max_price`, `min_rating`, `sort_by`, `safe_for_me`, `page`, `per_page`) |
+| `GET` | `/api/v1/products` | ALL | `FR-CAT-01` | Lọc sản phẩm Phase 1 (`query`, `category` hỗ trợ cả Department gốc và Subcategory, `brand`, `skinType`, `min_price`, `max_price`, `min_rating`, `sort_by`, `safe_for_me`, `page`, `per_page`). Trả về `department`. |
 | `GET` | `/api/v1/products/{id}` | ALL | `FR-PDP-01` | Chi tiết sản phẩm theo ID hoặc Slug hoặc Code |
 | `GET` | `/api/v1/products/{id}/similar` | ALL | `FR-PDP-08` | Sản phẩm tương tự cùng danh mục (loại trừ dị ứng của user) |
 | `GET` | `/api/v1/products/{id}/reviews` | ALL | `FR-REV-01` | Danh sách đánh giá sản phẩm (lọc skin_type, phân trang) |

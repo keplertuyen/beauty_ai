@@ -169,6 +169,7 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.Slug).HasColumnName("slug").HasMaxLength(255).IsRequired();
             entity.Property(e => e.BrandId).HasColumnName("brand_id").IsRequired();
             entity.Property(e => e.CategoryId).HasColumnName("category_id").IsRequired();
+            entity.Property(e => e.Department).HasColumnName("department").HasMaxLength(50).HasDefaultValue("Skincare");
             entity.Property(e => e.PriceUsd).HasColumnName("price_usd").HasPrecision(10, 2).IsRequired();
             entity.Property(e => e.VolumeMl).HasColumnName("volume_ml");
             entity.Property(e => e.Description).HasColumnName("description");

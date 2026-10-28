@@ -22,6 +22,7 @@ public class ProductRepository : IProductRepository
         var query = _context.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
+                .ThenInclude(c => c!.Parent)
             .AsNoTracking();
 
         // 1. Text Search (Query)
@@ -38,7 +39,13 @@ public class ProductRepository : IProductRepository
         if (!string.IsNullOrWhiteSpace(filter.Category))
         {
             var cat = filter.Category.Trim();
-            query = query.Where(p => p.Category != null && (p.Category.Name == cat || p.Category.Slug == cat));
+            query = query.Where(p =>
+                p.Department == cat ||
+                (p.Category != null && (
+                    p.Category.Name == cat ||
+                    p.Category.Slug == cat ||
+                    (p.Category.Parent != null && (p.Category.Parent.Name == cat || p.Category.Parent.Slug == cat))
+                )));
         }
 
         // 3. Brand Filter
@@ -121,6 +128,7 @@ public class ProductRepository : IProductRepository
         return await _context.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
+                .ThenInclude(c => c!.Parent)
             .Include(p => p.ProductIngredients)
                 .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking()
@@ -132,6 +140,7 @@ public class ProductRepository : IProductRepository
         return await _context.Products
             .Include(p => p.Brand)
             .Include(p => p.Category)
+                .ThenInclude(c => c!.Parent)
             .Include(p => p.ProductIngredients)
                 .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking()

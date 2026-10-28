@@ -22,7 +22,11 @@ import { translateHighlight } from '../utils/highlightTranslator';
 import './ProductDetail.css';
 
 /* ── helpers ─────────────────────────────────── */
-function getRoutineInfo(categoryName) {
+function getRoutineInfo(categoryName, department) {
+  // Guardrail: Non-skincare products NEVER get a skincare AM/PM routine step badge
+  if (department && department !== 'Skincare') {
+    return null;
+  }
   const cat = (categoryName || '').toLowerCase();
   if (cat.includes('cleanser') || cat.includes('wash')) {
     return { step: 'Step 1: Cleanse', time: 'AM & PM', tip: 'Use as the foundational first step to remove impurities without stripping skin barrier.' };
@@ -46,7 +50,10 @@ function getRoutineInfo(categoryName) {
   if (cat.includes('oil')) {
     return { step: 'Step 5: Seal & Nourish', time: 'PM', tip: 'Warm 2 drops in palms and press over moisturizer to lock in moisture and nourish lipid barrier.' };
   }
-  return { step: 'Step 4: Moisturize & Barrier', time: 'AM & PM', tip: 'Massage evenly onto face and neck to seal in hydration and reinforce skin barrier.' };
+  if (cat.includes('moisturiz') || cat.includes('cream') || cat.includes('lotion')) {
+    return { step: 'Step 4: Moisturize & Barrier', time: 'AM & PM', tip: 'Massage evenly onto face and neck to seal in hydration and reinforce skin barrier.' };
+  }
+  return { step: 'Skincare Support', time: 'Daily', tip: 'Incorporate into your daily skincare regimen according to instructions.' };
 }
 
 function getIngredientStats(ingredients) {
@@ -421,7 +428,7 @@ export default function ProductDetail() {
     product.ingredients_clean ||
     ''
   );
-  const routine = getRoutineInfo(categoryName);
+  const routine = getRoutineInfo(categoryName, product?.department);
   const loves = (() => {
     const baseLoves = parseInt(product?.loves_count) || 0;
     if (initialInWishlist === null || !product) return baseLoves;
@@ -763,18 +770,60 @@ export default function ProductDetail() {
                   </div>
                 )}
 
-                {/* Routine Positioning Card */}
-                <div className="pd-routine-card">
-                  <div className="pd-routine-header">
-                    <span className="pd-routine-step-badge">{routine.step}</span>
-                    <span className="pd-routine-time-badge">
-                      {routine.time.includes('AM') && <Sun size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
-                      {routine.time.includes('PM') && <Moon size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
-                      {routine.time}
-                    </span>
+                {/* Department Context Card / Routine Positioning Card */}
+                {routine ? (
+                  <div className="pd-routine-card">
+                    <div className="pd-routine-header">
+                      <span className="pd-routine-step-badge">{routine.step}</span>
+                      <span className="pd-routine-time-badge">
+                        {routine.time.includes('AM') && <Sun size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
+                        {routine.time.includes('PM') && <Moon size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
+                        {routine.time}
+                      </span>
+                    </div>
+                    <p className="pd-routine-tip">{routine.tip}</p>
                   </div>
-                  <p className="pd-routine-tip">{routine.tip}</p>
-                </div>
+                ) : product?.department === 'Tools & Brushes' ? (
+                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                    <div className="pd-routine-header">
+                      <span className="pd-routine-step-badge" style={{ background: '#3B82F6', color: '#FFF' }}>Tool & Accessory Care</span>
+                      <span className="pd-routine-time-badge">Hygiene & Care</span>
+                    </div>
+                    <p className="pd-routine-tip">
+                      Clean bristles or applicator weekly with a gentle brush cleaner or warm soapy water. Lay flat to dry to preserve shape and prevent bacteria accumulation.
+                    </p>
+                  </div>
+                ) : product?.department === 'Fragrance' ? (
+                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                    <div className="pd-routine-header">
+                      <span className="pd-routine-step-badge" style={{ background: '#8B5CF6', color: '#FFF' }}>Scent Application</span>
+                      <span className="pd-routine-time-badge">Pulse Points</span>
+                    </div>
+                    <p className="pd-routine-tip">
+                      Spritz onto pulse points (wrists, neck, behind ears) from 5-7 inches away. Allow to dry naturally without rubbing to preserve the delicate olfactory top and heart notes.
+                    </p>
+                  </div>
+                ) : product?.department === 'Makeup' ? (
+                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                    <div className="pd-routine-header">
+                      <span className="pd-routine-step-badge" style={{ background: '#D97706', color: '#FFF' }}>Makeup Artistry</span>
+                      <span className="pd-routine-time-badge">Application Tip</span>
+                    </div>
+                    <p className="pd-routine-tip">
+                      Apply onto hydrated skin. Blend smoothly with appropriate brush, sponge, or fingertips, layering gradually for desired opacity and long-lasting finish.
+                    </p>
+                  </div>
+                ) : product?.department === 'Hair' ? (
+                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                    <div className="pd-routine-header">
+                      <span className="pd-routine-step-badge" style={{ background: '#059669', color: '#FFF' }}>Hair Ritual</span>
+                      <span className="pd-routine-time-badge">Hair Care</span>
+                    </div>
+                    <p className="pd-routine-tip">
+                      Work evenly through damp or dry hair, focusing on mid-lengths and ends. Style or rinse according to formula directions.
+                    </p>
+                  </div>
+                ) : null}
 
                 {product.description && (
                   <div className="pd-desc-block">
@@ -889,8 +938,12 @@ export default function ProductDetail() {
                   </div>
                 ) : (
                   <div className="pd-empty-block">
-                    <span className="pd-empty-icon">🧪</span>
-                    <p>No ingredient information available for this product.</p>
+                    <span className="pd-empty-icon">🛡️</span>
+                    <p>
+                      {product?.department === 'Tools & Brushes'
+                        ? 'Physical Beauty Tool / Accessory — Contains no chemical cosmetic ingredients or allergens. Safe for direct skin contact.'
+                        : 'No chemical ingredient information listed for this formulation.'}
+                    </p>
                   </div>
                 )}
               </div>

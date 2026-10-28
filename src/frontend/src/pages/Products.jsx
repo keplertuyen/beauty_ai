@@ -455,9 +455,9 @@ export default function Products() {
               </div>
             </div>
 
-            {/* ─ Categories (Click-to-select Watsons Style) ─ */}
+            {/* ─ Categories (Department & Subcategory Hierarchy) ─ */}
             <div className="filter-section">
-              <div className="filter-title">{t('prod_category')}</div>
+              <div className="filter-title">{t('prod_category', 'Category')}</div>
               <div className="category-nav-list">
                 <button
                   type="button"
@@ -467,35 +467,89 @@ export default function Products() {
                     setSearchParams({});
                   }}
                 >
-
-                  <span className="category-nav-label">{t('cat_all', 'Tất cả danh mục')}</span>
+                  <span className="category-nav-label">{t('cat_all', 'All Categories')}</span>
                   {selectedCats.length === 0 && <span className="category-active-dot" />}
                 </button>
 
-                {categories.map(cat => {
-                  const catName = typeof cat === 'string' ? cat : cat.name || cat;
-                  const translatedCatName = t('cat_' + catName) === 'cat_' + catName ? catName : t('cat_' + catName);
-                  const isSelected = selectedCats.includes(catName);
-                  
-                  return (
-                    <button
-                      key={catName}
-                      type="button"
-                      className={`category-nav-btn ${isSelected ? 'active' : ''}`}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedCats([]);
-                        } else {
-                          setSelectedCats([catName]);
-                        }
-                      }}
-                    >
-                      <span className="category-nav-label">{translatedCatName}</span>
-                      {isSelected && <span className="category-active-dot" />}
-                    </button>
-                  );
-                })}
+                {/* Primary Departments first */}
+                {categories
+                  .filter(c => c.parentId === null || c.parent_id === null)
+                  .map(cat => {
+                    const catName = cat.name || cat;
+                    const isSelected = selectedCats.includes(catName);
+
+                    return (
+                      <button
+                        key={catName}
+                        type="button"
+                        className={`category-nav-btn ${isSelected ? 'active' : ''}`}
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedCats([]);
+                          } else {
+                            setSelectedCats([catName]);
+                          }
+                        }}
+                      >
+                        <span className="category-nav-label">{catName}</span>
+                        {isSelected && <span className="category-active-dot" />}
+                      </button>
+                    );
+                  })}
               </div>
+
+              {/* Subcategories (if a department or subcategory is selected, or expand popular) */}
+              {(() => {
+                const activeDeptName = selectedCats.find(c =>
+                  categories.some(cat => (cat.parentId === null || cat.parent_id === null) && cat.name === c)
+                ) || (selectedCats.length === 0 ? 'Skincare' : null);
+
+                const activeDept = categories.find(c => c.name === activeDeptName);
+                const subCats = activeDept
+                  ? categories.filter(c => (c.parentId === activeDept.id || c.parent_id === activeDept.id))
+                  : [];
+
+                if (subCats.length === 0) return null;
+
+                return (
+                  <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--border-subtle, #E2E8F0)' }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {activeDeptName} Subcategories
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                      {subCats.map(sub => {
+                        const isSubSelected = selectedCats.includes(sub.name);
+                        return (
+                          <button
+                            key={sub.id || sub.name}
+                            type="button"
+                            onClick={() => {
+                              if (isSubSelected) {
+                                setSelectedCats(activeDeptName ? [activeDeptName] : []);
+                              } else {
+                                setSelectedCats([sub.name]);
+                              }
+                            }}
+                            style={{
+                              padding: '3px 9px',
+                              borderRadius: '999px',
+                              fontSize: '0.74rem',
+                              fontWeight: isSubSelected ? 600 : 500,
+                              border: isSubSelected ? '1.5px solid var(--primary)' : '1px solid var(--glass-border, #CBD5E1)',
+                              background: isSubSelected ? 'var(--primary)' : 'var(--bg-secondary, #F8FAFC)',
+                              color: isSubSelected ? '#FFFFFF' : 'var(--text-primary)',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            {sub.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* ─ Price Range ─ */}
@@ -555,7 +609,7 @@ export default function Products() {
 
             {/* ─ Smart Filter: Active Ingredients (FR-04.3) ─ */}
             <div className="filter-section">
-              <div className="filter-title">{lang === 'en' ? 'Active Ingredients' : 'Hoạt chất (Smart Filter)'}</div>
+              <div className="filter-title">{t('filter_active_ingredients', 'Active Ingredients')}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {ACTIVE_OPTIONS.map(opt => {
                   const active = selectedActives.includes(opt.value);
@@ -585,7 +639,7 @@ export default function Products() {
 
             {/* ─ Smart Filter: Certifications (FR-04.1) ─ */}
             <div className="filter-section">
-              <div className="filter-title">{lang === 'en' ? 'Certifications' : 'Chứng nhận chuẩn sạch'}</div>
+              <div className="filter-title">{t('filter_certifications', 'Certifications')}</div>
               <div className="rating-options">
                 {CERT_OPTIONS.map(opt => (
                   <label key={opt.value} className="filter-option rating-option">
