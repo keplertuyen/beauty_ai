@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, X, ChevronDown, RotateCcw, Sparkles, ShieldCheck } from 'lucide-react';
+import { Search, SlidersHorizontal, X, ChevronDown, RotateCcw, ShieldCheck, Star, Package, Filter, PackageSearch } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getProducts, getCategories } from '../services/api';
 import ProductCard from '../components/ProductCard';
@@ -280,7 +280,7 @@ export default function Products() {
           <div className="products-header-inner">
             <div>
               <h1 className="products-title display-font">
-                <Sparkles size={28} className="products-title-icon" />
+                <Package size={26} className="products-title-icon" />
                 {t('prod_title')}
               </h1>
               <p className="products-subtitle">
@@ -346,7 +346,7 @@ export default function Products() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
-                    <span>🛡️</span> Safe For My Skin
+                    <ShieldCheck size={16} color="#10B981" /> Safe For My Skin
                   </div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                     Auto-hides your allergens
@@ -655,19 +655,19 @@ export default function Products() {
                 <div className="active-filters">
                   {safeForMe && (
                     <span className="filter-chip" style={{ background: '#10B981', color: '#FFFFFF', fontWeight: 600 }}>
-                      🛡️ Safe For My Skin
+                      <ShieldCheck size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Safe For My Skin
                       <button onClick={() => setSafeForMe(false)}><X size={11} color="#FFFFFF" /></button>
                     </span>
                   )}
                   {selectedSkinType && (
                     <span className="filter-chip">
-                      🧴 Skin: {selectedSkinType}
+                      Skin: {selectedSkinType}
                       <button onClick={() => setSelectedSkinType('')}><X size={11} /></button>
                     </span>
                   )}
                   {searchText && (
                     <span className="filter-chip">
-                      🔍 {searchText}
+                      <Search size={11} style={{ marginRight: 4, verticalAlign: 'middle' }} /> {searchText}
                       <button onClick={() => setSearchText('')}><X size={11} /></button>
                     </span>
                   )}
@@ -685,25 +685,25 @@ export default function Products() {
                   )}
                   {minRating && (
                     <span className="filter-chip">
-                      ⭐ {minRating}+
+                      <Star size={11} fill="currentColor" style={{ marginRight: 4, verticalAlign: 'middle' }} /> {minRating}+
                       <button onClick={() => setMinRating('')}><X size={11} /></button>
                     </span>
                   )}
                   {selectedActives.map(act => (
                     <span key={act} className="filter-chip">
-                      🧪 {ACTIVE_OPTIONS.find(o => o.value === act)?.label || act}
+                      {ACTIVE_OPTIONS.find(o => o.value === act)?.label || act}
                       <button onClick={() => toggleItem(setSelectedActives, act)}><X size={11} /></button>
                     </span>
                   ))}
                   {selectedCerts.map(cert => (
                     <span key={cert} className="filter-chip">
-                      🌿 {CERT_OPTIONS.find(o => o.value === cert)?.label || cert}
+                      {CERT_OPTIONS.find(o => o.value === cert)?.label || cert}
                       <button onClick={() => toggleItem(setSelectedCerts, cert)}><X size={11} /></button>
                     </span>
                   ))}
                   {selectedFreeFrom.map(ff => (
                     <span key={ff} className="filter-chip">
-                      🛡️ {FREE_FROM_OPTIONS.find(o => o.value === ff)?.label || ff}
+                      {FREE_FROM_OPTIONS.find(o => o.value === ff)?.label || ff}
                       <button onClick={() => toggleItem(setSelectedFreeFrom, ff)}><X size={11} /></button>
                     </span>
                   ))}
@@ -721,7 +721,7 @@ export default function Products() {
             {/* ─ Empty state ─ */}
             {!loading && products.length === 0 && (
               <div className="empty-state products-empty">
-                <div className="empty-state-icon">🔍</div>
+                <div className="empty-state-icon"><PackageSearch size={48} strokeWidth={1.5} color="#94A3B8" /></div>
                 <h3>{t('prod_no_products')}</h3>
                 <p>{t('prod_empty_desc')}</p>
                 <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={resetFilters}>

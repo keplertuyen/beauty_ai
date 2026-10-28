@@ -8,7 +8,7 @@ import {
 import {
   Package, Tag, Star, MessageSquare,
   TrendingUp, Award, ShoppingBag, BarChart2,
-  Sparkles, LogOut,
+  Droplets, LogOut,
 } from 'lucide-react';
 import { getDashboard } from '../services/api';
 import { useApp } from '../context/AppContext';
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
         <div className="admin-nav-inner">
           <Link to="/" className="admin-nav-logo">
             <div className="logo-icon">
-              <Sparkles size={16} />
+              <Droplets size={16} />
             </div>
             <span className="logo-text">
               Beauty<span className="logo-accent">AI</span> <span className="admin-badge">Admin</span>

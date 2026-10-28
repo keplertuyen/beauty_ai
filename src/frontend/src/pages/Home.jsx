@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles, FlaskConical, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Package, FlaskConical, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getFeatured, getTrending } from '../services/api';
 import { useApp } from '../context/AppContext';
@@ -19,7 +19,7 @@ const CATEGORIES = [
 ];
 
 /* ── Floating cosmetic decorations ── */
-const FLOATERS = ['💄', '🌸', '✨', '🧴', '🥑', '💧', '🧼', '🧪'];
+const FLOATERS = ['💄', '🌸', '🌿', '🧴', '🥑', '💧', '🧼', '🧪'];
 
 export default function Home() {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ export default function Home() {
   /* ── Feature highlights ── */
   const FEATURES = [
     {
-      icon: <Sparkles size={28} />,
+      icon: <ShieldCheck size={28} />,
       emoji: '🤖',
       title: t('home_ai_recs_title'),
       desc: t('home_ai_recs_desc'),
@@ -100,7 +100,7 @@ export default function Home() {
 
         <div className="container home-hero-content">
           <div className="home-hero-badge animate-fadeIn">
-            <Sparkles size={14} />
+            <ShieldCheck size={14} />
             <span>{t('home_hero_badge')}</span>
           </div>
 
@@ -114,7 +114,7 @@ export default function Home() {
 
           <div className="home-hero-actions animate-fadeIn" style={{ animationDelay: '0.3s' }}>
             <Link to="/products" className="btn btn-primary btn-lg">
-              <Sparkles size={18} />
+              <Package size={18} />
               {t('home_explore_btn')}
             </Link>
             <Link to="/skin-quiz" className="btn btn-secondary btn-lg">

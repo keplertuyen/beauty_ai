@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, ShoppingBag, Save, Camera, Clock, CheckCircle, XCircle, Truck, ShieldAlert, Plus, Trash2, Sparkles } from 'lucide-react';
+import { User, ShoppingBag, Save, Camera, Clock, CheckCircle, XCircle, Truck, ShieldAlert, Plus, Trash2, Fingerprint } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
 import { updateProfile, getMyOrders, getSkinProfile, updateSkinProfile, addAllergy, removeAllergy } from '../services/api';
@@ -8,11 +8,11 @@ import { getProductImage } from '../utils/productImages';
 import './Profile.css';
 
 const STATUS_MAP = {
-  pending:    { labelKey: 'order_status_pending', defaultLabel: 'Chờ xác nhận', color: 'badge-warning',   icon: Clock },
-  confirmed:  { labelKey: 'order_status_confirmed', defaultLabel: 'Đã xác nhận',  color: 'badge-secondary', icon: CheckCircle },
-  shipped:    { labelKey: 'order_status_shipped', defaultLabel: 'Đang giao',     color: 'badge-primary',   icon: Truck },
-  delivered:  { labelKey: 'order_status_delivered', defaultLabel: 'Đã giao',       color: 'badge-success',   icon: CheckCircle },
-  cancelled:  { labelKey: 'order_status_cancelled', defaultLabel: 'Đã hủy',        color: 'badge-danger',    icon: XCircle },
+  pending:    { labelKey: 'order_status_pending', defaultLabel: 'Pending',     color: 'badge-warning',   icon: Clock },
+  confirmed:  { labelKey: 'order_status_confirmed', defaultLabel: 'Confirmed',  color: 'badge-secondary', icon: CheckCircle },
+  shipped:    { labelKey: 'order_status_shipped', defaultLabel: 'Shipped',     color: 'badge-primary',   icon: Truck },
+  delivered:  { labelKey: 'order_status_delivered', defaultLabel: 'Delivered', color: 'badge-success',   icon: CheckCircle },
+  cancelled:  { labelKey: 'order_status_cancelled', defaultLabel: 'Cancelled', color: 'badge-danger',    icon: XCircle },
 };
 
 export default function Profile() {
@@ -122,7 +122,7 @@ export default function Profile() {
       const res = await getMyOrders();
       setOrders(res.data.orders || res.data || []);
     } catch {
-      toast.error(t('profile_error_orders', 'Không thể tải đơn hàng'));
+      toast.error(t('profile_error_orders', 'Unable to load orders'));
     } finally {
       setOrdersLoading(false);
     }
@@ -151,9 +151,9 @@ export default function Profile() {
         budgetLevel: skinProfile.budgetLevel
       });
 
-      toast.success(t('profile_update_success', 'Cập nhật Digital Skin ID & Hồ sơ thành công! ✨'));
+      toast.success(t('profile_update_success', 'Digital Skin ID & Profile updated successfully!'));
     } catch (err) {
-      toast.error(err.response?.data?.message || err.response?.data?.detail || t('profile_update_fail', 'Cập nhật thất bại'));
+      toast.error(err.response?.data?.message || err.response?.data?.detail || t('profile_update_fail', 'Update failed'));
     } finally {
       setSaving(false);
     }
@@ -161,8 +161,8 @@ export default function Profile() {
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('vi-VN', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      day: '2-digit', month: 'short', year: 'numeric',
     });
   };
 
@@ -174,7 +174,7 @@ export default function Profile() {
     return (
       <div className="loading-container" style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
         <div className="loading-spinner"></div>
-        <p>{t('profile_loading_info', 'Đang tải thông tin tài khoản...')}</p>
+        <p>{t('profile_loading_info', 'Loading account details...')}</p>
       </div>
     );
   }
@@ -199,11 +199,11 @@ export default function Profile() {
             </div>
           </div>
           <div className="profile-hero-info">
-            <h1 className="profile-name display-font">{form.name || t('profile_user_fallback', 'Người dùng')}</h1>
+            <h1 className="profile-name display-font">{form.name || t('profile_user_fallback', 'User')}</h1>
             <p className="profile-email">{user.email}</p>
             {form.skin_type && (
               <span className="badge badge-primary" style={{ marginTop: 8 }}>
-                🌿 {t('pd_skin_type') || 'Da'} {t(`skin_type_${form.skin_type.toLowerCase()}`) || form.skin_type}
+                {t('pd_skin_type') || 'Skin'}: {t(`skin_type_${form.skin_type.toLowerCase()}`) || form.skin_type}
               </span>
             )}
           </div>
@@ -216,14 +216,14 @@ export default function Profile() {
             onClick={() => setActiveTab('info')}
           >
             <User size={15} />
-            {t('profile_form_title') || 'Thông tin cá nhân'}
+            {t('profile_form_title') || 'Personal Information'}
           </button>
           <button
             className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
             onClick={() => setActiveTab('orders')}
           >
             <ShoppingBag size={15} />
-            {t('profile_orders_tab') || 'Đơn hàng của tôi'}
+            {t('profile_orders_tab') || 'My Orders'}
           </button>
         </div>
 
@@ -233,41 +233,41 @@ export default function Profile() {
           {activeTab === 'info' && (
             <div className="card profile-form-card">
               <div className="profile-form-header">
-                <h2>{t('profile_form_title') || 'Thông tin cá nhân'}</h2>
-                <p className="text-muted">{t('profile_form_desc') || 'Cập nhật hồ sơ của bạn để nhận tư vấn chính xác hơn'}</p>
+                <h2>{t('profile_form_title') || 'Personal Information'}</h2>
+                <p className="text-muted">{t('profile_form_desc') || 'Update your profile for more tailored recommendations'}</p>
               </div>
               <form onSubmit={handleSave} className="profile-form">
                 <div className="form-row-2">
                   <div className="form-group">
-                    <label className="form-label">{t('profile_fullname') || 'Họ và tên'}</label>
+                    <label className="form-label">{t('profile_fullname') || 'Full Name'}</label>
                     <input
                       className="form-input"
                       type="text"
                       value={form.name}
                       onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                      placeholder={t('profile_fullname_placeholder', 'Nhập họ tên của bạn')}
+                      placeholder={t('profile_fullname_placeholder', 'Enter your full name')}
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">{t('profile_phone') || 'Số điện thoại'}</label>
+                    <label className="form-label">{t('profile_phone') || 'Phone Number'}</label>
                     <input
                       className="form-input"
                       type="tel"
                       value={form.phone || ''}
                       onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                      placeholder="0901234567"
+                      placeholder="+1 (555) 000-0000"
                     />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">{t('profile_shipping_address') || 'Địa chỉ nhận hàng mặc định'}</label>
+                  <label className="form-label">{t('profile_shipping_address') || 'Default Shipping Address'}</label>
                   <input
                     className="form-input"
                     type="text"
                     value={form.shippingAddress || ''}
                     onChange={e => setForm(f => ({ ...f, shippingAddress: e.target.value }))}
-                    placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành"
+                    placeholder="Street address, city, state, zip code"
                   />
                 </div>
 
@@ -276,19 +276,19 @@ export default function Profile() {
                 {/* ==================================================== */}
                 <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(143,117,95,0.15)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                    <Sparkles size={20} color="#C48B71" />
+                    <Fingerprint size={20} color="#C48B71" />
                     <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#2D2520' }}>
-                      {t('skin_id_title') || 'Hồ Sơ Digital Skin ID Thống Nhất'}
+                      {t('skin_id_title') || 'Unified Digital Skin ID Profile'}
                     </h3>
                   </div>
                   <p className="text-muted" style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-                    {t('skin_id_desc') || 'Được đồng bộ hóa để lọc sản phẩm An Toàn Tuyệt Đối, tự động sinh Routine và Chat AI tư vấn.'}
+                    {t('skin_id_desc') || 'Synced across Safe For My Skin catalog filtering, Routine Generation, and AI Skin Consultant.'}
                   </p>
 
-                  {/* BƯỚC 1: CƠ ĐỊA NỀN TẢNG (LOẠI DA) */}
+                  {/* STEP 1: SKIN TYPE */}
                   <div className="form-group">
                     <label className="form-label" style={{ fontWeight: 600 }}>
-                      1. {t('profile_skin_type') || 'Cơ địa nền tảng (Loại da)'}
+                      1. {t('profile_skin_type') || 'Foundation Skin Type'}
                     </label>
                     <div className="skin-type-grid">
                       {['Normal', 'Dry', 'Oily', 'Combination', 'Sensitive'].map(type => (
@@ -298,32 +298,28 @@ export default function Profile() {
                           className={`skin-type-btn ${skinProfile.skinType === type ? 'active' : ''}`}
                           onClick={() => setSkinProfile(s => ({ ...s, skinType: type }))}
                         >
-                          {type === 'Normal' && `✨ ${t('skin_type_normal') || 'Normal'}`}
-                          {type === 'Dry' && `🌵 ${t('skin_type_dry') || 'Dry'}`}
-                          {type === 'Oily' && `💧 ${t('skin_type_oily') || 'Oily'}`}
-                          {type === 'Combination' && `🌗 ${t('skin_type_combination') || 'Combination'}`}
-                          {type === 'Sensitive' && `🌸 ${t('skin_type_sensitive') || 'Sensitive'}`}
+                          {t(`skin_type_${type.toLowerCase()}`) || type}
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  {/* BƯỚC 2: VÙNG CẤM KỴ AN TOÀN (ALLERGY BLACKLIST) */}
+                  {/* STEP 2: ALLERGY BLACKLIST */}
                   <div className="form-group" style={{ marginTop: '1.5rem', padding: '1.25rem', background: '#FFF8F6', borderRadius: '12px', border: '1px solid #FCDAD7' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                       <ShieldAlert size={18} color="#D25E5E" />
                       <label className="form-label" style={{ margin: 0, color: '#B3261E', fontWeight: 600 }}>
-                        2. {t('allergy_blacklist_title') || 'Vùng cấm kỵ an toàn (Blacklist Dị ứng)'}
+                        2. {t('allergy_blacklist_title') || 'Safety Allergy Blacklist'}
                       </label>
                     </div>
                     <p style={{ fontSize: '0.85rem', color: '#7D5260', margin: '0 0 12px 0' }}>
-                      Hệ thống tự động loại trừ mọi sản phẩm chứa hoạt chất này khi bạn bật bộ lọc "An toàn cho da tôi".
+                      The system automatically excludes any product containing these ingredients when "Safe For My Skin" is enabled.
                     </p>
 
-                    {/* Danh sách dị ứng hiện tại */}
+                    {/* Current allergy list */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
                       {skinProfile.allergies.length === 0 ? (
-                        <span style={{ fontSize: '0.85rem', color: '#888', fontStyle: 'italic' }}>Chưa có chất dị ứng nào trong danh sách cấm kỵ.</span>
+                        <span style={{ fontSize: '0.85rem', color: '#888', fontStyle: 'italic' }}>No allergens in blacklist yet.</span>
                       ) : (
                         skinProfile.allergies.map(item => (
                           <span
@@ -354,12 +350,12 @@ export default function Profile() {
                       )}
                     </div>
 
-                    {/* Form thêm nhanh dị ứng */}
+                    {/* Add allergy form */}
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <input
                         type="text"
                         className="form-input"
-                        placeholder="Tên chất dị ứng (vd: Alcohol Denat, Fragrance...)"
+                        placeholder="Allergen name (e.g., Alcohol Denat, Fragrance, Retinol...)"
                         value={newAllergy}
                         onChange={e => setNewAllergy(e.target.value)}
                         style={{ flex: '1 1 200px' }}
@@ -367,7 +363,7 @@ export default function Profile() {
                       <input
                         type="text"
                         className="form-input"
-                        placeholder="Ghi chú triệu chứng (tùy chọn)"
+                        placeholder="Symptom notes (optional)"
                         value={newAllergyNote}
                         onChange={e => setNewAllergyNote(e.target.value)}
                         style={{ flex: '1 1 180px' }}
@@ -378,24 +374,24 @@ export default function Profile() {
                         onClick={handleAddAllergyItem}
                         style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                       >
-                        <Plus size={16} /> Thêm
+                        <Plus size={16} /> Add
                       </button>
                     </div>
                   </div>
 
-                  {/* BƯỚC 3: NHU CẦU CẢI THIỆN (VẤN ĐỀ DA, MỤC TIÊU & NGÂN SÁCH) */}
+                  {/* STEP 3: SKIN CONCERNS & GOALS */}
                   <div className="form-group" style={{ marginTop: '1.5rem' }}>
                     <label className="form-label" style={{ fontWeight: 600 }}>
-                      3. {t('skin_concerns_title') || 'Nhu cầu cải thiện: Vấn đề da cần giải quyết'}
+                      3. {t('skin_concerns_title') || 'Target Skin Concerns'}
                     </label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '6px' }}>
                       {[
-                        { key: 'Acne', label: '🔴 Mụn & Bít tắc' },
-                        { key: 'Aging', label: '⏳ Lão hóa & Nếp nhăn' },
-                        { key: 'DarkSpots', label: '✨ Thâm nám & Không đều màu' },
-                        { key: 'Pores', label: '🔍 Lỗ chân lông to' },
-                        { key: 'Sensitivity', label: '🌸 Da nhạy cảm & Dễ đỏ' },
-                        { key: 'Dehydration', label: '💧 Thiếu ẩm & Bong tróc' }
+                        { key: 'Acne', label: 'Acne & Blemishes' },
+                        { key: 'Aging', label: 'Aging & Fine Lines' },
+                        { key: 'DarkSpots', label: 'Dark Spots & Uneven Tone' },
+                        { key: 'Pores', label: 'Enlarged Pores' },
+                        { key: 'Sensitivity', label: 'Sensitive & Redness-Prone' },
+                        { key: 'Dehydration', label: 'Dehydration & Dryness' }
                       ].map(item => {
                         const isSelected = skinProfile.skinConcerns.includes(item.key);
                         return (
@@ -423,32 +419,32 @@ export default function Profile() {
 
                   <div className="form-row-2" style={{ marginTop: '1rem' }}>
                     <div className="form-group">
-                      <label className="form-label" style={{ fontWeight: 600 }}>Mục tiêu dưỡng da chính</label>
+                      <label className="form-label" style={{ fontWeight: 600 }}>Primary Skincare Goal</label>
                       <input
                         className="form-input"
                         type="text"
                         value={skinProfile.primaryGoal || ''}
                         onChange={e => setSkinProfile(s => ({ ...s, primaryGoal: e.target.value }))}
-                        placeholder="Vd: Phục hồi màng ẩm, Sáng mịn da..."
+                        placeholder="e.g., Barrier repair, brightening, clear acne..."
                       />
                     </div>
                     <div className="form-group">
-                      <label className="form-label" style={{ fontWeight: 600 }}>Mức ngân sách mong muốn</label>
+                      <label className="form-label" style={{ fontWeight: 600 }}>Target Budget Level</label>
                       <select
                         className="form-select"
                         value={skinProfile.budgetLevel || 'Medium'}
                         onChange={e => setSkinProfile(s => ({ ...s, budgetLevel: e.target.value }))}
                       >
-                        <option value="Low">Tiết kiệm / Học sinh - Sinh viên ($)</option>
-                        <option value="Medium">Vừa phải / Phổ thông ($$)</option>
-                        <option value="High">Cao cấp / Treatment chuyên sâu ($$$)</option>
+                        <option value="Low">Budget-friendly / Student ($)</option>
+                        <option value="Medium">Mid-range / Standard ($$)</option>
+                        <option value="High">Premium / Specialized Treatment ($$$)</option>
                       </select>
                     </div>
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">{t('profile_avatar_url') || 'URL ảnh đại diện'}</label>
+                  <label className="form-label">{t('profile_avatar_url') || 'Avatar Image URL'}</label>
                   <input
                     className="form-input"
                     type="url"
@@ -479,12 +475,12 @@ export default function Profile() {
                   {saving ? (
                     <>
                       <span className="loading-spinner" style={{ width: 16, height: 16, borderWidth: 2 }} />
-                      {t('profile_saving') || 'Đang lưu...'}
+                      {t('profile_saving') || 'Saving...'}
                     </>
                   ) : (
                     <>
                       <Save size={16} />
-                      {t('profile_save_btn') || 'Lưu thay đổi'}
+                      {t('profile_save_btn') || 'Save Changes'}
                     </>
                   )}
                 </button>
@@ -498,20 +494,20 @@ export default function Profile() {
               {ordersLoading ? (
                 <div className="loading-container">
                   <div className="loading-spinner" />
-                  <p>{t('profile_orders_loading', 'Đang tải đơn hàng...')}</p>
+                  <p>{t('profile_orders_loading', 'Loading orders...')}</p>
                 </div>
               ) : orders.length === 0 ? (
                 <div className="empty-state card" style={{ padding: '3rem' }}>
                   <div className="empty-state-icon">📦</div>
-                  <h3>{t('profile_no_orders') || 'Chưa có đơn hàng nào'}</h3>
-                  <p>{t('profile_no_orders_desc', 'Hãy khám phá sản phẩm và đặt hàng ngay!')}</p>
+                  <h3>{t('profile_no_orders') || 'No orders found'}</h3>
+                  <p>{t('profile_no_orders_desc', 'Explore our catalog and place your first order!')}</p>
                   <button
                     className="btn btn-primary"
                     style={{ marginTop: 24 }}
                     onClick={() => navigate('/products')}
                   >
                     <ShoppingBag size={16} />
-                    {t('cart_shop_now') || 'Mua sắm ngay'}
+                    {t('cart_shop_now') || 'Shop Now'}
                   </button>
                 </div>
               ) : (
@@ -561,7 +557,7 @@ export default function Profile() {
                         </div>
 
                         <div className="order-footer">
-                          <span className="order-total-label">{t('profile_order_total') || 'Tổng cộng'}</span>
+                          <span className="order-total-label">{t('profile_order_total') || 'Total'}</span>
                           <span className="order-total">{formatDualPrice(order.total_usd ?? order.total_amount ?? order.total, order.exchange_rate)}</span>
                         </div>
                       </div>

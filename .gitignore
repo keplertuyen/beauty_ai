@@ -24,6 +24,7 @@ desktop.ini
 # .NET artifacts
 bin/
 obj/
+.aspnet/
 *.suo
 *.user
 *.userosscache

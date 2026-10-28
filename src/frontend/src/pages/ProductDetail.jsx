@@ -4,7 +4,7 @@ import {
   Heart, Share2, ShoppingBag, Star, ChevronRight,
   Truck, Package, FlaskConical, Info, MessageSquare,
   ThumbsUp, ThumbsDown, Send, ChevronDown, ChevronUp,
-  CheckCircle, Sparkles, Copy, Check, QrCode, ShieldCheck,
+  CheckCircle, Copy, Check, QrCode, ShieldCheck,
   RefreshCw, Plus, Minus, X, ExternalLink
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -31,7 +31,7 @@ const CATEGORY_EMOJI = {
   'Eye Creams': '👁️',
   'Lip Balm & Treatments': '💋',
   'Face Sunscreen': '☀️',
-  'Face Oils': '✨',
+  'Face Oils': '💧',
   'Toners': '💦',
   'Anti-Aging': '⏳',
   'Acne & Blemishes': '🌿',
@@ -659,8 +659,8 @@ export default function ProductDetail() {
                 {highlights.length > 0 && (
                   <div className="pd-highlights-block">
                     <h3 className="pd-block-heading">
-                      <Sparkles size={18} color="var(--primary, #4A3728)" />
-                      {t('pd_highlights', 'Điểm nổi bật chính')}
+                      <Star size={18} color="var(--primary, #4A3728)" />
+                      {t('pd_highlights', 'Key Highlights')}
                     </h3>
                     <div className="pd-highlights-grid">
                       {highlights.map((h, i) => (

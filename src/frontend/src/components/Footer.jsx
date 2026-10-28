@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Sparkles, Mail, Phone, MapPin, Heart,
+  Droplets, Mail, Phone, MapPin, Heart,
   Package, FlaskConical, Layers, GitCompare,
   MessageSquare, LifeBuoy, ClipboardList
 } from 'lucide-react';
@@ -17,7 +17,7 @@ export default function Footer() {
         <div className="footer-brand">
           <Link to="/" className="footer-logo">
             <div className="logo-icon">
-              <Sparkles size={18} />
+              <Droplets size={18} />
             </div>
             <span className="logo-text">
               Beauty<span className="logo-accent">AI</span>

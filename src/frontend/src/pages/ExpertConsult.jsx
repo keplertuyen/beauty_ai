@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Bot, User } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { chatWithBot, getFAQ } from '../services/api';
 import './ExpertConsult.css';
@@ -32,7 +33,7 @@ function MessageText({ text }) {
 function TypingIndicator() {
   return (
     <div className="ec-msg-row ec-msg-row--bot">
-      <div className="ec-avatar">✨</div>
+      <div className="ec-avatar"><Bot size={18} /></div>
       <div className="ec-bubble ec-bubble--bot ec-typing">
         <span className="ec-dot" />
         <span className="ec-dot" />
@@ -99,11 +100,11 @@ function ChatMessage({ msg }) {
 
   return (
     <div className={`ec-msg-row ${isBot ? 'ec-msg-row--bot' : 'ec-msg-row--user'} animate-fadeIn`}>
-      {isBot && <div className="ec-avatar">✨</div>}
+      {isBot && <div className="ec-avatar"><Bot size={18} /></div>}
       <div className={`ec-bubble ${isBot ? 'ec-bubble--bot' : 'ec-bubble--user'}`}>
         <MessageText text={msg.text} />
       </div>
-      {!isBot && <div className="ec-avatar ec-avatar--user">👤</div>}
+      {!isBot && <div className="ec-avatar ec-avatar--user"><User size={18} /></div>}
     </div>
   );
 }
@@ -456,7 +457,7 @@ export default function ExpertConsult() {
           <div className="ec-chat-card glass-card">
             {/* Chat header */}
             <div className="ec-chat-header">
-              <div className="ec-bot-avatar">✨</div>
+              <div className="ec-bot-avatar"><Bot size={22} /></div>
               <div className="ec-chat-header-info">
                 <h3 className="ec-chat-title">BeautyAI Assistant</h3>
                 <span className="ec-chat-status">

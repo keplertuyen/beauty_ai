@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle2, Award, RotateCcw } from 'lucide-react';
 import { getSkinQuizRecs } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useApp } from '../context/AppContext';
@@ -18,7 +18,7 @@ export default function SkinQuiz() {
       icon: '🌸',
       options: [
         { value: 'dry',         label: t('skin_type_dry'),       icon: '🏜️', desc: t('quiz_desc_dry', 'Dễ bong tróc, căng da') },
-        { value: 'oily',        label: t('skin_type_oily'),        icon: '✨', desc: t('quiz_desc_oily', 'Bóng nhờn, lỗ chân lông to') },
+        { value: 'oily',        label: t('skin_type_oily'),        icon: '💧', desc: t('quiz_desc_oily', 'Bóng nhờn, lỗ chân lông to') },
         { value: 'combination', label: t('skin_type_combination'),   icon: '☯️', desc: t('quiz_desc_combination', 'Vùng T dầu, má khô') },
         { value: 'normal',      label: t('skin_type_normal'),     icon: '🌿', desc: t('quiz_desc_normal', 'Cân bằng, ít vấn đề') },
         { value: 'sensitive',   label: t('skin_type_sensitive'),  icon: '🌺', desc: t('quiz_desc_sensitive', 'Dễ kích ứng, đỏ da') },
@@ -196,7 +196,7 @@ export default function SkinQuiz() {
         <header className="quiz-header">
           <div className="quiz-header-top">
             <div className="quiz-logo">
-              <Sparkles size={20} />
+              <Award size={20} />
               <span>BeautyAI Skin Quiz</span>
             </div>
             {step > 0 && !isResults && (
@@ -313,7 +313,7 @@ export default function SkinQuiz() {
                     <div className="quiz-loading-ring" />
                     <div className="quiz-loading-ring quiz-loading-ring--2" />
                     <div className="quiz-loading-ring quiz-loading-ring--3" />
-                    <span className="quiz-loading-emoji">✨</span>
+                    <span className="quiz-loading-emoji"><Award size={32} color="#C48B71" /></span>
                   </div>
                   <h2 className="quiz-loading-title">{t('quiz_loading_title')}</h2>
                   <p className="quiz-loading-msg">{LOADING_MSGS[loadingMsg]}</p>
@@ -337,7 +337,7 @@ export default function SkinQuiz() {
                 <>
                   {/* Results header */}
                   <div className="quiz-results-header">
-                    <div className="quiz-results-sparkle">✨</div>
+                    <div className="quiz-results-sparkle"><Award size={28} color="#C48B71" /></div>
                     <h1 className="quiz-results-title">
                       {t('quiz_results_title')}
                     </h1>

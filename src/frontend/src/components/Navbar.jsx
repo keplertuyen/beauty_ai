@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  ShoppingBag, Heart, Search, Menu, X, Sparkles,
+  ShoppingBag, Heart, Search, Menu, X, Droplets,
   FlaskConical, ChevronDown, User, Settings, LogOut,
   BarChart2, MessageCircle, LayoutDashboard,
   Package, Layers, GitCompare, MessageSquare, LifeBuoy
@@ -70,7 +70,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="navbar-logo">
             <div className="logo-icon">
-              <Sparkles size={18} />
+              <Droplets size={18} />
             </div>
             <span className="logo-text">
               Beauty<span className="logo-accent">AI</span>

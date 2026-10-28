@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   FlaskConical,
-  Sparkles,
   AlertTriangle,
   XCircle,
   CheckCircle,
@@ -17,6 +16,8 @@ import {
   Copy,
   Star,
   Layers,
+  Target,
+  ThumbsUp,
 } from 'lucide-react';
 import { analyzeIngredients, getSkintypeGuide } from '../services/api';
 import { useSearchParams, useLocation, Link } from 'react-router-dom';
@@ -525,14 +526,14 @@ export default function IngredientAnalyzer() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Sparkles size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
+                    <CheckCircle size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
                     <span>
-                      {t('ia_analyzing_for', 'Đang phân tích công thức của')}:{' '}
+                      {t('ia_analyzing_for', 'Analyzing formula for')}:{' '}
                       <strong style={{ color: 'var(--primary)' }}>{sourceProduct}</strong>
                     </span>
                   </div>
                   <span className="badge badge-clean" style={{ fontSize: '0.75rem' }}>
-                    ✨ {t('ia_auto_filled', 'Tự động điền công thức')}
+                    {t('ia_auto_filled', 'Auto-filled formula')}
                   </span>
                 </div>
               )}
@@ -612,8 +613,8 @@ export default function IngredientAnalyzer() {
 
                 <div className="ia-control-group">
                   <div className="ia-field-label">
-                    <Sparkles size={16} className="label-icon" />
-                    <span>{t('ia_select_condition', 'Tình trạng cụ thể')}</span>
+                    <Target size={16} className="label-icon" />
+                    <span>{t('ia_select_condition', 'Target Condition')}</span>
                   </div>
                   <select
                     className="form-select ia-condition-select"
@@ -635,7 +636,7 @@ export default function IngredientAnalyzer() {
                   onClick={() => handleFillSample(targetArea)}
                   type="button"
                 >
-                  <Sparkles size={14} />
+                  <BookOpen size={14} />
                   {targetArea === 'hair' ? t('ia_sample_hair') : targetArea === 'body' ? t('ia_sample_body') : t('ia_sample_face')}
                 </button>
                 <button
@@ -722,11 +723,11 @@ export default function IngredientAnalyzer() {
                   {results.compatible_skin_types?.length > 0 && (
                     <div className="ia-compat-card glass-card">
                       <h2 className="ia-section-title">
-                        <Sparkles size={18} />
+                        <Layers size={18} />
                         {targetArea === 'hair'
-                          ? 'Độ tương thích với tình trạng tóc & da đầu'
+                          ? 'Hair & Scalp Compatibility'
                           : targetArea === 'body'
-                          ? 'Độ tương thích với da cơ thể'
+                          ? 'Body Skin Compatibility'
                           : t('ia_skin_compatibility')}
                       </h2>
                       <div className="ia-compat-list">
@@ -868,13 +869,13 @@ export default function IngredientAnalyzer() {
                 {results.best_for_skin_types?.length > 0 && (
                   <div className="ia-section-card glass-card animate-fadeIn">
                     <h2 className="ia-section-title">
-                      <Sparkles size={18} style={{ color: '#C39B75' }} />
+                      <ThumbsUp size={18} style={{ color: '#C39B75' }} />
                       {t('ia_best_for')}
                     </h2>
                     <div className="ia-best-for">
                       {results.best_for_skin_types.map((st) => (
                         <span key={st} className="ia-skin-type-tag best">
-                          ✨ {getConditionLabel(st)}
+                          {getConditionLabel(st)}
                         </span>
                       ))}
                     </div>

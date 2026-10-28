@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getProducts } from '../services/api';
-import { Search, Scale, X, HelpCircle, Star, Sparkles } from 'lucide-react';
+import { Search, Scale, X, HelpCircle, Star } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useApp } from '../context/AppContext';
 import { getProductImage } from '../utils/productImages';

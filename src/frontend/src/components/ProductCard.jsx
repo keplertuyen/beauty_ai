@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag, Star, Eye } from 'lucide-react';
+import { Heart, ShoppingBag, Star, Eye, ShieldAlert, CheckCircle2, Package } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getProductImage, DEFAULT_PRODUCT_IMAGE } from '../utils/productImages';
 
@@ -21,19 +21,6 @@ export default function ProductCard({ product }) {
     setImgLoaded(false);
     setImgError(false);
   }, [product]);
-
-  const getCategoryEmoji = (cat) => {
-    const map = {
-      'Moisturizers': '🧴', 'Serums & Essences': '💧', 'Face Wash & Cleansers': '🫧',
-      'Face Masks': '🎭', 'Eye Creams': '👁️', 'Lip Balm & Treatments': '💋',
-      'Face Sunscreen': '☀️', 'Face Oils': '✨', 'Toners': '💦',
-      'Anti-Aging': '⏳', 'Acne & Blemishes': '🌿', 'Makeup Removers': '🌸',
-    };
-    for (const [key, emoji] of Object.entries(map)) {
-      if (cat?.includes(key)) return emoji;
-    }
-    return '💄';
-  };
 
   const rating = parseFloat(product.rating) || 0;
   const price = parseFloat(product.price_usd) || 0;
@@ -69,9 +56,9 @@ export default function ProductCard({ product }) {
             }}
           />
         ) : (
-          <span className="product-card-placeholder" style={{ fontSize: '3.5rem' }}>
-            {getCategoryEmoji(product.categoryName || product.primary_category)}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
+            <Package size={48} strokeWidth={1.5} />
+          </div>
         )}
 
         {/* Badges */}
@@ -86,10 +73,13 @@ export default function ProductCard({ product }) {
                 fontWeight: 700,
                 padding: '3px 8px',
                 borderRadius: '6px',
-                boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)'
+                boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
               }}
             >
-              ⚠️ ALLERGY: {allergen || 'Contains allergen'}
+              <ShieldAlert size={12} strokeWidth={2.5} /> ALLERGY: {allergen || 'Contains allergen'}
             </span>
           )}
           {!hasAllergyWarning && suitability != null && suitability > 0 && (
@@ -102,10 +92,13 @@ export default function ProductCard({ product }) {
                 fontWeight: 700,
                 padding: '3px 8px',
                 borderRadius: '6px',
-                backdropFilter: 'blur(4px)'
+                backdropFilter: 'blur(4px)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
               }}
             >
-              ✨ {suitability}% MATCH
+              <CheckCircle2 size={12} strokeWidth={2.5} /> {suitability}% MATCH
             </span>
           )}
           {product.new == 1 && <span className="badge badge-new" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>{t('badge_new', 'NEW')}</span>}
