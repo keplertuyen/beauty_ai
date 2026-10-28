@@ -358,8 +358,8 @@ export default function ProductDetail() {
     );
   }
 
-  const price = parseFloat(product.price_usd) || 0;
-  const salePrice = product.sale_price_usd ? parseFloat(product.sale_price_usd) : null;
+  const price = parseFloat(product.priceUsd ?? product.price_usd ?? product.price) || 0;
+  const salePrice = product.salePriceUsd ? parseFloat(product.salePriceUsd) : (product.sale_price_usd ? parseFloat(product.sale_price_usd) : null);
   const rating = parseFloat(product.rating) || 0;
   const reviewCount = reviews.length;
   const loves = (() => {

@@ -117,8 +117,8 @@ export default function Home() {
               <Package size={18} />
               {t('home_explore_btn')}
             </Link>
-            <Link to="/skin-quiz" className="btn btn-secondary btn-lg">
-              {t('home_quiz_btn')}
+            <Link to="/ingredient-analyzer" className="btn btn-secondary btn-lg">
+              {t('home_ing_analyzer_title')}
               <ArrowRight size={18} />
             </Link>
           </div>
@@ -235,8 +235,8 @@ export default function Home() {
           <p className="home-cta-subtitle">
             {t('home_cta_subtitle')}
           </p>
-          <Link to="/skin-quiz" className="btn btn-primary btn-lg home-cta-btn">
-            {t('home_cta_btn')}
+          <Link to="/ingredient-analyzer" className="btn btn-primary btn-lg home-cta-btn">
+            {t('home_ing_analyzer_title')}
             <ArrowRight size={20} />
           </Link>
         </div>

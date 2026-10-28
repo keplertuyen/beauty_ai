@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ShoppingBag, Heart, Search, Menu, X, Droplets,
-  FlaskConical, ChevronDown, User, Settings, LogOut,
+  ChevronDown, User, Settings, LogOut,
   BarChart2, MessageCircle, LayoutDashboard,
-  Package, Layers, GitCompare, MessageSquare, LifeBuoy
+  Package, Layers, MessageSquare, LifeBuoy
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import './Navbar.css';
@@ -25,9 +25,7 @@ export default function Navbar() {
     {
       label: t('nav_explore'),
       children: [
-        { path: '/skin-quiz',            icon: <FlaskConical size={15} />, label: t('nav_skin_quiz'),       desc: t('nav_skin_quiz_desc') },
         { path: '/ingredient-analyzer',  icon: <Layers size={15} />,       label: t('nav_ingredient'),      desc: t('nav_ingredient_desc') },
-        { path: '/compare',              icon: <GitCompare size={15} />,    label: t('nav_compare'),         desc: t('nav_compare_desc') },
       ],
     },
     {
@@ -110,14 +108,6 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="navbar-actions">
-            {/* Currency indicator (Phase 1 Global USD) */}
-            <span
-              className="badge badge-secondary"
-              style={{ padding: '4px 10px', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)' }}
-            >
-              $ USD
-            </span>
-
             {/* Search */}
             <button className="nav-icon-btn" onClick={() => setSearchOpen(!searchOpen)} aria-label={t('nav_search_btn')}>
               <Search size={18} />
@@ -234,11 +224,6 @@ export default function Navbar() {
                 {t('nav_login')} / {t('nav_register')}
               </button>
             )}
-            <div className="mobile-lang-row" style={{ marginTop: '8px', borderTop: '1px solid var(--glass-border)', paddingTop: '12px', display: 'flex', justifyContent: 'center' }}>
-              <span className="badge badge-secondary" style={{ padding: '6px 16px', fontSize: '0.8rem', fontWeight: 600 }}>
-                English (US) • USD ($)
-              </span>
-            </div>
           </div>
         )}
       </nav>

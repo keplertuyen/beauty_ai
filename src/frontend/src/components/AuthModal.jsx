@@ -41,7 +41,6 @@ export default function AuthModal() {
 
         {/* Header */}
         <div className="auth-header">
-          <div className="auth-logo">💄</div>
           <h2 className="auth-title">
             {mode === 'login' ? t('auth_welcome_title') : t('auth_register_title')}
           </h2>

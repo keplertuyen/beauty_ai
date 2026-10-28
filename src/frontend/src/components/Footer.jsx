@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Droplets, Mail, Phone, MapPin, Heart,
-  Package, FlaskConical, Layers, GitCompare,
+  Package, Layers,
   MessageSquare, LifeBuoy, ClipboardList
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -43,9 +43,7 @@ export default function Footer() {
           <h4 className="footer-title">{t('nav_explore')}</h4>
           <ul className="footer-links">
             <li><Link to="/products"><Package size={14} />{t('nav_products')}</Link></li>
-            <li><Link to="/skin-quiz"><FlaskConical size={14} />{t('nav_skin_quiz')}</Link></li>
             <li><Link to="/ingredient-analyzer"><Layers size={14} />{t('nav_ingredient')}</Link></li>
-            <li><Link to="/compare"><GitCompare size={14} />{t('nav_compare')}</Link></li>
           </ul>
         </div>
 

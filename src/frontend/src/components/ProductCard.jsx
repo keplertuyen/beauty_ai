@@ -23,7 +23,7 @@ export default function ProductCard({ product }) {
   }, [product]);
 
   const rating = parseFloat(product.rating) || 0;
-  const price = parseFloat(product.price_usd) || 0;
+  const price = parseFloat(product.priceUsd ?? product.price_usd ?? product.price) || 0;
   const suitability = product.suitabilityScore ?? product.suitability_score;
   const hasAllergyWarning = product.hasAllergyWarning || product.has_allergy_warning;
   const allergen = product.matchedAllergen || product.matched_allergen;
