@@ -10,9 +10,15 @@
     "gen:api": "openapi-typescript ../../docs/api/BeautyAI.Api.json -o src/api/schema.d.ts"
   },
   "dependencies": {
+    "axios": "^1.21.0",
+    "framer-motion": "^14.7.1",
+    "lucide-react": "^1.62.0",
     "openapi-fetch": "^0.13.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-hot-toast": "^2.6.1",
+    "react-router-dom": "^7.18.5",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@types/react": "19.2.17",

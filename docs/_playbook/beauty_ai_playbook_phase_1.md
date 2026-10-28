@@ -156,8 +156,9 @@ LIMIT 10;"
    ```
 
 ### ✅ Xong khi:
-- [ ] Lệnh `npm run build` chạy thành công không báo lỗi TypeScript/JSX.
-- [ ] Mở trình duyệt `http://localhost:5173` hiển thị trang chủ BeautyAI hoàn chỉnh với đầy đủ thanh điều hướng và chân trang.
+- [x] Lệnh `npm run build` chạy thành công không báo lỗi TypeScript/JSX (32 chunks bundled in 244ms).
+- [x] Mở trình duyệt `http://localhost:5173` (hoặc 5174) hiển thị trang chủ BeautyAI hoàn chỉnh với đầy đủ thanh điều hướng và chân trang.
+- [x] Cấu hình Axios API Client (`src/frontend/src/services/api.js`) kết nối đầy đủ các API Auth và Digital Skin ID.
 
 ---
 
