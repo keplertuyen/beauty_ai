@@ -51,12 +51,20 @@ export default function AuthModal() {
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="tabs" style={{ marginBottom: 24 }}>
-          <button className={`tab-btn ${mode === 'login' ? 'active' : ''}`} onClick={() => setMode('login')}>
+        {/* Tabs - 50/50 Balanced Toggle */}
+        <div className="auth-tabs">
+          <button
+            type="button"
+            className={`auth-tab-btn ${mode === 'login' ? 'active' : ''}`}
+            onClick={() => setMode('login')}
+          >
             {t('auth_login_tab')}
           </button>
-          <button className={`tab-btn ${mode === 'register' ? 'active' : ''}`} onClick={() => setMode('register')}>
+          <button
+            type="button"
+            className={`auth-tab-btn ${mode === 'register' ? 'active' : ''}`}
+            onClick={() => setMode('register')}
+          >
             {t('auth_register_tab')}
           </button>
         </div>
