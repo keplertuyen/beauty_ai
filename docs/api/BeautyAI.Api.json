@@ -764,6 +764,146 @@
           }
         }
       }
+    },
+    "/api/v1/tools/analyze-inci": {
+      "post": {
+        "tags": [
+          "Tools"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InciAnalysisRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InciAnalysisRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InciAnalysisRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InciAnalysisResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InciAnalysisResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InciAnalysisResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tools/check-conflict": {
+      "post": {
+        "tags": [
+          "Tools"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConflictCheckRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConflictCheckRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConflictCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictCheckResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictCheckResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictCheckResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tools/skintype-guide": {
+      "get": {
+        "tags": [
+          "Tools"
+        ],
+        "parameters": [
+          {
+            "name": "area",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "face"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -813,6 +953,74 @@
           }
         }
       },
+      "AnalyzedIngredientDto": {
+        "required": [
+          "name",
+          "inci_name",
+          "category",
+          "safety",
+          "function",
+          "benefits",
+          "caution",
+          "comedogenic_rating",
+          "irritation_rating",
+          "target_areas"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "inci_name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "safety": {
+            "type": "string"
+          },
+          "function": {
+            "type": "string"
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "caution": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "comedogenic_rating": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "irritation_rating": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "target_areas": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "AuthResponse": {
         "required": [
           "token",
@@ -832,6 +1040,158 @@
             "type": "string"
           },
           "role": {
+            "type": "string"
+          }
+        }
+      },
+      "CautionDto": {
+        "required": [
+          "caution",
+          "ingredient"
+        ],
+        "type": "object",
+        "properties": {
+          "caution": {
+            "type": "string"
+          },
+          "ingredient": {
+            "type": "string"
+          }
+        }
+      },
+      "CombinationWarningDto": {
+        "required": [
+          "warning",
+          "ingredients_involved",
+          "severity",
+          "recommendation"
+        ],
+        "type": "object",
+        "properties": {
+          "warning": {
+            "type": "string"
+          },
+          "ingredients_involved": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "severity": {
+            "type": "string"
+          },
+          "recommendation": {
+            "type": "string"
+          }
+        }
+      },
+      "CompatibleSkinTypeDto": {
+        "required": [
+          "key",
+          "score",
+          "vi_name"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "score": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "vi_name": {
+            "type": "string"
+          }
+        }
+      },
+      "ConditionEvaluationDto": {
+        "required": [
+          "condition_name",
+          "is_suitable"
+        ],
+        "type": "object",
+        "properties": {
+          "condition_name": {
+            "type": "string"
+          },
+          "is_suitable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ConflictCheckRequest": {
+        "required": [
+          "product_ids"
+        ],
+        "type": "object",
+        "properties": {
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "ConflictCheckResponse": {
+        "required": [
+          "has_conflict",
+          "conflicts"
+        ],
+        "type": "object",
+        "properties": {
+          "has_conflict": {
+            "type": "boolean"
+          },
+          "conflicts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConflictDetailDto"
+            }
+          }
+        }
+      },
+      "ConflictDetailDto": {
+        "required": [
+          "product_a",
+          "product_b",
+          "ingredient_a",
+          "ingredient_b",
+          "severity",
+          "reason",
+          "recommendation"
+        ],
+        "type": "object",
+        "properties": {
+          "product_a": {
+            "type": "string"
+          },
+          "product_b": {
+            "type": "string"
+          },
+          "ingredient_a": {
+            "type": "string"
+          },
+          "ingredient_b": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "recommendation": {
             "type": "string"
           }
         }
@@ -894,6 +1254,115 @@
           },
           "service": {
             "type": "string"
+          }
+        }
+      },
+      "InciAnalysisRequest": {
+        "required": [
+          "ingredients_text"
+        ],
+        "type": "object",
+        "properties": {
+          "ingredients_text": {
+            "type": "string"
+          },
+          "target_area": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": "face"
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "condition": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "skin_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "InciAnalysisResponse": {
+        "required": [
+          "summary",
+          "safety_score",
+          "compatible_skin_types",
+          "benefits",
+          "cautions",
+          "combination_warnings",
+          "condition_evaluation",
+          "identified_ingredients",
+          "unknown_ingredients"
+        ],
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "safety_score": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "compatible_skin_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompatibleSkinTypeDto"
+            }
+          },
+          "benefits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cautions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CautionDto"
+            }
+          },
+          "combination_warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CombinationWarningDto"
+            }
+          },
+          "condition_evaluation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConditionEvaluationDto"
+              }
+            ]
+          },
+          "identified_ingredients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyzedIngredientDto"
+            }
+          },
+          "unknown_ingredients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -1097,6 +1566,9 @@
     },
     {
       "name": "SkinProfile"
+    },
+    {
+      "name": "Tools"
     }
   ]
 }

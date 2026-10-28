@@ -43,11 +43,13 @@ builder.Services.AddDbContext<BeautyAIDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ISkinProfileRepository, SkinProfileRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IToolRepository, ToolRepository>();
 builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISkinProfileService, SkinProfileService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IToolsService, ToolsService>();
 
 // 5. JWT Authentication
 var jwtSecret = builder.Configuration["JWT_SECRET"] ?? "BeautyAI_SuperSecret_Dermatology_Key_2026_AtLeast32Chars!";

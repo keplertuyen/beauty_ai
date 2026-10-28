@@ -19,6 +19,7 @@ public class BeautyAIDbContext : DbContext
     public DbSet<Ingredient> Ingredients => Set<Ingredient>();
     public DbSet<ProductIngredient> ProductIngredients => Set<ProductIngredient>();
     public DbSet<Review> Reviews => Set<Review>();
+    public DbSet<ConflictRule> ConflictRules => Set<ConflictRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -237,6 +238,21 @@ public class BeautyAIDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // 10. ConflictRule
+        modelBuilder.Entity<ConflictRule>(entity =>
+        {
+            entity.ToTable("conflict_rules");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ActiveIngredientA).HasColumnName("active_ingredient_a").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.ActiveIngredientB).HasColumnName("active_ingredient_b").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Severity).HasColumnName("severity").HasMaxLength(50).HasDefaultValue("Warning");
+            entity.Property(e => e.Reason).HasColumnName("reason").IsRequired();
+            entity.Property(e => e.Recommendation).HasColumnName("recommendation").IsRequired();
+            entity.Ignore(e => e.CreatedAtUtc);
+            entity.Ignore(e => e.UpdatedAtUtc);
         });
     }
 }

@@ -131,6 +131,14 @@ sort, page, pageSize
 | `GET`/`POST`/`DELETE` | `/routines[/{id}]` | CUSTOMER | `FR-QUIZ-07` |
 | `POST` | `/routines/{id}/export` | CUSTOMER | `FR-QUIZ-08` |
 
+### Công cụ & Phân tích INCI (`/api/v1/tools`) — C3
+
+| Method | Đường dẫn | Quyền | FR | Mô tả Phase 1 |
+|---|---|---|---|---|
+| `POST` | `/api/v1/tools/analyze-inci` | ALL | `FR-ING-01` | Phân tích danh sách thành phần INCI (dán văn bản, phân nhóm công năng, tính toán độ tương thích loại da, cảnh báo thành phần nhạy cảm/xung đột) |
+| `POST` | `/api/v1/tools/check-conflict` | ALL | `FR-CONF-01` | Kiểm tra xung đột hoạt chất giữa các sản phẩm trong giỏ hàng dựa trên 12 quy tắc y khoa |
+| `GET` | `/api/v1/tools/skintype-guide` | ALL | `FR-ING-04` | Trả về cẩm nang và hướng dẫn chăm sóc chuyên sâu theo từng loại da |
+
 ### Phân tích thành phần (`/api/v1/ingredients`) — C3
 
 | Method | Đường dẫn | Quyền | FR |
