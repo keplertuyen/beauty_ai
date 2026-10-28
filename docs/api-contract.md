@@ -67,12 +67,16 @@ last_reviewed: 2026-10-27
 | `POST` | `/auth/change-password` | CUSTOMER/ADMIN | `FR-AUTH-04` | Đổi `securityStamp` → vô hiệu phiên khác |
 | `POST` | `/auth/csrf` | ALL | — | Cấp token CSRF |
 
-### Danh mục & tìm kiếm (`/api/v1/catalog`) — C2
+### Danh mục & tìm kiếm (`/api/v1/products`, `/api/v1/catalog`) — C2
 
-| Method | Đường dẫn | Quyền | FR |
-|---|---|---|---|
-| `GET` | `/catalog/products` | ALL | `FR-CAT-01`, `04`→`10` |
-| `GET` | `/catalog/products/{slug}` | ALL | `FR-PDP-01`→`04` |
+| Method | Đường dẫn | Quyền | FR | Mô tả Phase 1 |
+|---|---|---|---|---|
+| `GET` | `/api/v1/products` | ALL | `FR-CAT-01` | Lọc sản phẩm Phase 1 (`query`, `category`, `brand`, `skinType`, `min_price`, `max_price`, `min_rating`, `sort_by`, `safe_for_me`, `page`, `per_page`) |
+| `GET` | `/api/v1/products/{id}` | ALL | `FR-PDP-01` | Chi tiết sản phẩm theo ID hoặc Slug hoặc Code |
+| `GET` | `/api/v1/products/categories` | ALL | `FR-CAT-02` | Danh sách danh mục sản phẩm |
+| `GET` | `/api/v1/products/brands` | ALL | `FR-CAT-04` | Danh sách thương hiệu mỹ phẩm |
+| `GET` | `/catalog/products` | ALL | `FR-CAT-01`, `04`→`10` | |
+| `GET` | `/catalog/products/{slug}` | ALL | `FR-PDP-01`→`04` | |
 | `GET` | `/catalog/products/{id}/similar` | ALL | `FR-PDP-08` |
 | `GET` | `/catalog/products/{id}/bought-together` | ALL | `FR-PDP-09` |
 | `GET` | `/catalog/products/{id}/explain` | ALL | `FR-PDP-13` |

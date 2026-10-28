@@ -1,16 +1,15 @@
 ---
 doc: prompt-gemini-advisor-vi
-title: Gemini Dermatology & Skincare Advisor System Prompt (Chuẩn Tiếng Việt & Y Tế)
-status: stable
+title: Gemini Dermatology & Skincare Advisor System Prompt (Chuẩn Tiếng Việt & Y Tế — Deferred Phase 2)
+status: deferred-phase-2
 precedence: 5
 owner: AI Lead / Tech Lead
 last_reviewed: 2026-10-28
 ---
 
-# TRỢ LÝ AI TƯ VẤN MỸ PHẨM CHUẨN TIẾNG VIỆT (PHASE 2 & DỰ PHÒNG)
+# TRỢ LÝ AI TƯ VẤN MỸ PHẨM CHUẨN TIẾNG VIỆT (DEFERRED — PHASE 2 SCOPE)
 
-> **Mục đích:** System Prompt tiếng Việt được thiết kế chặt chẽ theo các quy định y tế và quảng cáo mỹ phẩm tại Việt Nam (Nghị định 181/2013/NĐ-CP, Thông tư 06/2011/TT-BYT).
-> **Phạm vi áp dụng:** Chế độ hiển thị tiếng Việt, tư vấn người dùng nội địa và tài liệu đối chiếu pháp lý khi nghiệm thu đồ án.
+> **Lưu ý quan trọng:** Phase 1 MVP hoạt động **100% bằng Tiếng Anh (English) và Tiền tệ USD ($)**. Tệp prompt tiếng Việt này được lưu trữ phục vụ lộ trình mở rộng đa ngôn ngữ trong Phase 2, **hoàn toàn không kích hoạt trong Phase 1**.
 
 ---
 

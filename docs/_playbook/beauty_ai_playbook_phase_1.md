@@ -187,8 +187,10 @@ LIMIT 10;"
    - Hiển thị thẻ Chip lọc đang áp dụng và thanh trượt giá.
 
 ### ✅ Xong khi:
-- [ ] Chọn filter "Da dầu" chỉ hiển thị các sản phẩm kiềm dầu/trị mụn.
-- [ ] Bật toggle *"An toàn cho da tôi"*, các sản phẩm chứa thành phần dị ứng trong hồ sơ cá nhân lập tức biến mất khỏi màn hình.
+- [x] Chọn filter "Skin Type" (Oily / Dry / Combination / Normal / Sensitive) lọc chính xác các sản phẩm theo cơ địa da.
+- [x] Bật toggle *"Safe For My Skin (Auto-exclude Allergens)"*, các sản phẩm chứa thành phần dị ứng trong hồ sơ cá nhân lập tức biến mất khỏi màn hình.
+- [x] Tính toán và hiển thị huy hiệu `SuitabilityScore` (% Match) và cờ cảnh báo dị ứng đỏ trên thẻ sản phẩm `ProductCard`.
+- [x] Chuẩn hóa toàn bộ trang Catalog và giá bán sang 100% English & USD ($).
 
 ---
 

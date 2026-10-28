@@ -11,6 +11,8 @@ last_reviewed: 2026-10-25
 
 > Nguồn chân lý về kiến trúc trợ lý AI 3 tầng, đường ống 7 chặng, ẩn danh hóa dữ liệu người dùng và bộ lọc tuân thủ y tế / quảng cáo (Precedence 2 — Contracts).
 > Bắt buộc tuân thủ bất biến: INV-04, INV-05, INV-06, INV-12.
+>
+> 🌐 **Phạm Vi Ngôn Ngữ & Tiền Tệ Phase 1 (MVP):** Nền tảng Phase 1 hoạt động **100% bằng Tiếng Anh (English) và Tiền tệ USD ($)**. Toàn bộ System Prompt chính thức đang chạy là `docs/prompt/01_gemini_advisor_en.md`. Bộ prompt tiếng Việt chuẩn y tế (`docs/prompt/02_gemini_advisor_vi.md`) được lưu trữ dự thảo phục vụ mở rộng đa ngôn ngữ trong Phase 2.
 
 ---
 

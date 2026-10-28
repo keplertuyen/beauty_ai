@@ -13,6 +13,12 @@ public class BeautyAIDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<SkinProfile> SkinProfiles => Set<SkinProfile>();
     public DbSet<UserAllergy> UserAllergies => Set<UserAllergy>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Brand> Brands => Set<Brand>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Ingredient> Ingredients => Set<Ingredient>();
+    public DbSet<ProductIngredient> ProductIngredients => Set<ProductIngredient>();
+    public DbSet<Review> Reviews => Set<Review>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -103,6 +109,133 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.Note).HasColumnName("note").HasMaxLength(500);
             entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Ignore(e => e.UpdatedAtUtc);
+        });
+
+        // 4. Brand
+        modelBuilder.Entity<Brand>(entity =>
+        {
+            entity.ToTable("brands");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Slug).HasColumnName("slug").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.OriginCountry).HasColumnName("origin_country").HasMaxLength(100);
+            entity.Ignore(e => e.CreatedAtUtc);
+            entity.Ignore(e => e.UpdatedAtUtc);
+        });
+
+        // 5. Category
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.ToTable("categories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Slug).HasColumnName("slug").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.ParentId).HasColumnName("parent_id");
+            entity.Ignore(e => e.CreatedAtUtc);
+            entity.Ignore(e => e.UpdatedAtUtc);
+
+            entity.HasOne(e => e.Parent)
+                .WithMany(p => p.SubCategories)
+                .HasForeignKey(e => e.ParentId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // 6. Ingredient
+        modelBuilder.Entity<Ingredient>(entity =>
+        {
+            entity.ToTable("ingredients");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.InciName).HasColumnName("inci_name").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.FunctionGroup).HasColumnName("function_group").HasMaxLength(100);
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.IsActiveIngredient).HasColumnName("is_active_ingredient");
+            entity.Property(e => e.ComedogenicRating).HasColumnName("comedogenic_rating");
+            entity.Property(e => e.IrritationRating).HasColumnName("irritation_rating");
+            entity.Ignore(e => e.CreatedAtUtc);
+            entity.Ignore(e => e.UpdatedAtUtc);
+        });
+
+        // 7. Product
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.ToTable("products");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Code).HasColumnName("code").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Slug).HasColumnName("slug").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.BrandId).HasColumnName("brand_id").IsRequired();
+            entity.Property(e => e.CategoryId).HasColumnName("category_id").IsRequired();
+            entity.Property(e => e.PriceUsd).HasColumnName("price_usd").HasPrecision(10, 2).IsRequired();
+            entity.Property(e => e.VolumeMl).HasColumnName("volume_ml");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.ImageUrl).HasColumnName("image_url").HasMaxLength(500);
+            entity.Property(e => e.IngredientListRaw).HasColumnName("ingredient_list_raw").IsRequired();
+            entity.Property(e => e.TargetSkinTypes).HasColumnName("target_skin_types").HasColumnType("varchar(50)[]");
+            entity.Property(e => e.StockQuantity).HasColumnName("stock_quantity").HasDefaultValue(100);
+            entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Ignore(e => e.UpdatedAtUtc);
+
+            entity.HasOne(e => e.Brand)
+                .WithMany(b => b.Products)
+                .HasForeignKey(e => e.BrandId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 8. ProductIngredient
+        modelBuilder.Entity<ProductIngredient>(entity =>
+        {
+            entity.ToTable("product_ingredients");
+            entity.HasKey(e => new { e.ProductId, e.IngredientId });
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.IngredientId).HasColumnName("ingredient_id");
+            entity.Property(e => e.PositionOrder).HasColumnName("position_order");
+
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.ProductIngredients)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Ingredient)
+                .WithMany(i => i.ProductIngredients)
+                .HasForeignKey(e => e.IngredientId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 9. Review
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.ToTable("reviews");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.ProductCode).HasColumnName("product_code").HasMaxLength(50);
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.AuthorName).HasColumnName("author_name").HasMaxLength(255);
+            entity.Property(e => e.Rating).HasColumnName("rating").IsRequired();
+            entity.Property(e => e.SkinType).HasColumnName("skin_type").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.SkinConcerns).HasColumnName("skin_concerns").HasMaxLength(255);
+            entity.Property(e => e.Content).HasColumnName("content");
+            entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Ignore(e => e.UpdatedAtUtc);
+
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

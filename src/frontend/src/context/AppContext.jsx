@@ -26,64 +26,44 @@ export const AppProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [lang, setLang] = useState(localStorage.getItem('beautyai_lang') || 'vi');
-  const [currency, setCurrency] = useState(localStorage.getItem('beautyai_currency') || 'VND');
-  const [exchangeRate, setExchangeRate] = useState(Number(localStorage.getItem('beautyai_exchange_rate')) || 25400);
+  // Phase 1 Scope: Strictly English & USD Only
+  const [lang, setLang] = useState('en');
+  const [currency, setCurrency] = useState('USD');
+  const [exchangeRate, setExchangeRate] = useState(1);
   const [authLoading, setAuthLoading] = useState(!!token);
 
-  const changeLanguage = (newLang) => {
-    setLang(newLang);
-    localStorage.setItem('beautyai_lang', newLang);
-    document.documentElement.lang = newLang;
+  const changeLanguage = (_newLang) => {
+    // Phase 1 is locked to English (Phase 2 will introduce multi-language)
+    setLang('en');
+    localStorage.setItem('beautyai_lang', 'en');
+    document.documentElement.lang = 'en';
   };
 
-  const changeCurrency = (newCurr) => {
-    const normalized = newCurr === 'USD' ? 'USD' : 'VND';
-    setCurrency(normalized);
-    localStorage.setItem('beautyai_currency', normalized);
+  const changeCurrency = (_newCurr) => {
+    // Phase 1 is locked to USD
+    setCurrency('USD');
+    localStorage.setItem('beautyai_currency', 'USD');
   };
 
-  const formatPrice = useCallback((priceUsd, customRate = null) => {
+  const formatPrice = useCallback((priceUsd) => {
     const usd = parseFloat(priceUsd) || 0;
-    if (currency === 'VND') {
-      const rate = customRate || exchangeRate || 25400;
-      const vnd = Math.round((usd * rate) / 1000) * 1000;
-      return `${new Intl.NumberFormat('vi-VN').format(vnd)}₫`;
-    }
     return `$${usd.toFixed(2)}`;
-  }, [currency, exchangeRate]);
+  }, []);
 
-  const formatDualPrice = useCallback((priceUsd, customRate = null) => {
+  const formatDualPrice = useCallback((priceUsd) => {
     const usd = parseFloat(priceUsd) || 0;
-    const rate = customRate || exchangeRate || 25400;
-    const vnd = Math.round((usd * rate) / 1000) * 1000;
-    const vndStr = `${new Intl.NumberFormat('vi-VN').format(vnd)}₫`;
-    const usdStr = `$${usd.toFixed(2)}`;
-    return currency === 'VND' ? `${vndStr} (${usdStr})` : `${usdStr} (${vndStr})`;
-  }, [currency, exchangeRate]);
+    return `$${usd.toFixed(2)}`;
+  }, []);
 
   useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
-
-  useEffect(() => {
-    getCurrencySettings()
-      .then((res) => {
-        if (res.data?.usd_vnd_rate) {
-          setExchangeRate(Number(res.data.usd_vnd_rate));
-          localStorage.setItem('beautyai_exchange_rate', String(res.data.usd_vnd_rate));
-        }
-      })
-      .catch(() => {});
+    document.documentElement.lang = 'en';
+    localStorage.setItem('beautyai_lang', 'en');
+    localStorage.setItem('beautyai_currency', 'USD');
   }, []);
 
   const t = (key, fallback) => {
-    if (translations[lang] && translations[lang][key] !== undefined) {
-      return translations[lang][key];
-    }
-    const other = lang === 'vi' ? 'en' : 'vi';
-    if (translations[other] && translations[other][key] !== undefined) {
-      return translations[other][key];
+    if (translations.en && translations.en[key] !== undefined) {
+      return translations.en[key];
     }
     return fallback || key;
   };

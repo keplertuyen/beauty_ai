@@ -7,7 +7,10 @@ import { getProductImage, DEFAULT_PRODUCT_IMAGE } from '../utils/productImages';
 export default function ProductCard({ product }) {
   const { addItemToCart, toggleWishlistItem, isInWishlist, formatPrice, t } = useApp();
   const navigate = useNavigate();
-  const inWishlist = isInWishlist(product.product_id);
+  const productId = product.id ?? product.product_id;
+  const productName = product.name ?? product.product_name ?? 'Beauty Product';
+  const brandName = product.brandName ?? product.brand_name ?? 'BeautyAI Brand';
+  const inWishlist = isInWishlist(productId);
 
   const [imgSrc, setImgSrc] = useState(() => getProductImage(product, 500));
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -34,13 +37,16 @@ export default function ProductCard({ product }) {
 
   const rating = parseFloat(product.rating) || 0;
   const price = parseFloat(product.price_usd) || 0;
+  const suitability = product.suitabilityScore ?? product.suitability_score;
+  const hasAllergyWarning = product.hasAllergyWarning || product.has_allergy_warning;
+  const allergen = product.matchedAllergen || product.matched_allergen;
 
   return (
     <div className="product-card">
       {/* Image */}
       <div
         className="product-card-image"
-        onClick={() => navigate(`/products/${product.product_id}`)}
+        onClick={() => navigate(`/products/${productId}`)}
         style={{ cursor: 'pointer', background: 'var(--bg-secondary)', position: 'relative', overflow: 'hidden' }}
       >
         {!imgLoaded && !imgError && (
@@ -49,7 +55,7 @@ export default function ProductCard({ product }) {
         {!imgError ? (
           <img
             src={imgSrc}
-            alt={product.product_name}
+            alt={productName}
             className={`product-card-real-img ${imgLoaded ? 'loaded' : ''}`}
             loading="lazy"
             referrerPolicy="no-referrer"
@@ -64,12 +70,44 @@ export default function ProductCard({ product }) {
           />
         ) : (
           <span className="product-card-placeholder" style={{ fontSize: '3.5rem' }}>
-            {getCategoryEmoji(product.primary_category)}
+            {getCategoryEmoji(product.categoryName || product.primary_category)}
           </span>
         )}
 
         {/* Badges */}
         <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', flexDirection: 'column', gap: 6, zIndex: 2 }}>
+          {hasAllergyWarning && (
+            <span
+              className="badge"
+              style={{
+                background: '#EF4444',
+                color: '#FFFFFF',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                padding: '3px 8px',
+                borderRadius: '6px',
+                boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)'
+              }}
+            >
+              ⚠️ ALLERGY: {allergen || 'Contains allergen'}
+            </span>
+          )}
+          {!hasAllergyWarning && suitability != null && suitability > 0 && (
+            <span
+              className="badge"
+              style={{
+                background: suitability >= 90 ? 'rgba(16, 185, 129, 0.92)' : 'rgba(74, 144, 226, 0.92)',
+                color: '#FFFFFF',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                padding: '3px 8px',
+                borderRadius: '6px',
+                backdropFilter: 'blur(4px)'
+              }}
+            >
+              ✨ {suitability}% MATCH
+            </span>
+          )}
           {product.new == 1 && <span className="badge badge-new" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>{t('badge_new', 'NEW')}</span>}
           {product.sale_price_usd && <span className="badge badge-sale" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>{t('badge_sale', 'SALE')}</span>}
           {product.limited_edition == 1 && !product.sale_price_usd && (
@@ -97,7 +135,7 @@ export default function ProductCard({ product }) {
             zIndex: 2,
             transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease',
           }}
-          onClick={(e) => { e.stopPropagation(); toggleWishlistItem(product.product_id); }}
+          onClick={(e) => { e.stopPropagation(); toggleWishlistItem(productId); }}
           aria-label={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
           title={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
         >
@@ -111,18 +149,18 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Body */}
-      <div className="product-card-body" onClick={() => navigate(`/products/${product.product_id}`)} style={{ cursor: 'pointer' }}>
-        <div className="product-card-brand">{product.brand_name}</div>
-        <div className="product-card-name" title={product.product_name}>{product.product_name}</div>
+      <div className="product-card-body" onClick={() => navigate(`/products/${productId}`)} style={{ cursor: 'pointer' }}>
+        <div className="product-card-brand">{brandName}</div>
+        <div className="product-card-name" title={productName}>{productName}</div>
         
         {/* Rating */}
         {rating > 0 && (
           <div className="product-card-rating" style={{ color: 'var(--accent-amber)' }}>
             <Star size={13} fill="currentColor" color="var(--accent-amber)" />
             <span style={{ fontWeight: 700, color: 'var(--text-primary)', marginLeft: 2 }}>{rating.toFixed(1)}</span>
-            {product.reviews && (
+            {(product.reviewsCount || product.reviews) && (
               <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginLeft: 2 }}>
-                ({parseInt(product.reviews).toLocaleString()})
+                ({parseInt(product.reviewsCount ?? product.reviews).toLocaleString()})
               </span>
             )}
           </div>

@@ -14,7 +14,7 @@ elif [ -n "${HOME:-}" ] && [ -d "${HOME}/.dotnet" ]; then
 fi
 
 echo "==> Building .NET solution (BeautyAI.slnx)..."
-dotnet build BeautyAI.slnx --no-restore -warnaserror
+dotnet build BeautyAI.slnx --no-restore -warnaserror -m:1 -nr:false
 
 echo "==> Building Frontend..."
 npm --prefix src/frontend run build

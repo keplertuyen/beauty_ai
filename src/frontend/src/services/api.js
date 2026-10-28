@@ -7,13 +7,12 @@ const API = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Auto-attach JWT token & Language header
+// Auto-attach JWT token & Language header (Strictly English in Phase 1)
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('beautyai_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   
-  const lang = localStorage.getItem('beautyai_lang') || 'vi';
-  config.headers['Accept-Language'] = lang;
+  config.headers['Accept-Language'] = 'en';
   
   return config;
 });

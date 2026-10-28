@@ -110,25 +110,13 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="navbar-actions">
-            {/* Currency Switcher (VND / USD) */}
-            <button
-              className="lang-toggle-btn"
-              onClick={() => changeCurrency(currency === 'VND' ? 'USD' : 'VND')}
-              title={currency === 'VND' ? 'Switch to USD ($)' : 'Chuyển sang VND (₫)'}
-              style={{ minWidth: '58px', justifyContent: 'center' }}
+            {/* Currency indicator (Phase 1 Global USD) */}
+            <span
+              className="badge badge-secondary"
+              style={{ padding: '4px 10px', fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)' }}
             >
-              <span className="lang-text">{currency === 'VND' ? '₫ VND' : '$ USD'}</span>
-            </button>
-
-            {/* Language Switcher */}
-            <button
-              className="lang-toggle-btn"
-              onClick={() => changeLanguage(lang === 'vi' ? 'en' : 'vi')}
-              title={lang === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
-            >
-              <span className="lang-flag">{lang === 'vi' ? '🇻🇳' : '🇬🇧'}</span>
-              <span className="lang-text">{lang === 'vi' ? 'VI' : 'EN'}</span>
-            </button>
+              $ USD
+            </span>
 
             {/* Search */}
             <button className="nav-icon-btn" onClick={() => setSearchOpen(!searchOpen)} aria-label={t('nav_search_btn')}>
@@ -246,22 +234,10 @@ export default function Navbar() {
                 {t('nav_login')} / {t('nav_register')}
               </button>
             )}
-            <div className="mobile-lang-row" style={{ marginTop: '8px', borderTop: '1px solid var(--glass-border)', paddingTop: '12px', display: 'flex', gap: '8px' }}>
-              <button
-                className="lang-toggle-btn"
-                style={{ flex: 1, justifyContent: 'center', margin: 0 }}
-                onClick={() => changeCurrency(currency === 'VND' ? 'USD' : 'VND')}
-              >
-                <span className="lang-text">{currency === 'VND' ? '₫ VND' : '$ USD'}</span>
-              </button>
-              <button
-                className="lang-toggle-btn"
-                style={{ flex: 1, justifyContent: 'center', margin: 0 }}
-                onClick={() => changeLanguage(lang === 'vi' ? 'en' : 'vi')}
-              >
-                <span className="lang-flag">{lang === 'vi' ? '🇻🇳' : '🇬🇧'}</span>
-                <span className="lang-text" style={{ marginLeft: '8px' }}>{lang === 'vi' ? 'VI - Tiếng Việt' : 'EN - English'}</span>
-              </button>
+            <div className="mobile-lang-row" style={{ marginTop: '8px', borderTop: '1px solid var(--glass-border)', paddingTop: '12px', display: 'flex', justifyContent: 'center' }}>
+              <span className="badge badge-secondary" style={{ padding: '6px 16px', fontSize: '0.8rem', fontWeight: 600 }}>
+                English (US) • USD ($)
+              </span>
             </div>
           </div>
         )}

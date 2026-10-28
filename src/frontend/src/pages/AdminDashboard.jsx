@@ -241,15 +241,6 @@ export default function AdminDashboard() {
             <p className="ad-page-subtitle">{t('admin_subtitle')}</p>
           </div>
           <div className="ad-header-actions">
-            {/* Language Switcher */}
-            <button
-              className="lang-toggle-btn ad-lang-toggle"
-              onClick={() => changeLanguage(lang === 'vi' ? 'en' : 'vi')}
-              title={lang === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
-            >
-              <span className="lang-flag">{lang === 'vi' ? '🇻🇳' : '🇬🇧'}</span>
-              <span className="lang-text">{lang === 'vi' ? 'VI' : 'EN'}</span>
-            </button>
             <div className="ad-header-badge">
               <span className="ad-live-dot" />
               {t('admin_live')}

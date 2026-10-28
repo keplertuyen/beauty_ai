@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, X, ChevronDown, RotateCcw, Sparkles } from 'lucide-react';
+import { Search, SlidersHorizontal, X, ChevronDown, RotateCcw, Sparkles, ShieldCheck } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { getProducts, getCategories } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useApp } from '../context/AppContext';
@@ -29,29 +30,38 @@ function SkeletonCard() {
 /* ─── Main Page ──────────────────────────────────────────────── */
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t, lang, formatPrice } = useApp();
+  const { t, lang, formatPrice, user } = useApp();
 
   const CERT_OPTIONS = [
-    { value: 'Vegan', label: lang === 'en' ? 'Vegan' : 'Thuần chay (Vegan)' },
-    { value: 'Cruelty-Free', label: lang === 'en' ? 'Cruelty-Free' : 'Không thử nghiệm ĐV' },
+    { value: 'Vegan', label: 'Vegan' },
+    { value: 'Cruelty-Free', label: 'Cruelty-Free' },
     { value: 'Clean at Sephora', label: 'Clean at Sephora' },
   ];
 
   const FREE_FROM_OPTIONS = [
-    { value: 'fragrance_free', label: lang === 'en' ? 'Fragrance-Free' : 'Không hương liệu' },
-    { value: 'paraben_free', label: lang === 'en' ? 'Paraben-Free' : 'Không Paraben' },
-    { value: 'alcohol_free', label: lang === 'en' ? 'Alcohol-Free' : 'Không cồn khô' },
-    { value: 'sulfate_free', label: lang === 'en' ? 'Sulfate-Free' : 'Không Sulfate' },
+    { value: 'fragrance_free', label: 'Fragrance-Free' },
+    { value: 'paraben_free', label: 'Paraben-Free' },
+    { value: 'alcohol_free', label: 'Alcohol-Free' },
+    { value: 'sulfate_free', label: 'Sulfate-Free' },
+  ];
+
+  const SKIN_TYPE_OPTIONS = [
+    { value: '', label: 'All Types' },
+    { value: 'Oily', label: 'Oily' },
+    { value: 'Dry', label: 'Dry' },
+    { value: 'Combination', label: 'Combination' },
+    { value: 'Normal', label: 'Normal' },
+    { value: 'Sensitive', label: 'Sensitive' },
   ];
 
   const ACTIVE_OPTIONS = [
     { value: 'niacinamide', label: 'Niacinamide' },
-    { value: 'bha', label: 'BHA (Salicylic)' },
+    { value: 'bha', label: 'BHA (Salicylic Acid)' },
     { value: 'aha', label: 'AHA (Glycolic/Lactic)' },
     { value: 'retinol', label: 'Retinol' },
     { value: 'hyaluronic acid', label: 'Hyaluronic Acid' },
     { value: 'vitamin c', label: 'Vitamin C' },
-    { value: 'centella', label: lang === 'en' ? 'Centella (Cica)' : 'Rau má (Centella)' },
+    { value: 'centella', label: 'Centella (Cica)' },
     { value: 'ceramide', label: 'Ceramide' },
     { value: 'peptide', label: 'Peptides' },
   ];
@@ -71,18 +81,20 @@ export default function Products() {
   ];
 
   /* Filters state — initialised from URL params */
-  const [searchText,     setSearchText]     = useState(searchParams.get('query')    || '');
-  const [selectedCats,   setSelectedCats]   = useState(() => {
+  const [searchText,         setSearchText]         = useState(searchParams.get('query')    || '');
+  const [selectedCats,       setSelectedCats]       = useState(() => {
     const c = searchParams.get('category');
     return c ? [c] : [];
   });
-  const [priceRange,     setPriceRange]     = useState([0, 500]);
-  const [minRating,      setMinRating]      = useState('');
-  const [sortBy,         setSortBy]         = useState('rating');
-  const [selectedCerts,  setSelectedCerts]  = useState([]);
-  const [selectedFreeFrom, setSelectedFreeFrom] = useState([]);
-  const [selectedActives, setSelectedActives] = useState([]);
-  const [sidebarOpen,    setSidebarOpen]    = useState(false);  // mobile toggle
+  const [selectedSkinType,   setSelectedSkinType]   = useState(searchParams.get('skinType') || '');
+  const [safeForMe,          setSafeForMe]          = useState(false);
+  const [priceRange,         setPriceRange]         = useState([0, 500]);
+  const [minRating,          setMinRating]          = useState('');
+  const [sortBy,             setSortBy]             = useState('rating');
+  const [selectedCerts,      setSelectedCerts]      = useState([]);
+  const [selectedFreeFrom,   setSelectedFreeFrom]   = useState([]);
+  const [selectedActives,    setSelectedActives]    = useState([]);
+  const [sidebarOpen,        setSidebarOpen]        = useState(false);  // mobile toggle
 
   /* Product data */
   const [products,    setProducts]    = useState([]);
@@ -130,6 +142,8 @@ export default function Products() {
       };
       if (searchText.trim())    params.query      = searchText.trim();
       if (selectedCats.length)  params.category   = selectedCats[0];
+      if (selectedSkinType)     params.skinType   = selectedSkinType;
+      if (safeForMe)            params.safe_for_me = true;
       
       const minP = priceRange[0] === '' ? 0 : Number(priceRange[0]);
       const maxP = priceRange[1] === '' ? 500 : Number(priceRange[1]);
@@ -159,7 +173,7 @@ export default function Products() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [searchText, selectedCats, priceRange, minRating, sortBy, selectedCerts, selectedFreeFrom, selectedActives]);
+  }, [searchText, selectedCats, selectedSkinType, safeForMe, priceRange, minRating, sortBy, selectedCerts, selectedFreeFrom, selectedActives]);
 
   /* ── Re-fetch when filters change (debounce search) ─────────  */
   useEffect(() => {
@@ -196,6 +210,8 @@ export default function Products() {
   const resetFilters = () => {
     setSearchText('');
     setSelectedCats([]);
+    setSelectedSkinType('');
+    setSafeForMe(false);
     setPriceRange([0, 500]);
     setMinRating('');
     setSortBy('rating');
@@ -247,6 +263,8 @@ export default function Products() {
   const activeFilterCount =
     (searchText ? 1 : 0) +
     selectedCats.length +
+    (selectedSkinType ? 1 : 0) +
+    (safeForMe ? 1 : 0) +
     selectedCerts.length +
     selectedFreeFrom.length +
     selectedActives.length +
@@ -310,6 +328,91 @@ export default function Products() {
                 >
                   <X size={18} />
                 </button>
+              </div>
+            </div>
+
+            {/* ─ USP Core: Safe For My Skin (Allergy Exclusion Toggle) ─ */}
+            <div
+              className="filter-section"
+              style={{
+                background: safeForMe ? 'rgba(16, 185, 129, 0.08)' : 'var(--bg-secondary)',
+                border: safeForMe ? '1.5px solid #10B981' : '1px solid var(--glass-border)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                marginBottom: '16px',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
+                    <span>🛡️</span> Safe For My Skin
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    Auto-hides your allergens
+                  </div>
+                </div>
+                <label style={{ position: 'relative', display: 'inline-block', width: '42px', height: '24px', cursor: 'pointer', margin: 0 }}>
+                  <input
+                    type="checkbox"
+                    checked={safeForMe}
+                    onChange={(e) => {
+                      if (!user) {
+                        toast.error('Please log in with your Digital Skin ID to enable allergy filtering');
+                        return;
+                      }
+                      setSafeForMe(e.target.checked);
+                    }}
+                    style={{ opacity: 0, width: 0, height: 0 }}
+                  />
+                  <span style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: safeForMe ? '#10B981' : '#D1D5DB',
+                    borderRadius: '24px', transition: '.25s'
+                  }}>
+                    <span style={{
+                      position: 'absolute', content: '""', height: '18px', width: '18px',
+                      left: safeForMe ? '21px' : '3px', bottom: '3px',
+                      backgroundColor: 'white', borderRadius: '50%', transition: '.25s',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                    }} />
+                  </span>
+                </label>
+              </div>
+              {safeForMe && (
+                <div style={{ marginTop: '8px', fontSize: '0.72rem', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <ShieldCheck size={13} /> Active: Products with allergens are hidden
+                </div>
+              )}
+            </div>
+
+            {/* ─ Skin Type Filter ─ */}
+            <div className="filter-section">
+              <div className="filter-title">Skin Type</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {SKIN_TYPE_OPTIONS.map(opt => {
+                  const active = selectedSkinType === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setSelectedSkinType(opt.value)}
+                      style={{
+                        padding: '5px 11px',
+                        borderRadius: '999px',
+                        fontSize: '0.78rem',
+                        fontWeight: active ? 600 : 500,
+                        border: active ? '1.5px solid var(--primary)' : '1px solid var(--glass-border)',
+                        background: active ? 'var(--primary)' : 'var(--bg-secondary)',
+                        color: active ? '#FFFFFF' : 'var(--text-primary)',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -550,6 +653,18 @@ export default function Products() {
               {/* Active filter chips */}
               {activeFilterCount > 0 && (
                 <div className="active-filters">
+                  {safeForMe && (
+                    <span className="filter-chip" style={{ background: '#10B981', color: '#FFFFFF', fontWeight: 600 }}>
+                      🛡️ Safe For My Skin
+                      <button onClick={() => setSafeForMe(false)}><X size={11} color="#FFFFFF" /></button>
+                    </span>
+                  )}
+                  {selectedSkinType && (
+                    <span className="filter-chip">
+                      🧴 Skin: {selectedSkinType}
+                      <button onClick={() => setSelectedSkinType('')}><X size={11} /></button>
+                    </span>
+                  )}
                   {searchText && (
                     <span className="filter-chip">
                       🔍 {searchText}

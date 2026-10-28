@@ -9,20 +9,20 @@ last_reviewed: 2026-10-28
 
 # THƯ VIỆN PROMPT TẬP TRUNG — BeautyAI Platform (`docs/prompt/`)
 
-> Thư mục tập trung toàn bộ các System Prompts, Structured Prompts và Workflow Prompts được sử dụng trong toàn bộ hệ thống BeautyAI (bao gồm cả Phase 1 MVP và định hướng Phase 2).
+> **Quy định phạm vi Phase 1 (MVP):** Nền tảng Phase 1 hoạt động **100% bằng Tiếng Anh (English) và Tiền tệ USD ($)**. Không hỗ trợ đa ngôn ngữ hay Tiếng Việt trong Phase 1 nhằm đảm bảo tính chuẩn xác của dữ liệu mỹ phẩm quốc tế INCI và dataset Sephora. Mọi tính năng dịch thuật / Tiếng Việt được chuyển giao sang Phase 2.
 
 ---
 
 ## 📑 Danh Mục Prompt Hệ Thống
 
-| Tệp Prompt | Mục Đích & Phạm Vi Áp Dụng | Mô Hình / Tầng | Ngôn Ngữ |
-|---|---|---|---|
-| [`01_gemini_advisor_en.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/01_gemini_advisor_en.md) | **System Prompt chính thức của Phase 1** cho Trợ lý Tư vấn Da & Mỹ phẩm tích hợp Gemini API (Grounding với Digital Skin ID & Catalog 300 sản phẩm). | Gemini 1.5 / 2.0 Flash | English (USD) |
-| [`02_gemini_advisor_vi.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/02_gemini_advisor_vi.md) | **System Prompt Tiếng Việt chuẩn y tế** (Tuân thủ Nghị định 181/2013/NĐ-CP, cấm từ ngữ "chữa trị", disclaimer an toàn). | Gemini Flash | Tiếng Việt (VNĐ) |
-| [`03_routine_generator.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/03_routine_generator.md) | **Prompt sinh chu trình Routine AM/PM** tự động từ 3 khối Digital Skin ID (Loại da, Blacklist dị ứng, Vấn đề da & Ngân sách). | Gemini / Rules Engine | Song ngữ (EN/VI) |
-| [`04_inci_analyzer.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/04_inci_analyzer.md) | **Prompt bóc tách & giải mã thành phần INCI** từ đoạn văn bản/nhãn mỹ phẩm người dùng dán vào, xếp nhóm công năng & cảnh báo kích ứng. | Gemini API | Song ngữ (EN/VI) |
-| [`05_chat_to_cart_intent.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/05_chat_to_cart_intent.md) | **Prompt phân loại ý định (Intent Recognition) & Chat-to-Cart** ("Thêm sản phẩm X vào giỏ", "Mua cả chu trình", hỏi giá, tìm sản phẩm thay thế). | Gemini Function Calling | Song ngữ (EN/VI) |
-| [`06_ai_agent_workflows.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/06_ai_agent_workflows.md) | **Tổng hợp các prompt điều phối phát triển dự án** (Kickoff, QA Test Design, Review, Architecture Options, Quality Gate). | AI Coding Assistants | Song ngữ |
+| Tệp Prompt | Mục Đích & Phạm Vi Áp Dụng | Mô Hình / Tầng | Ngôn Ngữ & Tiền Tệ | Trạng Thái |
+|---|---|---|---|---|
+| [`01_gemini_advisor_en.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/01_gemini_advisor_en.md) | **System Prompt chính thức của Phase 1** cho Trợ lý Tư vấn Da & Mỹ phẩm tích hợp Gemini API (Grounding với Digital Skin ID & Catalog 300 sản phẩm). | Gemini 1.5 / 2.0 Flash | **English (USD)** | **Active (Phase 1)** |
+| [`02_gemini_advisor_vi.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/02_gemini_advisor_vi.md) | System Prompt Tiếng Việt chuẩn y tế (Tuân thủ Nghị định 181/2013/NĐ-CP). Dự thảo phục vụ mở rộng thị trường nội địa. | Gemini Flash | Tiếng Việt (VNĐ) | *Deferred (Phase 2)* |
+| [`03_routine_generator.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/03_routine_generator.md) | **Prompt sinh chu trình Routine AM/PM** tự động từ 3 khối Unified Digital Skin ID (Skin Type, Allergy Blacklist, Skin Concerns & Budget). | Gemini / Rules Engine | **English (USD)** | **Active (Phase 1)** |
+| [`04_inci_analyzer.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/04_inci_analyzer.md) | **Prompt bóc tách & giải mã thành phần INCI** từ đoạn văn bản/nhãn mỹ phẩm người dùng dán vào, xếp nhóm công năng & cảnh báo kích ứng. | Gemini API | **English (INCI)** | **Active (Phase 1)** |
+| [`05_chat_to_cart_intent.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/05_chat_to_cart_intent.md) | **Prompt phân loại ý định (Intent Recognition) & Chat-to-Cart** ("Add product X to cart", "Buy whole routine", check price, find safe alternatives). | Gemini Function Calling | **English (USD)** | **Active (Phase 1)** |
+| [`06_ai_agent_workflows.md`](file:///Users/trucuyen/Documents/beauty_ai/docs/prompt/06_ai_agent_workflows.md) | **Tổng hợp các prompt điều phối phát triển dự án** (Kickoff, QA Test Design, Review, Architecture Options, Quality Gate). | AI Coding Assistants | Standard | **Active** |
 
 ---
 
