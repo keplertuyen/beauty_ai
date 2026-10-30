@@ -830,6 +830,26 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -901,6 +921,26 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -953,71 +993,87 @@
           }
         }
       },
-      "AnalyzedIngredientDto": {
+      "AnalyzedCautionDto": {
         "required": [
-          "name",
-          "inci_name",
-          "category",
-          "safety",
-          "function",
-          "benefits",
+          "type",
+          "title",
           "caution",
-          "comedogenic_rating",
-          "irritation_rating",
-          "target_areas"
+          "ingredients_involved"
         ],
         "type": "object",
         "properties": {
-          "name": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "caution": {
+            "type": "string"
+          },
+          "ingredients_involved": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AnalyzedFunctionalGroupDto": {
+        "required": [
+          "group_title",
+          "plain_explanation",
+          "count",
+          "ingredients"
+        ],
+        "type": "object",
+        "properties": {
+          "group_title": {
+            "type": "string"
+          },
+          "plain_explanation": {
+            "type": "string"
+          },
+          "count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AnalyzedKeyIngredientDto": {
+        "required": [
+          "common_name",
+          "inci_name",
+          "role_label",
+          "explanation",
+          "is_featured_in_product_name"
+        ],
+        "type": "object",
+        "properties": {
+          "common_name": {
             "type": "string"
           },
           "inci_name": {
             "type": "string"
           },
-          "category": {
+          "role_label": {
             "type": "string"
           },
-          "safety": {
+          "explanation": {
             "type": "string"
           },
-          "function": {
-            "type": "string"
-          },
-          "benefits": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "caution": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "comedogenic_rating": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "irritation_rating": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "target_areas": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+          "is_featured_in_product_name": {
+            "type": "boolean"
           }
         }
       },
@@ -1040,21 +1096,6 @@
             "type": "string"
           },
           "role": {
-            "type": "string"
-          }
-        }
-      },
-      "CautionDto": {
-        "required": [
-          "caution",
-          "ingredient"
-        ],
-        "type": "object",
-        "properties": {
-          "caution": {
-            "type": "string"
-          },
-          "ingredient": {
             "type": "string"
           }
         }
@@ -1082,45 +1123,6 @@
           },
           "recommendation": {
             "type": "string"
-          }
-        }
-      },
-      "CompatibleSkinTypeDto": {
-        "required": [
-          "key",
-          "score",
-          "vi_name"
-        ],
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string"
-          },
-          "score": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "vi_name": {
-            "type": "string"
-          }
-        }
-      },
-      "ConditionEvaluationDto": {
-        "required": [
-          "condition_name",
-          "is_suitable"
-        ],
-        "type": "object",
-        "properties": {
-          "condition_name": {
-            "type": "string"
-          },
-          "is_suitable": {
-            "type": "boolean"
           }
         }
       },
@@ -1270,10 +1272,21 @@
             "type": [
               "null",
               "string"
-            ],
-            "default": "face"
+            ]
+          },
+          "department": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "product_name": {
             "type": [
               "null",
               "string"
@@ -1296,33 +1309,80 @@
       "InciAnalysisResponse": {
         "required": [
           "summary",
-          "safety_score",
-          "compatible_skin_types",
+          "verdict",
+          "verdict_label",
+          "verdict_reason",
+          "requires_skin_id",
+          "user_skin_type",
+          "target_area",
+          "department",
+          "has_allergy_warning",
+          "allergy_matches",
+          "key_ingredients",
+          "functional_groups",
+          "benefits_title",
           "benefits",
           "cautions",
           "combination_warnings",
-          "condition_evaluation",
-          "identified_ingredients",
-          "unknown_ingredients"
+          "fragrance_disclosure",
+          "total_ingredients_count",
+          "raw_inci_list"
         ],
         "type": "object",
         "properties": {
           "summary": {
             "type": "string"
           },
-          "safety_score": {
-            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
-            "type": [
-              "number",
-              "string"
-            ],
-            "format": "double"
+          "verdict": {
+            "type": "string"
           },
-          "compatible_skin_types": {
+          "verdict_label": {
+            "type": "string"
+          },
+          "verdict_reason": {
+            "type": "string"
+          },
+          "requires_skin_id": {
+            "type": "boolean"
+          },
+          "user_skin_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "target_area": {
+            "type": "string"
+          },
+          "department": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "has_allergy_warning": {
+            "type": "boolean"
+          },
+          "allergy_matches": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CompatibleSkinTypeDto"
+              "type": "string"
             }
+          },
+          "key_ingredients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyzedKeyIngredientDto"
+            }
+          },
+          "functional_groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnalyzedFunctionalGroupDto"
+            }
+          },
+          "benefits_title": {
+            "type": "string"
           },
           "benefits": {
             "type": "array",
@@ -1333,7 +1393,7 @@
           "cautions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CautionDto"
+              "$ref": "#/components/schemas/AnalyzedCautionDto"
             }
           },
           "combination_warnings": {
@@ -1342,23 +1402,21 @@
               "$ref": "#/components/schemas/CombinationWarningDto"
             }
           },
-          "condition_evaluation": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/ConditionEvaluationDto"
-              }
+          "fragrance_disclosure": {
+            "type": [
+              "null",
+              "string"
             ]
           },
-          "identified_ingredients": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AnalyzedIngredientDto"
-            }
+          "total_ingredients_count": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           },
-          "unknown_ingredients": {
+          "raw_inci_list": {
             "type": "array",
             "items": {
               "type": "string"

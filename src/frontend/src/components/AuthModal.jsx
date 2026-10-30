@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import './AuthModal.css';
@@ -8,6 +9,7 @@ export default function AuthModal() {
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [showPassword, setShowPassword] = useState(false);
   const { login, register, loading, t } = useApp();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     email: '', password: '', name: '', gender: '', skin_type: '',
@@ -27,7 +29,14 @@ export default function AuthModal() {
     } else {
       ok = await register(form);
     }
-    if (ok) setOpen(false);
+    if (ok) {
+      setOpen(false);
+      const pendingRedirect = sessionStorage.getItem('beautyai_post_login_redirect');
+      if (pendingRedirect) {
+        sessionStorage.removeItem('beautyai_post_login_redirect');
+        navigate(pendingRedirect);
+      }
+    }
   };
 
   if (!open) return null;

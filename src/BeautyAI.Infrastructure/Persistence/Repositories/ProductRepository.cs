@@ -1,6 +1,7 @@
 using BeautyAI.Application.DTOs;
 using BeautyAI.Application.Interfaces.Repositories;
 using BeautyAI.Domain.Entities;
+using BeautyAI.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BeautyAI.Infrastructure.Persistence.Repositories;
@@ -76,12 +77,16 @@ public class ProductRepository : IProductRepository
             query = query.Where(p => p.PriceUsd <= filter.MaxPrice.Value);
         }
 
-        // 6. Safe For Me: Zero-Tolerance Allergy Blacklist Exclusion
-        if (allergyBlacklist != null)
+        // 6. Safe For Me: Zero-Tolerance Allergy Blacklist Exclusion + Group B Unverified Cosmetic Exclusion
+        if (filter.SafeForMe || allergyBlacklist != null)
         {
-            var allergens = allergyBlacklist
-                .Where(a => !string.IsNullOrWhiteSpace(a))
-                .Select(a => a.Trim().ToLower())
+            // Exclude Group B cosmetics that lack manufacturer INCI data (keep Group A Tools & Brushes)
+            query = query.Where(p =>
+                p.Department == "Tools & Brushes" ||
+                (!string.IsNullOrEmpty(p.IngredientListRaw) && p.IngredientListRaw != "No ingredients listed"));
+
+            var allergens = CosmeticKnowledgeBase.ExpandAllergyBlacklist(allergyBlacklist)
+                .Select(a => a.ToLower())
                 .Distinct()
                 .ToList();
 
@@ -178,9 +183,13 @@ public class ProductRepository : IProductRepository
 
         if (allergyBlacklist != null && allergyBlacklist.Any())
         {
-            var allergens = allergyBlacklist
-                .Where(a => !string.IsNullOrWhiteSpace(a))
-                .Select(a => a.Trim().ToLower())
+            query = query.Where(p =>
+                p.Department == "Tools & Brushes" ||
+                (!string.IsNullOrEmpty(p.IngredientListRaw) && p.IngredientListRaw != "No ingredients listed"));
+
+            var allergens = CosmeticKnowledgeBase.ExpandAllergyBlacklist(allergyBlacklist)
+                .Select(a => a.ToLower())
+                .Distinct()
                 .ToList();
 
             if (allergens.Any())

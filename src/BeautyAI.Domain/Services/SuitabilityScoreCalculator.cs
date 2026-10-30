@@ -2,20 +2,23 @@ using BeautyAI.Domain.Entities;
 
 namespace BeautyAI.Domain.Services;
 
-public record SuitabilityScoreResult(
-    int SuitabilityScore,
+public record SuitabilityVerdictResult(
+    string Verdict,
+    string VerdictLabel,
     bool HasAllergyWarning,
     string? MatchedAllergen = null,
-    string? MatchReason = null
+    string? MatchReason = null,
+    bool HasIngredients = true,
+    bool IsNonCosmeticTool = false
 );
 
 /// <summary>
-/// Domain service implementing INV-01: Suitability calculation based on skin profile and allergy blacklist.
-/// NEVER computes any safety/hazard scores.
+/// Domain service implementing INV-01: Text-based suitability verdict calculation based on skin profile
+/// and expanded allergy blacklist. NEVER computes any numeric safety/hazard or percentage scores.
 /// </summary>
 public static class SuitabilityScoreCalculator
 {
-    public static SuitabilityScoreResult Calculate(
+    public static SuitabilityVerdictResult Calculate(
         Product product,
         SkinProfile? skinProfile,
         IEnumerable<string>? allergyBlacklist)
@@ -23,89 +26,176 @@ public static class SuitabilityScoreCalculator
         if (product == null)
             throw new ArgumentNullException(nameof(product));
 
-        // 1. Zero-Allergy Check: If any allergen is present, suitability is strictly 0
+        var department = product.Department ?? "Skincare";
+        var categoryName = product.Category?.Name ?? "";
+        var targetArea = CosmeticKnowledgeBase.ResolveTargetArea(department, categoryName);
+
+        // 1. Group A: Non-cosmetic Tools & Accessories
+        if (string.Equals(department, "Tools & Brushes", StringComparison.OrdinalIgnoreCase) ||
+            targetArea == "non-cosmetic")
+        {
+            return new SuitabilityVerdictResult(
+                Verdict: "AccessoryTool",
+                VerdictLabel: "Accessory / Tool",
+                HasAllergyWarning: false,
+                MatchedAllergen: null,
+                MatchReason: "Physical beauty tool or accessory — contains no chemical cosmetic ingredients.",
+                HasIngredients: false,
+                IsNonCosmeticTool: true
+            );
+        }
+
+        // 2. Group B: Cosmetic product missing manufacturer INCI list
+        var rawInci = (product.IngredientListRaw ?? "").Trim();
+        var hasStructured = product.ProductIngredients != null && product.ProductIngredients.Count > 0;
+        var hasRaw = !string.IsNullOrWhiteSpace(rawInci) &&
+                     !string.Equals(rawInci, "No ingredients listed", StringComparison.OrdinalIgnoreCase) &&
+                     rawInci.Length >= 3;
+
+        if (!hasRaw && !hasStructured)
+        {
+            return new SuitabilityVerdictResult(
+                Verdict: "InsufficientData",
+                VerdictLabel: "Insufficient INCI Data",
+                HasAllergyWarning: false,
+                MatchedAllergen: null,
+                MatchReason: "Manufacturer has not provided a detailed INCI list for this product — unable to cross-check against your allergy profile.",
+                HasIngredients: false,
+                IsNonCosmeticTool: false
+            );
+        }
+
+        // 3. Zero-Allergy Check (using expanded synonym dictionary + structured & raw ingredients)
         if (allergyBlacklist != null)
         {
-            var allergens = allergyBlacklist
-                .Where(a => !string.IsNullOrWhiteSpace(a))
-                .Select(a => a.Trim().ToLowerInvariant())
-                .ToList();
-
-            if (allergens.Count > 0)
+            // Check structured ingredients first
+            if (product.ProductIngredients != null)
             {
-                // Check in structured product ingredients
-                var matchedInIngredients = product.ProductIngredients?
-                    .Select(pi => pi.Ingredient?.InciName)
-                    .FirstOrDefault(inci => inci != null && allergens.Contains(inci.ToLowerInvariant()));
-
-                if (matchedInIngredients != null)
+                foreach (var pi in product.ProductIngredients)
                 {
-                    return new SuitabilityScoreResult(
-                        SuitabilityScore: 0,
-                        HasAllergyWarning: true,
-                        MatchedAllergen: matchedInIngredients,
-                        MatchReason: $"Contains blacklisted allergen: {matchedInIngredients}"
-                    );
-                }
-
-                // Check in raw ingredient list text as safety fallback
-                if (!string.IsNullOrWhiteSpace(product.IngredientListRaw))
-                {
-                    var rawLower = product.IngredientListRaw.ToLowerInvariant();
-                    var matchedRaw = allergens.FirstOrDefault(allergen => rawLower.Contains(allergen));
-
-                    if (matchedRaw != null)
+                    var inci = pi.Ingredient?.InciName;
+                    if (!string.IsNullOrWhiteSpace(inci))
                     {
-                        return new SuitabilityScoreResult(
-                            SuitabilityScore: 0,
+                        var match = CosmeticKnowledgeBase.MatchAllergenInToken(inci, allergyBlacklist);
+                        if (match != null)
+                        {
+                            return new SuitabilityVerdictResult(
+                                Verdict: "AllergyConflict",
+                                VerdictLabel: "Not Suitable — Allergy Alert",
+                                HasAllergyWarning: true,
+                                MatchedAllergen: match,
+                                MatchReason: $"Contains {match}, which matches your personal Allergy Blacklist.",
+                                HasIngredients: true,
+                                IsNonCosmeticTool: false
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Check raw ingredient tokens
+            if (hasRaw)
+            {
+                var tokens = CosmeticKnowledgeBase.SplitInciList(rawInci);
+                foreach (var token in tokens)
+                {
+                    var match = CosmeticKnowledgeBase.MatchAllergenInToken(token, allergyBlacklist);
+                    if (match != null)
+                    {
+                        return new SuitabilityVerdictResult(
+                            Verdict: "AllergyConflict",
+                            VerdictLabel: "Not Suitable — Allergy Alert",
                             HasAllergyWarning: true,
-                            MatchedAllergen: matchedRaw,
-                            MatchReason: $"Contains blacklisted allergen: {matchedRaw}"
+                            MatchedAllergen: match,
+                            MatchReason: $"Contains {match}, which matches your personal Allergy Blacklist.",
+                            HasIngredients: true,
+                            IsNonCosmeticTool: false
                         );
                     }
                 }
             }
         }
 
-        // If no skin profile, default neutral suitability
+        // 4. If user has not set up Skin Profile yet
         if (skinProfile == null)
         {
-            return new SuitabilityScoreResult(
-                SuitabilityScore: 80,
+            return new SuitabilityVerdictResult(
+                Verdict: "RequiresSkinId",
+                VerdictLabel: "Complete Skin ID to Check",
                 HasAllergyWarning: false,
-                MatchReason: "General recommendation (No skin profile set)"
+                MatchedAllergen: null,
+                MatchReason: "Complete your 30-second Digital Skin ID to see your personalized formula match.",
+                HasIngredients: true,
+                IsNonCosmeticTool: false
             );
         }
 
-        // 2. Skin Type Compatibility
+        // 5. Evaluate compatibility & soft cautions for user's SkinType
         var userSkinType = skinProfile.SkinType.ToString();
+        var rawLower = rawInci.ToLowerInvariant();
+        var isFragranceDept = string.Equals(department, "Fragrance", StringComparison.OrdinalIgnoreCase) || targetArea == "fragrance";
+
+        // Soft caution check for Sensitive skin (synthetic fragrance or drying alcohol)
+        if (string.Equals(userSkinType, "Sensitive", StringComparison.OrdinalIgnoreCase) && !isFragranceDept)
+        {
+            if (rawLower.Contains("parfum") || rawLower.Contains("fragrance") || rawLower.Contains("limonene") || rawLower.Contains("linalool"))
+            {
+                return new SuitabilityVerdictResult(
+                    Verdict: "MatchWithNotes",
+                    VerdictLabel: "Match with Notes",
+                    HasAllergyWarning: false,
+                    MatchedAllergen: null,
+                    MatchReason: "Zero personal allergy conflicts, but contains fragrance components — patch-test for Sensitive skin.",
+                    HasIngredients: true,
+                    IsNonCosmeticTool: false
+                );
+            }
+        }
+
+        if ((string.Equals(userSkinType, "Dry", StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(userSkinType, "Sensitive", StringComparison.OrdinalIgnoreCase)) &&
+            !isFragranceDept &&
+            (rawLower.Contains("alcohol denat") || rawLower.Contains("sd alcohol")))
+        {
+            return new SuitabilityVerdictResult(
+                Verdict: "MatchWithNotes",
+                VerdictLabel: "Match with Notes",
+                HasAllergyWarning: false,
+                MatchedAllergen: null,
+                MatchReason: $"Contains quick-drying Alcohol Denat. — follow with barrier moisturizer on {userSkinType} skin.",
+                HasIngredients: true,
+                IsNonCosmeticTool: false
+            );
+        }
+
         var targetSkinTypes = product.TargetSkinTypes ?? Array.Empty<string>();
-
-        var score = 70; // Baseline compatibility
-        var isDirectMatch = targetSkinTypes.Any(t => string.Equals(t, userSkinType, StringComparison.OrdinalIgnoreCase));
-        var isUniversal = targetSkinTypes.Any(t => string.Equals(t, "All", StringComparison.OrdinalIgnoreCase));
-
-        if (isDirectMatch)
+        if (targetSkinTypes.Length > 0 && targetArea == "face")
         {
-            score += 25; // 95% match for directly targeted skin
-        }
-        else if (isUniversal || targetSkinTypes.Length == 0)
-        {
-            score += 15; // 85% match for universal products
-        }
-        else
-        {
-            score -= 10; // 60% for non-targeted skin
+            var isDirectMatch = targetSkinTypes.Any(t => string.Equals(t, userSkinType, StringComparison.OrdinalIgnoreCase)) ||
+                                targetSkinTypes.Any(t => string.Equals(t, "All", StringComparison.OrdinalIgnoreCase));
+
+            if (!isDirectMatch)
+            {
+                return new SuitabilityVerdictResult(
+                    Verdict: "MatchWithNotes",
+                    VerdictLabel: "Match with Notes",
+                    HasAllergyWarning: false,
+                    MatchedAllergen: null,
+                    MatchReason: $"Safe for your allergy list; primarily targeted for {string.Join("/", targetSkinTypes)} skin.",
+                    HasIngredients: true,
+                    IsNonCosmeticTool: false
+                );
+            }
         }
 
-        score = Math.Clamp(score, 10, 100);
-
-        return new SuitabilityScoreResult(
-            SuitabilityScore: score,
+        return new SuitabilityVerdictResult(
+            Verdict: "GoodMatch",
+            VerdictLabel: "Good Match",
             HasAllergyWarning: false,
-            MatchReason: isDirectMatch 
-                ? $"Formulated specifically for {userSkinType} skin" 
-                : $"Compatible with {userSkinType} skin"
+            MatchedAllergen: null,
+            MatchReason: $"Well-suited for your {userSkinType} skin profile with zero allergy conflicts.",
+            HasIngredients: true,
+            IsNonCosmeticTool: false
         );
     }
 }

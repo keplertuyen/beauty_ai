@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getProducts } from '../services/api';
-import { Search, Scale, X, HelpCircle, Star } from 'lucide-react';
-import ProductCard from '../components/ProductCard';
+import { getProducts, getProduct } from '../services/api';
+import { Search, Scale, X, Star, CheckCircle2, AlertCircle, ShieldAlert } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getProductImage } from '../utils/productImages';
-import { translateHighlight } from '../utils/highlightTranslator';
-import './Products.css'; // use existing styles
+import './Products.css';
 
 export default function Compare() {
-  const { t, lang, formatPrice } = useApp();
+  const { t, formatPrice, user } = useApp();
   const [query1, setQuery1] = useState('');
   const [query2, setQuery2] = useState('');
   const [results1, setResults1] = useState([]);
@@ -20,8 +18,8 @@ export default function Compare() {
 
   useEffect(() => {
     if (query1.trim().length > 1) {
-      getProducts({ query: query1, per_page: 5 }).then(res => {
-        setResults1(res.data.products || []);
+      getProducts({ query: query1, pageSize: 5 }).then((res) => {
+        setResults1(res.data?.items || res.data?.products || []);
       });
     } else {
       setResults1([]);
@@ -30,24 +28,92 @@ export default function Compare() {
 
   useEffect(() => {
     if (query2.trim().length > 1) {
-      getProducts({ query: query2, per_page: 5 }).then(res => {
-        setResults2(res.data.products || []);
+      getProducts({ query: query2, pageSize: 5 }).then((res) => {
+        setResults2(res.data?.items || res.data?.products || []);
       });
     } else {
       setResults2([]);
     }
   }, [query2]);
 
-  const selectProduct = (p, slot) => {
+  const selectProduct = async (p, slot) => {
+    const pid = p.id ?? p.product_id;
+    let detail = p;
+    try {
+      const res = await getProduct(pid);
+      if (res?.data) detail = res.data;
+    } catch {
+      // Fallback to summary item
+    }
     if (slot === 1) {
-      setProd1(p);
+      setProd1(detail);
       setQuery1('');
       setShowDropdown1(false);
     } else {
-      setProd2(p);
+      setProd2(detail);
       setQuery2('');
       setShowDropdown2(false);
     }
+  };
+
+  const renderVerdictBadge = (prod) => {
+    if (!prod) return '-';
+    if (!user) return 'Sign in for Skin ID Match';
+    const verdict = prod.suitabilityVerdict || prod.suitability_verdict;
+    const label = prod.suitabilityLabel || prod.suitability_label || 'Good Match';
+    if (prod.hasAllergyWarning || verdict === 'AllergyConflict') {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#DC2626', fontWeight: 700 }}>
+          <ShieldAlert size={15} /> Allergy Alert ({prod.matchedAllergen || 'Allergen'})
+        </span>
+      );
+    }
+    if (verdict === 'GoodMatch') {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#059669', fontWeight: 700 }}>
+          <CheckCircle2 size={15} /> {label}
+        </span>
+      );
+    }
+    if (verdict === 'MatchWithNotes') {
+      return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#D97706', fontWeight: 700 }}>
+          <AlertCircle size={15} /> {label}
+        </span>
+      );
+    }
+    return label;
+  };
+
+  const renderKeyIngredients = (prod) => {
+    if (!prod) return '-';
+    if (prod.isNonCosmeticTool || prod.department === 'Tools & Brushes') {
+      return 'Physical Beauty Tool (No chemical INCI)';
+    }
+    if (prod.formulaBreakdown?.keyIngredients?.length > 0) {
+      return (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
+          {prod.formulaBreakdown.keyIngredients.map((k, i) => (
+            <span
+              key={i}
+              className="badge"
+              style={{
+                background: 'rgba(196, 139, 113, 0.14)',
+                color: '#6B442A',
+                fontSize: '0.76rem',
+                padding: '4px 9px',
+                borderRadius: '999px',
+              }}
+            >
+              {k.commonName}
+            </span>
+          ))}
+        </div>
+      );
+    }
+    const raw = prod.ingredientListRaw || prod.ingredients || '';
+    if (!raw || raw === 'No ingredients listed') return 'Insufficient INCI Data';
+    return raw.length > 220 ? `${raw.slice(0, 220)}...` : raw;
   };
 
   return (
@@ -64,11 +130,11 @@ export default function Compare() {
           <div className="search-bar">
             <Search size={16} color="var(--text-muted)" />
             <input
-               type="text"
-               placeholder={t('comp_prod_1_placeholder')}
-               value={query1}
-               onChange={(e) => { setQuery1(e.target.value); setShowDropdown1(true); }}
-               onFocus={() => setShowDropdown1(true)}
+              type="text"
+              placeholder={t('comp_prod_1_placeholder')}
+              value={query1}
+              onChange={(e) => { setQuery1(e.target.value); setShowDropdown1(true); }}
+              onFocus={() => setShowDropdown1(true)}
             />
             {prod1 && (
               <button className="btn-icon" onClick={() => setProd1(null)} style={{ border: 'none', background: 'none' }}>
@@ -78,16 +144,21 @@ export default function Compare() {
           </div>
           {showDropdown1 && results1.length > 0 && (
             <div className="glass-card" style={{ position: 'absolute', top: '75px', left: 0, right: 0, zIndex: 10, padding: '10px', background: 'var(--bg-elevated)' }}>
-              {results1.map(p => (
-                <div
-                  key={p.product_id}
-                  onClick={() => selectProduct(p, 1)}
-                  style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                >
-                  <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{p.product_name}</span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--primary-light)' }}>{p.brand_name}</span>
-                </div>
-              ))}
+              {results1.map((p) => {
+                const pid = p.id ?? p.product_id;
+                const pname = p.name ?? p.product_name;
+                const bname = p.brandName ?? p.brand_name;
+                return (
+                  <div
+                    key={pid}
+                    onClick={() => selectProduct(p, 1)}
+                    style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  >
+                    <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{pname}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--primary-light)' }}>{bname}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -98,11 +169,11 @@ export default function Compare() {
           <div className="search-bar">
             <Search size={16} color="var(--text-muted)" />
             <input
-               type="text"
-               placeholder={t('comp_prod_2_placeholder')}
-               value={query2}
-               onChange={(e) => { setQuery2(e.target.value); setShowDropdown2(true); }}
-               onFocus={() => setShowDropdown2(true)}
+              type="text"
+              placeholder={t('comp_prod_2_placeholder')}
+              value={query2}
+              onChange={(e) => { setQuery2(e.target.value); setShowDropdown2(true); }}
+              onFocus={() => setShowDropdown2(true)}
             />
             {prod2 && (
               <button className="btn-icon" onClick={() => setProd2(null)} style={{ border: 'none', background: 'none' }}>
@@ -112,16 +183,21 @@ export default function Compare() {
           </div>
           {showDropdown2 && results2.length > 0 && (
             <div className="glass-card" style={{ position: 'absolute', top: '75px', left: 0, right: 0, zIndex: 10, padding: '10px', background: 'var(--bg-elevated)' }}>
-              {results2.map(p => (
-                <div
-                  key={p.product_id}
-                  onClick={() => selectProduct(p, 2)}
-                  style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                >
-                  <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{p.product_name}</span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--primary-light)' }}>{p.brand_name}</span>
-                </div>
-              ))}
+              {results2.map((p) => {
+                const pid = p.id ?? p.product_id;
+                const pname = p.name ?? p.product_name;
+                const bname = p.brandName ?? p.brand_name;
+                return (
+                  <div
+                    key={pid}
+                    onClick={() => selectProduct(p, 2)}
+                    style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  >
+                    <span style={{ fontWeight: '500', fontSize: '0.85rem' }}>{pname}</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--primary-light)' }}>{bname}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -140,14 +216,16 @@ export default function Compare() {
                       <div style={{ width: '80px', height: '80px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#FFFFFF', border: '1px solid var(--glass-border)', padding: '6px' }}>
                         <img
                           src={getProductImage(prod1, 160)}
-                          alt={prod1.product_name}
+                          alt={prod1.name ?? prod1.product_name}
                           style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                           loading="lazy"
                           referrerPolicy="no-referrer"
                         />
                       </div>
-                      <div style={{ fontWeight: 'bold', color: 'var(--primary-light)', fontSize: '1.05rem' }}>{prod1.brand_name}</div>
-                      <div style={{ fontSize: '0.9rem' }}>{prod1.product_name}</div>
+                      <div style={{ fontWeight: 'bold', color: 'var(--primary-light)', fontSize: '1.05rem' }}>
+                        {prod1.brandName ?? prod1.brand_name}
+                      </div>
+                      <div style={{ fontSize: '0.9rem' }}>{prod1.name ?? prod1.product_name}</div>
                     </div>
                   ) : t('comp_not_selected')}
                 </th>
@@ -157,34 +235,46 @@ export default function Compare() {
                       <div style={{ width: '80px', height: '80px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#FFFFFF', border: '1px solid var(--glass-border)', padding: '6px' }}>
                         <img
                           src={getProductImage(prod2, 160)}
-                          alt={prod2.product_name}
+                          alt={prod2.name ?? prod2.product_name}
                           style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                           loading="lazy"
                           referrerPolicy="no-referrer"
                         />
                       </div>
-                      <div style={{ fontWeight: 'bold', color: 'var(--primary-light)', fontSize: '1.05rem' }}>{prod2.brand_name}</div>
-                      <div style={{ fontSize: '0.9rem' }}>{prod2.product_name}</div>
+                      <div style={{ fontWeight: 'bold', color: 'var(--primary-light)', fontSize: '1.05rem' }}>
+                        {prod2.brandName ?? prod2.brand_name}
+                      </div>
+                      <div style={{ fontSize: '0.9rem' }}>{prod2.name ?? prod2.product_name}</div>
                     </div>
                   ) : t('comp_not_selected')}
                 </th>
               </tr>
             </thead>
             <tbody>
+              {/* Personal Skin Match Verdict */}
+              <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
+                <td style={{ fontWeight: '600', padding: '16px 12px' }}>Personal Skin ID Match</td>
+                <td style={{ textAlign: 'center', padding: '16px 12px' }}>{renderVerdictBadge(prod1)}</td>
+                <td style={{ textAlign: 'center', padding: '16px 12px' }}>{renderVerdictBadge(prod2)}</td>
+              </tr>
               {/* Category */}
               <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
                 <td style={{ fontWeight: '600', padding: '16px 12px' }}>{t('comp_category')}</td>
-                <td style={{ textAlign: 'center', padding: '16px 12px' }}>{prod1 ? t(`cat_${prod1.primary_category}`, prod1.primary_category) : '-'}</td>
-                <td style={{ textAlign: 'center', padding: '16px 12px' }}>{prod2 ? t(`cat_${prod2.primary_category}`, prod2.primary_category) : '-'}</td>
+                <td style={{ textAlign: 'center', padding: '16px 12px' }}>
+                  {prod1 ? `${prod1.department || ''} · ${prod1.categoryName || prod1.primary_category || ''}` : '-'}
+                </td>
+                <td style={{ textAlign: 'center', padding: '16px 12px' }}>
+                  {prod2 ? `${prod2.department || ''} · ${prod2.categoryName || prod2.primary_category || ''}` : '-'}
+                </td>
               </tr>
               {/* Price */}
               <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
                 <td style={{ fontWeight: '600', padding: '16px 12px' }}>{t('comp_price')}</td>
                 <td style={{ textAlign: 'center', padding: '16px 12px', fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--accent)' }}>
-                  {prod1 ? formatPrice(prod1.price_usd) : '-'}
+                  {prod1 ? formatPrice(prod1.priceUsd ?? prod1.price_usd) : '-'}
                 </td>
                 <td style={{ textAlign: 'center', padding: '16px 12px', fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--accent)' }}>
-                  {prod2 ? formatPrice(prod2.price_usd) : '-'}
+                  {prod2 ? formatPrice(prod2.priceUsd ?? prod2.price_usd) : '-'}
                 </td>
               </tr>
               {/* Rating */}
@@ -194,7 +284,7 @@ export default function Compare() {
                   {prod1 ? (
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
                       <Star size={16} fill="var(--accent)" stroke="var(--accent)" />
-                      <span>{prod1.rating} ({prod1.reviews} {t('pd_rating')})</span>
+                      <span>{prod1.rating} ({prod1.reviewsCount ?? prod1.reviews ?? 0} {t('pd_rating')})</span>
                     </div>
                   ) : '-'}
                 </td>
@@ -202,47 +292,19 @@ export default function Compare() {
                   {prod2 ? (
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
                       <Star size={16} fill="var(--accent)" stroke="var(--accent)" />
-                      <span>{prod2.rating} ({prod2.reviews} {t('pd_rating')})</span>
+                      <span>{prod2.rating} ({prod2.reviewsCount ?? prod2.reviews ?? 0} {t('pd_rating')})</span>
                     </div>
                   ) : '-'}
                 </td>
               </tr>
-              {/* Loves Count */}
-              <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                <td style={{ fontWeight: '600', padding: '16px 12px' }}>{t('comp_loves')}</td>
-                <td style={{ textAlign: 'center', padding: '16px 12px' }}>{prod1 ? `${Number(prod1.loves_count).toLocaleString()} ❤️` : '-'}</td>
-                <td style={{ textAlign: 'center', padding: '16px 12px' }}>{prod2 ? `${Number(prod2.loves_count).toLocaleString()} ❤️` : '-'}</td>
-              </tr>
-              {/* Highlights */}
-              <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                <td style={{ fontWeight: '600', padding: '16px 12px' }}>{t('comp_highlights')}</td>
-                <td style={{ textAlign: 'center', padding: '16px 12px' }}>
-                  {(prod1?.highlights || prod1?.highlights_clean) ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
-                      {(prod1.highlights || prod1.highlights_clean).split(',').map((h, i) => (
-                        <span key={i} className="badge badge-primary">{translateHighlight(h.trim(), lang)}</span>
-                      ))}
-                    </div>
-                  ) : '-'}
-                </td>
-                <td style={{ textAlign: 'center', padding: '16px 12px' }}>
-                  {(prod2?.highlights || prod2?.highlights_clean) ? (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
-                      {(prod2.highlights || prod2.highlights_clean).split(',').map((h, i) => (
-                        <span key={i} className="badge badge-primary">{translateHighlight(h.trim(), lang)}</span>
-                      ))}
-                    </div>
-                  ) : '-'}
-                </td>
-              </tr>
-              {/* Ingredients */}
+              {/* Key Ingredients */}
               <tr>
-                <td style={{ fontWeight: '600', padding: '16px 12px' }}>{t('comp_ingredients')}</td>
-                <td style={{ padding: '16px 12px', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  {prod1?.ingredients || prod1?.ingredients_clean || '-'}
+                <td style={{ fontWeight: '600', padding: '16px 12px' }}>Key Ingredients</td>
+                <td style={{ padding: '16px 12px', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', textAlign: 'center' }}>
+                  {renderKeyIngredients(prod1)}
                 </td>
-                <td style={{ padding: '16px 12px', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  {prod2?.ingredients || prod2?.ingredients_clean || '-'}
+                <td style={{ padding: '16px 12px', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', textAlign: 'center' }}>
+                  {renderKeyIngredients(prod2)}
                 </td>
               </tr>
             </tbody>

@@ -230,7 +230,7 @@ def main():
             img_pool = CATEGORY_IMAGES.get(prim, [DEFAULT_IMAGE])
             img_url = img_pool[idx % len(img_pool)]
 
-            raw_ingredients = (p.get('ingredients') or '').strip() or "No ingredients listed"
+            raw_ingredients = (p.get('ingredients') or '').strip()
 
             # Target skin types
             if prim == 'Skincare':
@@ -264,7 +264,7 @@ def main():
 
     sql_copy_products = (
         "COPY products(code, name, slug, brand_id, category_id, department, price_usd, volume_ml, description, image_url, ingredient_list_raw, target_skin_types, stock_quantity) "
-        "FROM STDIN WITH (FORMAT csv, HEADER false, QUOTE '\"', ESCAPE '\"');"
+        "FROM STDIN WITH (FORMAT csv, HEADER false, QUOTE '\"', ESCAPE '\"', FORCE_NOT_NULL (ingredient_list_raw));"
     )
     run_psql_copy(sql_copy_products, product_row_generator())
 

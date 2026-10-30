@@ -13,9 +13,13 @@ public record ProductSummaryDto(
     decimal Rating,
     int ReviewsCount,
     string[] TargetSkinTypes,
-    int? SuitabilityScore,
+    string SuitabilityVerdict,
+    string SuitabilityLabel,
     bool HasAllergyWarning,
     string? MatchedAllergen = null,
+    string? SuitabilityReason = null,
+    bool HasIngredients = true,
+    bool IsNonCosmeticTool = false,
     string Department = "Skincare"
 );
 
@@ -36,10 +40,49 @@ public record ProductDetailDto(
     string[] TargetSkinTypes,
     int StockQuantity,
     IReadOnlyList<ProductIngredientDto> Ingredients,
-    int? SuitabilityScore,
+    string SuitabilityVerdict,
+    string SuitabilityLabel,
     bool HasAllergyWarning,
     string? MatchedAllergen = null,
-    string Department = "Skincare"
+    string? SuitabilityReason = null,
+    bool HasIngredients = true,
+    bool IsNonCosmeticTool = false,
+    string Department = "Skincare",
+    ProductFormulaBreakdownDto? FormulaBreakdown = null
+);
+
+public record ProductFormulaBreakdownDto(
+    string TargetArea,
+    string BenefitsTitle,
+    IReadOnlyList<string> Benefits,
+    IReadOnlyList<KeyIngredientDto> KeyIngredients,
+    IReadOnlyList<FunctionalGroupDto> FunctionalGroups,
+    IReadOnlyList<FormulaCautionDto> Cautions,
+    string? FragranceDisclosure,
+    int TotalIngredientsCount,
+    IReadOnlyList<string> RawInciList
+);
+
+public record KeyIngredientDto(
+    string CommonName,
+    string InciName,
+    string RoleLabel,
+    string Explanation,
+    bool IsFeaturedInProductName
+);
+
+public record FunctionalGroupDto(
+    string GroupTitle,
+    string PlainExplanation,
+    int Count,
+    IReadOnlyList<string> Ingredients
+);
+
+public record FormulaCautionDto(
+    string Type,
+    string Title,
+    string Message,
+    IReadOnlyList<string> IngredientsInvolved
 );
 
 public record ProductIngredientDto(

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag, Star, Eye, ShieldAlert, CheckCircle2, Package } from 'lucide-react';
+import { Heart, ShoppingBag, Star, Eye, ShieldAlert, CheckCircle2, Package, AlertCircle, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getProductImage, DEFAULT_PRODUCT_IMAGE } from '../utils/productImages';
 
 export default function ProductCard({ product }) {
-  const { addItemToCart, toggleWishlistItem, isInWishlist, formatPrice, t } = useApp();
+  const { addItemToCart, toggleWishlistItem, isInWishlist, formatPrice, t, user } = useApp();
   const navigate = useNavigate();
   const productId = product.id ?? product.product_id;
   const productName = product.name ?? product.product_name ?? 'Beauty Product';
@@ -24,8 +24,9 @@ export default function ProductCard({ product }) {
 
   const rating = parseFloat(product.rating) || 0;
   const price = parseFloat(product.priceUsd ?? product.price_usd ?? product.price) || 0;
-  const suitability = product.suitabilityScore ?? product.suitability_score;
-  const hasAllergyWarning = product.hasAllergyWarning || product.has_allergy_warning;
+  const verdict = product.suitabilityVerdict ?? product.suitability_verdict;
+  const verdictLabel = product.suitabilityLabel ?? product.suitability_label;
+  const hasAllergyWarning = product.hasAllergyWarning || product.has_allergy_warning || verdict === 'AllergyConflict';
   const allergen = product.matchedAllergen || product.matched_allergen;
 
   return (
@@ -82,11 +83,11 @@ export default function ProductCard({ product }) {
               <ShieldAlert size={12} strokeWidth={2.5} /> ALLERGY: {allergen || 'Contains allergen'}
             </span>
           )}
-          {!hasAllergyWarning && suitability != null && suitability > 0 && (
+          {!hasAllergyWarning && user && verdict === 'GoodMatch' && (
             <span
               className="badge"
               style={{
-                background: suitability >= 90 ? 'rgba(16, 185, 129, 0.92)' : 'rgba(74, 144, 226, 0.92)',
+                background: 'rgba(16, 185, 129, 0.94)',
                 color: '#FFFFFF',
                 fontSize: '0.68rem',
                 fontWeight: 700,
@@ -97,8 +98,47 @@ export default function ProductCard({ product }) {
                 alignItems: 'center',
                 gap: '4px'
               }}
+              title={product.suitabilityReason || 'Good Match for your Skin ID'}
             >
-              <CheckCircle2 size={12} strokeWidth={2.5} /> {suitability}% MATCH
+              <CheckCircle2 size={12} strokeWidth={2.5} /> {verdictLabel || 'Good Match'}
+            </span>
+          )}
+          {!hasAllergyWarning && user && verdict === 'MatchWithNotes' && (
+            <span
+              className="badge"
+              style={{
+                background: 'rgba(217, 119, 6, 0.92)',
+                color: '#FFFFFF',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                padding: '3px 8px',
+                borderRadius: '6px',
+                backdropFilter: 'blur(4px)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title={product.suitabilityReason || 'Match with Notes for your Skin ID'}
+            >
+              <AlertCircle size={12} strokeWidth={2.5} /> {verdictLabel || 'Match with Notes'}
+            </span>
+          )}
+          {verdict === 'AccessoryTool' && (
+            <span
+              className="badge"
+              style={{
+                background: 'rgba(59, 130, 246, 0.9)',
+                color: '#FFFFFF',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                padding: '3px 8px',
+                borderRadius: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <Sparkles size={11} strokeWidth={2.5} /> Accessory / Tool
             </span>
           )}
           {product.new == 1 && <span className="badge badge-new" style={{ fontSize: '0.68rem', padding: '3px 8px' }}>{t('badge_new', 'NEW')}</span>}
@@ -185,7 +225,7 @@ export default function ProductCard({ product }) {
             fontWeight: 600,
             borderRadius: 'var(--radius-full)',
           }}
-          onClick={() => addItemToCart(product.product_id)}
+          onClick={() => addItemToCart(productId)}
         >
           <ShoppingBag size={14} />
           {t('prod_add_to_cart')}
@@ -203,7 +243,7 @@ export default function ProductCard({ product }) {
             background: 'var(--bg-secondary)',
             color: 'var(--text-secondary)',
           }}
-          onClick={() => navigate(`/products/${product.product_id}`)}
+          onClick={() => navigate(`/products/${productId}`)}
           title={t('prod_view_details')}
         >
           <Eye size={15} />

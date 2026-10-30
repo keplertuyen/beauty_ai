@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Xunit;
 
 namespace BeautyAI.ArchitectureTests;
@@ -8,15 +9,18 @@ public class NoSafetyScoreAnywhereTests
     private static readonly string[] ForbiddenTerms = new[]
     {
         "SafetyScore",
+        "safety_score",
         "SafetyRating",
+        "safety_rating",
         "HazardScore",
+        "hazard_score",
         "DangerLevel",
         "ToxicityScore",
         "SafetyLevel"
     };
 
     private const string InvariantViolationMessage =
-        "INV-01: BeautyAI KHÔNG chấm điểm an toàn/nguy hiểm (xem docs/adr/ và BRD §4.3 G-01). Dùng SuitabilityScore (phù hợp với hồ sơ da) thay thế.";
+        "INV-01: BeautyAI KHÔNG chấm điểm an toàn/nguy hiểm (xem docs/adr/ và BRD §4.3 G-01). Dùng SuitabilityVerdict (phù hợp với hồ sơ da) thay thế.";
 
     [Fact]
     public void Assemblies_MustNotContainForbiddenSafetyScoreTerms()
@@ -38,17 +42,23 @@ public class NoSafetyScoreAnywhereTests
                     }
                 }
 
-                // Check properties
+                // Check properties & their [JsonPropertyName] attributes
                 var properties = type.GetProperties(
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly
                 );
                 foreach (var prop in properties)
                 {
+                    var jsonAttr = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
                     foreach (var term in ForbiddenTerms)
                     {
                         if (prop.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
                         {
                             violations.Add($"Property: {type.FullName}.{prop.Name} violates INV-01 with forbidden term '{term}'.");
+                        }
+
+                        if (jsonAttr != null && jsonAttr.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
+                        {
+                            violations.Add($"JsonPropertyName on {type.FullName}.{prop.Name} ('{jsonAttr.Name}') violates INV-01 with forbidden term '{term}'.");
                         }
                     }
                 }
@@ -59,7 +69,6 @@ public class NoSafetyScoreAnywhereTests
                 );
                 foreach (var field in fields)
                 {
-                    // Skip compiler-generated backing fields if the property was already caught
                     if (field.Name.StartsWith("<") && field.Name.Contains(">k__BackingField"))
                     {
                         continue;
@@ -80,7 +89,6 @@ public class NoSafetyScoreAnywhereTests
                 );
                 foreach (var method in methods)
                 {
-                    // Skip property getters and setters
                     if (method.IsSpecialName && (method.Name.StartsWith("get_") || method.Name.StartsWith("set_")))
                     {
                         continue;

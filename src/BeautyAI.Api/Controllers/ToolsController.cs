@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BeautyAI.Application.DTOs;
 using BeautyAI.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -17,12 +18,13 @@ public class ToolsController : ControllerBase
     }
 
     /// <summary>
-    /// Analyzes an INCI ingredient list pasted or extracted from cosmetic packaging.
+    /// Analyzes an INCI ingredient list against the authenticated user's Digital Skin ID and target care area.
     /// </summary>
     [HttpPost("analyze-inci")]
-    [AllowAnonymous]
+    [Authorize]
     [ProducesResponseType(typeof(InciAnalysisResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AnalyzeInci([FromBody] InciAnalysisRequest request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.IngredientsText))
@@ -30,7 +32,8 @@ public class ToolsController : ControllerBase
             return BadRequest(new { message = "Ingredients text cannot be empty." });
         }
 
-        var result = await _toolsService.AnalyzeInciAsync(request, cancellationToken);
+        var userId = GetCurrentUserId();
+        var result = await _toolsService.AnalyzeInciAsync(request, userId, cancellationToken);
         return Ok(result);
     }
 
@@ -47,14 +50,23 @@ public class ToolsController : ControllerBase
     }
 
     /// <summary>
-    /// Returns skin type characteristics, recommended and cautionary ingredients.
+    /// Returns skin type characteristics, recommended and cautionary ingredients for authenticated members.
     /// </summary>
     [HttpGet("skintype-guide")]
-    [AllowAnonymous]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetSkinTypeGuide([FromQuery] string area = "face", CancellationToken cancellationToken = default)
     {
         var result = await _toolsService.GetSkinTypeGuideAsync(area, cancellationToken);
         return Ok(result);
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (int.TryParse(claim, out int userId))
+            return userId;
+        return null;
     }
 }

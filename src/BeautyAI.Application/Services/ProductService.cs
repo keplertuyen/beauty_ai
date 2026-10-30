@@ -35,7 +35,7 @@ public class ProductService : IProductService
         }
 
         // Only pass blacklist for filtering if SafeForMe is active
-        var filteringBlacklist = filter.SafeForMe ? allergyNames : null;
+        var filteringBlacklist = filter.SafeForMe ? (allergyNames ?? new List<string>()) : null;
 
         var (items, totalCount) = await _productRepository.GetProductsAsync(
             filter,
@@ -65,9 +65,13 @@ public class ProductService : IProductService
                 Rating: rating,
                 ReviewsCount: reviewsCount,
                 TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
-                SuitabilityScore: matchResult.SuitabilityScore,
+                SuitabilityVerdict: matchResult.Verdict,
+                SuitabilityLabel: matchResult.VerdictLabel,
                 HasAllergyWarning: matchResult.HasAllergyWarning,
                 MatchedAllergen: matchResult.MatchedAllergen,
+                SuitabilityReason: matchResult.MatchReason,
+                HasIngredients: matchResult.HasIngredients,
+                IsNonCosmeticTool: matchResult.IsNonCosmeticTool,
                 Department: p.Department ?? "Skincare"
             );
         }).ToList();
@@ -127,6 +131,46 @@ public class ProductService : IProductService
             ))
             .ToList() ?? new List<ProductIngredientDto>();
 
+        var dbIngMap = product.ProductIngredients?
+            .Where(pi => pi.Ingredient != null && !string.IsNullOrWhiteSpace(pi.Ingredient.InciName))
+            .GroupBy(pi => pi.Ingredient!.InciName.ToLowerInvariant())
+            .ToDictionary(g => g.Key, g => g.First().Ingredient!, StringComparer.OrdinalIgnoreCase);
+
+        var effectiveRawInci = !string.IsNullOrWhiteSpace(product.IngredientListRaw) &&
+                               !string.Equals(product.IngredientListRaw, "No ingredients listed", StringComparison.OrdinalIgnoreCase)
+            ? product.IngredientListRaw
+            : (ingredientsDto.Count > 0 ? string.Join(", ", ingredientsDto.Select(i => i.InciName)) : "");
+
+        var breakdownDomain = CosmeticKnowledgeBase.AnalyzeFormula(
+            rawIngredientsText: effectiveRawInci,
+            productName: product.Name,
+            department: product.Department ?? "Skincare",
+            categoryName: product.Category?.Name ?? "Skincare",
+            explicitTargetArea: null,
+            skinProfile: skinProfile,
+            userAllergies: allergyNames,
+            targetSkinTypes: product.TargetSkinTypes,
+            dbIngredientMap: dbIngMap
+        );
+
+        var formulaBreakdownDto = new ProductFormulaBreakdownDto(
+            TargetArea: breakdownDomain.TargetArea,
+            BenefitsTitle: breakdownDomain.BenefitsTitle,
+            Benefits: breakdownDomain.Benefits,
+            KeyIngredients: breakdownDomain.KeyIngredients
+                .Select(k => new KeyIngredientDto(k.CommonName, k.InciName, k.RoleLabel, k.Explanation, k.IsFeaturedInProductName))
+                .ToList(),
+            FunctionalGroups: breakdownDomain.FunctionalGroups
+                .Select(g => new FunctionalGroupDto(g.GroupTitle, g.PlainExplanation, g.Count, g.Ingredients))
+                .ToList(),
+            Cautions: breakdownDomain.Cautions
+                .Select(c => new FormulaCautionDto(c.Type, c.Title, c.Message, c.IngredientsInvolved))
+                .ToList(),
+            FragranceDisclosure: breakdownDomain.FragranceDisclosure,
+            TotalIngredientsCount: breakdownDomain.TotalIngredientsCount,
+            RawInciList: breakdownDomain.RawInciTokens
+        );
+
         var (rating, reviewsCount) = await _productRepository.GetProductReviewStatsAsync(product.Id, cancellationToken);
 
         return new ProductDetailDto(
@@ -140,16 +184,21 @@ public class ProductService : IProductService
             VolumeMl: product.VolumeMl,
             Description: product.Description,
             ImageUrl: product.ImageUrl,
-            IngredientListRaw: product.IngredientListRaw,
+            IngredientListRaw: effectiveRawInci,
             Rating: rating,
             ReviewsCount: reviewsCount,
             TargetSkinTypes: product.TargetSkinTypes ?? Array.Empty<string>(),
             StockQuantity: product.StockQuantity,
             Ingredients: ingredientsDto,
-            SuitabilityScore: matchResult.SuitabilityScore,
+            SuitabilityVerdict: matchResult.Verdict,
+            SuitabilityLabel: matchResult.VerdictLabel,
             HasAllergyWarning: matchResult.HasAllergyWarning,
             MatchedAllergen: matchResult.MatchedAllergen,
-            Department: product.Department ?? "Skincare"
+            SuitabilityReason: matchResult.MatchReason,
+            HasIngredients: matchResult.HasIngredients,
+            IsNonCosmeticTool: matchResult.IsNonCosmeticTool,
+            Department: product.Department ?? "Skincare",
+            FormulaBreakdown: formulaBreakdownDto
         );
     }
 
@@ -211,9 +260,14 @@ public class ProductService : IProductService
                 Rating: rating,
                 ReviewsCount: reviewsCount,
                 TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
-                SuitabilityScore: match.SuitabilityScore,
+                SuitabilityVerdict: match.Verdict,
+                SuitabilityLabel: match.VerdictLabel,
                 HasAllergyWarning: match.HasAllergyWarning,
-                MatchedAllergen: match.MatchedAllergen
+                MatchedAllergen: match.MatchedAllergen,
+                SuitabilityReason: match.MatchReason,
+                HasIngredients: match.HasIngredients,
+                IsNonCosmeticTool: match.IsNonCosmeticTool,
+                Department: p.Department ?? "Skincare"
             );
         }).ToList();
     }

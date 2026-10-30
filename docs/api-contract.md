@@ -4,7 +4,7 @@ title: Hợp Đồng Giao Diện Lập Trình (API Contract & Endpoints) — Bea
 status: draft
 precedence: 2
 owner: SA / Backend Lead
-last_reviewed: 2026-10-27
+last_reviewed: 2026-10-28
 ---
 
 # HỢP ĐỒNG API & DANH MỤC ENDPOINT — BeautyAI Platform
@@ -135,9 +135,9 @@ sort, page, pageSize
 
 | Method | Đường dẫn | Quyền | FR | Mô tả Phase 1 |
 |---|---|---|---|---|
-| `POST` | `/api/v1/tools/analyze-inci` | ALL | `FR-ING-01` | Phân tích danh sách thành phần INCI (dán văn bản, phân nhóm công năng, tính toán độ tương thích loại da, cảnh báo thành phần nhạy cảm/xung đột) |
+| `POST` | `/api/v1/tools/analyze-inci` | CUSTOMER/ADMIN | `FR-ING-01`, `FR-ING-05` | Phân tích danh sách thành phần INCI theo cấu trúc 3 tầng (Tier 1: Verdict dạng chữ đối chiếu Digital Skin ID & Allergy Blacklist; Tier 2: 3–6 Key Ingredients + Functional Role Groups + Lưu ý theo danh mục; Tier 3: Raw INCI) |
 | `POST` | `/api/v1/tools/check-conflict` | ALL | `FR-CONF-01` | Kiểm tra xung đột hoạt chất giữa các sản phẩm trong giỏ hàng dựa trên 12 quy tắc y khoa |
-| `GET` | `/api/v1/tools/skintype-guide` | ALL | `FR-ING-04` | Trả về cẩm nang và hướng dẫn chăm sóc chuyên sâu theo từng loại da |
+| `GET` | `/api/v1/tools/skintype-guide` | CUSTOMER/ADMIN | `FR-ING-04` | Trả về cẩm nang và hướng dẫn chăm sóc chuyên sâu theo từng loại da cho thành viên đã đăng nhập |
 
 ### Phân tích thành phần (`/api/v1/ingredients`) — C3
 
