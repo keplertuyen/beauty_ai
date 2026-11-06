@@ -26,14 +26,20 @@ public class ProductRepository : IProductRepository
                 .ThenInclude(c => c!.Parent)
             .AsNoTracking();
 
-        // 1. Text Search (Query)
+        // 1. Text Search (Query) — Tokenized multi-word search for Brand, Name, Category, Description
         if (!string.IsNullOrWhiteSpace(filter.Query))
         {
-            var q = filter.Query.Trim().ToLower();
-            query = query.Where(p =>
-                p.Name.ToLower().Contains(q) ||
-                (p.Brand != null && p.Brand.Name.ToLower().Contains(q)) ||
-                (p.Description != null && p.Description.ToLower().Contains(q)));
+            var rawQuery = filter.Query.Trim();
+            var tokens = rawQuery.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var token in tokens)
+            {
+                var t = token.ToLower();
+                query = query.Where(p =>
+                    p.Name.ToLower().Contains(t) ||
+                    (p.Brand != null && p.Brand.Name.ToLower().Contains(t)) ||
+                    (p.Category != null && p.Category.Name.ToLower().Contains(t)) ||
+                    (p.Description != null && p.Description.ToLower().Contains(t)));
+            }
         }
 
         // 2. Category Filter
@@ -104,15 +110,16 @@ public class ProductRepository : IProductRepository
             }
         }
 
-        // 7. Sorting
+        // 7. Sorting — Priority: Top rated products with verified reviews first, then tie-break by reviews count, then catalog ID (Id ASC)
         query = (filter.SortBy?.ToLower()) switch
         {
             "price_asc" => query.OrderBy(p => p.PriceUsd),
             "price_desc" => query.OrderByDescending(p => p.PriceUsd),
             "reviews" => query.OrderByDescending(p => p.Reviews.Count),
             "loves" => query.OrderByDescending(p => p.Reviews.Count),
-            _ => query.OrderByDescending(p => p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 5.0)
-                      .ThenByDescending(p => p.Id)
+            _ => query.OrderByDescending(p => p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 0.0)
+                      .ThenByDescending(p => p.Reviews.Count)
+                      .ThenBy(p => p.Id)
         };
 
         var totalCount = await query.CountAsync(cancellationToken);

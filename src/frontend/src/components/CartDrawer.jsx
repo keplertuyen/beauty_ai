@@ -1,12 +1,23 @@
 import React, { useEffect, useRef } from 'react';
-import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { X, ShoppingBag, Trash2, Plus, Minus, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { getProductImage } from '../utils/productImages';
 import './CartDrawer.css';
 
 export default function CartDrawer() {
-  const { cart, cartOpen, setCartOpen, removeItemFromCart, updateItemQuantity, cartCount, formatPrice, t } = useApp();
+  const {
+    cart,
+    cartConflicts,
+    conflictAcknowledged,
+    cartOpen,
+    setCartOpen,
+    removeItemFromCart,
+    updateItemQuantity,
+    cartCount,
+    formatPrice,
+    t
+  } = useApp();
   const drawerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -21,22 +32,28 @@ export default function CartDrawer() {
     return () => { document.body.style.overflow = ''; };
   }, [cartOpen]);
 
-  const total = cart.reduce((sum, item) => sum + (item.subtotal || 0), 0);
+  const total = cart.reduce((sum, item) => sum + ((parseFloat(item.price_usd) || 0) * item.quantity), 0);
+  const hasConflict = Boolean(cartConflicts?.has_conflict ?? cartConflicts?.has_conflicts);
 
   return (
     <>
       {cartOpen && (
         <div className="cart-overlay" onClick={() => setCartOpen(false)} />
       )}
-      <div className={`cart-drawer ${cartOpen ? 'open' : ''}`}>
+      <div ref={drawerRef} className={`cart-drawer ${cartOpen ? 'open' : ''}`}>
         {/* Header */}
         <div className="cart-header">
           <div className="cart-title">
             <ShoppingBag size={20} />
-            <span>{t('nav_cart')}</span>
+            <span>{t('nav_cart', 'Shopping Bag')}</span>
             {cartCount > 0 && <span className="cart-count-badge">{cartCount}</span>}
           </div>
-          <button className="btn-icon" onClick={() => setCartOpen(false)}>
+          <button
+            type="button"
+            className="btn-icon"
+            onClick={() => setCartOpen(false)}
+            aria-label="Close shopping bag drawer"
+          >
             <X size={18} />
           </button>
         </div>
@@ -46,16 +63,42 @@ export default function CartDrawer() {
           {cart.length === 0 ? (
             <div className="cart-empty">
               <ShoppingBag size={48} opacity={0.3} />
-              <p>{t('cart_empty')}</p>
+              <p>{t('cart_empty', 'Your shopping bag is empty')}</p>
               <button
+                type="button"
                 className="btn btn-primary btn-sm"
                 onClick={() => { setCartOpen(false); navigate('/products'); }}
               >
-                {t('cart_shop_now')}
+                {t('cart_shop_now', 'Shop Now')}
               </button>
             </div>
           ) : (
             <div className="cart-items">
+              {hasConflict && (
+                <div
+                  style={{
+                    padding: '10px 12px',
+                    marginBottom: '12px',
+                    borderRadius: '10px',
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    border: '1px solid rgba(217, 119, 6, 0.35)',
+                    color: '#92400E',
+                    fontSize: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '8px',
+                  }}
+                >
+                  <AlertTriangle size={16} color="#D97706" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <strong>Active Ingredient Interaction Detected</strong>
+                    <div style={{ marginTop: '2px' }}>
+                      Review alternating routine advice in your Shopping Bag before checkout.
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {cart.map((item) => (
                 <div key={item.product_id} className="cart-item">
                   <div className="cart-item-image">
@@ -79,17 +122,27 @@ export default function CartDrawer() {
                   </div>
                   <div className="cart-item-controls">
                     <div className="quantity-control">
-                      <button onClick={() => updateItemQuantity(item.product_id, item.quantity - 1)}>
+                      <button
+                        type="button"
+                        onClick={() => updateItemQuantity(item.product_id, item.quantity - 1)}
+                        aria-label={`Decrease quantity of ${item.product_name}`}
+                      >
                         <Minus size={12} />
                       </button>
                       <span>{item.quantity}</span>
-                      <button onClick={() => updateItemQuantity(item.product_id, item.quantity + 1)}>
+                      <button
+                        type="button"
+                        onClick={() => updateItemQuantity(item.product_id, item.quantity + 1)}
+                        aria-label={`Increase quantity of ${item.product_name}`}
+                      >
                         <Plus size={12} />
                       </button>
                     </div>
                     <button
+                      type="button"
                       className="cart-remove-btn"
                       onClick={() => removeItemFromCart(item.product_id)}
+                      aria-label={`Remove ${item.product_name} from bag`}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -104,22 +157,33 @@ export default function CartDrawer() {
         {cart.length > 0 && (
           <div className="cart-footer">
             <div className="cart-total">
-              <span>{t('cart_total')}</span>
+              <span>{t('cart_total', 'Total')}</span>
               <span className="price-tag">{formatPrice(total)}</span>
             </div>
             <button
+              type="button"
               className="btn btn-primary"
               style={{ width: '100%' }}
-              onClick={() => { setCartOpen(false); navigate('/checkout'); }}
+              onClick={() => {
+                setCartOpen(false);
+                if (hasConflict && !conflictAcknowledged) {
+                  navigate('/cart');
+                } else {
+                  navigate('/checkout');
+                }
+              }}
             >
-              {t('cart_checkout_btn')}
+              {hasConflict && !conflictAcknowledged
+                ? 'Review Conflict & Checkout'
+                : t('cart_checkout_btn', 'Proceed to Checkout')}
             </button>
             <button
+              type="button"
               className="btn btn-secondary"
               style={{ width: '100%', marginTop: 8 }}
               onClick={() => { setCartOpen(false); navigate('/cart'); }}
             >
-              {t('cart_view_btn')}
+              {t('cart_view_btn', 'View Full Bag')}
             </button>
           </div>
         )}

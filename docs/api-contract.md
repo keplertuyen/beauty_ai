@@ -4,7 +4,7 @@ title: Hợp Đồng Giao Diện Lập Trình (API Contract & Endpoints) — Bea
 status: draft
 precedence: 2
 owner: SA / Backend Lead
-last_reviewed: 2026-10-28
+last_reviewed: 2026-10-30
 ---
 
 # HỢP ĐỒNG API & DANH MỤC ENDPOINT — BeautyAI Platform
@@ -164,16 +164,18 @@ sort, page, pageSize
 
 ### Đơn hàng (`/api/v1/orders`) — C7
 
-| Method | Đường dẫn | Quyền | FR |
-|---|---|---|---|
-| `POST` | `/orders` | CUSTOMER | `FR-ORD-03` — nhận `Idempotency-Key` |
-| `GET` | `/orders` | CUSTOMER (chỉ của mình) | `FR-ORD-06` |
-| `GET` | `/orders/{orderCode}` | CUSTOMER (kiểm tra chủ sở hữu) | `FR-ORD-06`, `09` |
-| `POST` | `/orders/{orderCode}/cancel` | CUSTOMER | `FR-ORD-07` |
-| `POST` | `/orders/{orderCode}/reorder` | CUSTOMER | `FR-ORD-11` |
-| `GET` | `/orders/{orderCode}/payment-url` | CUSTOMER | `FR-ORD-04` AC-01 |
-| `POST` | `/webhooks/vnpay/ipn` | **PUBLIC (xác minh chữ ký)** | `FR-ORD-04` AC-02, AC-03, AC-06 |
-| `GET` | `/webhooks/vnpay/return` | PUBLIC | `FR-ORD-04` |
+| Method | Đường dẫn | Quyền | FR | Mô tả Phase 1 |
+|---|---|---|---|---|
+| `POST` | `/api/v1/orders` | CUSTOMER/ADMIN | `FR-ORD-01`, `FR-ORD-02` | Tạo đơn hàng COD (`recipient_name`, `phone_number`, `shipping_address`, `notes`, `conflict_acknowledged`, `items`), kiểm tra & trừ tồn kho, sinh mã đơn `BA-YYYYMMDD-XXXX` (bỏ mã giảm giá ở Phase 1) |
+| `GET` | `/api/v1/orders/my-orders` | CUSTOMER/ADMIN | `FR-ORD-03` | Lấy lịch sử các đơn hàng COD của người dùng hiện tại kèm chi tiết sản phẩm |
+| `POST` | `/orders` | CUSTOMER | `FR-ORD-03` | Nhận `Idempotency-Key` (Phase 2) |
+| `GET` | `/orders` | CUSTOMER (chỉ của mình) | `FR-ORD-06` | |
+| `GET` | `/orders/{orderCode}` | CUSTOMER (kiểm tra chủ sở hữu) | `FR-ORD-06`, `09` | |
+| `POST` | `/orders/{orderCode}/cancel` | CUSTOMER | `FR-ORD-07` | |
+| `POST` | `/orders/{orderCode}/reorder` | CUSTOMER | `FR-ORD-11` | |
+| `GET` | `/orders/{orderCode}/payment-url` | CUSTOMER | `FR-ORD-04` AC-01 | |
+| `POST` | `/webhooks/vnpay/ipn` | **PUBLIC (xác minh chữ ký)** | `FR-ORD-04` AC-02, AC-03, AC-06 | |
+| `GET` | `/webhooks/vnpay/return` | PUBLIC | `FR-ORD-04` | |
 
 > ⚠️ **Thiết kế webhook:** endpoint IPN là **công khai** (cổng thanh toán gọi tới) nên **bảo mật nằm hoàn toàn ở việc xác minh chữ ký** (`NFR-SEC-08`). Phải: ① xác minh chữ ký **trước khi** đọc nội dung nghiệp vụ; ② xử lý idempotent theo mã giao dịch; ③ ghi log mọi lần nhận, kể cả lần bị từ chối chữ ký (`FR-ORD-04` AC-03).
 

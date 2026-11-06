@@ -228,9 +228,9 @@ export default function ProductDetail() {
   // Set initial wishlist state once product is loaded
   useEffect(() => {
     if (product && initialInWishlist === null) {
-      setInitialInWishlist(isInWishlist(product.product_id));
+      setInitialInWishlist(isInWishlist(product.id ?? product.product_id ?? id));
     }
-  }, [product, isInWishlist, initialInWishlist]);
+  }, [product, isInWishlist, initialInWishlist, id]);
 
   /* review form */
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -253,7 +253,7 @@ export default function ProductDetail() {
     }
   }, [user, getInitialSkinType]);
 
-  const inWishlist = isInWishlist(id);
+  const inWishlist = isInWishlist(product?.id ?? product?.product_id ?? id);
 
   /* fetch product and reviews */
   const fetchProductDetail = useCallback(() => {
@@ -466,12 +466,6 @@ export default function ProductDetail() {
 
     const targetUrl = `/ingredient-analyzer?ingredients=${encodeURIComponent(inciString)}&product_name=${encodeURIComponent(productName)}&brand_name=${encodeURIComponent(brandName)}&department=${encodeURIComponent(department)}&category=${encodeURIComponent(categoryName)}&target_area=${encodeURIComponent(formulaBreakdown?.targetArea || '')}`;
 
-    if (!user) {
-      sessionStorage.setItem('beautyai_post_login_redirect', targetUrl);
-      toast('Please sign in to access personalized Deep Formula Analysis', { icon: '🔒' });
-      window.dispatchEvent(new CustomEvent('open-auth-modal'));
-      return;
-    }
     navigate(targetUrl);
   };
   const routine = getRoutineInfo(categoryName, product?.department);
@@ -550,10 +544,11 @@ export default function ProductDetail() {
                 {/* Floating Quick Action Buttons */}
                 <div className="pd-visual-actions">
                   <button
+                    type="button"
                     className={`pd-action-btn ${inWishlist ? 'active' : ''}`}
                     onClick={() => toggleWishlistItem(productId)}
-                    aria-label={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
-                    title={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
+                    aria-pressed={inWishlist}
+                    aria-label={`Save ${productName} to wishlist`}
                   >
                     <Heart
                       size={18}
@@ -839,7 +834,7 @@ export default function ProductDetail() {
 
                 <button
                   className="btn btn-primary pd-cta-btn"
-                  onClick={() => addItemToCart(productId, quantity)}
+                  onClick={() => addItemToCart(product, quantity)}
                 >
                   <ShoppingBag size={18} />
                   <span>{t('prod_add_to_cart', 'Add to Bag')} · {formatPrice((salePrice || price) * quantity)}</span>
@@ -1044,82 +1039,72 @@ export default function ProductDetail() {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-                    {/* ── TIER 1: PERSONALIZED VERDICT & ALLERGY SUMMARY ── */}
-                    <div
-                      style={{
-                        padding: '16px 20px',
-                        borderRadius: '14px',
-                        background: hasAllergyWarning
-                          ? 'rgba(239, 68, 68, 0.08)'
-                          : suitabilityVerdict === 'MatchWithNotes'
-                          ? 'rgba(245, 158, 11, 0.08)'
-                          : suitabilityVerdict === 'GoodMatch' && user
-                          ? 'rgba(16, 185, 129, 0.08)'
-                          : 'rgba(196, 139, 113, 0.08)',
-                        border: hasAllergyWarning
-                          ? '1px solid rgba(239, 68, 68, 0.3)'
-                          : suitabilityVerdict === 'MatchWithNotes'
-                          ? '1px solid rgba(245, 158, 11, 0.3)'
-                          : suitabilityVerdict === 'GoodMatch' && user
-                          ? '1px solid rgba(16, 185, 129, 0.28)'
-                          : '1px solid rgba(196, 139, 113, 0.28)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexWrap: 'wrap',
-                        gap: '12px',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                        {hasAllergyWarning ? (
-                          <ShieldAlert size={22} color="#DC2626" style={{ marginTop: 2, flexShrink: 0 }} />
-                        ) : suitabilityVerdict === 'MatchWithNotes' ? (
-                          <AlertCircle size={22} color="#D97706" style={{ marginTop: 2, flexShrink: 0 }} />
-                        ) : user && suitabilityVerdict === 'GoodMatch' ? (
-                          <CheckCircle2 size={22} color="#059669" style={{ marginTop: 2, flexShrink: 0 }} />
-                        ) : (
-                          <Sparkles size={22} color="#8F5B42" style={{ marginTop: 2, flexShrink: 0 }} />
-                        )}
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '0.96rem', color: '#2C2018' }}>
-                            {!user
-                              ? 'Personal Skin ID Cross-Check Available'
-                              : suitabilityLabel || 'Good Match'}
-                          </div>
-                          <div style={{ fontSize: '0.86rem', color: '#574B42', marginTop: 3, lineHeight: 1.45 }}>
-                            {!user
-                              ? 'Sign in to automatically check this formula against your personal Allergy Blacklist and Skin Type.'
-                              : suitabilityReason}
+                    {/* ── TIER 1: PERSONALIZED VERDICT & ALLERGY SUMMARY (Authenticated Users Only) ── */}
+                    {user && (
+                      <div
+                        style={{
+                          padding: '16px 20px',
+                          borderRadius: '14px',
+                          background: hasAllergyWarning
+                            ? 'rgba(239, 68, 68, 0.08)'
+                            : suitabilityVerdict === 'MatchWithNotes'
+                            ? 'rgba(245, 158, 11, 0.08)'
+                            : suitabilityVerdict === 'GoodMatch'
+                            ? 'rgba(16, 185, 129, 0.08)'
+                            : 'rgba(196, 139, 113, 0.08)',
+                          border: hasAllergyWarning
+                            ? '1px solid rgba(239, 68, 68, 0.3)'
+                            : suitabilityVerdict === 'MatchWithNotes'
+                            ? '1px solid rgba(245, 158, 11, 0.3)'
+                            : suitabilityVerdict === 'GoodMatch'
+                            ? '1px solid rgba(16, 185, 129, 0.28)'
+                            : '1px solid rgba(196, 139, 113, 0.28)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          flexWrap: 'wrap',
+                          gap: '12px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                          {hasAllergyWarning ? (
+                            <ShieldAlert size={22} color="#DC2626" style={{ marginTop: 2, flexShrink: 0 }} />
+                          ) : suitabilityVerdict === 'MatchWithNotes' ? (
+                            <AlertCircle size={22} color="#D97706" style={{ marginTop: 2, flexShrink: 0 }} />
+                          ) : suitabilityVerdict === 'GoodMatch' ? (
+                            <CheckCircle2 size={22} color="#059669" style={{ marginTop: 2, flexShrink: 0 }} />
+                          ) : (
+                            <Sparkles size={22} color="#8F5B42" style={{ marginTop: 2, flexShrink: 0 }} />
+                          )}
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.96rem', color: '#2C2018' }}>
+                              {suitabilityLabel || 'Good Match'}
+                            </div>
+                            <div style={{ fontSize: '0.86rem', color: '#574B42', marginTop: 3, lineHeight: 1.45 }}>
+                              {suitabilityReason}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {!user ? (
-                        <button
-                          type="button"
-                          className="btn btn-primary btn-sm"
-                          onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal'))}
-                        >
-                          Sign In
-                        </button>
-                      ) : suitabilityVerdict === 'RequiresSkinId' ? (
-                        <button
-                          type="button"
-                          className="btn btn-primary btn-sm"
-                          onClick={() => setSkinIdModalOpen(true)}
-                        >
-                          Complete Skin ID (30s)
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="btn btn-secondary btn-sm"
-                          onClick={() => setSkinIdModalOpen(true)}
-                        >
-                          Edit Skin ID
-                        </button>
-                      )}
-                    </div>
+                        {suitabilityVerdict === 'RequiresSkinId' ? (
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            onClick={() => setSkinIdModalOpen(true)}
+                          >
+                            Complete Skin ID (30s)
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => setSkinIdModalOpen(true)}
+                          >
+                            Edit Skin ID
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     {/* ── TIER 2A: KEY INGREDIENTS STRIP (3–6 HERO CARDS) ── */}
                     {formulaBreakdown?.keyIngredients?.length > 0 && (

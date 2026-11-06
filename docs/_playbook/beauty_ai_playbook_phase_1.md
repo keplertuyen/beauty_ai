@@ -147,7 +147,7 @@ LIMIT 10;"
   - `src/frontend/src/services/api.js`
 
 ### Các bước thực hiện chi tiết:
-1. Sao chép các tệp trang (`Home.jsx`, `Products.jsx`, `ProductDetail.jsx`, `Cart.jsx`, `SkinQuiz.jsx`, `IngredientAnalyzer.jsx`, `Compare.jsx`, `Wishlist.jsx`, `Profile.jsx`, `AdminDashboard.jsx`) vào `src/frontend/src/pages/`.
+1. Sao chép các tệp trang (`Home.jsx`, `Products.jsx`, `ProductDetail.jsx`, `Cart.jsx`, `SkinQuiz.jsx`, `IngredientAnalyzer.jsx`, `Wishlist.jsx`, `Profile.jsx`, `AdminDashboard.jsx`) vào `src/frontend/src/pages/` (trang `Compare.jsx` được chuyển sang Phase 2).
 2. Sao chép các component (`Navbar.jsx`, `Footer.jsx`, `ProductCard.jsx`, `AuthModal.jsx`) vào `src/frontend/src/components/`.
 3. Trong `src/frontend/src/services/api.js`, cấu hình Axios hoặc Fetch trỏ tới `http://localhost:5000/api/v1` (sử dụng biến môi trường `VITE_API_BASE_URL`).
 4. Khởi chạy thử nghiệm và kiểm tra build:
@@ -188,58 +188,60 @@ LIMIT 10;"
 
 ### ✅ Xong khi:
 - [x] Chọn filter "Skin Type" (Oily / Dry / Combination / Normal / Sensitive) lọc chính xác các sản phẩm theo cơ địa da.
-- [x] Bật toggle *"Safe For My Skin (Auto-exclude Allergens)"*, các sản phẩm chứa thành phần dị ứng trong hồ sơ cá nhân lập tức biến mất khỏi màn hình.
-- [x] Tính toán và hiển thị huy hiệu `SuitabilityScore` (% Match) và cờ cảnh báo dị ứng đỏ trên thẻ sản phẩm `ProductCard`.
+- [x] Bật toggle *"Safe For My Skin (Auto-exclude Allergens)"*, các sản phẩm chứa thành phần dị ứng trong hồ sơ cá nhân hoặc mỹ phẩm thiếu bảng INCI từ hãng lập tức được loại khỏi kết quả (vẫn giữ dụng cụ vật lý `Tools & Brushes`).
+- [x] Tính toán và hiển thị huy hiệu kết luận dạng chữ `SuitabilityVerdict` (`Good Match`, `Match with Notes`, `Accessory / Tool`) và cờ cảnh báo dị ứng đỏ trên thẻ sản phẩm `ProductCard`.
 - [x] Chuẩn hóa toàn bộ trang Catalog và giá bán sang 100% English & USD ($).
 
 ---
 
-## ▸ Nhiệm vụ 2.3 — Hoàn thiện Trang PDP, Bảng INCI & Cảnh Báo Dị Ứng Đỏ
+## ▸ Nhiệm vụ 2.3 — Hoàn thiện Trang PDP, Bảng INCI 3 Tầng & Cảnh Báo Dị Ứng Đỏ
 
-- **Mục tiêu:** Hiển thị chi tiết sản phẩm, bảng thành phần phân loại màu, tính điểm Match Score và hiển thị banner đỏ cảnh báo dị ứng.
+- **Mục tiêu:** Hiển thị chi tiết sản phẩm, bảng thành phần INCI 3 tầng (Key Notable Ingredients + Functional Role Groups + Full Packaging INCI thu gọn), kết luận độ phù hợp dạng chữ (`SuitabilityVerdict`) và banner đỏ cảnh báo dị ứng.
 - **Tệp liên quan:**
+  - `src/BeautyAI.Domain/Services/CosmeticKnowledgeBase.cs`
   - `src/BeautyAI.Domain/Services/SuitabilityScoreCalculator.cs`
   - `src/frontend/src/pages/ProductDetail.jsx`
 
 ### Các bước thực hiện chi tiết:
-1. Cài đặt thuật toán `SuitabilityScoreCalculator` trong Domain theo công thức đặc tả ở Technical Solutions Phase 1:
-   - Nếu sản phẩm chứa chất dị ứng của người dùng ➔ `MatchScore = 0`, `HasAllergyWarning = true`.
-   - Ngược lại ➔ Tính điểm tương thích từ 0–100% dựa trên loại da và mối quan tâm da.
-2. Xây dựng endpoint `GET /api/v1/products/{slug}` trả về `ProductDetailDto`.
+1. Cài đặt bộ tri thức `CosmeticKnowledgeBase` và `SuitabilityScoreCalculator` trong Domain:
+   - Nếu sản phẩm là dụng cụ vật lý (`Tools & Brushes`) ➔ `SuitabilityVerdict = "AccessoryTool"`.
+   - Nếu sản phẩm là mỹ phẩm nhưng thiếu bảng INCI từ hãng ➔ `SuitabilityVerdict = "InsufficientData"`.
+   - Nếu sản phẩm chứa chất dị ứng của người dùng ➔ `SuitabilityVerdict = "AllergyConflict"`, `HasAllergyWarning = true`.
+   - Ngược lại ➔ Đánh giá theo loại da, vấn đề da và vùng chăm sóc để trả về `GoodMatch` hoặc `MatchWithNotes` kèm giải thích ngắn gọn (tuyệt đối không dùng điểm số `%` hay `SafetyScore /5`).
+2. Xây dựng endpoint `GET /api/v1/products/{slug}` trả về `ProductDetailDto` kèm `FormulaBreakdown` 3 tầng.
 3. Trên giao diện `ProductDetail.jsx`:
-   - Render Banner màu đỏ rực ngay phía trên nút mua hàng nếu `hasAllergyWarning == true`:
-     > *"⚠️ CẢNH BÁO DỊ ỨNG: Sản phẩm này chứa **[Tên chất]** nằm trong danh sách dị ứng của bạn. Khuyến nghị không nên sử dụng!"*
-   - Kèm nút bấm: *"Tìm sản phẩm thay thế an toàn"*.
-   - Render bảng thành phần phân màu: Xanh lá (Dưỡng ẩm, phục hồi), Vàng (Hoạt chất mạnh), Đỏ (Cồn, hương liệu).
-   - Render biểu đồ Donut Chart phân bổ tỷ lệ công năng.
+   - Render Banner màu đỏ rực ngay phía trên nút mua hàng nếu `hasAllergyWarning == true` kèm nút *"Find Safe Alternatives"*.
+   - Ẩn tab *Formula & Ingredients* với dụng cụ `Tools & Brushes`; hiển thị thông báo minh bạch `Insufficient INCI Data` với mỹ phẩm thiếu INCI.
+   - Render bảng thành phần 3 tầng: 3–6 thẻ **Key Notable Ingredients** (tên thông dụng + INCI + giải thích 1 dòng), **Functional Role Groups**, và thanh trượt **Full Packaging INCI List** thu gọn mặc định.
 
 ### ✅ Xong khi:
-- [ ] Truy cập sản phẩm có chứa chất dị ứng của tài khoản đang đăng nhập ➔ Banner đỏ xuất hiện nổi bật ngay lập tức.
-- [ ] Điểm Match Score % hiển thị đúng theo loại da của người xem.
+- [x] Truy cập sản phẩm có chứa chất dị ứng của tài khoản đang đăng nhập ➔ Banner đỏ xuất hiện nổi bật ngay lập tức.
+- [x] Kết luận dạng chữ (`Suitability Verdict`) và bảng INCI 3 tầng hiển thị đồng nhất, dễ đọc.
 
 ---
 
-## ▸ Nhiệm vụ 2.4 — Hoàn thiện Công Cụ Phân Tích INCI Tự Do & So Sánh / Wishlist
+## ▸ Nhiệm vụ 2.4 — Hoàn thiện Công Cụ Phân Tích INCI Theo Vùng Chăm Sóc & Danh Sách Yêu Thích (Wishlist)
 
-- **Mục tiêu:** Cho phép người dùng dán chuỗi thành phần bao bì bất kỳ để phân tích và hoàn thiện tính năng so sánh, wishlist.
+- **Mục tiêu:** Cho phép người dùng đã đăng nhập phân tích chuyên sâu công thức mỹ phẩm theo 7 vùng chăm sóc (`TargetCareArea`), đối chiếu Allergy Blacklist cá nhân và hoàn thiện trang Danh sách yêu thích (`Wishlist.jsx`).
 - **Tệp liên quan:**
   - `src/BeautyAI.Api/Controllers/ToolsController.cs`
+  - `src/frontend/src/components/SkinIdQuickModal.jsx`
   - `src/frontend/src/pages/IngredientAnalyzer.jsx`
-  - `src/frontend/src/pages/Compare.jsx`
   - `src/frontend/src/pages/Wishlist.jsx`
 
 ### Các bước thực hiện chi tiết:
-1. Xây dựng endpoint `POST /api/v1/tools/analyze-inci`:
-   - Nhận chuỗi văn bản người dùng dán vào ô Textarea.
-   - Bóc tách theo dấu phẩy, tra cứu từ điển bảng `ingredients`.
-   - Trả về danh sách phân tích: Tên chất, nhãn công năng, chỉ số kích ứng, chỉ số bít tắc và cờ cảnh báo nếu trùng chất trong Allergy Blacklist.
-2. Kết nối giao diện `IngredientAnalyzer.jsx` hiển thị kết quả trực quan.
-3. Ghép nối thanh Drawer so sánh đáy màn hình và trang `/compare` hiển thị bảng so sánh song song 2-4 sản phẩm.
-4. Hoàn thiện trang `/wishlist` lưu các sản phẩm đã thả tim.
+1. Xây dựng endpoint `POST /api/v1/tools/analyze-inci` và `GET /api/v1/tools/skintype-guide` (`[Authorize]`):
+   - Tự động nạp hồ sơ Digital Skin ID và Allergy Blacklist của người dùng đang đăng nhập.
+   - Nhận diện 7 vùng chăm sóc (`face`, `eye`, `lips`, `hair`, `body`, `fragrance`, `nails`) và phân loại Hương liệu/Cồn béo 3 mức độ (chiết xuất dịu nhẹ / tinh dầu tạo cảm giác / 26 chất dị ứng hương liệu EU).
+   - Trả về kết luận dạng chữ (`verdict`, `verdict_label`, `verdict_reason`), danh sách dị ứng gộp gọn (`allergy_matches`), 3–6 `key_ingredients`, `functional_groups` và `cautions` theo danh mục.
+2. Kết nối giao diện `IngredientAnalyzer.jsx`:
+   - Hiển thị giao diện làm mờ (`Blurred Preview Gate`) kèm thẻ mời đăng nhập cho khách vãng lai; tự động bật popup `SkinIdQuickModal` (30 giây) nếu người dùng đã đăng nhập nhưng chưa hoàn tất Skin ID.
+3. Hoàn thiện trang `/wishlist` (`Wishlist.jsx`):
+   - Lưu danh sách yêu thích theo tài khoản người dùng, hiển thị thẻ sản phẩm kèm nhãn `Suitability Verdict` và cảnh báo dị ứng, nút *Add to Cart* và nút *Clear All* (tính năng So sánh sản phẩm chuyển sang Phase 2).
 
 ### ✅ Xong khi:
-- [ ] Dán một đoạn text thành phần bất kỳ (ví dụ: *"Water, Glycerin, Niacinamide, Alcohol Denat"*) ➔ Phân tích chính xác từng chất.
-- [ ] Bảng so sánh hiển thị đầy đủ thông số và cảnh báo dị ứng trên từng cột sản phẩm.
+- [x] Phân tích chính xác công thức theo 7 vùng chăm sóc, không báo nhầm chiết xuất thực vật dịu nhẹ hay cồn béo dưỡng ẩm.
+- [x] Trang Danh sách yêu thích (`/wishlist`) hoạt động mượt mà: thả tim/bỏ tim tức thì, hiển thị đầy đủ kết luận dạng chữ và nút xóa tất cả.
 
 ---
 
@@ -267,14 +269,14 @@ LIMIT 10;"
    - Hiển thị checkbox xác nhận: *"Tôi đã đọc và hiểu khuyến cáo sử dụng luân phiên các hoạt chất này"*.
 
 ### ✅ Xong khi:
-- [ ] Thêm 1 lọ BHA và 1 lọ Retinol vào giỏ hàng ➔ Mở giỏ hàng lập tức thấy khung cảnh báo xung đột viền cam.
-- [ ] Tick chọn checkbox xác nhận ➔ Nút thanh toán được kích hoạt cho phép mua hàng tiếp.
+- [x] Thêm 1 lọ BHA và 1 lọ Retinol vào giỏ hàng ➔ Mở giỏ hàng lập tức thấy khung cảnh báo xung đột viền cam.
+- [x] Tick chọn checkbox xác nhận ➔ Nút thanh toán được kích hoạt cho phép mua hàng tiếp.
 
 ---
 
 ## ▸ Nhiệm vụ 3.2 — Luồng Thanh Toán COD & Quản Lý Đơn Hàng Cá Nhân
 
-- **Mục tiêu:** Cho phép khách hàng nhập thông tin nhận hàng, áp dụng voucher và đặt hàng COD thành công.
+- **Mục tiêu:** Cho phép khách hàng nhập thông tin nhận hàng và đặt hàng COD thành công, xem lại lịch sử đơn hàng trong trang cá nhân (bỏ mã giảm giá/voucher ở Phase 1).
 - **Tệp liên quan:**
   - `src/BeautyAI.Api/Controllers/OrdersController.cs`
   - `src/frontend/src/pages/Checkout.jsx`
@@ -283,18 +285,17 @@ LIMIT 10;"
 ### Các bước thực hiện chi tiết:
 1. Xây dựng endpoint `POST /api/v1/orders`:
    - Kiểm tra tồn kho sản phẩm.
-   - Áp dụng mã voucher nếu có (`BEAUTYAI10` giảm 10%, `FREESHIP` giảm phí ship).
    - Tạo mã đơn hàng dạng `BA-YYYYMMDD-XXXX`.
-   - Lưu vào bảng `orders` và `order_items` với trạng thái `Pending`.
+   - Lưu vào bảng `orders` và `order_items` với trạng thái `Pending` và cờ `conflict_acknowledged`.
    - Trừ tồn kho trong bảng `products`.
 2. Kết nối giao diện `Checkout.jsx`:
    - Form nhập Họ tên, SĐT, Địa chỉ nhận hàng, Ghi chú.
-   - Phương thức thanh toán cố định là COD.
-   - Bấm xác nhận ➔ Chuyển sang trang cảm ơn Thank You tóm tắt đơn hàng.
-3. Xây dựng endpoint `GET /api/v1/orders/my-orders` và kết nối tab Đơn hàng trong trang `Profile.jsx`.
+   - Phương thức thanh toán cố định là COD (Cash on Delivery).
+   - Bấm xác nhận ➔ Hiển thị màn hình xác nhận đặt hàng thành công (Thank You) tóm tắt đơn hàng và làm rỗng giỏ.
+3. Xây dựng endpoint `GET /api/v1/orders/my-orders` và kết nối tab Đơn hàng (`My Orders`) trong trang `Profile.jsx`.
 
 ### ✅ Xong khi:
-- [ ] Đặt hàng thành công 1 đơn COD ➔ Đơn xuất hiện trong CSDL và hiển thị trong lịch sử đơn hàng của người dùng.
+- [x] Đặt hàng thành công 1 đơn COD ➔ Đơn xuất hiện trong CSDL và hiển thị trong lịch sử đơn hàng của người dùng.
 
 ---
 

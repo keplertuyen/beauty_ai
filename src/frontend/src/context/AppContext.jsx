@@ -3,14 +3,10 @@ import {
   login as loginAPI,
   register as registerAPI,
   getMe,
-  getCart,
-  addToCart,
-  removeFromCart,
-  updateCart as updateCartAPI,
-  clearCart as clearCartAPI,
+  getProduct,
+  checkProductConflicts,
   toggleWishlist,
   getWishlist,
-  getCurrencySettings,
 } from '../services/api';
 import toast from 'react-hot-toast';
 import { translations } from './translations';
@@ -22,7 +18,8 @@ export const AppProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('beautyai_token'));
   const [cart, setCart] = useState([]);
   const [cartCount, setCartCount] = useState(0);
-  const [cartConflicts, setCartConflicts] = useState({ has_conflicts: false, conflicts: [], product_actives: [] });
+  const [cartConflicts, setCartConflicts] = useState({ has_conflict: false, has_conflicts: false, conflicts: [] });
+  const [conflictAcknowledged, setConflictAcknowledged] = useState(false);
   const [wishlist, setWishlist] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -75,12 +72,15 @@ export const AppProvider = ({ children }) => {
       getMe()
         .then(res => {
           const d = res.data;
-          setUser({
+          const u = {
             ...d,
             name: d.fullName || d.name || d.email?.split('@')[0],
             fullName: d.fullName || d.name,
             skin_type: d.skinProfile?.skinType || d.skin_type
-          });
+          };
+          setUser(u);
+          loadCart(u);
+          loadWishlist(u);
         })
         .catch(() => {
           localStorage.removeItem('beautyai_token');
@@ -90,36 +90,111 @@ export const AppProvider = ({ children }) => {
         .finally(() => {
           setAuthLoading(false);
         });
-      loadCart();
-      loadWishlist();
     } else {
       setAuthLoading(false);
     }
   }, [token]);
 
-  const loadCart = useCallback(async () => {
+  const getCartStorageKey = useCallback((u) => {
+    const activeUser = u || user;
+    const keySuffix = activeUser?.id || activeUser?.email || 'default';
+    return `beautyai_cart_${keySuffix}`;
+  }, [user]);
+
+  const refreshCartConflicts = useCallback(async (items) => {
+    if (!items || items.length < 2) {
+      setCartConflicts({ has_conflict: false, has_conflicts: false, conflicts: [] });
+      setConflictAcknowledged(false);
+      return;
+    }
     try {
-      const res = await getCart();
-      setCart(res.data.cart || []);
-      setCartCount(res.data.item_count || 0);
-      if (res.data.conflict_report) {
-        setCartConflicts(res.data.conflict_report);
-      } else {
-        setCartConflicts({ has_conflicts: false, conflicts: [], product_actives: [] });
-      }
+      const pids = items.map((item) => Number(item.product_id ?? item.id)).filter((n) => !Number.isNaN(n) && n > 0);
+      const res = await checkProductConflicts(pids);
+      const data = res.data || {};
+      const conflicts = data.conflicts || [];
+      const hasConflict = Boolean(data.has_conflict ?? data.has_conflicts ?? conflicts.length > 0);
+      setCartConflicts({
+        has_conflict: hasConflict,
+        has_conflicts: hasConflict,
+        conflict_count: conflicts.length,
+        conflicts,
+      });
     } catch {
-      setCart([]);
-      setCartCount(0);
-      setCartConflicts({ has_conflicts: false, conflicts: [], product_actives: [] });
+      setCartConflicts({ has_conflict: false, has_conflicts: false, conflicts: [] });
     }
   }, []);
 
-  const loadWishlist = useCallback(async () => {
+  const syncCartState = useCallback((items, u) => {
+    const key = getCartStorageKey(u);
+    const normalized = (items || []).map((item) => {
+      const priceUsd = parseFloat(item.price_usd ?? item.priceUsd ?? item.price) || 0;
+      const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
+      return {
+        ...item,
+        product_id: Number(item.product_id ?? item.id),
+        id: Number(item.id ?? item.product_id),
+        product_name: item.product_name ?? item.name ?? 'Beauty Product',
+        brand_name: item.brand_name ?? item.brandName ?? 'BeautyAI',
+        price_usd: priceUsd,
+        quantity: qty,
+        subtotal: priceUsd * qty,
+      };
+    });
+
+    setCart(normalized);
+    const totalCount = normalized.reduce((sum, i) => sum + i.quantity, 0);
+    setCartCount(totalCount);
+
     try {
-      const res = await getWishlist();
-      setWishlist(res.data.wishlist?.map(p => p.product_id) || []);
-    } catch { setWishlist([]); }
-  }, []);
+      localStorage.setItem(key, JSON.stringify(normalized));
+    } catch {
+      // ignore storage quota errors
+    }
+
+    refreshCartConflicts(normalized);
+  }, [getCartStorageKey, refreshCartConflicts]);
+
+  const loadCart = useCallback(async (u) => {
+    const key = getCartStorageKey(u);
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          syncCartState(parsed, u);
+          return;
+        }
+      }
+    } catch {
+      // ignore parse error
+    }
+    setCart([]);
+    setCartCount(0);
+    setCartConflicts({ has_conflict: false, has_conflicts: false, conflicts: [] });
+  }, [getCartStorageKey, syncCartState]);
+
+  const getWishlistStorageKey = useCallback((u) => {
+    const activeUser = u || user;
+    const keySuffix = activeUser?.id || activeUser?.email || 'default';
+    return `beautyai_wishlist_${keySuffix}`;
+  }, [user]);
+
+  const loadWishlist = useCallback(async (u) => {
+    const key = getWishlistStorageKey(u);
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setWishlist(parsed.map(String));
+          return;
+        }
+      }
+    } catch {
+      // ignore storage parse error
+    }
+    setWishlist([]);
+  }, [getWishlistStorageKey]);
 
   const login = async (email, password) => {
     setLoading(true);
@@ -136,8 +211,8 @@ export const AppProvider = ({ children }) => {
       setToken(t_val);
       setUser(u);
       toast.success(t('toast_welcome').replace('{name}', u.fullName || u.name));
-      loadCart();
-      loadWishlist();
+      loadCart(u);
+      loadWishlist(u);
       return true;
     } catch (err) {
       toast.error(err.response?.data?.message || err.response?.data?.detail || t('toast_login_failed'));
@@ -184,58 +259,146 @@ export const AppProvider = ({ children }) => {
     toast.success(t('toast_logout_success'));
   };
 
-  const addItemToCart = async (productId, quantity = 1) => {
-    if (!user) { toast.error(t('toast_login_required_cart')); return; }
+  const addItemToCart = async (productIdOrObj, quantity = 1) => {
+    if (!user) {
+      toast.error(t('toast_login_required_cart'));
+      window.dispatchEvent(new CustomEvent('open-auth-modal'));
+      return;
+    }
+
+    const qtyToAdd = Math.max(1, parseInt(quantity, 10) || 1);
+    const pid = typeof productIdOrObj === 'object'
+      ? Number(productIdOrObj.id ?? productIdOrObj.product_id)
+      : Number(productIdOrObj);
+
     try {
-      await addToCart({ product_id: String(productId), quantity });
+      const existingIndex = cart.findIndex((item) => Number(item.product_id ?? item.id) === pid);
+      if (existingIndex >= 0) {
+        const nextCart = cart.map((item, idx) =>
+          idx === existingIndex
+            ? { ...item, quantity: item.quantity + qtyToAdd }
+            : item
+        );
+        syncCartState(nextCart, user);
+        setConflictAcknowledged(false);
+        toast.success(t('toast_cart_added'));
+        return;
+      }
+
+      let prodData = typeof productIdOrObj === 'object' && (productIdOrObj.name || productIdOrObj.product_name) ? productIdOrObj : null;
+      if (!prodData) {
+        const res = await getProduct(pid);
+        prodData = res.data;
+      }
+
+      const newItem = {
+        id: Number(prodData.id ?? prodData.product_id ?? pid),
+        product_id: Number(prodData.id ?? prodData.product_id ?? pid),
+        code: prodData.code || '',
+        product_name: prodData.name ?? prodData.product_name ?? 'Beauty Product',
+        brand_name: prodData.brandName ?? prodData.brand_name ?? (typeof prodData.brand === 'string' ? prodData.brand : prodData.brand?.name) ?? 'BeautyAI',
+        category_name: prodData.categoryName ?? prodData.primary_category ?? (typeof prodData.category === 'string' ? prodData.category : prodData.category?.name) ?? 'Skincare',
+        department: prodData.department ?? 'Skincare',
+        price_usd: parseFloat(prodData.priceUsd ?? prodData.price_usd ?? prodData.price) || 0,
+        image_url: prodData.imageUrl ?? prodData.image_url,
+        quantity: qtyToAdd,
+      };
+
+      syncCartState([...cart, newItem], user);
+      setConflictAcknowledged(false);
       toast.success(t('toast_cart_added'));
-      loadCart();
     } catch (err) {
-      console.error("Add to cart error:", err);
+      console.error('Add to cart error:', err);
       toast.error(err.response?.data?.detail || err.message || t('toast_cart_add_failed'));
     }
   };
 
   const removeItemFromCart = async (productId) => {
-    try {
-      await removeFromCart(String(productId));
-      loadCart();
-    } catch { toast.error(t('toast_cart_remove_failed')); }
+    const pid = Number(productId);
+    const nextCart = cart.filter((item) => Number(item.product_id ?? item.id) !== pid);
+    syncCartState(nextCart, user);
+    setConflictAcknowledged(false);
   };
 
   const updateItemQuantity = async (productId, quantity) => {
-    try {
-      await updateCartAPI(String(productId), quantity);
-      loadCart();
-    } catch { toast.error(t('toast_cart_update_failed')); }
+    const pid = Number(productId);
+    const nextQty = parseInt(quantity, 10);
+    if (nextQty <= 0) {
+      await removeItemFromCart(pid);
+      return;
+    }
+    const nextCart = cart.map((item) =>
+      Number(item.product_id ?? item.id) === pid
+        ? { ...item, quantity: nextQty }
+        : item
+    );
+    syncCartState(nextCart, user);
   };
 
-  const toggleWishlistItem = async (productId) => {
-    if (!user) { toast.error(t('toast_login_required_wishlist')); return; }
-    const pid = String(productId);
+  const clearCart = useCallback(() => {
+    const key = getCartStorageKey(user);
+    setCart([]);
+    setCartCount(0);
+    setCartConflicts({ has_conflict: false, has_conflicts: false, conflicts: [] });
+    setConflictAcknowledged(false);
     try {
-      const res = await toggleWishlist(pid);
-      const added = res.data.added;
-      if (added) {
-        setWishlist(prev => [...prev, pid]);
-        toast.success(t('toast_wishlist_added'));
-      } else {
-        setWishlist(prev => prev.filter(id => String(id) !== pid));
-        toast.success(t('toast_wishlist_removed'));
-      }
-    } catch { toast.error(t('toast_wishlist_failed')); }
+      localStorage.removeItem(key);
+    } catch {
+      // ignore
+    }
+  }, [getCartStorageKey, user]);
+
+  const toggleWishlistItem = async (productId) => {
+    if (!user) {
+      toast.error(t('toast_login_required_wishlist'));
+      window.dispatchEvent(new CustomEvent('open-auth-modal'));
+      return;
+    }
+    const pid = String(productId);
+    const key = getWishlistStorageKey(user);
+    const alreadySaved = wishlist.map(String).includes(pid);
+    const updated = alreadySaved
+      ? wishlist.filter(id => String(id) !== pid)
+      : [...wishlist.map(String), pid];
+
+    setWishlist(updated);
+    try {
+      localStorage.setItem(key, JSON.stringify(updated));
+    } catch {
+      // ignore storage quota errors
+    }
+
+    if (alreadySaved) {
+      toast.success(t('toast_wishlist_removed'));
+    } else {
+      toast.success(t('toast_wishlist_added'));
+    }
+  };
+
+  const clearWishlist = () => {
+    if (!user) return;
+    const key = getWishlistStorageKey(user);
+    setWishlist([]);
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // ignore
+    }
+    toast.success('Cleared your wishlist');
   };
 
   const isInWishlist = (productId) => wishlist.map(String).includes(String(productId));
 
   return (
     <AppContext.Provider value={{
-      user, setUser, token, cart, cartCount, cartConflicts, wishlist,
+      user, setUser, token, cart, cartCount, cartConflicts,
+      conflictAcknowledged, setConflictAcknowledged,
+      wishlist,
       cartOpen, setCartOpen,
       loading, authLoading,
       login, register, logout,
-      loadCart, addItemToCart, removeItemFromCart, updateItemQuantity,
-      toggleWishlistItem, isInWishlist,
+      loadCart, addItemToCart, removeItemFromCart, updateItemQuantity, clearCart,
+      toggleWishlistItem, clearWishlist, isInWishlist,
       lang, changeLanguage, t,
       currency, changeCurrency, exchangeRate, formatPrice, formatDualPrice,
     }}>

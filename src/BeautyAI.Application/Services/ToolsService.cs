@@ -171,6 +171,7 @@ public class ToolsService : IToolsService
         var products = await _toolRepository.GetProductsForConflictCheckAsync(request.ProductIds, cancellationToken);
         var conflictRules = await _toolRepository.GetAllConflictRulesAsync(cancellationToken);
         var detected = new List<ConflictDetailDto>();
+        var seenPairs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         for (int i = 0; i < products.Count; i++)
         {
@@ -179,8 +180,17 @@ public class ToolsService : IToolsService
                 var p1 = products[i];
                 var p2 = products[j];
 
+                if (string.Equals(p1.Department, "Tools & Brushes", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(p2.Department, "Tools & Brushes", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 var ing1 = p1.ProductIngredients.Select(pi => pi.Ingredient?.InciName ?? "").Concat(new[] { p1.IngredientListRaw }).ToList();
                 var ing2 = p2.ProductIngredients.Select(pi => pi.Ingredient?.InciName ?? "").Concat(new[] { p2.IngredientListRaw }).ToList();
+
+                var p1Display = p1.Brand != null ? $"{p1.Brand.Name} — {p1.Name}" : p1.Name;
+                var p2Display = p2.Brand != null ? $"{p2.Brand.Name} — {p2.Name}" : p2.Name;
 
                 foreach (var rule in conflictRules)
                 {
@@ -195,9 +205,16 @@ public class ToolsService : IToolsService
 
                     if ((p1HasA && p2HasB) || (p1HasB && p2HasA))
                     {
+                        var pairKey = $"{Math.Min(p1.Id, p2.Id)}:{Math.Max(p1.Id, p2.Id)}:{rule.Id}";
+                        if (!seenPairs.Add(pairKey))
+                            continue;
+
+                        var prodForA = p1HasA ? p1Display : p2Display;
+                        var prodForB = p1HasA ? p2Display : p1Display;
+
                         detected.Add(new ConflictDetailDto(
-                            ProductA: p1.Name,
-                            ProductB: p2.Name,
+                            ProductA: prodForA,
+                            ProductB: prodForB,
                             IngredientA: rule.ActiveIngredientA,
                             IngredientB: rule.ActiveIngredientB,
                             Severity: rule.Severity,

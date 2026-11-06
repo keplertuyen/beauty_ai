@@ -51,12 +51,12 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 | **Xác thực & Tài khoản** | Đăng ký, Đăng nhập Email/Password chuẩn, JWT an toàn, Đổi mật khẩu, Cập nhật Profile. | Đăng nhập Google/Facebook OAuth, Quên mật khẩu qua email token SMTP. |
 | **Hồ sơ da & Dị ứng** | Digital Skin ID (Loại da, nhạy cảm, 5 vấn đề da), Allergy Blacklist cá nhân hóa, Cảnh báo dị ứng đỏ. | Lịch sử biến đổi da theo thời gian, Đánh giá mức độ nhạy cảm qua camera phân tích ảnh. |
 | **Danh mục & Tìm kiếm** | Danh mục 2 cấp, Tìm kiếm từ khóa/hoạt chất, Lọc loại da/giá, Sắp xếp, Công tắc *"An toàn cho da tôi"*. | Lọc theo chứng nhận Vegan/Cruelty-Free, Tìm kiếm bằng giọng nói / hình ảnh. |
-| **Trang chi tiết (PDP)** | Bảng INCI phân màu, Match Score %, Biểu đồ công năng, Cảnh báo dị ứng đỏ, Lọc 1M reviews theo loại da. | Modal phân tích trọng số thuật toán chi tiết, Gợi ý sản phẩm mua kèm bằng thuật toán Apriori. |
-| **Phân tích INCI** | Dán bảng thành phần thô bất kỳ, bóc tách dấu phẩy, tra cứu từ điển CSDL, đối chiếu dị ứng. | Chụp ảnh bao bì OCR tự động nhận diện chữ, Bách khoa toàn thư thành phần Wikipedia. |
+| **Trang chi tiết (PDP)** | Bảng INCI 3 tầng (Key Notable Ingredients 3–6 chất + Nhóm chức năng + Full INCI thu gọn), Kết luận `Suitability Verdict` dạng chữ, Cảnh báo dị ứng đỏ, Lọc 1M reviews theo loại da. | Modal phân tích trọng số thuật toán chi tiết, Gợi ý sản phẩm mua kèm bằng thuật toán Apriori. |
+| **Phân tích INCI** | Bắt buộc đăng nhập (Blurred Preview Gate) + Popup Skin ID 30 giây, Nhận diện 7 vùng chăm sóc (`TargetCareArea`), Phân loại Hương liệu/Cồn béo 3 mức, Bảng INCI 3 tầng. | Kiểm chứng tuyên bố tiếp thị trên bao bì (Marketing Claim Check), Chụp ảnh bao bì OCR tự động nhận diện chữ. |
 | **Xung đột hoạt chất** | Quét giỏ hàng tự động, phát hiện 12 cặp kỵ nhau, cảnh báo viền cam kèm hướng dẫn chia lịch Sáng/Tối. | Admin UI tự tạo quy tắc xung đột mới, Quét sản phẩm khách đang dùng ở nhà. |
 | **Digital Skin ID & Routine** | Thiết lập Hồ sơ Digital Skin ID 1 chạm (Loại da ➔ Dị ứng ➔ Vấn đề & Mục tiêu), Tự động sinh Routine AM/PM, Nút **Chat-to-Cart** thêm cả bộ vào giỏ. | **Skin Quiz trắc nghiệm chẩn đoán loại da nâng cao**, Xuất Routine ra file PDF, Chia sẻ chu trình lên mạng xã hội. |
-| **So sánh & Wishlist** | Khay so sánh Drawer, Bảng so sánh 2-4 sản phẩm (thông số, hoạt chất, Match Score), Quản lý Wishlist. | Tự động gợi ý sản phẩm đối trọng để so sánh, Thông báo đẩy khi Wishlist giảm giá. |
-| **Giỏ hàng & Đơn hàng** | Quản lý giỏ hàng, Áp dụng voucher cơ bản (`BEAUTYAI10`, `FREESHIP`), Checkout COD, Lịch sử đơn hàng. | Cart drawer trượt ngang, Voucher đa tầng (sàn + shop), Khách tự hủy đơn / Mua lại đơn cũ. |
+| **Wishlist & So sánh** | Quản lý Danh sách yêu thích (`Wishlist`): Thả tim, xem sản phẩm yêu thích kèm `Suitability Verdict` & cảnh báo dị ứng, nút *Clear All*. | **So sánh sản phẩm (Compare Drawer & Bảng so sánh 2–4 sản phẩm)**, Tự động gợi ý sản phẩm đối trọng, Thông báo đẩy khi giảm giá. |
+| **Giỏ hàng & Đơn hàng** | Quản lý giỏ hàng, Smart Conflict Detector kèm checkbox xác nhận, Checkout COD, Lịch sử đơn hàng. | Mã giảm giá / Voucher đa tầng (sàn + shop), Khách tự hủy đơn / Mua lại đơn cũ. |
 | **Trợ lý AI** | Gemini API Flash, Grounding sản phẩm sàn, Cá nhân hóa Skin ID, Guardrail an toàn y tế. | Chuyển giao hội thoại sang Zalo OA tư vấn viên, Lưu trữ và phân tích tâm lý khách hàng nhiều phiên. |
 | **Đánh giá cộng đồng** | Danh sách reviews từ dataset 1M, Tab lọc theo loại da (Da dầu, Da khô...), Gửi đánh giá mới. | Bình chọn đánh giá hữu ích (Upvote), Kiểm duyệt tự động bằng mô hình AI NLP. |
 | **Quản trị Admin** | Dashboard thẻ KPI (Doanh thu, Đơn hàng, SP), CRUD Sản phẩm & INCI, Đổi trạng thái đơn COD. | Xuất báo cáo Excel, Cấu hình tỷ giá đa tiền tệ, Nhật ký kiểm toán thao tác hệ thống (Audit log). |
@@ -149,21 +149,21 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 - **Điều kiện chấp nhận:**
   - `AC-01.1` **Given** tôi mở trang `/products/{slug}`, **When** trang tải xong, **Then** hiển thị đầy đủ: Ảnh sản phẩm chất lượng cao (có chức năng zoom/xem ảnh phóng to), Tên thương hiệu, Tên sản phẩm, Dung tích (ml/g), Giá bán chuẩn USD ($), Tình trạng còn hàng/hết hàng, Nút số lượng và Nút *"Thêm vào giỏ hàng"*.
 
-### FR-PDP-02 [Must-Have] Bảng thành phần INCI chuẩn hóa có nhãn tiếng Việt
-- **Mô tả:** Toàn bộ bảng thành phần hóa học được bóc tách và giải nghĩa khoa học rõ ràng.
+### FR-PDP-02 [Must-Have] Bảng thành phần INCI 3 tầng (3-Tier Progressive Disclosure)
+- **Mô tả:** Bảng thành phần hóa học được bóc tách thành 3 tầng dễ hiểu thay vì liệt kê dày đặc gây choáng ngợp.
 - **Điều kiện chấp nhận:**
-  - `AC-02.1` **Given** sản phẩm có bảng thành phần in trên vỏ hộp, **When** xem mục Bảng thành phần, **Then** các thành phần được liệt kê chính xác theo thứ tự nồng độ giảm dần (theo chuẩn công bố mỹ phẩm quốc tế).
-  - `AC-02.2` **Given** mỗi thành phần trong danh sách, **When** hiển thị, **Then** đi kèm nhãn tiếng Việt giải nghĩa công dụng chính (ví dụ: *Glycerin - Dưỡng ẩm sâu*, *Niacinamide - Làm sáng da & Thu nhỏ lỗ chân lông*, *Salicylic Acid - Tẩy tế bào chết & Trị mụn*).
-  - `AC-02.3` **Given** thành phần được phân loại theo màu sắc an toàn:
-    - 🟢 **Màu xanh lá:** Thành phần lành tính, dưỡng ẩm, phục hồi, làm dịu da.
-    - 🟡 **Màu vàng / cam:** Hoạt chất điều trị nồng độ cao (Treatment) cần lưu ý cách dùng.
-    - 🔴 **Màu đỏ:** Thành phần có nguy cơ gây kích ứng cao, hương liệu, cồn khô.
+  - `AC-02.1` **Given** sản phẩm là dụng cụ vật lý (`Tools & Brushes`), **When** xem trang PDP, **Then** ẩn hoàn toàn tab *Formula & Ingredients* và nút *Deep Formula Analysis*, hiển thị nhãn `Accessory / Tool`.
+  - `AC-02.2` **Given** sản phẩm là mỹ phẩm nhưng nhà sản xuất không cung cấp bảng INCI, **When** xem trang PDP, **Then** ẩn nút *Deep Formula Analysis*, hiển thị thông báo minh bạch `Insufficient INCI Data` và loại khỏi bộ lọc dị ứng `"Safe for me"`.
+  - `AC-02.3` **Given** sản phẩm có bảng thành phần INCI, **When** xem tab *Formula & Ingredients*, **Then** hiển thị:
+    - **Dải Key Notable Ingredients (3–6 chất chủ đạo):** Tên thông dụng dễ hiểu + tên gốc INCI + vai trò công năng + giải thích 1 dòng.
+    - **Nhóm chức năng (How the Complete Formula Is Built):** Gom các chất nền, tạo màu, hương thơm và bảo quản theo nhóm kèm số lượng.
+    - **Toàn bộ danh sách INCI trên bao bì:** Thu gọn mặc định trong thanh trượt *"View Full Packaging INCI List"*.
 
-### FR-PDP-03 [Must-Have — USP] Điểm tương thích da (Suitability Match Score)
-- **Quy tắc nghiệp vụ:** `BR-ALGO-01`, `ADR-011`.
+### FR-PDP-03 [Must-Have — USP] Kết luận tương thích cá nhân hóa dạng chữ (Suitability Verdict)
+- **Quy tắc nghiệp vụ:** `BR-ALGO-01`, `ADR-011`, `INV-01` (Tuyệt đối không dùng điểm số `%` hay `SafetyScore /5`).
 - **Điều kiện chấp nhận:**
-  - `AC-03.1` **Given** tôi đã đăng nhập và có Digital Skin ID (ví dụ: Da dầu, Có mụn), **When** xem trang PDP, **Then** hệ thống tính toán và hiển thị thanh đo **Match Score** theo phần trăm (ví dụ: *"92% Phù hợp với làn da của bạn"*).
-  - `AC-03.2` **Given** tôi là khách vãng lai chưa có Skin ID, **When** xem trang PDP, **Then** vị trí Match Score hiển thị lời mời: *"Thiết lập Digital Skin ID ngay để xem độ phù hợp của sản phẩm với làn da bạn"*.
+  - `AC-03.1` **Given** tôi đã đăng nhập và có Digital Skin ID, **When** xem trang Catalog, PDP, Wishlist hoặc Analyzer, **Then** hệ thống đánh giá và hiển thị **Kết luận dạng chữ (Suitability Verdict)** đồng nhất (`Good Match`, `Match with Notes`, hoặc `Not Suitable — Allergy Alert`) kèm giải thích ngắn gọn 1 dòng.
+  - `AC-03.2` **Given** tôi là khách vãng lai chưa đăng nhập hoặc chưa hoàn tất Skin ID, **When** xem trang PDP, **Then** vùng Buy Box hiển thị nút mời đăng nhập hoặc mở Popup hoàn tất Skin ID trong 30 giây (`SkinIdQuickModal`).
 
 ### FR-PDP-04 [Must-Have — USP] Banner đỏ cảnh báo dị ứng cá nhân trên PDP
 - **Mô tả:** Cảnh báo nổi bật tức thì để bảo vệ người dùng không mua nhầm sản phẩm chứa chất mình dị ứng.
@@ -180,9 +180,9 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 - **Điều kiện chấp nhận:**
   - `AC-06.1` **Given** sản phẩm là Kem chống nắng, **When** xem mục Hướng dẫn sử dụng, **Then** hệ thống hiển thị huy hiệu: *"Dùng buổi SÁNG (AM)"* và chỉ rõ vị trí: *"Bước cuối cùng trong chu trình dưỡng da buổi sáng, trước khi trang điểm"*.
 
-### FR-PDP-07 [Must-Have] Thêm vào Wishlist & So sánh từ PDP
+### FR-PDP-07 [Must-Have] Thêm vào Wishlist từ PDP
 - **Điều kiện chấp nhận:**
-  - `AC-07.1` **Given** trang PDP, **When** tôi bấm icon Trái tim, **Then** sản phẩm được lưu vào Wishlist; bấm nút *"So sánh"*, **Then** sản phẩm được đưa vào khay so sánh đáy màn hình.
+  - `AC-07.1` **Given** trang PDP, **When** tôi bấm icon Trái tim, **Then** sản phẩm được lưu vào Wishlist và cập nhật số lượng ngay trên thanh điều hướng.
 
 ---
 
@@ -245,18 +245,21 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ## 4.6. Module 06 — Công Cụ Phân Tích Thành Phần Tự Do (M06: INCI Analyzer Tool)
 
-### FR-INCI-01 [Must-Have] Nhập và dán danh sách thành phần bất kỳ
+### FR-INCI-01 [Must-Have] Yêu cầu Đăng nhập (Blurred Preview Gate), Skin ID 30 giây & 7 vùng chăm sóc
 - **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** tôi vào trang `/ingredient-analyzer`, **When** tôi copy-paste toàn bộ đoạn văn bản thành phần in trên bao bì của một sản phẩm bất kỳ ngoài thị trường vào khung Textarea và bấm *"Phân tích ngay"*, **Then** hệ thống tự động bóc tách các chất theo dấu phẩy, loại bỏ khoảng trắng thừa và tra cứu đối chiếu với CSDL từ điển INCI.
+  - `AC-01.1` **Given** tôi vào trang `/ingredient-analyzer` khi chưa đăng nhập, **When** trang tải xong, **Then** hiển thị giao diện phân tích công thức được làm mờ (`Blurred Preview Gate`) kèm thẻ nổi *"Personal Skin ID Cross-Check Available"* yêu cầu đăng nhập để mở khóa.
+  - `AC-01.2` **Given** tôi đã đăng nhập nhưng chưa hoàn tất Skin ID, **When** truy cập trang phân tích, **Then** hệ thống tự động mở popup thiết lập nhanh trong 30 giây (`SkinIdQuickModal`).
+  - `AC-01.3` **Given** tôi chọn 1 trong 7 vùng chăm sóc (`Face`, `Eye Area`, `Lips`, `Hair & Scalp`, `Bath & Body`, `Fragrance`, `Nails & Cuticles`) hoặc điều hướng từ trang sản phẩm, **When** phân tích, **Then** công dụng và lưu ý nhạy cảm được điều chỉnh đúng theo vùng chăm sóc đó.
 
-### FR-INCI-02 [Must-Have] Kết quả phân tích độ an toàn & bít tắc lỗ chân lông
+### FR-INCI-02 [Must-Have] Bóc tách INCI 3 tầng & Phân loại Hương liệu / Cồn béo 3 mức độ
 - **Điều kiện chấp nhận:**
-  - `AC-02.1` **Given** danh sách thành phần đã bóc tách, **When** màn hình kết quả hiển thị, **Then** liệt kê chi tiết từng hoạt chất kèm nhãn phân loại màu (Xanh/Vàng/Đỏ), công năng tóm tắt, chỉ số kích ứng (0-5) và chỉ số gây bít tắc lỗ chân lông sinh mụn (Comedogenic Rating 0-5).
+  - `AC-02.1` **Given** danh sách thành phần đã bóc tách, **When** màn hình kết quả hiển thị, **Then** hiển thị cấu trúc 3 tầng: Kết luận cá nhân hóa dạng chữ ➔ 3–6 Key Notable Ingredients + Functional Role Groups ➔ Danh sách Full Packaging INCI thu gọn.
+  - `AC-02.2` **Given** bảng thành phần chứa chiết xuất thực vật dịu nhẹ (`Rosa Damascena Flower Water`, `Vanilla`, `Chamomile`) hoặc cồn béo dưỡng ẩm (`Cetearyl Alcohol`, `Cetyl Alcohol`), **Then** hệ thống phân loại đúng là chất làm dịu/dưỡng ẩm, tuyệt đối không cảnh báo nhầm là chất gây kích ứng hay cồn khô.
 
-### FR-INCI-03 [Must-Have — USP] Đối chiếu tự động với Allergy Blacklist
+### FR-INCI-03 [Must-Have — USP] Đối chiếu tự động với Allergy Blacklist (Gộp gọn 1 dòng)
 - **Điều kiện chấp nhận:**
-  - `AC-03.1` **Given** tôi dán một bảng thành phần có chứa chất `Fragrance` mà tôi đang bị dị ứng, **When** phân tích xong, **Then** hệ thống hiển thị cảnh báo đỏ trên đầu trang:
-    > *"Cảnh báo: Bảng thành phần này có chứa **Fragrance**, hoạt chất nằm trong danh sách dị ứng của bạn!"*
+  - `AC-03.1` **Given** tôi dán một bảng thành phần có chứa các chất nằm trong `Allergy Blacklist` của tôi, **When** phân tích xong, **Then** hệ thống trả về kết luận `Not Suitable — Allergy Alert` và hiển thị dòng cảnh báo gộp gọn:
+    > *"⚠️ Contains ingredients that trigger your personal Allergy Blacklist: Linalool, Limonene..."*
 
 ---
 
@@ -282,20 +285,9 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ---
 
-## 4.8. Module 08 — So Sánh Sản Phẩm (M08: Product Comparison)
+## 4.8. Module 08 — So Sánh Sản Phẩm (M08: Product Comparison — Chuyển sang Phase 2)
 
-### FR-COMP-01 [Must-Have] Khay so sánh ghim đáy màn hình (Compare Drawer)
-- **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** tôi đang duyệt sản phẩm ngoài Catalog hoặc PDP, **When** tôi bấm nút *"So sánh"* trên tối đa 3-4 sản phẩm cùng danh mục, **Then** ở đáy màn hình xuất hiện một thanh Drawer hiển thị ảnh thu nhỏ của các sản phẩm đã chọn kèm nút *"So sánh ngay (3)"* và nút xóa từng món.
-
-### FR-COMP-02 [Must-Have] Bảng so sánh thông số, thành phần & Match Score
-- **Điều kiện chấp nhận:**
-  - `AC-02.1` **Given** tôi bấm *"So sánh ngay"*, **When** trang `/compare` hiển thị, **Then** xuất hiện bảng so sánh song song đa cột (Side-by-side Table):
-    - Dòng 1: Hình ảnh, tên, giá bán USD ($), dung tích, xuất xứ thương hiệu.
-    - Dòng 2: **Điểm tương thích Match Score** theo hồ sơ da của người xem (ví dụ: SP A đạt 88%, SP B đạt 70%).
-    - Dòng 3: Danh sách các hoạt chất chính và điểm khác biệt về công năng.
-    - Dòng 4: Cảnh báo dị ứng: Đánh dấu đỏ trực tiếp lên cột sản phẩm nào có chứa chất dị ứng của người xem.
-    - Dòng 5: Nút *"Thêm vào giỏ"* ngay dưới chân mỗi cột sản phẩm.
+> **Trạng thái phạm vi:** Tính năng So sánh sản phẩm (`Compare Drawer` & `Bảng so sánh song song 2–4 sản phẩm`) đã được chuyển sang **Phase 2** nhằm tinh gọn thanh điều hướng và tập trung hoàn thiện 5 tính năng USP cốt lõi trong Phase 1.
 
 ---
 
@@ -309,17 +301,14 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ---
 
-## 4.10. Module 10 — Giỏ Hàng & Mã Giảm Giá (M10: Cart & Coupons)
+## 4.10. Module 10 — Giỏ Hàng (M10: Shopping Bag)
 
 ### FR-CART-01 [Must-Have] Quản lý sản phẩm trong giỏ hàng
 - **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** trang giỏ hàng `/cart`, **When** tôi thay đổi số lượng bằng nút `+` hoặc `-`, **Then** số lượng được cập nhật tức thì, tổng tiền tạm tính tự động tính lại.
-  - `AC-01.2` **Given** tôi bấm icon Thùng rác bên cạnh một sản phẩm, **When** xác nhận, **Then** sản phẩm bị xóa khỏi giỏ hàng. Nếu giỏ trống, hiển thị màn hình rỗng kèm nút *"Tiếp tục mua sắm"*.
+  - `AC-01.1` **Given** trang giỏ hàng `/cart` hoặc khay `CartDrawer`, **When** tôi thay đổi số lượng bằng nút `+` hoặc `-`, **Then** số lượng được cập nhật tức thì, tổng tiền tạm tính tự động tính lại.
+  - `AC-01.2` **Given** tôi bấm icon Thùng rác bên cạnh một sản phẩm hoặc nút *"Clear Bag"*, **When** xác nhận, **Then** sản phẩm bị xóa khỏi giỏ hàng. Nếu giỏ trống, hiển thị màn hình rỗng kèm nút *"Shop Catalog"*.
 
-### FR-CART-02 [Must-Have] Áp dụng mã giảm giá cơ bản
-- **Điều kiện chấp nhận:**
-  - `AC-02.1` **Given** ô nhập mã giảm giá trong giỏ hàng, **When** tôi nhập `BEAUTYAI10` và bấm *"Áp dụng"*, **Then** hệ thống giảm 10% trên tổng tiền đơn hàng và hiển thị dòng giảm giá rõ ràng.
-  - `AC-02.2` **Given** tôi nhập mã không tồn tại hoặc hết hạn, **When** bấm áp dụng, **Then** hệ thống thông báo: *"Mã giảm giá không hợp lệ."* và giữ nguyên tổng tiền ban đầu.
+> **Lưu ý phạm vi:** Tính năng Mã giảm giá (Voucher / Coupon) được chuyển sang **Phase 2** để tập trung vào luồng thanh toán COD và kiểm tra xung đột hoạt chất ở Phase 1.
 
 ---
 

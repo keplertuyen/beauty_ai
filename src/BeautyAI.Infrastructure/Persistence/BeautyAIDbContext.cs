@@ -20,6 +20,8 @@ public class BeautyAIDbContext : DbContext
     public DbSet<ProductIngredient> ProductIngredients => Set<ProductIngredient>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<ConflictRule> ConflictRules => Set<ConflictRule>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -253,6 +255,52 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.Recommendation).HasColumnName("recommendation").IsRequired();
             entity.Ignore(e => e.CreatedAtUtc);
             entity.Ignore(e => e.UpdatedAtUtc);
+        });
+
+        // 11. Order & OrderItem (Table 9 in Phase 1 Schema)
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("orders");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.RecipientName).HasColumnName("recipient_name").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.PhoneNumber).HasColumnName("phone_number").HasMaxLength(20).IsRequired();
+            entity.Property(e => e.ShippingAddress).HasColumnName("shipping_address").IsRequired();
+            entity.Property(e => e.PaymentMethod).HasColumnName("payment_method").HasMaxLength(50).HasDefaultValue("COD");
+            entity.Property(e => e.PaymentStatus).HasColumnName("payment_status").HasMaxLength(50).HasDefaultValue("Pending");
+            entity.Property(e => e.OrderStatus).HasColumnName("order_status").HasMaxLength(50).HasDefaultValue("Pending");
+            entity.Property(e => e.TotalAmountUsd).HasColumnName("total_amount_usd").HasPrecision(10, 2).IsRequired();
+            entity.Property(e => e.ConflictAcknowledged).HasColumnName("conflict_acknowledged").HasDefaultValue(false);
+            entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Ignore(e => e.UpdatedAtUtc);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasMany(e => e.OrderItems)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.ToTable("order_items");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id").IsRequired();
+            entity.Property(e => e.ProductId).HasColumnName("product_id").IsRequired();
+            entity.Property(e => e.Quantity).HasColumnName("quantity").IsRequired();
+            entity.Property(e => e.UnitPriceUsd).HasColumnName("unit_price_usd").HasPrecision(10, 2).IsRequired();
+            entity.Property(e => e.TotalPriceUsd).HasColumnName("total_price_usd").HasPrecision(10, 2).IsRequired();
+
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

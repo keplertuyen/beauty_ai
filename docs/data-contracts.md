@@ -764,7 +764,8 @@ CREATE TABLE products (
     is_paraben_free         BOOLEAN NOT NULL DEFAULT FALSE,
     is_alcohol_free         BOOLEAN NOT NULL DEFAULT FALSE,
     routine_step            VARCHAR(20),
-    image_local_url         TEXT,                      -- ảnh TẢI VỀ CỤC BỘ (DQ-08)
+    image_url               TEXT,                      -- đường dẫn URI ảnh cục bộ (/images/products/{code}.webp) hoặc CDN; TUYỆT ĐỐI không lưu binary/base64 trong DB (DQ-08)
+    image_local_url         TEXT,                      -- dự phòng ảnh TẢI VỀ CỤC BỘ (DQ-08)
     cosmetic_declaration_no VARCHAR(100),              -- CMP-01, để sẵn cho Phase sau
     declaration_expiry_date DATE,                      -- CMP-02
     created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -799,6 +800,14 @@ CREATE INDEX ix_products_name_trgm    ON products USING GIN (vn_normalize(name) 
 CREATE INDEX ix_products_highlights_trgm
                                       ON products USING GIN (vn_normalize(highlights) gin_trgm_ops);
 ```
+
+### Ràng buộc Quản lý & Chuẩn Hóa Hình Ảnh Sản Phẩm (DQ-08 & Invariant)
+
+- **DQ-08a (URI Format):** Cột `image_url` chỉ lưu đường dẫn tương đối tĩnh (`/images/products/{code}.webp`) trỏ tới kho tài nguyên static của frontend hoặc URL CDN bên thứ ba đã được kiểm duyệt.
+- **DQ-08b (No Binary/Base64 in DB):** TUYỆT ĐỐI KHÔNG lưu trữ dữ liệu nhị phân (`BYTEA`, `BLOB`) hoặc chuỗi Base64 data URI trong PostgreSQL. Việc lưu trữ binary trong DB bị cấm nhằm chống phình to dung lượng (database bloat), tối ưu hóa I/O, giảm dung lượng sao lưu và tận dụng tối đa HTTP Cache của trình duyệt / CDN.
+- **DQ-08c (Format & Optimization):** Toàn bộ ảnh sản phẩm lưu trữ cục bộ phải được chuẩn hóa về định dạng **WebP** với độ phân giải tối đa 800x800px, thuật toán nội suy Lanczos, chất lượng nén 85% (dung lượng trung bình 15–40 KB/ảnh).
+- **DQ-08d (Grounding & Harvester Protocol):** Cấm đoán mò SKU (heuristic guessing) hoặc gán ảnh tự động thiếu kiểm soát; mọi hình ảnh thu thập phải được xác thực chính xác thông qua Sephora SKU Grounding (`s-code`) hoặc CDN chính hãng của thương hiệu. Nghiêm cấm dùng ảnh stock không phù hợp (như hình quả cam, khuôn mặt spa) làm ảnh dự phòng.
+
 
 ## 6.3. Trí tuệ thành phần
 

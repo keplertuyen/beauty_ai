@@ -7,21 +7,6 @@
   overflow: hidden;
 }
 
-/* Subtle glow orb at the bottom */
-.footer::before {
-  content: '';
-  position: absolute;
-  bottom: -150px;
-  right: 10%;
-  width: 300px;
-  height: 300px;
-  border-radius: var(--radius-full);
-  background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.5;
-}
-
 .footer-inner {
   display: grid;
   grid-template-columns: 1.2fr repeat(3, 1fr);
@@ -91,15 +76,12 @@
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
-  transition: all var(--transition-base);
 }
 
 .social-link:hover {
   background: var(--gradient-primary);
   border-color: transparent;
   color: white;
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-glow);
 }
 
 .footer-col {
@@ -126,7 +108,6 @@
 .footer-links a {
   font-size: 0.9rem;
   color: var(--text-muted);
-  transition: all var(--transition-fast);
   display: flex;
   align-items: center;
   gap: 7px;
@@ -134,7 +115,6 @@
 
 .footer-links a:hover {
   color: var(--primary-light);
-  padding-left: 4px;
 }
 
 .footer-contact {
@@ -188,12 +168,6 @@
 
 .heart-icon {
   color: var(--accent-red);
-  animation: heartBeat 2s infinite ease-in-out;
-}
-
-@keyframes heartBeat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
 }
 
 @media (max-width: 992px) {

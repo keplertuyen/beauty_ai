@@ -163,7 +163,7 @@ CREATE TABLE products (
     price_usd NUMERIC(10, 2) NOT NULL CHECK (price_usd >= 0),
     volume_ml INT,
     description TEXT,
-    image_url VARCHAR(500),
+    image_url VARCHAR(500), -- Relative static path (e.g. '/images/products/P505461.webp') or verified CDN URL. Real images are stored as optimized 800px WebP files under frontend public/images/products/. Never store binary/base64 data directly in PostgreSQL.
     ingredient_list_raw TEXT NOT NULL, -- Raw INCI ingredient string from packaging
     target_skin_types VARCHAR(50)[] NOT NULL, -- ARRAY['Oily', 'Combination']
     stock_quantity INT DEFAULT 100 NOT NULL CHECK (stock_quantity >= 0),
@@ -294,29 +294,56 @@ Hệ thống được nạp sẵn 12 bộ quy tắc xung đột chuẩn y văn d
 | **Copper Peptides** | **AHA / BHA** | `Warning` | Môi trường acid phá hủy liên kết peptide. | Thoa cách nhau ít nhất 30 phút. |
 | **Retinol** | **Tẩy da chết vật lý (Scrub)** | `Warning` | Tổn thương vi mô kết hợp bong sừng gây viêm da tiếp xúc. | Không dùng scrub dạng hạt khi đang treatment Retinol. |
 
+### 3.3. Chiến Lược Thu Thập & Chuẩn Hóa Hình Ảnh Sản Phẩm (Product Imagery Architecture)
+
+Nhằm giải quyết triệt để vấn đề hiển thị sai ảnh sản phẩm và tối ưu hóa hiệu năng trải nghiệm người dùng, hệ thống áp dụng kiến trúc chuẩn hóa hình ảnh sản phẩm như sau:
+
+#### 1. Phân tích nguyên nhân cào sai & trùng lặp ảnh (Root Cause Analysis):
+- **Thiếu định danh hình ảnh gốc:** Dataset Kaggle Sephora chỉ cung cấp `product_id` (ví dụ `P469502`), hoàn toàn không có trường link ảnh hoặc Sephora SKU ID (`s-code`).
+- **Lỗi phỏng đoán (Heuristic Guessing) & Cào thiếu grounding:** Việc cố gắng tạo link ảnh dựa trên suy đoán SKU hoặc cào ảnh tự động thiếu đối soát thương hiệu dẫn đến việc gán nhầm sản phẩm (ví dụ: nước hoa Yves Saint Laurent hiển thị ảnh son môi, bộ gift set hiển thị chai kem nền, cọ trang điểm hiển thị bảng phấn mắt).
+- **Fallback Unsplash thiếu chọn lọc & Trùng ảnh lặp lại:** Pool ảnh dự phòng trước đây chứa các ảnh stock không phù hợp (quả cam, khuôn mặt người mẫu đắp mặt nạ, vòi sen tắm) và thuật toán băm (hash) dựa trên seed ngắn dẫn đến nhiều sản phẩm kế tiếp nhau bị gán chung một ảnh.
+
+#### 2. Kiến trúc lưu trữ ảnh tĩnh (Static Asset Architecture & DQ-08):
+- **Vị trí lưu trữ vật lý:** Các tệp ảnh đã xử lý được lưu trữ tập trung tại thư mục tài nguyên tĩnh của Frontend: `src/frontend/public/images/products/{product_id}.webp`.
+- **Định danh trong Cơ sở dữ liệu:** Cột `products.image_url` chỉ lưu đường dẫn tương đối (URI: `/images/products/{product_id}.webp`) hoặc URL CDN đã được xác thực.
+- **Nguyên tắc bất biến:** **TUYỆT ĐỐI KHÔNG lưu trữ dữ liệu nhị phân (BLOB) hay Base64 trong PostgreSQL.** Việc lưu URI tĩnh giúp database siêu nhẹ, sao lưu nhanh chóng, không gây bloating RAM/Disk, đồng thời tận dụng triệt để cơ chế HTTP Cache, Browser Caching và HTTP/2 multiplexing của web server.
+
+#### 3. Quy chuẩn cào ảnh chính xác (Standardized Scraping & Harvester Protocol):
+1. **Search Grounding chính xác SKU:** Truy vấn danh mục chính thức Sephora theo cú pháp `"{Brand}" "{Product Name}" sephora "skuId"` để lấy mã định danh SKU duy nhất của Sephora (ví dụ: `P469502` -> `s2421360`).
+2. **Khai thác trực tiếp Sephora CDN:** Tải ảnh gốc độ phân giải cao theo cấu trúc:
+   `https://www.sephora.com/productimages/sku/{sku}-main-zoom.jpg`
+   với đầy đủ HTTP headers tiêu chuẩn (`User-Agent` Chrome Desktop và `Referer: https://www.sephora.com/`).
+3. **Cơ chế Fallback CDN Hãng:** Đối với sản phẩm không còn niêm yết trên Sephora US (như dòng Paula's Choice EU direct), trích xuất ảnh từ CDN chính thức của nhãn hàng (ví dụ: `media.paulaschoice-eu.com`).
+4. **Chuẩn hóa tối ưu (Pillow Standardization Pipeline):**
+   - Chuyển đổi màu sắc sang không gian RGB chuẩn.
+   - Resize theo tỷ lệ tối đa 800x800px với bộ lọc Lanczos cao cấp.
+   - Nén sang định dạng hiện đại **WebP** ở chất lượng 85% (dung lượng chỉ 15–40 KB/ảnh mà độ nét hoàn hảo).
+5. **Làm sạch Fallback Studio:** Loại bỏ 100% các hình ảnh quả cam, mặt spa; chỉ sử dụng ảnh chụp studio mỹ phẩm trung tính và kết hợp băm đa biến `hash("{product_id}_{product_name}_{brand_name}")` để không bị trùng lặp.
+6. **Công cụ tự động hóa:** Tích hợp bộ script quản lý tập trung:
+   - `scripts/crawl_product_images.py`: Harvester tự động tải và chuẩn hóa WebP.
+   - `scripts/sync_image_data.py`: Đồng bộ dữ liệu ảnh giữa thư mục static, file CSV dataset và PostgreSQL database.
+
 ---
 
 # 4. THUẬT TOÁN KHOA HỌC CỐT LÕI (CORE ALGORITHMS)
 
-## 4.1. Thuật toán Điểm Tương Thích (Suitability Match Score — ADR-011)
-Được cài đặt trong Domain service `SuitabilityScoreCalculator`, tính toán động mỗi khi người dùng truy cập trang sản phẩm:
+## 4.1. Thuật toán Đánh giá Kết luận Tương thích (Suitability Verdict — ADR-011 & INV-01)
+Được cài đặt trong Domain service `SuitabilityScoreCalculator` kết hợp `CosmeticKnowledgeBase`, đánh giá động mỗi khi người dùng truy cập danh mục, trang chi tiết sản phẩm hoặc công cụ phân tích INCI (tuyệt đối không sử dụng con số `%` hay `SafetyScore /5`):
 
-$$\text{SuitabilityScore} = \text{BaseScore} + \Delta_{\text{SkinType}} + \Delta_{\text{Concerns}} - \text{Penalty}_{\text{Allergy}}$$
-
-**Quy tắc tính điểm chi tiết:**
-1. **Điểm cơ sở:** `BaseScore = 50`.
-2. **Khớp Loại da ($\Delta_{\text{SkinType}}$):**
-   - Nếu Loại da của người dùng nằm trong mảng `target_skin_types` của sản phẩm: $+25$ điểm.
-   - Nếu không khớp (ví dụ: sản phẩm chỉ dành cho da khô nhưng người dùng là da dầu): $-20$ điểm.
-3. **Giải quyết Vấn đề da ($\Delta_{\text{Concerns}}$):**
-   - Mỗi thành phần trong sản phẩm có công năng giải quyết đúng mối quan tâm của người dùng (ví dụ: người dùng quan tâm `Mụn` và sản phẩm có `Salicylic Acid`): $+10$ điểm/thành phần (tối đa $+25$ điểm).
-4. **Kiểm tra Da nhạy cảm:**
-   - Nếu người dùng có `is_sensitive = true` và sản phẩm chứa chất có `irritancy_rating >= 3`: $-30$ điểm.
-5. **Quy tắc trừng phạt dị ứng tuyệt đối ($\text{Penalty}_{\text{Allergy}}$):**
-   - **BẤT BIẾN:** Nếu sản phẩm chứa **BẤT KỲ** thành phần nào nằm trong `Allergy Blacklist` của người dùng:
-     - $\text{Penalty}_{\text{Allergy}} = 1000$
-     - $\text{SuitabilityScore} = \max(0, \text{Score}) = \mathbf{0\%}$.
-     - Kèm cờ cảnh báo: `HasAllergyWarning = true`, trả về danh sách tên các chất dị ứng cụ thể.
+**Quy tắc phân tầng kết luận (`SuitabilityVerdict`):**
+1. **Phân loại Dụng cụ vật lý (`AccessoryTool`):**
+   - Nếu sản phẩm thuộc ngành hàng `Tools & Brushes`: Trả về `Verdict = "AccessoryTool"`, `Label = "Accessory / Tool"` (không áp dụng phân tích hóa học INCI, vẫn giữ trong bộ lọc `"Safe for me"`).
+2. **Phân loại Mỹ phẩm thiếu dữ liệu INCI (`InsufficientData`):**
+   - Nếu sản phẩm là mỹ phẩm nhưng nhà sản xuất không công bố danh sách INCI (`ingredient_list_raw == ""`): Trả về `Verdict = "InsufficientData"`, `Label = "Insufficient INCI Data"` và tự động loại khỏi kết quả khi bật bộ lọc dị ứng `"Safe for me"`.
+3. **Quy tắc chặn dị ứng tuyệt đối (`AllergyConflict`):**
+   - **BẤT BIẾN:** Nếu sản phẩm chứa **BẤT KỲ** thành phần nào trùng khớp với `Allergy Blacklist` của người dùng:
+     - Trả về `Verdict = "AllergyConflict"`, `Label = "Not Suitable — Allergy Alert"`, `HasAllergyWarning = true`, kèm danh sách gộp gọn các chất gây dị ứng trùng khớp.
+4. **Kiểm tra trạng thái Hồ sơ da (`RequiresSkinId`):**
+   - Nếu khách chưa đăng nhập hoặc đã đăng nhập nhưng chưa thiết lập Digital Skin ID: Trả về `Verdict = "RequiresSkinId"`, mời hoàn tất Skin ID trong 30 giây.
+5. **Đánh giá theo Vùng chăm sóc (`TargetCareArea`) & Phân loại Hương liệu / Cồn béo 3 mức (`GoodMatch` vs `MatchWithNotes`):**
+   - Nhận diện 7 vùng chăm sóc (`face`, `eye`, `lips`, `hair`, `body`, `fragrance`, `nails`).
+   - Không bao giờ cảnh báo nhầm chiết xuất/nước hoa thực vật dịu nhẹ (`Rosa Damascena Flower Water`, `Vanilla`, `Chamomile`) hoặc cồn béo dưỡng ẩm (`Cetearyl Alcohol`, `Cetyl Alcohol`, `Stearyl Alcohol`) là chất gây kích ứng.
+   - Nếu phát hiện chất cần lưu ý cho cơ địa người dùng (ví dụ: cồn khô trên da khô/nhạy cảm, hoặc 26 hương liệu EU trên da nhạy cảm ở vùng mặt): Trả về `Verdict = "MatchWithNotes"` kèm hướng dẫn cụ thể. Ngược lại trả về `Verdict = "GoodMatch"`.
 
 ## 4.2. Thuật toán Phát hiện Xung đột (Smart Conflict Detector)
 Được cài đặt trong `ConflictDetectorService`:

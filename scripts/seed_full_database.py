@@ -226,9 +226,11 @@ def main():
 
             desc = p.get('highlights', '').strip() or f"Authentic {name} from {b_name}."
             
-            # Select category-curated image
-            img_pool = CATEGORY_IMAGES.get(prim, [DEFAULT_IMAGE])
-            img_url = img_pool[idx % len(img_pool)]
+            # Priority: use image_url from CSV if present, otherwise select from pool
+            img_url = (p.get('image_url') or '').strip()
+            if not img_url:
+                img_pool = CATEGORY_IMAGES.get(prim, [DEFAULT_IMAGE])
+                img_url = img_pool[idx % len(img_pool)]
 
             raw_ingredients = (p.get('ingredients') or '').strip()
 

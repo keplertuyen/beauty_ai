@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { User, ShoppingBag, Save, Camera, Clock, CheckCircle, XCircle, Truck, ShieldAlert, Plus, Trash2, Fingerprint } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
@@ -10,7 +10,9 @@ import './Profile.css';
 const STATUS_MAP = {
   pending:    { labelKey: 'order_status_pending', defaultLabel: 'Pending',     color: 'badge-warning',   icon: Clock },
   confirmed:  { labelKey: 'order_status_confirmed', defaultLabel: 'Confirmed',  color: 'badge-secondary', icon: CheckCircle },
+  delivering: { labelKey: 'order_status_shipped', defaultLabel: 'Delivering',  color: 'badge-primary',   icon: Truck },
   shipped:    { labelKey: 'order_status_shipped', defaultLabel: 'Shipped',     color: 'badge-primary',   icon: Truck },
+  completed:  { labelKey: 'order_status_delivered', defaultLabel: 'Completed', color: 'badge-success',   icon: CheckCircle },
   delivered:  { labelKey: 'order_status_delivered', defaultLabel: 'Delivered', color: 'badge-success',   icon: CheckCircle },
   cancelled:  { labelKey: 'order_status_cancelled', defaultLabel: 'Cancelled', color: 'badge-danger',    icon: XCircle },
 };
@@ -18,8 +20,12 @@ const STATUS_MAP = {
 export default function Profile() {
   const { user, setUser, authLoading, formatPrice, formatDualPrice, t } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState('info');
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') === 'orders' ? 'orders' : 'info';
+  });
   const [saving, setSaving] = useState(false);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -111,10 +117,17 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    if (activeTab === 'orders' && orders.length === 0) {
+    const params = new URLSearchParams(location.search);
+    if (params.get('tab') === 'orders') {
+      setActiveTab('orders');
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    if (activeTab === 'orders' && user) {
       fetchOrders();
     }
-  }, [activeTab]);
+  }, [activeTab, user]);
 
   const fetchOrders = async () => {
     setOrdersLoading(true);
@@ -513,14 +526,19 @@ export default function Profile() {
               ) : (
                 <div className="orders-list">
                   {orders.map((order) => {
-                    const status = STATUS_MAP[order.status] || STATUS_MAP.pending;
+                    const normStatus = String(order.status || order.order_status || 'pending').toLowerCase();
+                    const status = STATUS_MAP[normStatus] || STATUS_MAP.pending;
                     const StatusIcon = status.icon;
+                    const displayCode = order.order_code || order.orderCode || `#${order.order_id || order.id}`;
                     return (
-                      <div key={order.order_id} className="card order-card animate-fadeIn">
+                      <div key={order.order_id || order.id} className="card order-card animate-fadeIn">
                         <div className="order-header">
                           <div className="order-meta">
-                            <span className="order-id">#{order.order_id}</span>
-                            <span className="order-date">{formatDate(order.created_at)}</span>
+                            <span className="order-id">{displayCode}</span>
+                            <span className="order-date">{formatDate(order.created_at || order.createdAt)}</span>
+                            <span className="badge badge-secondary" style={{ fontSize: '0.72rem' }}>
+                              {order.payment_method || order.paymentMethod || 'COD'}
+                            </span>
                           </div>
                           <span className={`badge ${status.color}`}>
                             <StatusIcon size={12} />
@@ -528,13 +546,19 @@ export default function Profile() {
                           </span>
                         </div>
 
+                        {(order.shipping_address || order.shippingAddress) && (
+                          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                            <strong>Ship to:</strong> {order.recipient_name || order.recipientName} ({order.phone_number || order.phoneNumber}) — {order.shipping_address || order.shippingAddress}
+                          </div>
+                        )}
+
                         <div className="order-items">
                           {(order.items || []).map((item, idx) => (
                             <div key={idx} className="order-item">
                               <div className="order-item-emoji" style={{ overflow: 'hidden', padding: 2, background: '#FFF' }}>
                                 <img
                                   src={getProductImage(item, 80)}
-                                  alt={item.product_name || item.name}
+                                  alt={item.product_name || item.productName || item.name}
                                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                                   loading="lazy"
                                   referrerPolicy="no-referrer"
@@ -546,19 +570,28 @@ export default function Profile() {
                                 <span style={{ display: 'none' }}>💄</span>
                               </div>
                               <div className="order-item-info">
-                                <span className="order-item-name">{item.product_name || item.name}</span>
-                                <span className="order-item-qty">x{item.quantity}</span>
+                                <span className="order-item-name">{item.product_name || item.productName || item.name}</span>
+                                <span className="order-item-qty">
+                                  {item.brand_name || item.brandName ? `${item.brand_name || item.brandName} · ` : ''}x{item.quantity}
+                                </span>
                               </div>
                               <span className="order-item-price">
-                                {formatCurrency((item.price_usd ?? item.price ?? 0) * item.quantity, order.exchange_rate)}
+                                {formatCurrency(
+                                  item.total_price_usd ??
+                                  item.totalPriceUsd ??
+                                  ((item.unit_price_usd ?? item.unitPriceUsd ?? item.price_usd ?? item.price ?? 0) * item.quantity),
+                                  order.exchange_rate
+                                )}
                               </span>
                             </div>
                           ))}
                         </div>
 
                         <div className="order-footer">
-                          <span className="order-total-label">{t('profile_order_total') || 'Total'}</span>
-                          <span className="order-total">{formatDualPrice(order.total_usd ?? order.total_amount ?? order.total, order.exchange_rate)}</span>
+                          <span className="order-total-label">{t('profile_order_total') || 'Total (COD)'}</span>
+                          <span className="order-total">
+                            {formatDualPrice(order.total_usd ?? order.totalUsd ?? order.total_amount ?? order.total, order.exchange_rate)}
+                          </span>
                         </div>
                       </div>
                     );

@@ -74,7 +74,10 @@ export const saveRoutine = (data) => API.post('/routines/save', data);
 export const analyzeIngredients = (data) => API.post('/tools/analyze-inci', data);
 export const getIngredientDB = () => API.get('/ingredients/database');
 export const getSkintypeGuide = (area = 'face') => API.get('/tools/skintype-guide', { params: { area } });
-export const checkProductConflicts = (productIds) => API.post('/tools/check-conflict', { productIds });
+export const checkProductConflicts = (productIds) =>
+  API.post('/tools/check-conflict', {
+    product_ids: (productIds || []).map((id) => Number(id)).filter((n) => !Number.isNaN(n) && n > 0),
+  });
 
 // ==========================================
 // 6. REVIEWS

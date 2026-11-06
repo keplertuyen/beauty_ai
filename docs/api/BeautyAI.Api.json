@@ -280,6 +280,127 @@
         }
       }
     },
+    "/api/v1/orders": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/my-orders": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/Products": {
       "get": {
         "tags": [
@@ -1198,6 +1319,69 @@
           }
         }
       },
+      "CreateOrderItemRequest": {
+        "required": [
+          "product_id",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CreateOrderRequest": {
+        "required": [
+          "recipient_name",
+          "phone_number",
+          "shipping_address"
+        ],
+        "type": "object",
+        "properties": {
+          "recipient_name": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "shipping_address": {
+            "type": "string"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "conflict_acknowledged": {
+            "type": "boolean",
+            "default": false
+          },
+          "items": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/CreateOrderItemRequest"
+            }
+          }
+        }
+      },
       "DigitalSkinIdDto": {
         "required": [
           "userId",
@@ -1439,6 +1623,140 @@
           }
         }
       },
+      "OrderDto": {
+        "required": [
+          "order_id",
+          "order_code",
+          "recipient_name",
+          "phone_number",
+          "shipping_address",
+          "payment_method",
+          "payment_status",
+          "status",
+          "total_usd",
+          "conflict_acknowledged",
+          "created_at",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "order_code": {
+            "type": "string"
+          },
+          "recipient_name": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "shipping_address": {
+            "type": "string"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "payment_status": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total_usd": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "conflict_acknowledged": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemDto"
+            }
+          }
+        }
+      },
+      "OrderItemDto": {
+        "required": [
+          "product_id",
+          "product_code",
+          "product_name",
+          "brand_name",
+          "image_url",
+          "quantity",
+          "unit_price_usd",
+          "total_price_usd"
+        ],
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "product_code": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "brand_name": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "unit_price_usd": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "total_price_usd": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -1618,6 +1936,9 @@
     },
     {
       "name": "Auth"
+    },
+    {
+      "name": "Orders"
     },
     {
       "name": "Products"

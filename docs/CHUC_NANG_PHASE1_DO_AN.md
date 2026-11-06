@@ -2,8 +2,8 @@
 
 > **Mục tiêu:** Hoàn thiện và đóng gói toàn bộ hệ thống BeautyAI trong vòng **1 tháng (4 tuần)** phục vụ bảo vệ đồ án tốt nghiệp.
 > **Nguyên tắc phân bổ:** 
-> - Ưu tiên tuyệt đối các tính năng USP (Khác biệt hóa & AI da liễu): Digital Skin ID, Allergy Blacklist, INCI Analyzer, Conflict Detector, Skin Quiz, Trợ lý Gemini AI.
-> - Khai thác tối đa thế mạnh tài nguyên sẵn có: **Dataset 1 triệu review** (lọc review theo loại da) và **UI có sẵn** (So sánh sản phẩm & Wishlist).
+> - Ưu tiên tuyệt đối các tính năng USP (Khác biệt hóa & AI da liễu): Digital Skin ID, Allergy Blacklist, INCI Analyzer, Conflict Detector, Routine Builder, Trợ lý Gemini AI.
+> - Khai thác tối đa thế mạnh tài nguyên sẵn có: **Dataset 1 triệu review** (lọc review theo loại da) và **UI có sẵn** (Danh sách yêu thích Wishlist).
 > - Cắt giảm các tính năng quản trị phức tạp, tích hợp bên thứ ba rườm rà (Zalo OA, tỷ giá đa tệ, email SMTP...) để đưa vào **Phase 2 (Hướng phát triển tương lai trong báo cáo)**.
 
 ---
@@ -47,17 +47,31 @@
 
 ### 🟢 Phase 1 — Triển khai cho đồ án:
 1. **Thông tin cơ bản sản phẩm:** Tên, thương hiệu, hình ảnh, giá bán, mô tả, dung tích, tình trạng kho.
-2. **Hiển thị bảng thành phần INCI đầy đủ:** Danh sách thành phần chuẩn hóa theo thứ tự nồng độ, có giải nghĩa công năng tiếng Việt (Dưỡng ẩm, Làm dịu, Chống lão hóa, Tẩy da chết...).
-3. **Điểm Phù Hợp (Match Score):** Tính toán độ tương thích của sản phẩm với hồ sơ da hiện tại của người dùng (thang điểm % trực quan).
-4. **Biểu đồ phân bổ công năng thành phần:** Donut chart hoặc Progress bar hiển thị tỷ lệ các nhóm công năng (ví dụ: 40% Dưỡng ẩm, 20% Chống oxy hóa...).
-5. **Cảnh báo dị ứng cá nhân trên PDP *(USP)*:** 
-   - Banner màu đỏ nổi bật: *"Cảnh báo: Sản phẩm chứa [Tên chất] nằm trong Danh sách dị ứng của bạn"*.
-6. **Thêm vào giỏ từ PDP:** Chọn số lượng và thêm vào giỏ hàng.
-7. **Hướng dẫn sử dụng & Vị trí trong routine:** Gợi ý dùng vào buổi Sáng (AM) hay Tối (PM), sau bước nào và trước bước nào.
-8. **Sản phẩm tương tự:** Gợi ý tối đa 4-6 sản phẩm cùng danh mục/công dụng.
-9. **Thêm vào Wishlist / So sánh từ PDP:** Nút bấm tương tác nhanh kết nối với Modal/Bar so sánh và Danh sách yêu thích.
+2. **Hiển thị bảng thành phần INCI 3 tầng (Progressive Disclosure):**
+   - **Tầng 1 (Kết luận cá nhân hóa):** Hiển thị kết luận dạng chữ (`Good Match`, `Match with Notes`, `Not Suitable — Allergy Alert`) kèm giải thích ngắn gọn và cảnh báo dị ứng.
+   - **Tầng 2 (Key Notable Ingredients & Functional Role Groups):** Hiển thị 3–6 chất nổi bật nhất bằng tên thông dụng dễ hiểu (kèm tên gốc INCI và giải thích 1 dòng) + Gom nhóm các chất nền theo vai trò công thức.
+   - **Tầng 3 (Full Packaging INCI List):** Thu gọn mặc định trong thanh trượt để tra cứu toàn bộ danh sách INCI theo thứ tự nồng độ.
+3. **Kết luận độ phù hợp dạng chữ (Suitability Verdict — Bỏ điểm số `%` & `/5`):** Đồng bộ toàn hệ thống (Catalog, PDP, Wishlist, Analyzer) về kết luận dạng chữ dễ hiểu thay vì con số phần trăm gây nhầm lẫn; ẩn tab INCI với dụng cụ vật lý (`Tools & Brushes`) và thông báo minh bạch `Insufficient INCI Data` với mỹ phẩm thiếu INCI từ hãng (đồng thời loại khỏi bộ lọc `"Safe for me"`).
+4. **Cảnh báo dị ứng cá nhân trên PDP *(USP)*:** 
+   - Banner màu đỏ nổi bật liệt kê gộp gọn các chất trùng với **Allergy Blacklist** của người dùng: *"Contains ingredients that trigger your personal Allergy Blacklist: a, b, c"*.
+5. **Thêm vào giỏ từ PDP:** Chọn số lượng và thêm vào giỏ hàng.
+6. **Hướng dẫn sử dụng & Vị trí trong routine theo đúng ngành hàng:** Gợi ý bước AM/PM cho Skincare, hoặc hướng dẫn sử dụng phù hợp cho Fragrance, Makeup, Hair, Tools & Brushes.
+7. **Sản phẩm tương tự:** Gợi ý tối đa 4-6 sản phẩm cùng danh mục/công dụng.
+8. **Thêm vào Wishlist từ PDP:** Nút bấm thả tim tương tác nhanh kết nối với Danh sách yêu thích.
+9. **Kho hình ảnh sản phẩm chuẩn hóa (Local High-Res WebP Assets):**
+   - Lưu trữ cục bộ **378+ ảnh sản phẩm thật** độ phân giải cao (800x800px WebP) tại `src/frontend/public/images/products/{product_id}.webp` bao phủ 100% các dòng trọng điểm (The Ordinary 54/54, Drunk Elephant 56/56, Paula's Choice 39/39, Hourglass Ambient 14/14, Rare Beauty Soft Pinch) cùng đợt đầu tiên của Cụm thương hiệu # & A (Anastasia Beverly Hills, Armani Beauty, Algenist, Augustinus Bader, amika...).
+   - Đồng bộ trường `image_url` trực tiếp trong Database (PostgreSQL) và Dataset (`products_cleaned.csv`, `products_ready.csv`) trỏ URI tĩnh (`/images/products/{code}.webp`), tuyệt đối không lưu dữ liệu nhị phân/base64 trong database nhằm bảo toàn hiệu năng cao và tận dụng HTTP browser caching.
+   - **Phân tích nguyên nhân lỗi ảnh & Giải pháp cào ảnh chuẩn hóa:**
+     - *Nguyên nhân cào sai / trùng ảnh trước đây:* (1) Dataset gốc Kaggle Sephora chỉ có `product_id` (dạng `P...`), không chứa link ảnh gốc hay SKU ID của Sephora; (2) Thuật toán gán SKU phỏng đoán (heuristic guessing) và cào ảnh tự động thiếu kiểm chứng dẫn đến sai lệch bản chất sản phẩm (nước hoa ra ảnh son, gift set ra kem nền, cọ ra bảng phấn); (3) Pool ảnh fallback Unsplash cũ chứa các hình không phù hợp (quả cam, mặt spa đắp mặt nạ, vòi sen) và thuật toán hash ngắn khiến sản phẩm cạnh nhau bị trùng ảnh.
+     - *Quy chuẩn cào ảnh chính xác (BeautyAI Harvester Protocol):*
+       1. Khớp chính xác mã SKU Sephora (`skuId`) thông qua cơ chế Search Grounding danh mục chính hãng (`"{Brand}" "{Product Name}" sephora "skuId"`).
+       2. Tải trực tiếp ảnh zoom độ phân giải cao từ CDN Sephora (`https://www.sephora.com/productimages/sku/{sku}-main-zoom.jpg`) kèm HTTP headers chuẩn (`User-Agent` Chrome Desktop và `Referer: https://www.sephora.com/`).
+       3. Với các mã hàng phân phối độc quyền ngoài Sephora US (như Paula's Choice EU direct), trích xuất ảnh chuẩn từ CDN chính thức của thương hiệu.
+       4. Xử lý chuẩn hóa bằng Pillow: chuyển đổi về kích thước chuẩn 800x800px, định dạng WebP (lossy quality 85), dung lượng tối ưu ~15-40KB/ảnh.
+       5. Làm sạch triệt để danh mục fallback: loại bỏ hoàn toàn các ảnh quả cam/khuôn mặt spa, chỉ giữ lại ảnh studio mỹ phẩm tối giản và áp dụng hàm băm ghép chuỗi đa thành phần (`{id}_{name}_{brand}`) để ngăn chặn trùng lặp.
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
+- *So sánh sản phẩm (Product Comparison & Compare Drawer):* Tạm hoãn sang Phase 2 để tinh gọn thanh điều hướng và tập trung vào 5 USP cốt lõi.
 - *"Vì sao sản phẩm này được gợi ý?" (Modal giải thích trọng số thuật toán):* Thay bằng 1 dòng tooltip/text ngắn gọn.
 - *"Thường được mua cùng" (Frequently Bought Together):* Cần thuật toán khai phá giỏ hàng (Apriori/Association Rules), tốn tài nguyên tính toán.
 
@@ -111,17 +125,18 @@
 ## 6. CÔNG CỤ PHÂN TÍCH THÀNH PHẦN (INCI ANALYZER)
 
 ### 🟢 Phase 1 — Triển khai cho đồ án:
-1. **Dán & phân tích bảng thành phần bất kỳ:** 
-   - Một ô Textarea cho phép người dùng copy paste toàn bộ thành phần in trên bao bì của bất kỳ món mỹ phẩm nào họ đang dùng ở nhà.
-   - Hệ thống tự động bóc tách (parse) theo dấu phẩy, tra cứu từ điển INCI trong DB.
-2. **Kết quả phân tích an toàn:**
-   - Đánh dấu màu trực quan: Thành phần an toàn / Dưỡng ẩm (Xanh lá), Hoạt chất mạnh cần chú ý (Vàng/Cam), Thành phần dễ gây kích ứng/cồn khô/hương liệu (Đỏ).
-   - Thống kê tỷ lệ độ lành tính và chỉ số bít tắc lỗ chân lông (Comedogenic).
-3. **Đối chiếu với hồ sơ da cá nhân:**
-   - Phát hiện ngay nếu bảng thành phần vừa dán có chứa chất nằm trong **Allergy Blacklist** của người dùng.
+1. **Yêu cầu Đăng nhập (Blurred Preview Gate) & Thiết lập nhanh Skin ID 30 giây:**
+   - Cả 2 tab (*Formula Breakdown* & *Skin Type Guide*) yêu cầu đăng nhập để cá nhân hóa theo hồ sơ da (khách chưa đăng nhập sẽ thấy giao diện phân tích làm mờ kèm lời mời đăng nhập).
+   - Nếu đã đăng nhập nhưng chưa hoàn tất Skin ID, hệ thống bật popup thiết lập nhanh trong 30 giây (`SkinIdQuickModal`).
+2. **Tự động nhận diện 7 vùng chăm sóc (Target Care Area) & Dán bảng thành phần bất kỳ:**
+   - Hỗ trợ 7 vùng chăm sóc (`Face`, `Eye Area`, `Lips`, `Hair & Scalp`, `Bath & Body`, `Fragrance`, `Nails & Cuticles`) từ 9 ngành hàng và 62 danh mục con.
+   - Bóc tách chuỗi INCI và hiển thị theo cấu trúc **3 tầng** (Verdict cá nhân hóa ➔ 3–6 Key Notable Ingredients + Functional Role Groups ➔ Full Packaging INCI thu gọn).
+3. **Phân biệt thông minh Hương liệu & Cồn béo + Đối chiếu Allergy Blacklist:**
+   - Không báo nhầm chiết xuất thực vật dịu nhẹ (`Rosa Damascena Flower Water`, `Vanilla`, `Chamomile`) hay cồn béo dưỡng ẩm (`Cetearyl Alcohol`, `Cetyl Alcohol`) là chất gây kích ứng.
+   - Cảnh báo gộp gọn các chất trùng với **Allergy Blacklist** của người dùng (`"Contains ingredients that trigger your personal Allergy Blacklist: a, b, c"`).
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
-- *Từ điển bách khoa tra cứu chi tiết từng chất dạng Wikipedia:* Chỉ cần hiển thị popup/tooltip tóm tắt công năng khi click vào từng chất.
+- *Kiểm chứng tuyên bố tiếp thị trên bao bì (Marketing Claim Check) & Từ điển bách khoa chi tiết dạng Wikipedia.*
 
 ---
 
@@ -143,19 +158,10 @@
 
 ---
 
-## 8. SO SÁNH SẢN PHẨM (ĐÃ CÓ SẴN UI FRONTEND)
-
-### 🟢 Phase 1 — Triển khai cho đồ án (Khai thác UI có sẵn):
-1. **Thêm sản phẩm vào khay so sánh:** Chọn tối đa 3-4 sản phẩm cùng danh mục từ trang Catalog hoặc PDP.
-2. **Khay so sánh (Compare Drawer/Bar):** Thanh ghim ở đáy màn hình hiển thị danh sách các món đang chọn, có nút "So sánh ngay" và nút xóa từng món.
-3. **Bảng so sánh chi tiết (Side-by-side table):**
-   - So sánh thông số cơ bản: Giá bán, dung tích, xuất xứ, thương hiệu, rating.
-   - So sánh công năng: Phù hợp loại da nào, giải quyết vấn đề da gì.
-   - So sánh thành phần: Điểm giống nhau và khác nhau về hoạt chất chính.
-   - So sánh điểm tương thích với hồ sơ da (Match Score của từng món).
-4. **Cảnh báo cá nhân hóa trong bảng so sánh:** Đánh dấu cảnh báo đỏ ngay trên cột sản phẩm nào dính chất trong Allergy Blacklist của người dùng.
+## 8. SO SÁNH SẢN PHẨM (CHUYỂN SANG PHASE 2)
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
+- **Thêm sản phẩm vào khay so sánh (Compare Drawer/Bar)** & **Bảng so sánh chi tiết (Side-by-side table):** Đã thống nhất chuyển sang Phase 2 nhằm tinh gọn thanh điều hướng và tập trung nguồn lực cho 5 tính năng USP cốt lõi ở Phase 1.
 - *Tự động đề xuất sản phẩm đối trọng tương đương để so sánh.*
 
 ---
@@ -176,20 +182,17 @@
 ## 10. GIỎ HÀNG & THANH TOÁN (CART & CHECKOUT)
 
 ### 🟢 Phase 1 — Triển khai cho đồ án:
-1. **Xem giỏ hàng:** Trang giỏ hàng chuẩn (`/cart`) hiển thị danh sách sản phẩm, hình ảnh, đơn giá, số lượng, thành tiền.
-2. **Thao tác giỏ hàng:** Tăng/giảm số lượng, xóa sản phẩm, dọn sạch giỏ.
-3. **Tích hợp cảnh báo xung đột:** Hiển thị khối cảnh báo xung đột hoạt chất nổi bật ngay đầu giỏ hàng (nếu có).
-4. **Mã giảm giá (Voucher) cơ bản:** Một ô nhập mã giảm giá áp dụng mã cố định (demo 1-2 mã như `BEAUTYAI10` giảm 10%, `FREESHIP`).
-5. **Luồng Checkout:**
+1. **Xem giỏ hàng:** Trang giỏ hàng chuẩn (`/cart`) và khay `CartDrawer` hiển thị danh sách sản phẩm, hình ảnh, đơn giá, số lượng, thành tiền.
+2. **Thao tác giỏ hàng:** Tăng/giảm số lượng, xóa sản phẩm, dọn sạch giỏ (`Clear Bag`).
+3. **Tích hợp cảnh báo xung đột:** Hiển thị khối cảnh báo xung đột hoạt chất nổi bật ngay đầu giỏ hàng (nếu có) kèm checkbox xác nhận đã hiểu khuyến cáo chia lịch sử dụng.
+4. **Luồng Checkout COD:**
    - Form nhập địa chỉ nhận hàng, số điện thoại, ghi chú giao hàng.
-   - Phương thức thanh toán: **COD (Thanh toán khi nhận hàng)** là bắt buộc.
-   - *Tùy chọn bổ sung:* Tích hợp cổng VNPay Sandbox nếu kịp trong tuần 4.
-6. **Tạo đơn hàng & Trang kết quả (Thank You page):** Tạo mã đơn hàng duy nhất, lưu thông tin vào DB và hiển thị tóm tắt đơn vừa đặt.
-7. **Lịch sử đơn hàng của tôi:** Người dùng xem lại các đơn hàng đã đặt và trạng thái đơn (`Chờ xử lý`, `Đang giao`, `Đã giao`).
+   - Phương thức thanh toán: **COD (Thanh toán khi nhận hàng)**.
+5. **Tạo đơn hàng & Trang kết quả (Thank You page):** Tạo mã đơn hàng duy nhất (`BA-YYYYMMDD-XXXX`), lưu thông tin vào DB và hiển thị tóm tắt đơn vừa đặt.
+6. **Lịch sử đơn hàng của tôi:** Người dùng xem lại các đơn hàng đã đặt và trạng thái đơn (`Pending`, `Delivering`, `Completed`).
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
-- *Cart Drawer trượt ngang:* Dùng trang `/cart` truyền thống để tránh lỗi đồng bộ state phức tạp.
-- *Hệ thống Voucher đa tầng (kết hợp voucher sàn + voucher shop + voucher ship).*
+- *Mã giảm giá (Voucher / Coupon) & Hệ thống Voucher đa tầng.*
 - *Khách tự hủy đơn hàng / Mua lại đơn cũ.*
 - *Gửi Email xác nhận đơn hàng qua SMTP.*
 
@@ -273,7 +276,7 @@ flowchart LR
         T11["Database & Auth"] --> T12["Seed 100 SP & Xung đột"] --> T13["Import 1M Reviews"] --> T14["Digital Skin ID"]
     end
     subgraph W2["Tuần 2: Frontend & INCI"]
-        T21["Ghép UI So sánh/Wishlist"] --> T22["Catalog & Lọc an toàn"] --> T23["PDP & Bảng INCI"] --> T24["Tool dán INCI"]
+        T21["Tích hợp UI React"] --> T22["Catalog & Lọc an toàn"] --> T23["PDP & Bảng INCI 3 tầng"] --> T24["Tool Phân tích INCI"] --> T25["Wishlist"]
     end
     subgraph W3["Tuần 3: E-Commerce & Conflict"]
         T31["Giỏ hàng & Conflict"] --> T32["Checkout COD"] --> T33["Review theo loại da"]
@@ -291,10 +294,10 @@ flowchart LR
   - Hoàn thành Auth (Đăng ký, Đăng nhập, Profile, Digital Skin ID, Allergy Blacklist).
   - Chuẩn bị dữ liệu: Seed khoảng 50–100 sản phẩm có bảng thành phần INCI đầy đủ; đưa tập mẫu 1 triệu review vào DB (tối ưu index trên cột `product_id` và `skin_type` để query cực nhanh).
 - **Tuần 2: Ghép UI có sẵn & Xây dựng các tính năng INCI Cốt lõi**
-  - Tích hợp các màn hình UI đã có sẵn từ thư mục frontend: **Bảng So sánh sản phẩm** và **Danh sách Wishlist**.
   - Xây dựng trang Danh mục sản phẩm với bộ lọc theo loại da và công tắc *"An toàn cho da tôi"*.
-  - Xây dựng trang chi tiết sản phẩm (PDP): Bảng INCI, biểu đồ công năng, cờ cảnh báo đỏ nếu trùng chất trong Allergy Blacklist.
-  - Làm trang Công cụ Dán & Phân tích INCI độc lập.
+  - Xây dựng trang chi tiết sản phẩm (PDP): Bảng INCI 3 tầng, kết luận `Suitability Verdict` dạng chữ, cờ cảnh báo đỏ nếu trùng chất trong Allergy Blacklist.
+  - Làm trang Công cụ Phân tích INCI chuyên sâu theo 7 vùng chăm sóc (Blurred Preview Gate + Skin ID 30 giây).
+  - Hoàn thiện trang **Danh sách yêu thích (Wishlist)** (So sánh sản phẩm đã chuyển sang Phase 2).
 - **Tuần 3: Giỏ hàng, Phát hiện xung đột, Thanh toán & Review**
   - Làm trang Giỏ hàng và thuật toán **Smart Conflict Detector** (quét cặp kỵ nhau, cảnh báo vàng).
   - Luồng Thanh toán COD -> Tạo đơn -> Lịch sử đơn hàng.

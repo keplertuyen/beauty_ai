@@ -56,13 +56,13 @@ flowchart LR
 
     subgraph W2["TUẦN 2: GHÉP UI & CORE INCI (40h)"]
         T21["T2.1 Tích hợp React UI (8h)"] --> T22["T2.2 Catalog & Lọc an toàn (10h)"]
-        T22 --> T23["T2.3 PDP & Bảng INCI màu (12h)"]
-        T23 --> T24["T2.4 Công cụ Dán INCI (6h)"]
-        T24 --> T25["T2.5 So sánh & Wishlist (4h)"]
+        T22 --> T23["T2.3 PDP & Bảng INCI 3 tầng (12h)"]
+        T23 --> T24["T2.4 Công cụ Phân tích INCI (6h)"]
+        T24 --> T25["T2.5 Danh sách yêu thích Wishlist (4h)"]
     end
 
     subgraph W3["TUẦN 3: E-COMMERCE & CONFLICT (40h)"]
-        T31["T3.1 Giỏ hàng & Smart Conflict (14h)"] --> T32["T3.2 Checkout COD & Voucher (10h)"]
+        T31["T3.1 Giỏ hàng & Smart Conflict (14h)"] --> T32["T3.2 Checkout COD (10h)"]
         T32 --> T33["T3.3 Lịch sử đơn hàng Profile (6h)"]
         T33 --> T34["T3.4 Tích hợp Review 1M trên PDP (10h)"]
     end
@@ -107,15 +107,15 @@ flowchart LR
 | Mã Task | Tên nhiệm vụ | Thời lượng | Đầu vào kỹ thuật | Đầu ra nghiệm thu |
 |---|---|---|---|---|
 | **T2.1** | **Ghép nối mã nguồn React Frontend** | 8 giờ | Thư mục `docs/_ui-ux_design/phase_1/frontend/` | Đưa các component, CSS, trang vào `src/frontend`; cấu hình base API URL; chạy `npm run build` thành công. |
-| **T2.2** | **Hoàn thiện Trang Catalog & Bộ lọc an toàn** | 10 giờ | `Products.jsx` & API `GET /api/v1/products` | Lọc theo loại da, mức giá; Công tắc toggle *"An toàn cho da tôi"* tự động ẩn toàn bộ sản phẩm dính chất dị ứng. |
-| **T2.3** | **Hoàn thiện Trang PDP & Bảng INCI phân màu** | 12 giờ | `ProductDetail.jsx` & API chi tiết SP | Bảng INCI phân màu Xanh/Vàng/Đỏ; Biểu đồ Donut công năng; Match Score %; **Banner đỏ cảnh báo dị ứng cá nhân**. |
-| **T2.4** | **Hoàn thiện Công cụ Dán & Phân tích INCI** | 6 giờ | `IngredientAnalyzer.jsx` & API parser | Ô Textarea nhận văn bản dán từ bao bì, tự động bóc tách danh sách chất và đối chiếu dị ứng. |
-| **T2.5** | **Ghép nối màn hình So sánh & Wishlist** | 4 giờ | `Compare.jsx`, `Wishlist.jsx` | Khay Compare Drawer đáy màn hình; Bảng so sánh 3 sản phẩm; Danh sách yêu thích thả tim. |
+| **T2.2** | **Hoàn thiện Trang Catalog & Bộ lọc an toàn** | 10 giờ | `Products.jsx` & API `GET /api/v1/products` | Lọc theo loại da, mức giá; Công tắc toggle *"Safe For My Skin"* tự động ẩn toàn bộ sản phẩm dính chất dị ứng và các mỹ phẩm thiếu bảng INCI từ hãng (vẫn giữ dụng cụ vật lý `Tools & Brushes`). |
+| **T2.3** | **Hoàn thiện Trang PDP & Bảng INCI 3 tầng** | 12 giờ | `ProductDetail.jsx` & API chi tiết SP | Bảng INCI 3 tầng (Key Notable Ingredients 3–6 chất + Functional Role Groups + Full Packaging INCI thu gọn); Kết luận dạng chữ (`Suitability Verdict`); **Banner đỏ cảnh báo dị ứng cá nhân**. |
+| **T2.4** | **Hoàn thiện Công cụ Phân tích INCI theo Vùng chăm sóc** | 6 giờ | `IngredientAnalyzer.jsx` & API `[Authorize]` | Bắt buộc đăng nhập (Blurred Preview Gate) + Popup thiết lập Skin ID 30 giây; Nhận diện 7 vùng chăm sóc (`TargetCareArea`); Phân loại Hương liệu/Cồn béo 3 mức độ. |
+| **T2.5** | **Hoàn thiện Danh sách yêu thích (Wishlist)** | 4 giờ | `Wishlist.jsx`, `AppContext.jsx` | Thả tim/bỏ tim sản phẩm trên Catalog & PDP; Hiển thị danh sách yêu thích kèm kết luận `Suitability Verdict` và cảnh báo dị ứng; Nút *Clear All* (Product Compare chuyển sang Phase 2). |
 
 🎯 **MỐC QUALITY GATE 2 (Cuối Tuần 2):**
 - [ ] Người dùng xem được danh mục, lọc theo loại da và công tắc an toàn hoạt động chính xác.
-- [ ] Trang PDP hiển thị bảng INCI có nhãn tiếng Việt và banner cảnh báo đỏ xuất hiện khi trùng chất dị ứng.
-- [ ] Công cụ phân tích thành phần dán chuỗi thô bóc tách chuẩn xác.
+- [ ] Trang PDP hiển thị bảng INCI 3 tầng dễ hiểu, kết luận dạng chữ và banner cảnh báo đỏ xuất hiện khi trùng chất dị ứng.
+- [ ] Công cụ phân tích thành phần yêu cầu đăng nhập/Skin ID và bóc tách chuẩn xác theo từng vùng chăm sóc.
 
 ---
 
@@ -126,7 +126,7 @@ flowchart LR
 | Mã Task | Tên nhiệm vụ | Thời lượng | Đầu vào kỹ thuật | Đầu ra nghiệm thu |
 |---|---|---|---|---|
 | **T3.1** | **Giỏ hàng & Smart Conflict Detector (USP)** | 14 giờ | `Cart.jsx` & `ConflictDetectorService` | Quét tự động giỏ hàng; Khung cảnh báo viền cam nổi bật khi có cặp kỵ nhau (vd: Retinol + BHA); Đưa ra lời khuyên chia lịch sáng/tối; Checkbox xác nhận mua tiếp. |
-| **T3.2** | **Thanh toán COD & Quản lý Voucher** | 10 giờ | `Checkout.jsx` & API `POST /api/v1/orders` | Form nhập địa chỉ nhận hàng; Áp dụng mã `BEAUTYAI10` (-10%) và `FREESHIP`; Tạo đơn hàng COD và hiển thị trang cảm ơn Thank You. |
+| **T3.2** | **Thanh toán COD (Cash on Delivery)** | 10 giờ | `Checkout.jsx` & API `POST /api/v1/orders` | Form nhập địa chỉ nhận hàng; Thanh toán COD trực tiếp không qua mã giảm giá; Tạo đơn hàng COD (`BA-YYYYMMDD-XXXX`), trừ tồn kho và hiển thị màn hình xác nhận Thank You. |
 | **T3.3** | **Lịch sử đơn hàng cá nhân** | 6 giờ | `Profile.jsx` & API my-orders | Danh sách các đơn hàng đã đặt, mã đơn, tổng tiền USD ($), danh sách sản phẩm và trạng thái đơn. |
 | **T3.4** | **Tích hợp Reviews 1M trên trang PDP** | 10 giờ | Bảng `reviews` đã đánh chỉ mục B-Tree | Hiển thị điểm sao trung bình; Tab lọc đánh giá theo loại da (*"Xem người có DA DẦU nói gì"*); Ưu tiên bài viết cùng loại da với khách. |
 

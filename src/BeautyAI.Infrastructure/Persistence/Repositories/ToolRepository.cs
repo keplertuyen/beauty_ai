@@ -30,6 +30,8 @@ public class ToolRepository : IToolRepository
     public async Task<IReadOnlyList<Product>> GetProductsForConflictCheckAsync(IReadOnlyList<int> productIds, CancellationToken cancellationToken = default)
     {
         return await _context.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
             .Include(p => p.ProductIngredients)
                 .ThenInclude(pi => pi.Ingredient)
             .Where(p => productIds.Contains(p.Id))

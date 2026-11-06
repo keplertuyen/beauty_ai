@@ -159,7 +159,7 @@ export const TOP_PRODUCT_IMAGES = {
   // Dior - BACKSTAGE Face & Body Foundation
   P432500: 'https://www.sephora.com/productimages/sku/s2070118-main-zoom.jpg',
   // Anastasia Beverly Hills - Soft Glam Eyeshadow Palette
-  P58930227: 'https://www.sephora.com/productimages/sku/s2036499-main-zoom.jpg',
+  P58930227: 'https://www.sephora.com/productimages/sku/s2036481-main-zoom.jpg',
   // Drunk Elephant - D-Bronzi Anti-Pollution Bronzing Drops with Peptides
   P432668: 'https://www.sephora.com/productimages/sku/s2081529-main-zoom.jpg',
   // KVD Beauty - Lock-It Full-Coverage Long-Wear Matte Liquid Foundation
@@ -210,65 +210,145 @@ export const TOP_PRODUCT_IMAGES = {
   P392246: 'https://www.sephora.com/productimages/sku/s1679315-main-zoom.jpg',
 };
 
+// Set of product IDs with local offline WebP photography in public/images/products/
+export const LOCAL_PRODUCT_IMAGES = new Set([
+  'P109908', 'P12430', 'P12495', 'P133707', 'P144212', 'P174213', 'P186805', 'P18975403',
+  'P19700127', 'P202633', 'P228913', 'P229406', 'P230234', 'P236816', 'P245205', 'P247355',
+  'P248407', 'P253818', 'P263504', 'P264900', 'P271538', 'P278610', 'P281411', 'P284507',
+  'P284716', 'P2855', 'P289307', 'P290636', 'P293605', 'P306857', 'P308201', 'P309308',
+  'P309813', 'P311138', 'P377710', 'P377723', 'P377724', 'P377784', 'P377873', 'P378284',
+  'P378821', 'P381000', 'P382309', 'P383083', 'P384059', 'P384060', 'P384099', 'P384963',
+  'P386335', 'P386783', 'P387906', 'P388029', 'P38855877', 'P392245', 'P392246', 'P392247',
+  'P392248', 'P392249', 'P393281', 'P393401', 'P393411', 'P393434', 'P394534', 'P394639',
+  'P395697', 'P397517', 'P39787544', 'P400259', 'P403812', 'P403818', 'P404706', 'P404827',
+  'P404830', 'P404831', 'P404832', 'P404916', 'P405584', 'P406080', 'P406576', 'P406712',
+  'P407636', 'P408219', 'P409118', 'P409239', 'P409317', 'P409523', 'P409800', 'P410504',
+  'P410532', 'P411387', 'P413341', 'P415777', 'P416200', 'P417238', 'P417312', 'P418218',
+  'P419221', 'P419222', 'P419223', 'P420162', 'P420652', 'P421275', 'P421277', 'P421481',
+  'P421485', 'P421813', 'P422077', 'P422083', 'P423925', 'P424378', 'P424900', 'P424901',
+  'P424902', 'P424915', 'P425840', 'P425938', 'P426173', 'P426836', 'P427301', 'P427404',
+  'P427405', 'P427406', 'P427408', 'P427409', 'P427410', 'P427411', 'P427412', 'P427413',
+  'P427414', 'P427415', 'P427416', 'P427417', 'P427418', 'P427419', 'P427420', 'P427421',
+  'P427536', 'P428224', 'P429515', 'P429952', 'P430871', 'P430932', 'P430969', 'P432087',
+  'P432298', 'P432500', 'P432668', 'P433172', 'P433173', 'P433402', 'P433516', 'P433526',
+  'P433530', 'P433904', 'P434002', 'P434104', 'P436148', 'P437097', 'P43818047', 'P439055',
+  'P439633', 'P439926', 'P440307', 'P440658', 'P441101', 'P441813', 'P441814', 'P441817',
+  'P441831', 'P441838', 'P442563', 'P442566', 'P442752', 'P442753', 'P442754', 'P442755',
+  'P442756', 'P442757', 'P442758', 'P442759', 'P442830', 'P442831', 'P442833', 'P442998',
+  'P442999', 'P443563', 'P444048', 'P444154', 'P444718', 'P446938', 'P447376', 'P447377',
+  'P447378', 'P447379', 'P447380', 'P447381', 'P447594', 'P447596', 'P447597', 'P447598',
+  'P448530', 'P448854', 'P448866', 'P448869', 'P449150', 'P449163', 'P449342', 'P449793',
+  'P450947', 'P453814', 'P454120', 'P454380', 'P454762', 'P455338', 'P455339', 'P455418',
+  'P455897', 'P455898', 'P455899', 'P455900', 'P455936', 'P456151', 'P456158', 'P457202',
+  'P457203', 'P457204', 'P457205', 'P457262', 'P457685', 'P457686', 'P457687', 'P457884',
+  'P458219', 'P458268', 'P458270', 'P460446', 'P460447', 'P460448', 'P460450', 'P460515',
+  'P461147', 'P461167', 'P461420', 'P461421', 'P462002', 'P462347', 'P465752', 'P466117',
+  'P466118', 'P466123', 'P467451', 'P467602', 'P467607', 'P467659', 'P467660', 'P468341',
+  'P468709', 'P469502', 'P469503', 'P469504', 'P469505', 'P469506', 'P469507', 'P469508',
+  'P469510', 'P469511', 'P469512', 'P469513', 'P469514', 'P469515', 'P469516', 'P469517',
+  'P469518', 'P469519', 'P469520', 'P469521', 'P469522', 'P469523', 'P469524', 'P469525',
+  'P469526', 'P469527', 'P469528', 'P470000', 'P470001', 'P470024', 'P470025', 'P470506',
+  'P470507', 'P470508', 'P470509', 'P470510', 'P471221', 'P471294', 'P471547', 'P471761',
+  'P471793', 'P472016', 'P472160', 'P473121', 'P473122', 'P473123', 'P473126', 'P473304',
+  'P473305', 'P474970', 'P475046', 'P475535', 'P476671', 'P476672', 'P477985', 'P479338',
+  'P479342', 'P479343', 'P479732', 'P479860', 'P479861', 'P480151', 'P480274', 'P480576',
+  'P480627', 'P480628', 'P481170', 'P481171', 'P481172', 'P481347', 'P481348', 'P481350',
+  'P481390', 'P482060', 'P482327', 'P482328', 'P482510', 'P482661', 'P482669', 'P483496',
+  'P483501', 'P484025', 'P49848448', 'P500062', 'P500139', 'P500170', 'P500420', 'P500423',
+  'P500600', 'P500601', 'P500603', 'P500605', 'P500617', 'P500874', 'P500983', 'P501028',
+  'P501140', 'P501154', 'P501180', 'P501282', 'P501288', 'P501330', 'P501591', 'P502964',
+  'P502999', 'P503159', 'P503209', 'P503294', 'P503693', 'P503711', 'P503998', 'P504018',
+  'P504028', 'P504075', 'P504333', 'P504428', 'P504430', 'P504433', 'P504448', 'P504629',
+  'P505120', 'P505214', 'P505274', 'P505320', 'P505461', 'P58930227', 'P63087293', 'P64546856',
+  'P64879845', 'P67988453', 'P69300', 'P69304', 'P69517', 'P73124556', 'P74312', 'P7880',
+  'P78834', 'P85225585', 'P87985432', 'P88779809', 'P97989778'
+]);
+
+// Placeholder / dummy seed image hashes that were repeated across thousands of products in the database
+export const DUMMY_SEED_IMAGE_HASHES = new Set([
+  'photo-1617897903246-719242758050',
+  'photo-1616683693504-3ea7e9ad6fec',
+  'photo-1608248597359-5975e523f669',
+  'photo-1570172619644-dfd03ed5d881',
+  'photo-1598440947619-2c35fc9aa908',
+  'photo-1512496015851-a90fb38ba796',
+  'photo-1583241800698-e8ab01830a07',
+  'photo-1522337360788-8b13dee7a37e',
+  'photo-1596462502278-27bfdc403348',
+  'photo-1594035910387-fea47794261f',
+  'photo-1588405748880-12d1d2a59f75',
+  'photo-1523293182086-7651a899d37f',
+  'photo-1535585209827-a15fcdbc4c2d',
+  'photo-1527799820374-dcf8d9d4a388',
+  'photo-1556228722-d0b7197b1202',
+  'photo-1506794778202-cad84cf45f1d',
+]);
+
+export function isDummySeedImage(url) {
+  if (!url) return true;
+  const s = String(url);
+  for (const hash of DUMMY_SEED_IMAGE_HASHES) {
+    if (s.includes(hash)) return true;
+  }
+  return false;
+}
+
 // ── 2. CURATED CATEGORY REAL STUDIO PHOTOGRAPHY ──────────────────────────────
 export const CATEGORY_STUDIO_IMAGES = {
   // ── Moisturizers & Creams
   Moisturizers: [
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228722-d0b7313a0328?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1567928805164-e598f4194098?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1556228722-d0b7197b1202?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1608248597359-5975e523f669?auto=format&fit=crop&q=85',
   ],
 
   // ── Serums & Essences
   'Serums & Essences': [
-    'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&q=85',
   ],
 
   // ── Cleansers & Face Wash
   'Face Wash & Cleansers': [
-    'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228722-d0b7313a0328?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1567928805164-e598f4194098?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
   ],
 
   // ── Sunscreens
   'Face Sunscreen': [
-    'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
   ],
 
   // ── Eye Creams & Care
   'Eye Creams': [
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228722-d0b7313a0328?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
   ],
 
   // ── Face Masks
   'Face Masks': [
     'https://images.unsplash.com/photo-1567928805164-e598f4194098?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
   ],
 
   // ── Facial Oils
   'Face Oils': [
     'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&q=85',
   ],
@@ -276,33 +356,33 @@ export const CATEGORY_STUDIO_IMAGES = {
   // ── Toners & Mists
   Toners: [
     'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228722-d0b7313a0328?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
   ],
 
   // ── Lip Treatments
   'Lip Balm & Treatments': [
-    'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1583241800698-e8ab01830a07?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1599732497042-302381285223?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?auto=format&fit=crop&q=85',
   ],
 
   // ── Anti-Aging & Treatments
   'Anti-Aging': [
     'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
   ],
 
   // ── Acne & Blemishes
   'Acne & Blemishes': [
-    'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
   ],
 
   // ── Makeup
@@ -310,39 +390,47 @@ export const CATEGORY_STUDIO_IMAGES = {
     'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1583241800698-e8ab01830a07?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1503236823255-94609f598e71?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1583241800698-e8ab01830a07?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1590156221187-578d380e224e?auto=format&fit=crop&q=85',
   ],
 
   // ── Hair
   Hair: [
-    'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
   ],
 
   // ── Fragrance
   Fragrance: [
-    'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1583445013765-46c20c4a6772?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1615397349754-cfa2066a298e?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1585218356057-dc0e8d555899?auto=format&fit=crop&q=85',
   ],
 
   // ── Bath & Body
   'Bath & Body': [
-    'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
     'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228722-d0b7313a0328?auto=format&fit=crop&q=85',
+    'https://images.unsplash.com/photo-1608248597359-5975e523f669?auto=format&fit=crop&q=85',
   ],
 };
 
 // Default universal fallback image
 export const DEFAULT_PRODUCT_IMAGE =
-  'https://images.unsplash.com/photo-1608248597359-0020163351ca?auto=format&fit=crop&q=85';
+  'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85&w=600';
 
 /**
  * Deterministic hash function that maps a string to a non-negative integer.
@@ -366,26 +454,40 @@ function hashString(str) {
  * @returns {string} Fully qualified image URL
  */
 export function getProductImage(product, width = 600) {
-  if (!product) return `${DEFAULT_PRODUCT_IMAGE}&w=${width}`;
+  if (!product) return DEFAULT_PRODUCT_IMAGE;
 
-  const pid = String(product.product_id || product.id || '').trim();
+  const pid = String(product.code || product.product_id || product.id || '').trim();
 
-  // 1. Direct custom image URL if supplied
-  if (product.image_url && String(product.image_url).startsWith('http')) {
-    return product.image_url;
+  // 1. Local downloaded high-res WebP image (Fast, offline, 100% exact product match)
+  if (pid && LOCAL_PRODUCT_IMAGES.has(pid)) {
+    return `/images/products/${pid}.webp`;
   }
 
-  // 2. Iconic hero product override
+  // 2. Direct iconic hero product override (verified high-res Sephora images)
   if (pid && TOP_PRODUCT_IMAGES[pid]) {
-    return `${TOP_PRODUCT_IMAGES[pid]}&w=${width}`;
+    return TOP_PRODUCT_IMAGES[pid];
   }
 
-  // 3. Category matching (check tertiary -> secondary -> primary)
+  // 3. Direct custom image URL if supplied and NOT one of the repeating dummy seed hashes
+  const rawImg = product.imageUrl || product.image_url;
+  if (
+    rawImg &&
+    (String(rawImg).startsWith('http') || String(rawImg).startsWith('/')) &&
+    !isDummySeedImage(rawImg)
+  ) {
+    return String(rawImg);
+  }
+
+  // 3. Category matching (supports both .NET camelCase DTOs and legacy fields)
   const categoriesToCheck = [
+    product.categoryName,
+    product.department,
     product.tertiary_category,
     product.secondary_category,
     product.primary_category,
     product.category,
+    product.name,
+    product.product_name,
   ].filter(Boolean);
 
   let matchedList = null;
@@ -464,8 +566,10 @@ export function getProductImage(product, width = 600) {
     matchedList = CATEGORY_STUDIO_IMAGES['Moisturizers'];
   }
 
-  // 4. Deterministic indexing using hash of product_id or product_name
-  const seed = pid || product.product_name || 'beautyai';
+  // 4. Deterministic indexing using a unique compound seed (pid + name + brand)
+  const pName = product.product_name || product.name || '';
+  const bName = product.brand_name || product.brandName || '';
+  const seed = `${pid}_${pName}_${bName}`;
   const index = hashString(seed) % matchedList.length;
   const baseUrl = matchedList[index];
 

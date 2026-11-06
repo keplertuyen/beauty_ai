@@ -249,6 +249,337 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateOrderRequest"];
+                    "text/json": components["schemas"]["CreateOrderRequest"];
+                    "application/*+json": components["schemas"]["CreateOrderRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["OrderDto"];
+                        "application/json": components["schemas"]["OrderDto"];
+                        "text/json": components["schemas"]["OrderDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/my-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/Products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    query?: string;
+                    category?: string;
+                    brand?: string;
+                    skinType?: string;
+                    min_price?: number | string;
+                    max_price?: number | string;
+                    min_rating?: number | string;
+                    sort_by?: string;
+                    safe_for_me?: boolean;
+                    page?: number | string;
+                    per_page?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/Products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/Products/{id}/similar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number | string;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/Products/{id}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    skin_type?: string;
+                    page?: number | string;
+                    per_page?: number | string;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/Products/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/Products/brands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/skin-profile": {
         parameters: {
             query?: never;
@@ -435,6 +766,160 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tools/analyze-inci": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["InciAnalysisRequest"];
+                    "text/json": components["schemas"]["InciAnalysisRequest"];
+                    "application/*+json": components["schemas"]["InciAnalysisRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["InciAnalysisResponse"];
+                        "application/json": components["schemas"]["InciAnalysisResponse"];
+                        "text/json": components["schemas"]["InciAnalysisResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tools/check-conflict": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ConflictCheckRequest"];
+                    "text/json": components["schemas"]["ConflictCheckRequest"];
+                    "application/*+json": components["schemas"]["ConflictCheckRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ConflictCheckResponse"];
+                        "application/json": components["schemas"]["ConflictCheckResponse"];
+                        "text/json": components["schemas"]["ConflictCheckResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tools/skintype-guide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    area?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -449,11 +934,68 @@ export interface components {
             ingredientName: string;
             note: null | string;
         };
+        AnalyzedCautionDto: {
+            type: string;
+            title: string;
+            caution: string;
+            ingredients_involved: string[];
+        };
+        AnalyzedFunctionalGroupDto: {
+            group_title: string;
+            plain_explanation: string;
+            /** Format: int32 */
+            count: number | string;
+            ingredients: string[];
+        };
+        AnalyzedKeyIngredientDto: {
+            common_name: string;
+            inci_name: string;
+            role_label: string;
+            explanation: string;
+            is_featured_in_product_name: boolean;
+        };
         AuthResponse: {
             token: string;
             email: string;
             fullName: string;
             role: string;
+        };
+        CombinationWarningDto: {
+            warning: string;
+            ingredients_involved: string[];
+            severity: string;
+            recommendation: string;
+        };
+        ConflictCheckRequest: {
+            product_ids: (number | string)[];
+        };
+        ConflictCheckResponse: {
+            has_conflict: boolean;
+            conflicts: components["schemas"]["ConflictDetailDto"][];
+        };
+        ConflictDetailDto: {
+            product_a: string;
+            product_b: string;
+            ingredient_a: string;
+            ingredient_b: string;
+            severity: string;
+            reason: string;
+            recommendation: string;
+        };
+        CreateOrderItemRequest: {
+            /** Format: int32 */
+            product_id: number | string;
+            /** Format: int32 */
+            quantity: number | string;
+        };
+        CreateOrderRequest: {
+            recipient_name: string;
+            phone_number: string;
+            shipping_address: string;
+            notes?: null | string;
+            /** @default false */
+            conflict_acknowledged: boolean;
+            items?: null | components["schemas"]["CreateOrderItemRequest"][];
         };
         DigitalSkinIdDto: {
             /** Format: int32 */
@@ -469,9 +1011,71 @@ export interface components {
             status: string;
             service: string;
         };
+        InciAnalysisRequest: {
+            ingredients_text: string;
+            target_area?: null | string;
+            department?: null | string;
+            category?: null | string;
+            product_name?: null | string;
+            condition?: null | string;
+            skin_type?: null | string;
+        };
+        InciAnalysisResponse: {
+            summary: string;
+            verdict: string;
+            verdict_label: string;
+            verdict_reason: string;
+            requires_skin_id: boolean;
+            user_skin_type: null | string;
+            target_area: string;
+            department: null | string;
+            has_allergy_warning: boolean;
+            allergy_matches: string[];
+            key_ingredients: components["schemas"]["AnalyzedKeyIngredientDto"][];
+            functional_groups: components["schemas"]["AnalyzedFunctionalGroupDto"][];
+            benefits_title: string;
+            benefits: string[];
+            cautions: components["schemas"]["AnalyzedCautionDto"][];
+            combination_warnings: components["schemas"]["CombinationWarningDto"][];
+            fragrance_disclosure: null | string;
+            /** Format: int32 */
+            total_ingredients_count: number | string;
+            raw_inci_list: string[];
+        };
         LoginRequest: {
             email: string;
             password: string;
+        };
+        OrderDto: {
+            /** Format: int32 */
+            order_id: number | string;
+            order_code: string;
+            recipient_name: string;
+            phone_number: string;
+            shipping_address: string;
+            payment_method: string;
+            payment_status: string;
+            status: string;
+            /** Format: double */
+            total_usd: number | string;
+            conflict_acknowledged: boolean;
+            /** Format: date-time */
+            created_at: string;
+            items: components["schemas"]["OrderItemDto"][];
+        };
+        OrderItemDto: {
+            /** Format: int32 */
+            product_id: number | string;
+            product_code: null | string;
+            product_name: string;
+            brand_name: string;
+            image_url: null | string;
+            /** Format: int32 */
+            quantity: number | string;
+            /** Format: double */
+            unit_price_usd: number | string;
+            /** Format: double */
+            total_price_usd: number | string;
         };
         ProblemDetails: {
             type?: null | string;

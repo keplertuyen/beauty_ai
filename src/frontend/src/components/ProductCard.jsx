@@ -12,15 +12,21 @@ export default function ProductCard({ product }) {
   const brandName = product.brandName ?? product.brand_name ?? 'BeautyAI Brand';
   const inWishlist = isInWishlist(productId);
 
-  const [imgSrc, setImgSrc] = useState(() => getProductImage(product, 500));
+  const resolvedSrc = getProductImage(product, 500);
+  const [imgSrc, setImgSrc] = useState(resolvedSrc);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    setImgSrc(getProductImage(product, 500));
-    setImgLoaded(false);
-    setImgError(false);
-  }, [product]);
+    setImgSrc((prev) => {
+      if (prev !== resolvedSrc) {
+        setImgLoaded(false);
+        setImgError(false);
+        return resolvedSrc;
+      }
+      return prev;
+    });
+  }, [resolvedSrc]);
 
   const rating = parseFloat(product.rating) || 0;
   const price = parseFloat(product.priceUsd ?? product.price_usd ?? product.price) || 0;
@@ -38,13 +44,19 @@ export default function ProductCard({ product }) {
         style={{ cursor: 'pointer', background: 'var(--bg-secondary)', position: 'relative', overflow: 'hidden' }}
       >
         {!imgLoaded && !imgError && (
-          <div className="skeleton product-card-skeleton-img" style={{ position: 'absolute', inset: 0 }} />
+          <div className="skeleton product-card-skeleton-img" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
         )}
         {!imgError ? (
           <img
+            ref={(el) => {
+              if (el && el.complete && el.naturalWidth > 0 && !imgLoaded) {
+                setImgLoaded(true);
+              }
+            }}
             src={imgSrc}
             alt={productName}
             className={`product-card-real-img ${imgLoaded ? 'loaded' : ''}`}
+            style={{ position: 'relative', zIndex: 1 }}
             loading="lazy"
             referrerPolicy="no-referrer"
             onLoad={() => setImgLoaded(true)}
@@ -150,6 +162,7 @@ export default function ProductCard({ product }) {
 
         {/* Wishlist Button - Clean White Circular Floating Button */}
         <button
+          type="button"
           className={`wishlist-btn-float ${inWishlist ? 'active' : ''}`}
           style={{
             position: 'absolute',
@@ -169,8 +182,8 @@ export default function ProductCard({ product }) {
             transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease',
           }}
           onClick={(e) => { e.stopPropagation(); toggleWishlistItem(productId); }}
-          aria-label={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
-          title={inWishlist ? t('pd_unfavorite') : t('pd_favorite')}
+          aria-pressed={inWishlist}
+          aria-label={`Save ${productName} to wishlist`}
         >
           <Heart
             size={17}
@@ -225,7 +238,7 @@ export default function ProductCard({ product }) {
             fontWeight: 600,
             borderRadius: 'var(--radius-full)',
           }}
-          onClick={() => addItemToCart(productId)}
+          onClick={() => addItemToCart(product)}
         >
           <ShoppingBag size={14} />
           {t('prod_add_to_cart')}

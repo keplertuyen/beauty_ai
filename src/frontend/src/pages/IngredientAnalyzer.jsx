@@ -297,54 +297,197 @@ export default function IngredientAnalyzer() {
           </p>
         </div>
 
-        {/* ── AUTHENTICATION GATE (Unauthenticated Users) ── */}
+        {/* ── AUTHENTICATION BLURRED PREVIEW GATE (Unauthenticated Users) ── */}
         {!authLoading && !user ? (
-          <div
-            className="glass-card animate-fadeIn"
-            style={{
-              maxWidth: '640px',
-              margin: '16px auto 60px',
-              padding: '40px 32px',
-              textAlign: 'center',
-              borderRadius: '20px',
-              border: '1px solid rgba(196, 139, 113, 0.3)',
-              background: '#FFFFFF',
-              boxShadow: '0 16px 40px rgba(74, 55, 40, 0.08)',
-            }}
-          >
+          <div style={{ position: 'relative', marginBottom: '64px' }}>
+            {/* Blurred Preview of Deep Formula Analysis */}
+            <div
+              aria-hidden="true"
+              style={{
+                filter: 'blur(7px)',
+                WebkitFilter: 'blur(7px)',
+                opacity: 0.62,
+                pointerEvents: 'none',
+                userSelect: 'none',
+              }}
+            >
+              {/* Tab Bar Preview */}
+              <div className="ia-tabs tabs" style={{ marginBottom: '20px' }}>
+                <button className="tab-btn active" type="button">
+                  <FlaskConical size={15} />
+                  Formula Breakdown
+                </button>
+                <button className="tab-btn" type="button">
+                  <BookOpen size={15} />
+                  Skin Type & Ingredient Guide
+                </button>
+              </div>
+
+              {/* Input Section Preview */}
+              <div className="ia-input-section glass-card" style={{ marginBottom: '20px' }}>
+                {sourceProduct && (
+                  <div
+                    style={{
+                      background: 'rgba(196, 139, 113, 0.09)',
+                      border: '1px solid rgba(196, 139, 113, 0.25)',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      marginBottom: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <span>
+                      Analyzing product formula: <strong>{sourceProduct}</strong>
+                    </span>
+                    <span className="badge badge-clean">Auto-filled from Product Page</span>
+                  </div>
+                )}
+
+                <div style={{ marginBottom: '16px' }}>
+                  <div className="ia-field-label" style={{ marginBottom: '8px' }}>
+                    <Layers size={16} className="label-icon" />
+                    <span>Target Care Area (Tailors benefits & sensitivity rules)</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {TARGET_AREA_OPTIONS.map((opt) => (
+                      <span
+                        key={opt.key}
+                        className={`ia-area-pill ${targetArea === opt.key ? 'active' : ''}`}
+                      >
+                        {opt.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <textarea
+                  className="ia-textarea form-textarea"
+                  value={inputText || SAMPLES[targetArea] || SAMPLES.face}
+                  readOnly
+                  rows={4}
+                />
+              </div>
+
+              {/* Blurred 3-Tier Results Preview */}
+              <div className="glass-card" style={{ padding: '24px', borderRadius: '18px', marginBottom: '16px', background: 'rgba(16, 185, 129, 0.08)', border: '1.5px solid rgba(16, 185, 129, 0.35)' }}>
+                <div style={{ fontWeight: 800, fontSize: '1.3rem', color: '#065F46', marginBottom: '6px' }}>
+                  Good Match For Your Personal Skin ID
+                </div>
+                <p style={{ margin: 0, color: '#3D312A' }}>
+                  Cross-checked against your personal Allergy Blacklist, skin barrier profile, and target care area.
+                </p>
+              </div>
+
+              <div className="ia-section-card glass-card" style={{ padding: '20px' }}>
+                <h3 style={{ margin: '0 0 12px', fontSize: '1.05rem' }}>Key Notable Ingredients (4)</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                  <div style={{ background: '#FFF', padding: '14px', borderRadius: '12px', border: '1px solid #EAE3DC' }}>
+                    <div style={{ fontWeight: 700 }}>Hyaluronic Acid</div>
+                    <div style={{ fontSize: '0.82rem', color: '#6B5E55' }}>Deep multi-layer hydration</div>
+                  </div>
+                  <div style={{ background: '#FFF', padding: '14px', borderRadius: '12px', border: '1px solid #EAE3DC' }}>
+                    <div style={{ fontWeight: 700 }}>Niacinamide (Vitamin B3)</div>
+                    <div style={{ fontSize: '0.82rem', color: '#6B5E55' }}>Supports barrier & tone</div>
+                  </div>
+                  <div style={{ background: '#FFF', padding: '14px', borderRadius: '12px', border: '1px solid #EAE3DC' }}>
+                    <div style={{ fontWeight: 700 }}>Ceramide NP</div>
+                    <div style={{ fontSize: '0.82rem', color: '#6B5E55' }}>Reinforces lipid moisture seal</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Centered Floating Lock Overlay */}
             <div
               style={{
-                width: 60,
-                height: 60,
-                borderRadius: '50%',
-                background: 'rgba(196, 139, 113, 0.14)',
-                color: '#8F5B42',
+                position: 'absolute',
+                inset: 0,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 18px',
+                padding: '20px',
+                zIndex: 10,
               }}
             >
-              <Lock size={28} />
-            </div>
-            <h2 style={{ margin: '0 0 10px', fontSize: '1.5rem', color: '#2C2018' }}>
-              Sign In to Use Personalized Formula Analysis
-            </h2>
-            <p style={{ margin: '0 auto 24px', maxWidth: 480, color: '#6B5E55', fontSize: '0.94rem', lineHeight: 1.55 }}>
-              Instead of generic chemical scores, BeautyAI evaluates every formula directly against your personal <strong>Digital Skin ID</strong> (your skin type, concerns, and allergy blacklist). Sign in to unlock both the <strong>Formula Breakdown</strong> and <strong>Skin Type Guide</strong>.
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal'))}
-                style={{ padding: '12px 28px', fontSize: '0.95rem', fontWeight: 700 }}
+              <div
+                className="glass-card animate-fadeIn"
+                style={{
+                  maxWidth: '540px',
+                  width: '100%',
+                  padding: '36px 32px',
+                  textAlign: 'center',
+                  borderRadius: '20px',
+                  border: '1.5px solid rgba(196, 139, 113, 0.4)',
+                  background: 'rgba(255, 255, 255, 0.96)',
+                  backdropFilter: 'blur(16px)',
+                  boxShadow: '0 24px 60px rgba(44, 32, 24, 0.16)',
+                }}
               >
-                Sign In / Create Free Account
-              </button>
-              <Link to="/products" className="btn btn-secondary" style={{ padding: '12px 22px' }}>
-                Browse Catalog
-              </Link>
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    background: 'rgba(196, 139, 113, 0.15)',
+                    color: '#8F5B42',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                  }}
+                >
+                  <Sparkles size={26} />
+                </div>
+
+                {sourceProduct && (
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '4px 12px',
+                      borderRadius: '999px',
+                      background: 'rgba(196, 139, 113, 0.12)',
+                      color: '#6B442A',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      marginBottom: '10px',
+                    }}
+                  >
+                    <FlaskConical size={13} />
+                    <span>{sourceProduct}</span>
+                  </div>
+                )}
+
+                <h2 style={{ margin: '0 0 10px', fontSize: '1.4rem', fontWeight: 800, color: '#2C2018' }}>
+                  Personal Skin ID Cross-Check Available
+                </h2>
+                <p style={{ margin: '0 auto 24px', maxWidth: 440, color: '#574B42', fontSize: '0.94rem', lineHeight: 1.55 }}>
+                  Sign in to automatically check this formula against your personal <strong>Allergy Blacklist</strong> and <strong>Skin Type</strong>, and unlock both the <strong>Deep Formula Breakdown</strong> and <strong>Skin Type Guide</strong>.
+                </p>
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => {
+                      sessionStorage.setItem(
+                        'beautyai_post_login_redirect',
+                        `${location.pathname}${location.search}`
+                      );
+                      window.dispatchEvent(new CustomEvent('open-auth-modal'));
+                    }}
+                    style={{ padding: '12px 28px', fontSize: '0.95rem', fontWeight: 700 }}
+                  >
+                    Sign In to Unlock Analysis
+                  </button>
+                  <Link to="/products" className="btn btn-secondary" style={{ padding: '12px 20px' }}>
+                    Back to Catalog
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         ) : (

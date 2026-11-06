@@ -150,7 +150,7 @@ export default function Navbar() {
                       <Link to="/wishlist" className="user-menu-item">
                         <Heart size={15} /> {t('nav_wishlist')}
                       </Link>
-                      <Link to="/profile" className="user-menu-item">
+                      <Link to="/profile?tab=orders" className="user-menu-item">
                         <ShoppingBag size={15} /> {t('nav_my_orders')}
                       </Link>
                       {user.role === 'admin' && (
