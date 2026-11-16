@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const API = axios.create({
   baseURL: BASE_URL,
@@ -67,6 +67,8 @@ export const getSkinQuizRecs = (data) => API.post('/recommendations/skinquiz', d
 export const getUserRecs = (user_id) => API.post('/recommendations/user', { user_id });
 export const generateRoutine = (data) => API.post('/routines/generate', data);
 export const saveRoutine = (data) => API.post('/routines/save', data);
+export const getMyRoutines = () => API.get('/routines/my-routines');
+export const deleteRoutine = (id) => API.delete(`/routines/${id}`);
 
 // ==========================================
 // 5. INGREDIENTS & CONFLICT ANALYSIS
@@ -115,5 +117,8 @@ export const submitContact = (data) => API.post('/consultation/contact', data);
 // 10. ADMIN
 // ==========================================
 export const getDashboard = () => API.get('/admin/dashboard');
+export const getAdminOrders = (limit = 50) => API.get('/admin/orders', { params: { limit } });
+export const updateAdminOrderStatus = (id, status) => API.patch(`/admin/orders/${id}/status`, { status });
+export const createAdminProduct = (data) => API.post('/admin/products', data);
 
 export default API;

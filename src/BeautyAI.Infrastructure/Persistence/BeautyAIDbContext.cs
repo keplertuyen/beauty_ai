@@ -22,6 +22,7 @@ public class BeautyAIDbContext : DbContext
     public DbSet<ConflictRule> ConflictRules => Set<ConflictRule>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<SavedRoutine> SavedRoutines => Set<SavedRoutine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -301,6 +302,25 @@ public class BeautyAIDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SavedRoutine>(entity =>
+        {
+            entity.ToTable("saved_routines");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.RoutineName).HasColumnName("routine_name").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.RoutineType).HasColumnName("routine_type").HasMaxLength(50).IsRequired();
+            entity.Property(e => e.ItemsJson).HasColumnName("items").HasColumnType("jsonb").IsRequired();
+            entity.Property(e => e.Notes).HasColumnName("notes");
+            entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Ignore(e => e.UpdatedAtUtc);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

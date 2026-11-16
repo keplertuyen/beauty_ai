@@ -353,4 +353,69 @@ public class ProductService : IProductService
             Pages: pages
         );
     }
+
+    public async Task<ProductReviewDto> AddReviewAsync(
+        int? userId,
+        CreateReviewRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var targetId = request.ProductId;
+        if (string.IsNullOrWhiteSpace(targetId))
+            throw new ArgumentException("Product ID is required", nameof(request.ProductId));
+
+        Product? product = null;
+        if (int.TryParse(targetId, out var parsedId))
+        {
+            product = await _productRepository.GetProductByIdAsync(parsedId, cancellationToken);
+        }
+        if (product == null)
+        {
+            product = await _productRepository.GetProductByCodeOrSlugAsync(targetId, cancellationToken);
+        }
+
+        if (product == null)
+            throw new KeyNotFoundException($"Product with ID/code '{targetId}' not found.");
+
+        var rating = Math.Clamp(request.Rating, 1, 5);
+        var content = !string.IsNullOrWhiteSpace(request.Content) ? request.Content : request.ReviewText;
+        var authorName = !string.IsNullOrWhiteSpace(request.AuthorName) ? request.AuthorName.Trim() : "BeautyAI Shopper";
+
+        var skinType = "Unknown";
+        if (!string.IsNullOrWhiteSpace(request.SkinType))
+        {
+            var raw = request.SkinType.Trim().ToLowerInvariant();
+            if (raw.Contains("oily")) skinType = "Oily";
+            else if (raw.Contains("dry")) skinType = "Dry";
+            else if (raw.Contains("comb")) skinType = "Combination";
+            else if (raw.Contains("norm")) skinType = "Normal";
+        }
+
+        var review = new Review
+        {
+            ProductId = product.Id,
+            ProductCode = product.Code,
+            UserId = userId,
+            AuthorName = authorName,
+            Rating = rating,
+            SkinType = skinType,
+            SkinConcerns = request.SkinConcerns,
+            Content = content
+        };
+
+        var saved = await _productRepository.AddReviewAsync(review, cancellationToken);
+
+        return new ProductReviewDto(
+            Id: saved.Id,
+            ProductId: saved.ProductId,
+            AuthorName: saved.AuthorName,
+            Rating: saved.Rating,
+            SkinType: saved.SkinType,
+            SkinConcerns: saved.SkinConcerns,
+            Content: saved.Content,
+            CreatedAt: saved.CreatedAtUtc
+        );
+    }
 }

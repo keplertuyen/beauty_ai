@@ -1,485 +1,22 @@
 /**
- * productImages.js — High-Resolution Real Product Imagery System for BeautyAI
- * 
- * Provides professional studio cosmetics and skincare photography
- * with deterministic hashing per product_id, iconic product overrides,
- * and graceful fallback handling.
+ * productImages.js — Verified Product Imagery & Neutral Placeholder Resolver
+ *
+ * Every real photo in LOCAL_PRODUCT_IMAGES is backed by a verified row in
+ * docs/_data/images/manifest.csv (synced by scripts/sync_image_data.py).
+ * Products without a verified photo render a neutral category SVG placeholder
+ * instead of misleading stock photography.
  */
 
-// ── 1. ICONIC HERO PRODUCT OVERRIDES ──────────────────────────────────────────
-export const TOP_PRODUCT_IMAGES = {
-  // Rare Beauty by Selena Gomez - Soft Pinch Liquid Blush
-  P97989778: 'https://www.sephora.com/productimages/sku/s3014594-main-zoom.jpg',
-  // NARS - Radiant Creamy Concealer
-  P377873: 'https://www.sephora.com/productimages/sku/s2172310-main-zoom.jpg',
-  // LANEIGE - Lip Sleeping Mask Intense Hydration with Vitamin C
-  P420652: 'https://www.sephora.com/productimages/sku/s1966258-main-zoom.jpg',
-  // SEPHORA COLLECTION - Cream Lip Stain Liquid Lipstick
-  P281411: 'https://www.sephora.com/productimages/sku/s1296110-main-zoom.jpg',
-  // Fenty Beauty by Rihanna - Gloss Bomb Universal Lip Luminizer
-  P67988453: 'https://www.sephora.com/productimages/sku/s1925965-main-zoom.jpg',
-  // Fenty Beauty by Rihanna - Pro Filt’r Soft Matte Longwear Liquid Foundation
-  P87985432: 'https://www.sephora.com/productimages/sku/s2170322-main-zoom.jpg',
-  // NARS - Blush
-  P2855: 'https://www.sephora.com/productimages/sku/s2245389-main-zoom.jpg',
-  // Anastasia Beverly Hills - Brow Wiz Ultra-Slim Precision Brow Pencil
-  P202633: 'https://www.sephora.com/productimages/sku/s1488337-main-zoom.jpg',
-  // Laura Mercier - Translucent Loose Setting Powder
-  P109908: 'https://www.sephora.com/productimages/sku/s2988509-main-zoom.jpg',
-  // The Ordinary - Niacinamide 10% + Zinc 1% Oil Control Serum
-  P427417: 'https://www.sephora.com/productimages/sku/s2031391-main-zoom.jpg',
-  // Dior - Dior Addict Lip Glow
-  P236816: 'https://www.sephora.com/productimages/sku/s2435345-main-zoom.jpg',
-  // The Ordinary - Hyaluronic Acid 2% + B5 Hydrating Serum
-  P427419: 'https://www.sephora.com/productimages/sku/s2031375-main-zoom.jpg',
-  // Dior - Lip Glow Oil
-  P453814: 'https://www.sephora.com/productimages/sku/s2316438-main-zoom.jpg',
-  // Urban Decay - All Nighter Long-Lasting Makeup Setting Spray
-  P263504: 'https://www.sephora.com/productimages/sku/s1536549-main-zoom.jpg',
-  // Estée Lauder - Double Wear Stay-in-Place Foundation
-  P378284: 'https://www.sephora.com/productimages/sku/s1465095-main-zoom.jpg',
-  // Armani Beauty - Luminous Silk Perfect Glow Flawless Oil-Free Foundation
-  P393401: 'https://www.sephora.com/productimages/sku/s1201508-main-zoom.jpg',
-  // Anastasia Beverly Hills - DIPBROW Waterproof, Smudge Proof Brow Pomade
-  P384060: 'https://www.sephora.com/productimages/sku/s1578277-main-zoom.jpg',
-  // Anastasia Beverly Hills - Eye Shadow Singles
-  P404832: 'https://www.sephora.com/productimages/sku/s1685817-main-zoom.jpg',
-  // Urban Decay - Vice Hydrating Lipstick
-  P409523: 'https://www.sephora.com/productimages/sku/s2484392-main-zoom.jpg',
-  // Anastasia Beverly Hills - Liquid Lipstick
-  P404831: 'https://www.sephora.com/productimages/sku/s1685874-main-zoom.jpg',
-  // KVD Beauty - Tattoo Liner Vegan Waterproof Liquid Eyeliner
-  P245205: 'https://www.sephora.com/productimages/sku/s1934983-main-zoom.jpg',
-  // Urban Decay - 24/7 Glide-On Waterproof Eyeliner Pencil
-  P133707: 'https://www.sephora.com/productimages/sku/s1393693-main-zoom.jpg',
-  // The Ordinary - Glycolic Acid 7% Exfoliating Toning Solution
-  P427406: 'https://www.sephora.com/productimages/sku/s2031508-main-zoom.jpg',
-  // The Ordinary - AHA 30% + BHA 2% Exfoliating Peeling Solution
-  P442563: 'https://www.sephora.com/productimages/sku/s2210722-main-zoom.jpg',
-  // Too Faced - Better Than Sex Volumizing & Lengthening Mascara
-  P381000: 'https://www.sephora.com/productimages/sku/s1533439-main-zoom.jpg',
-  // Olaplex - No. 3 Hair Repair Perfector
-  P428224: 'https://www.sephora.com/productimages/sku/s2033264-main-zoom.jpg',
-  // Kosas - Revealer Super Creamy + Brightening Concealer and Daytime Eye Cream
-  P456151: 'https://www.sephora.com/productimages/sku/s2334043-main-zoom.jpg',
-  // Too Faced - Born This Way Super Coverage Multi-Use Longwear Concealer
-  P432298: 'https://www.sephora.com/productimages/sku/s2084408-main-zoom.jpg',
-  // Charlotte Tilbury - Hollywood Flawless Filter
-  P434104: 'https://www.sephora.com/productimages/sku/s2434678-main-zoom.jpg',
-  // Fenty Beauty by Rihanna - Stunna Lip Paint Longwear Fluid Lip Color
-  P39787544: 'https://www.sephora.com/productimages/sku/s1925965-main-zoom.jpg',
-  // Charlotte Tilbury - Airbrush Flawless Finish Setting Powder
-  P433526: 'https://www.sephora.com/productimages/sku/s2434751-main-zoom.jpg',
-  // Dior - Dior Addict Lip Maximizer Plumping Gloss
-  P186805: 'https://www.sephora.com/productimages/sku/s2168557-main-zoom.jpg',
-  // Rare Beauty by Selena Gomez - Positive Light Liquid Luminizer Highlight
-  P38855877: 'https://www.sephora.com/productimages/sku/s2362168-main-zoom.jpg',
-  // Fenty Beauty by Rihanna - Match Stix Matte Contour Skinstick
-  P18975403: 'https://www.sephora.com/productimages/sku/s2565141-main-zoom.jpg',
-  // Fenty Beauty by Rihanna - Killawatt Freestyle Highlighter
-  P64879845: 'https://www.sephora.com/productimages/sku/s1925940-main-zoom.jpg',
-  // LANEIGE - Lip Glowy Balm
-  P443563: 'https://www.sephora.com/productimages/sku/s2198083-main-zoom.jpg',
-  // Sol de Janeiro - Brazilian Bum Bum Body Cream
-  P406080: 'https://www.sephora.com/productimages/sku/s1802412-main-zoom.jpg',
-  // Too Faced - Born This Way Natural Finish Longwear Liquid Foundation
-  P397517: 'https://www.sephora.com/productimages/sku/s1710011-main-zoom.jpg',
-  // Buxom - Full-On Plumping Lip Polish Gloss
-  P174213: 'https://www.sephora.com/productimages/sku/s1887850-main-zoom.jpg',
-  // stila - Glitter & Glow Liquid Eye Shadow
-  P63087293: 'https://www.sephora.com/productimages/sku/s1887850-main-zoom.jpg',
-  // Anastasia Beverly Hills - Modern Renaissance Eye Shadow Palette
-  P409118: 'https://www.sephora.com/productimages/sku/s1824333-main-zoom.jpg',
-  // Charlotte Tilbury - Beauty Highlighter Wand
-  P444154: 'https://www.sephora.com/productimages/sku/s2144368-main-zoom.jpg',
-  // NARS - Mini Radiant Creamy Concealer
-  P422077: 'https://www.sephora.com/productimages/sku/s2172310-main-zoom.jpg',
-  // beautyblender - ORIGINAL BEAUTYBLENDER Makeup Sponge
-  P228913: 'https://www.sephora.com/productimages/sku/s1100577-main-zoom.jpg',
-  // SEPHORA COLLECTION - Sephora Colorful Eyeshadow
-  P430932: 'https://www.sephora.com/productimages/sku/s2040921-main-zoom.jpg',
-  // Charlotte Tilbury - Lip Cheat Lip Liner
-  P433516: 'https://www.sephora.com/productimages/sku/s2434827-main-zoom.jpg',
-  // Urban Decay - 24/7 Eyeshadow
-  P309813: 'https://www.sephora.com/productimages/sku/s2419406-main-zoom.jpg',
-  // SEPHORA COLLECTION - #LIPSTORIES Lipstick
-  P424915: 'https://www.sephora.com/productimages/sku/s1974641-main-zoom.jpg',
-  // NARS - Velvet Matte Lipstick Pencil
-  P78834: 'https://www.sephora.com/productimages/sku/s1637958-main-zoom.jpg',
-  // Urban Decay - Naked3 Eyeshadow Palette
-  P384099: 'https://www.sephora.com/productimages/sku/s1573336-main-zoom.jpg',
-  // NARS - Soft Matte Complete Concealer
-  P416200: 'https://www.sephora.com/productimages/sku/s1900356-main-zoom.jpg',
-  // Drunk Elephant - Protini Polypeptide Firming Refillable Moisturizer
-  P427421: 'https://www.sephora.com/productimages/sku/s2025633-main-zoom.jpg',
-  // Laura Mercier - Caviar Stick Eye Shadow
-  P293605: 'https://www.sephora.com/productimages/sku/s1368943-main-zoom.jpg',
-  // Youth To The People - Superfood Antioxidant Cleanser
-  P411387: 'https://www.sephora.com/productimages/sku/s1863588-main-zoom.jpg',
-  // Farmacy - Green Clean Makeup Removing Cleansing Balm
-  P417238: 'https://www.sephora.com/productimages/sku/s1899103-main-zoom.jpg',
-  // ILIA - Super Serum Skin Tint SPF 40 Foundation
-  P455418: 'https://www.sephora.com/productimages/sku/s2332583-main-zoom.jpg',
-  // stila - Stay All Day Waterproof Liquid Eye Liner
-  P253818: 'https://www.sephora.com/productimages/sku/s1221084-main-zoom.jpg',
-  // Glow Recipe - Watermelon Glow Niacinamide Dew Drops
-  P466123: 'https://www.sephora.com/productimages/sku/s2404846-main-zoom.jpg',
-  // Charlotte Tilbury - Mini Pillow Talk Lipstick & Liner Set
-  P458268: 'https://www.sephora.com/productimages/sku/s2434827-main-zoom.jpg',
-  // Tatcha - The Dewy Skin Cream Plumping & Hydrating Moisturizer
-  P441101: 'https://www.sephora.com/productimages/sku/s2181006-main-zoom.jpg',
-  // Tower 28 Beauty - ShineOn Lip Jelly Non-Sticky Gloss
-  P448854: 'https://www.sephora.com/productimages/sku/s2285195-main-zoom.jpg',
-  // Benefit Cosmetics - Hoola Bronzer
-  P290636: 'https://www.sephora.com/productimages/sku/s2371904-main-zoom.jpg',
-  // tarte - Amazonian Clay 12-Hour Blush
-  P278610: 'https://www.sephora.com/productimages/sku/s1328780-main-zoom.jpg',
-  // Tatcha - The Water Cream Oil-Free Pore Minimizing Moisturizer
-  P418218: 'https://www.sephora.com/productimages/sku/s1932920-main-zoom.jpg',
-  // Yves Saint Laurent - Rouge Volupté Shine Lipstick Balm
-  P377710: 'https://www.sephora.com/productimages/sku/s1484781-main-zoom.jpg',
-  // Rare Beauty by Selena Gomez - Warm Wishes Effortless Bronzer Sticks
-  P479343: 'https://www.sephora.com/productimages/sku/s2518934-main-zoom.jpg',
-  // tarte - Tartelette In Bloom Clay Eyeshadow Palette
-  P403812: 'https://www.sephora.com/productimages/sku/s1776996-main-zoom.jpg',
-  // Summer Fridays - Lip Butter Balm
-  P455936: 'https://www.sephora.com/productimages/sku/s2495497-main-zoom.jpg',
-  // Charlotte Tilbury - Hollywood Contour Wand
-  P434002: 'https://www.sephora.com/productimages/sku/s2434652-main-zoom.jpg',
-  // Charlotte Tilbury - Matte Revolution Lipstick
-  P433530: 'https://www.sephora.com/productimages/sku/s2434777-main-zoom.jpg',
-  // The Ordinary - Multi-Peptide + HA Serum
-  P427420: 'https://www.sephora.com/productimages/sku/s2031409-main-zoom.jpg',
-  // Kaja - Eye Bento Bouncy Eyeshadow Trio
-  P436148: 'https://www.sephora.com/productimages/sku/s2139632-main-zoom.jpg',
-  // NARS - Audacious Lipstick
-  P387906: 'https://www.sephora.com/productimages/sku/s1637958-main-zoom.jpg',
-  // Too Faced - Melted Matte Liquid Lipstick
-  P407636: 'https://www.sephora.com/productimages/sku/s1829910-main-zoom.jpg',
-  // Dior - BACKSTAGE Face & Body Foundation
-  P432500: 'https://www.sephora.com/productimages/sku/s2070118-main-zoom.jpg',
-  // Anastasia Beverly Hills - Soft Glam Eyeshadow Palette
-  P58930227: 'https://www.sephora.com/productimages/sku/s2036481-main-zoom.jpg',
-  // Drunk Elephant - D-Bronzi Anti-Pollution Bronzing Drops with Peptides
-  P432668: 'https://www.sephora.com/productimages/sku/s2081529-main-zoom.jpg',
-  // KVD Beauty - Lock-It Full-Coverage Long-Wear Matte Liquid Foundation
-  P311138: 'https://www.sephora.com/productimages/sku/s1501550-main-zoom.jpg',
-  // HUDA BEAUTY - Easy Bake Loose Baking & Setting Powder
-  P433402: 'https://www.sephora.com/productimages/sku/s2114031-main-zoom.jpg',
-  // Smashbox - Always On Longwear Matte Liquid Lipstick
-  P409317: 'https://www.sephora.com/productimages/sku/s1815349-main-zoom.jpg',
-  // MILK MAKEUP - Hydro Grip Hydrating Makeup Primer
-  P441813: 'https://www.sephora.com/productimages/sku/s2169423-main-zoom.jpg',
-  // Benefit Cosmetics - The POREfessional Pore Minimizing Primer
-  P264900: 'https://www.sephora.com/productimages/sku/s1259068-main-zoom.jpg',
-  // Peace Out - Salicylic Acid Acne Healing Dots
-  P421275: 'https://www.sephora.com/productimages/sku/s1976075-main-zoom.jpg',
-  // Laura Mercier - Mini Translucent Loose Setting Powder
-  P422083: 'https://www.sephora.com/productimages/sku/s2042232-main-zoom.jpg',
-  // Charlotte Tilbury - Mini Hollywood Flawless Filter
-  P467607: 'https://www.sephora.com/productimages/sku/s2434678-main-zoom.jpg',
-  // Benefit Cosmetics - They're Real! Lengthening Mascara
-  P289307: 'https://www.sephora.com/productimages/sku/s1343938-main-zoom.jpg',
-  // NARS - Natural Radiant Longwear Foundation
-  P427301: 'https://www.sephora.com/productimages/sku/s2031177-main-zoom.jpg',
-  // Fenty Beauty by Rihanna - Eaze Drop Blurring Skin Tint
-  P470025: 'https://www.sephora.com/productimages/sku/s2431864-main-zoom.jpg',
-  // Urban Decay - Eyeshadow Primer Potion
-  P284716: 'https://www.sephora.com/productimages/sku/s1704402-main-zoom.jpg',
-  // Charlotte Tilbury - Airbrush Flawless Longwear Foundation
-  P448869: 'https://www.sephora.com/productimages/sku/s2244804-main-zoom.jpg',
-  // MAKE UP FOR EVER - Artist Color Pencil Brow, Eye & Lip Liner
-  P430969: 'https://www.sephora.com/productimages/sku/s2039980-main-zoom.jpg',
-  // Supergoop! - Unseen Sunscreen SPF 40 PA+++
-  P454380: 'https://www.sephora.com/productimages/sku/s2334589-main-zoom.jpg',
-  // Olaplex - No. 7 Bonding Hair Oil
-  P447376: 'https://www.sephora.com/productimages/sku/s2266328-main-zoom.jpg',
-  // Drunk Elephant - C-Firma Fresh Vitamin-C Day Serum
-  P400259: 'https://www.sephora.com/productimages/sku/s2484913-main-zoom.jpg',
-  // First Aid Beauty - Ultra Repair Cream Intense Hydration
-  P248407: 'https://www.sephora.com/productimages/sku/s1217744-main-zoom.jpg',
-  // SEPHORA COLLECTION - Retractable Waterproof Eyeliner
-  P230234: 'https://www.sephora.com/productimages/sku/s1198944-main-zoom.jpg',
-  // The Ordinary - Lactic Acid 10% + HA 2% Exfoliating Serum
-  P427413: 'https://www.sephora.com/productimages/sku/s2031441-main-zoom.jpg',
-  // Hourglass - Vanish Seamless Finish Foundation Stick
-  P410532: 'https://www.sephora.com/productimages/sku/s1828003-main-zoom.jpg',
-  // Benefit Cosmetics - Gimme Brow+ Tinted Volumizing Eyebrow Gel
-  P409239: 'https://www.sephora.com/productimages/sku/s2077972-main-zoom.jpg',
-  // Drunk Elephant - T.L.C. Framboos Glycolic Resurfacing Night Serum
-  P392246: 'https://www.sephora.com/productimages/sku/s1679315-main-zoom.jpg',
-};
+export const DEFAULT_PRODUCT_IMAGE = '/images/placeholders/default.svg';
 
-// Set of product IDs with local offline WebP photography in public/images/products/
-export const LOCAL_PRODUCT_IMAGES = new Set([
-  'P109908', 'P12430', 'P12495', 'P133707', 'P144212', 'P174213', 'P186805', 'P18975403',
-  'P19700127', 'P202633', 'P228913', 'P229406', 'P230234', 'P236816', 'P245205', 'P247355',
-  'P248407', 'P253818', 'P263504', 'P264900', 'P271538', 'P278610', 'P281411', 'P284507',
-  'P284716', 'P2855', 'P289307', 'P290636', 'P293605', 'P306857', 'P308201', 'P309308',
-  'P309813', 'P311138', 'P377710', 'P377723', 'P377724', 'P377784', 'P377873', 'P378284',
-  'P378821', 'P381000', 'P382309', 'P383083', 'P384059', 'P384060', 'P384099', 'P384963',
-  'P386335', 'P386783', 'P387906', 'P388029', 'P38855877', 'P392245', 'P392246', 'P392247',
-  'P392248', 'P392249', 'P393281', 'P393401', 'P393411', 'P393434', 'P394534', 'P394639',
-  'P395697', 'P397517', 'P39787544', 'P400259', 'P403812', 'P403818', 'P404706', 'P404827',
-  'P404830', 'P404831', 'P404832', 'P404916', 'P405584', 'P406080', 'P406576', 'P406712',
-  'P407636', 'P408219', 'P409118', 'P409239', 'P409317', 'P409523', 'P409800', 'P410504',
-  'P410532', 'P411387', 'P413341', 'P415777', 'P416200', 'P417238', 'P417312', 'P418218',
-  'P419221', 'P419222', 'P419223', 'P420162', 'P420652', 'P421275', 'P421277', 'P421481',
-  'P421485', 'P421813', 'P422077', 'P422083', 'P423925', 'P424378', 'P424900', 'P424901',
-  'P424902', 'P424915', 'P425840', 'P425938', 'P426173', 'P426836', 'P427301', 'P427404',
-  'P427405', 'P427406', 'P427408', 'P427409', 'P427410', 'P427411', 'P427412', 'P427413',
-  'P427414', 'P427415', 'P427416', 'P427417', 'P427418', 'P427419', 'P427420', 'P427421',
-  'P427536', 'P428224', 'P429515', 'P429952', 'P430871', 'P430932', 'P430969', 'P432087',
-  'P432298', 'P432500', 'P432668', 'P433172', 'P433173', 'P433402', 'P433516', 'P433526',
-  'P433530', 'P433904', 'P434002', 'P434104', 'P436148', 'P437097', 'P43818047', 'P439055',
-  'P439633', 'P439926', 'P440307', 'P440658', 'P441101', 'P441813', 'P441814', 'P441817',
-  'P441831', 'P441838', 'P442563', 'P442566', 'P442752', 'P442753', 'P442754', 'P442755',
-  'P442756', 'P442757', 'P442758', 'P442759', 'P442830', 'P442831', 'P442833', 'P442998',
-  'P442999', 'P443563', 'P444048', 'P444154', 'P444718', 'P446938', 'P447376', 'P447377',
-  'P447378', 'P447379', 'P447380', 'P447381', 'P447594', 'P447596', 'P447597', 'P447598',
-  'P448530', 'P448854', 'P448866', 'P448869', 'P449150', 'P449163', 'P449342', 'P449793',
-  'P450947', 'P453814', 'P454120', 'P454380', 'P454762', 'P455338', 'P455339', 'P455418',
-  'P455897', 'P455898', 'P455899', 'P455900', 'P455936', 'P456151', 'P456158', 'P457202',
-  'P457203', 'P457204', 'P457205', 'P457262', 'P457685', 'P457686', 'P457687', 'P457884',
-  'P458219', 'P458268', 'P458270', 'P460446', 'P460447', 'P460448', 'P460450', 'P460515',
-  'P461147', 'P461167', 'P461420', 'P461421', 'P462002', 'P462347', 'P465752', 'P466117',
-  'P466118', 'P466123', 'P467451', 'P467602', 'P467607', 'P467659', 'P467660', 'P468341',
-  'P468709', 'P469502', 'P469503', 'P469504', 'P469505', 'P469506', 'P469507', 'P469508',
-  'P469510', 'P469511', 'P469512', 'P469513', 'P469514', 'P469515', 'P469516', 'P469517',
-  'P469518', 'P469519', 'P469520', 'P469521', 'P469522', 'P469523', 'P469524', 'P469525',
-  'P469526', 'P469527', 'P469528', 'P470000', 'P470001', 'P470024', 'P470025', 'P470506',
-  'P470507', 'P470508', 'P470509', 'P470510', 'P471221', 'P471294', 'P471547', 'P471761',
-  'P471793', 'P472016', 'P472160', 'P473121', 'P473122', 'P473123', 'P473126', 'P473304',
-  'P473305', 'P474970', 'P475046', 'P475535', 'P476671', 'P476672', 'P477985', 'P479338',
-  'P479342', 'P479343', 'P479732', 'P479860', 'P479861', 'P480151', 'P480274', 'P480576',
-  'P480627', 'P480628', 'P481170', 'P481171', 'P481172', 'P481347', 'P481348', 'P481350',
-  'P481390', 'P482060', 'P482327', 'P482328', 'P482510', 'P482661', 'P482669', 'P483496',
-  'P483501', 'P484025', 'P49848448', 'P500062', 'P500139', 'P500170', 'P500420', 'P500423',
-  'P500600', 'P500601', 'P500603', 'P500605', 'P500617', 'P500874', 'P500983', 'P501028',
-  'P501140', 'P501154', 'P501180', 'P501282', 'P501288', 'P501330', 'P501591', 'P502964',
-  'P502999', 'P503159', 'P503209', 'P503294', 'P503693', 'P503711', 'P503998', 'P504018',
-  'P504028', 'P504075', 'P504333', 'P504428', 'P504430', 'P504433', 'P504448', 'P504629',
-  'P505120', 'P505214', 'P505274', 'P505320', 'P505461', 'P58930227', 'P63087293', 'P64546856',
-  'P64879845', 'P67988453', 'P69300', 'P69304', 'P69517', 'P73124556', 'P74312', 'P7880',
-  'P78834', 'P85225585', 'P87985432', 'P88779809', 'P97989778'
-]);
+// Auto-synced by scripts/sync_image_data.py from docs/_data/images/manifest.csv
+// BEGIN_VERIFIED_SET
+export const LOCAL_PRODUCT_IMAGES = new Set(['P04897543', 'P109908', 'P111902', 'P12045', 'P122751', 'P12336', 'P12495', 'P12573', 'P126301', 'P12790', 'P128706', 'P133707', 'P163103', 'P173726', 'P17484987', 'P186805', 'P18975403', 'P19700127', 'P202625', 'P202633', 'P210575', 'P228913', 'P244437', 'P248404', 'P248407', 'P253818', 'P256308', 'P258612', 'P261211', 'P264900', 'P270539', 'P278317', 'P281411', 'P284507', 'P284716', 'P2855', 'P286513', 'P289307', 'P290636', 'P297524', 'P302103', 'P302923', 'P309813', 'P375849', 'P377533', 'P377542', 'P377723', 'P377784', 'P377873', 'P378145', 'P378284', 'P378821', 'P379832', 'P381000', 'P382309', 'P384060', 'P384099', 'P384963', 'P385477', 'P388225', 'P38855877', 'P391759', 'P392235', 'P392245', 'P392246', 'P392516', 'P393281', 'P393325', 'P393718', 'P394534', 'P395615', 'P395697', 'P39784685', 'P39787544', 'P399330', 'P399623', 'P400259', 'P402718', 'P402944', 'P403812', 'P404758', 'P404916', 'P406712', 'P406922', 'P407908', 'P408017', 'P408218', 'P408219', 'P409239', 'P409523', 'P410532', 'P411388', 'P411848', 'P412090', 'P415747', 'P415771', 'P416200', 'P416563', 'P417936', 'P417985', 'P418507', 'P420533', 'P420652', 'P421456', 'P422077', 'P422083', 'P423925', 'P425608', 'P426340', 'P426836', 'P427301', 'P427411', 'P427413', 'P427415', 'P427416', 'P427417', 'P427418', 'P427419', 'P427421', 'P427517', 'P428222', 'P428661', 'P429515', 'P429548', 'P429952', 'P430146', 'P430240', 'P430969', 'P431750', 'P431852', 'P432298', 'P432502', 'P432504', 'P433172', 'P433173', 'P433206', 'P433402', 'P433516', 'P433523', 'P433530', 'P434002', 'P434101', 'P434104', 'P436148', 'P437631', 'P440307', 'P440700', 'P441813', 'P441814', 'P442563', 'P442744', 'P442821', 'P442830', 'P442831', 'P443352', 'P443563', 'P443833', 'P443840', 'P443845', 'P444048', 'P444154', 'P444718', 'P444989', 'P446609', 'P446938', 'P447364', 'P447376', 'P447519', 'P448102', 'P449116', 'P449342', 'P450887', 'P451920', 'P453225', 'P454042', 'P454348', 'P454751', 'P454762', 'P455201', 'P455418', 'P455936', 'P456218', 'P456446', 'P456953', 'P457223', 'P458219', 'P458268', 'P461147', 'P461148', 'P461483', 'P461537', 'P462353', 'P462699', 'P463036', 'P465757', 'P467038', 'P467208', 'P467451', 'P467607', 'P467760', 'P467762', 'P468175', 'P468353', 'P468685', 'P468691', 'P468693', 'P468694', 'P469065', 'P469825', 'P470025', 'P470257', 'P470529', 'P471049', 'P471059', 'P471242', 'P472997', 'P473708', 'P475543', 'P475599', 'P477838', 'P479343', 'P479345', 'P479732', 'P479846', 'P479847', 'P480286', 'P481114', 'P481396', 'P481403', 'P481968', 'P482262', 'P482535', 'P483662', 'P500061', 'P500283', 'P500423', 'P500452', 'P500636', 'P502185', 'P503711', 'P503714', 'P55849781', 'P55978864', 'P58930227', 'P61004', 'P64546856', 'P64879845', 'P67988453', 'P73124556', 'P7880', 'P85225585', 'P87985432', 'P88779809', 'P94421', 'P97989778', 'P98364786']);
+// END_VERIFIED_SET
 
-// Placeholder / dummy seed image hashes that were repeated across thousands of products in the database
-export const DUMMY_SEED_IMAGE_HASHES = new Set([
-  'photo-1617897903246-719242758050',
-  'photo-1616683693504-3ea7e9ad6fec',
-  'photo-1608248597359-5975e523f669',
-  'photo-1570172619644-dfd03ed5d881',
-  'photo-1598440947619-2c35fc9aa908',
-  'photo-1512496015851-a90fb38ba796',
-  'photo-1583241800698-e8ab01830a07',
-  'photo-1522337360788-8b13dee7a37e',
-  'photo-1596462502278-27bfdc403348',
-  'photo-1594035910387-fea47794261f',
-  'photo-1588405748880-12d1d2a59f75',
-  'photo-1523293182086-7651a899d37f',
-  'photo-1535585209827-a15fcdbc4c2d',
-  'photo-1527799820374-dcf8d9d4a388',
-  'photo-1556228722-d0b7197b1202',
-  'photo-1506794778202-cad84cf45f1d',
-]);
-
-export function isDummySeedImage(url) {
-  if (!url) return true;
-  const s = String(url);
-  for (const hash of DUMMY_SEED_IMAGE_HASHES) {
-    if (s.includes(hash)) return true;
-  }
-  return false;
-}
-
-// ── 2. CURATED CATEGORY REAL STUDIO PHOTOGRAPHY ──────────────────────────────
-export const CATEGORY_STUDIO_IMAGES = {
-  // ── Moisturizers & Creams
-  Moisturizers: [
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1567928805164-e598f4194098?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1556228722-d0b7197b1202?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-5975e523f669?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Serums & Essences
-  'Serums & Essences': [
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Cleansers & Face Wash
-  'Face Wash & Cleansers': [
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1567928805164-e598f4194098?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Sunscreens
-  'Face Sunscreen': [
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Eye Creams & Care
-  'Eye Creams': [
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Face Masks
-  'Face Masks': [
-    'https://images.unsplash.com/photo-1567928805164-e598f4194098?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Facial Oils
-  'Face Oils': [
-    'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Toners & Mists
-  Toners: [
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Lip Treatments
-  'Lip Balm & Treatments': [
-    'https://images.unsplash.com/photo-1583241800698-e8ab01830a07?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1599305090598-fe179d501227?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1625093742435-6fa192b6fb10?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1599732497042-302381285223?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Anti-Aging & Treatments
-  'Anti-Aging': [
-    'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Acne & Blemishes
-  'Acne & Blemishes': [
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Makeup
-  Makeup: [
-    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1583241800698-e8ab01830a07?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1503236823255-94609f598e71?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1583241800698-e8ab01830a07?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1590156221187-578d380e224e?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Hair
-  Hair: [
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Fragrance
-  Fragrance: [
-    'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1583445013765-46c20c4a6772?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1615397349754-cfa2066a298e?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1585218356057-dc0e8d555899?auto=format&fit=crop&q=85',
-  ],
-
-  // ── Bath & Body
-  'Bath & Body': [
-    'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=85',
-    'https://images.unsplash.com/photo-1608248597359-5975e523f669?auto=format&fit=crop&q=85',
-  ],
-};
-
-// Default universal fallback image
-export const DEFAULT_PRODUCT_IMAGE =
-  'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=85&w=600';
-
-/**
- * Deterministic hash function that maps a string to a non-negative integer.
- */
-function hashString(str) {
-  if (!str) return 0;
-  const s = String(str);
-  let hash = 0;
-  for (let i = 0; i < s.length; i++) {
-    hash = (hash << 5) - hash + s.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-/**
- * Resolves the real studio photo for a product based on its ID, brand, or category.
- * 
- * @param {Object} product - Product object from API
- * @param {number} width - Desired image width (default: 600)
- * @returns {string} Fully qualified image URL
- */
-export function getProductImage(product, width = 600) {
+export function resolveCategoryPlaceholder(product) {
   if (!product) return DEFAULT_PRODUCT_IMAGE;
-
-  const pid = String(product.code || product.product_id || product.id || '').trim();
-
-  // 1. Local downloaded high-res WebP image (Fast, offline, 100% exact product match)
-  if (pid && LOCAL_PRODUCT_IMAGES.has(pid)) {
-    return `/images/products/${pid}.webp`;
-  }
-
-  // 2. Direct iconic hero product override (verified high-res Sephora images)
-  if (pid && TOP_PRODUCT_IMAGES[pid]) {
-    return TOP_PRODUCT_IMAGES[pid];
-  }
-
-  // 3. Direct custom image URL if supplied and NOT one of the repeating dummy seed hashes
-  const rawImg = product.imageUrl || product.image_url;
-  if (
-    rawImg &&
-    (String(rawImg).startsWith('http') || String(rawImg).startsWith('/')) &&
-    !isDummySeedImage(rawImg)
-  ) {
-    return String(rawImg);
-  }
-
-  // 3. Category matching (supports both .NET camelCase DTOs and legacy fields)
-  const categoriesToCheck = [
+  const joined = [
     product.categoryName,
     product.department,
     product.tertiary_category,
@@ -488,90 +25,59 @@ export function getProductImage(product, width = 600) {
     product.category,
     product.name,
     product.product_name,
-  ].filter(Boolean);
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
 
-  let matchedList = null;
+  if (/serum|essence|ampoule|retinol|niacinamide/.test(joined)) {
+    return '/images/placeholders/serum.svg';
+  }
+  if (/cleanse|wash|exfoli|scrub|toner/.test(joined)) {
+    return '/images/placeholders/cleanser.svg';
+  }
+  if (/sunscreen|spf|sun /.test(joined)) {
+    return '/images/placeholders/sunscreen.svg';
+  }
+  if (/fragrance|perfume|parfum|cologne|candle/.test(joined)) {
+    return '/images/placeholders/fragrance.svg';
+  }
+  if (/hair|shampoo|conditioner|scalp/.test(joined)) {
+    return '/images/placeholders/hair.svg';
+  }
+  if (/makeup|lipstick|blush|mascara|foundation|concealer|brow|eyeshadow|gloss/.test(joined)) {
+    return '/images/placeholders/makeup.svg';
+  }
+  if (/bath|body|deodorant|hand |lotion/.test(joined)) {
+    return '/images/placeholders/bath-body.svg';
+  }
+  if (/tool|brush|sponge|curler|device/.test(joined)) {
+    return '/images/placeholders/tools.svg';
+  }
+  if (/skincare|moistur|cream|mask|eye|oil|balm/.test(joined)) {
+    return '/images/placeholders/skincare.svg';
+  }
+  return DEFAULT_PRODUCT_IMAGE;
+}
 
-  for (const cat of categoriesToCheck) {
-    if (CATEGORY_STUDIO_IMAGES[cat]) {
-      matchedList = CATEGORY_STUDIO_IMAGES[cat];
-      break;
-    }
+/**
+ * Resolves a verified local product image or a neutral category placeholder.
+ *
+ * @param {Object} product - Product object from API
+ * @returns {string} Image URL path
+ */
+export function getProductImage(product) {
+  if (!product) return DEFAULT_PRODUCT_IMAGE;
 
-    const catLower = String(cat).toLowerCase();
-    if (catLower.includes('serum') || catLower.includes('essence') || catLower.includes('treatment')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Serums & Essences'];
-      break;
-    }
-    if (catLower.includes('cleanse') || catLower.includes('wash') || catLower.includes('remover')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Face Wash & Cleansers'];
-      break;
-    }
-    if (catLower.includes('moistur') || catLower.includes('cream') || catLower.includes('lotion')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Moisturizers'];
-      break;
-    }
-    if (catLower.includes('sun') || catLower.includes('spf')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Face Sunscreen'];
-      break;
-    }
-    if (catLower.includes('eye')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Eye Creams'];
-      break;
-    }
-    if (catLower.includes('mask')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Face Masks'];
-      break;
-    }
-    if (catLower.includes('oil')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Face Oils'];
-      break;
-    }
-    if (catLower.includes('toner') || catLower.includes('mist')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Toners'];
-      break;
-    }
-    if (catLower.includes('lip')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Lip Balm & Treatments'];
-      break;
-    }
-    if (catLower.includes('aging') || catLower.includes('anti-aging')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Anti-Aging'];
-      break;
-    }
-    if (catLower.includes('acne') || catLower.includes('blemish')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Acne & Blemishes'];
-      break;
-    }
-    if (catLower.includes('fragrance') || catLower.includes('perfume')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Fragrance'];
-      break;
-    }
-    if (catLower.includes('hair')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Hair'];
-      break;
-    }
-    if (catLower.includes('makeup')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Makeup'];
-      break;
-    }
-    if (catLower.includes('body') || catLower.includes('bath')) {
-      matchedList = CATEGORY_STUDIO_IMAGES['Bath & Body'];
-      break;
-    }
+  const pid = String(product.code || product.product_id || product.id || '').trim();
+  if (pid && LOCAL_PRODUCT_IMAGES.has(pid)) {
+    return `/images/products/${pid}.webp`;
   }
 
-  // Fallback to Moisturizers if no specific category matched
-  if (!matchedList || matchedList.length === 0) {
-    matchedList = CATEGORY_STUDIO_IMAGES['Moisturizers'];
+  const rawImg = String(product.imageUrl || product.image_url || '').trim();
+  if (rawImg.startsWith('/images/placeholders/')) {
+    return rawImg;
   }
 
-  // 4. Deterministic indexing using a unique compound seed (pid + name + brand)
-  const pName = product.product_name || product.name || '';
-  const bName = product.brand_name || product.brandName || '';
-  const seed = `${pid}_${pName}_${bName}`;
-  const index = hashString(seed) % matchedList.length;
-  const baseUrl = matchedList[index];
-
-  return `${baseUrl}&w=${width}`;
+  return resolveCategoryPlaceholder(product);
 }

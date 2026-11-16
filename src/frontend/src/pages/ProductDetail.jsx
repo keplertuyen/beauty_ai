@@ -140,33 +140,44 @@ function ReviewCard({ review }) {
     return map[norm] || skin;
   };
 
+  const author = review.authorName || review.author_name || review.reviewer_name || review.user_name || 'BeautyAI Shopper';
+  const skinType = review.skinType || review.skin_type;
+  const ratingValue = parseInt(review.rating) || review.star_rating || 5;
+  const dateVal = review.createdAt || review.created_at;
+  const content = review.content || review.review_text;
+
   return (
     <div className="pd-review-card glass-card">
       <div className="pd-review-header">
         <div className="pd-review-avatar">
-          {(review.author_name || review.reviewer_name || review.user_name || 'A')[0].toUpperCase()}
+          {author[0].toUpperCase()}
         </div>
         <div className="pd-review-meta">
           <span className="pd-review-name">
-            {review.author_name || review.reviewer_name || review.user_name || 'Anonymous'}
+            {author}
           </span>
-          {review.skin_type && (
+          {skinType && skinType !== 'Unknown' && (
             <span className="pd-review-skin badge badge-secondary">
-              {getSkinTypeLabel(review.skin_type)}
+              {getSkinTypeLabel(skinType)}
+            </span>
+          )}
+          {review.skinConcerns && (
+            <span className="pd-review-skin badge badge-subtle" style={{ fontSize: '0.72rem' }}>
+              {review.skinConcerns}
             </span>
           )}
         </div>
         <div className="pd-review-right">
-          <StarRating value={parseInt(review.rating) || review.star_rating || 0} size={13} />
-          {review.created_at && (
+          <StarRating value={ratingValue} size={13} />
+          {dateVal && (
             <span className="pd-review-date">
-              {new Date(review.created_at).toLocaleDateString(lang === 'en' ? 'en-US' : 'vi-VN')}
+              {new Date(dateVal).toLocaleDateString(lang === 'en' ? 'en-US' : 'vi-VN')}
             </span>
           )}
         </div>
       </div>
-      {review.review_text && (
-        <p className="pd-review-text">{review.review_text}</p>
+      {content && (
+        <p className="pd-review-text">{content}</p>
       )}
       {review.is_recommended !== undefined && (
         <div className={`pd-review-recommend ${review.is_recommended ? 'yes' : 'no'}`}>
@@ -255,13 +266,46 @@ export default function ProductDetail() {
 
   const inWishlist = isInWishlist(product?.id ?? product?.product_id ?? id);
 
-  /* fetch product and reviews */
+  /* Reviews pagination & skin filtering (1M+ Reviews Index) */
+  const [selectedReviewSkin, setSelectedReviewSkin] = useState('All');
+  const [reviewPage, setReviewPage] = useState(1);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [totalReviewPages, setTotalReviewPages] = useState(1);
+
+  /* fetch product detail */
   const fetchProductDetail = useCallback(() => {
     getProduct(id)
       .then((res) => setProduct(res.data))
       .catch(() => toast.error(t('pd_not_found', 'Product not found')))
       .finally(() => setLoadingProduct(false));
   }, [id, t]);
+
+  /* fetch reviews with b-tree indexed skin filter */
+  const loadReviews = useCallback((skinType = selectedReviewSkin, page = 1) => {
+    if (!id) return;
+    setLoadingReviews(true);
+    const params = {
+      page,
+      per_page: 8
+    };
+    if (skinType && skinType !== 'All') {
+      params.skin_type = skinType;
+    }
+    getReviews(id, params)
+      .then((res) => {
+        const items = res.data?.reviews || res.data || [];
+        setReviews(items);
+        setTotalReviews(res.data?.total || items.length);
+        setTotalReviewPages(res.data?.pages || 1);
+        setReviewPage(page);
+      })
+      .catch(() => {
+        setReviews([]);
+        setTotalReviews(0);
+        setTotalReviewPages(1);
+      })
+      .finally(() => setLoadingReviews(false));
+  }, [id, selectedReviewSkin]);
 
   useEffect(() => {
     setLoadingProduct(true);
@@ -271,13 +315,11 @@ export default function ProductDetail() {
     getSimilarProducts(id, 8)
       .then((res) => setSimilar(res.data?.recommendations || res.data || []))
       .catch(() => setSimilar([]));
-
-    setLoadingReviews(true);
-    getReviews(id)
-      .then((res) => setReviews(res.data?.reviews || res.data || []))
-      .catch(() => setReviews([]))
-      .finally(() => setLoadingReviews(false));
   }, [id, t, fetchProductDetail]);
+
+  useEffect(() => {
+    loadReviews(selectedReviewSkin, 1);
+  }, [id, selectedReviewSkin, loadReviews]);
 
   // Re-evaluate product verdict whenever user logs in or updates Skin ID
   useEffect(() => {
@@ -351,8 +393,7 @@ export default function ProductDetail() {
         is_recommended: true
       });
       // Refresh reviews
-      const res = await getReviews(id);
-      setReviews(res.data?.reviews || res.data || []);
+      loadReviews(selectedReviewSkin, 1);
     } catch (err) {
       toast.error(err.response?.data?.detail || t('pd_review_failed', 'Failed to submit review'));
     } finally {
@@ -464,7 +505,13 @@ export default function ProductDetail() {
       ? rawIngredients.join(', ')
       : structuredIngredients.map((i) => i.inciName).join(', '));
 
-    const targetUrl = `/ingredient-analyzer?ingredients=${encodeURIComponent(inciString)}&product_name=${encodeURIComponent(productName)}&brand_name=${encodeURIComponent(brandName)}&department=${encodeURIComponent(department)}&category=${encodeURIComponent(categoryName)}&target_area=${encodeURIComponent(formulaBreakdown?.targetArea || '')}`;
+    const targetSkins = Array.isArray(product.targetSkinTypes)
+      ? product.targetSkinTypes.join(',')
+      : Array.isArray(product.target_skin_types)
+      ? product.target_skin_types.join(',')
+      : '';
+
+    const targetUrl = `/ingredient-analyzer?ingredients=${encodeURIComponent(inciString)}&product_name=${encodeURIComponent(productName)}&brand_name=${encodeURIComponent(brandName)}&department=${encodeURIComponent(department)}&category=${encodeURIComponent(categoryName)}&target_area=${encodeURIComponent(formulaBreakdown?.targetArea || '')}${targetSkins ? `&target_skin_types=${encodeURIComponent(targetSkins)}` : ''}`;
 
     navigate(targetUrl);
   };
@@ -1451,6 +1498,86 @@ export default function ProductDetail() {
                   </form>
                 )}
 
+                {/* Personalized Skin Match Banner */}
+                {user?.skin_type && (
+                  <div
+                    className="pd-reviews-user-match-banner"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px 18px',
+                      background: 'linear-gradient(135deg, rgba(74, 55, 40, 0.06), rgba(212, 163, 115, 0.12))',
+                      borderRadius: '12px',
+                      marginBottom: '16px',
+                      border: '1px solid rgba(74, 55, 40, 0.14)',
+                      flexWrap: 'wrap',
+                      gap: '10px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Sparkles size={18} color="#D4A373" />
+                      <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#4A3728' }}>
+                        {lang === 'vi'
+                          ? `Hồ sơ da của bạn: ${user.skin_type}. Lọc nhận xét từ người dùng có cùng loại da?`
+                          : `Your Skin ID: ${user.skin_type}. Explore verified reviews from ${user.skin_type} skin users?`}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className={`btn btn-sm ${selectedReviewSkin.toLowerCase() === user.skin_type.toLowerCase() ? 'btn-primary' : 'btn-secondary'}`}
+                      onClick={() => setSelectedReviewSkin(user.skin_type)}
+                      style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                    >
+                      {lang === 'vi' ? `Xem người có DA ${user.skin_type.toUpperCase()} nói gì` : `See what ${user.skin_type} skin says`}
+                    </button>
+                  </div>
+                )}
+
+                {/* Skin Type Filter Tabs */}
+                <div
+                  className="pd-review-filters"
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    flexWrap: 'wrap',
+                    marginBottom: '20px',
+                    alignItems: 'center'
+                  }}
+                >
+                  <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#777', marginRight: '4px' }}>
+                    {lang === 'vi' ? 'Lọc theo loại da:' : 'Filter by skin type:'}
+                  </span>
+                  {['All', 'Oily', 'Dry', 'Combination', 'Normal'].map((st) => {
+                    const active = selectedReviewSkin.toLowerCase() === st.toLowerCase();
+                    return (
+                      <button
+                        key={st}
+                        type="button"
+                        className={`btn btn-sm ${active ? 'btn-primary' : 'btn-secondary'}`}
+                        onClick={() => setSelectedReviewSkin(st)}
+                        style={{
+                          borderRadius: '20px',
+                          padding: '5px 14px',
+                          fontSize: '0.82rem',
+                          fontWeight: active ? 600 : 500
+                        }}
+                      >
+                        {st === 'All'
+                          ? (lang === 'vi' ? 'Tất cả' : 'All')
+                          : (lang === 'vi' ? `Da ${st}` : `${st} Skin`)}
+                      </button>
+                    );
+                  })}
+                  {selectedReviewSkin !== 'All' && (
+                    <span style={{ fontSize: '0.78rem', color: '#888', marginLeft: 'auto' }}>
+                      {lang === 'vi'
+                        ? `Tìm thấy ${totalReviews.toLocaleString()} đánh giá cho da ${selectedReviewSkin}`
+                        : `Showing ${totalReviews.toLocaleString()} reviews for ${selectedReviewSkin} skin`}
+                    </span>
+                  )}
+                </div>
+
                 {/* Reviews List */}
                 {loadingReviews ? (
                   <div className="loading-container">
@@ -1458,15 +1585,55 @@ export default function ProductDetail() {
                     <span>{t('pd_loading_reviews', 'Loading customer reviews...')}</span>
                   </div>
                 ) : reviews.length > 0 ? (
-                  <div className="pd-reviews-list">
-                    {reviews.map((r, i) => (
-                      <ReviewCard key={r.review_id || i} review={r} />
-                    ))}
-                  </div>
+                  <>
+                    <div className="pd-reviews-list">
+                      {reviews.map((r, i) => (
+                        <ReviewCard key={r.id || r.review_id || i} review={r} />
+                      ))}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalReviewPages > 1 && (
+                      <div
+                        className="pd-reviews-pagination"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '16px',
+                          marginTop: '28px',
+                          paddingTop: '16px',
+                          borderTop: '1px solid rgba(74, 55, 40, 0.08)'
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          disabled={reviewPage <= 1 || loadingReviews}
+                          onClick={() => loadReviews(selectedReviewSkin, reviewPage - 1)}
+                        >
+                          ← {lang === 'vi' ? 'Trang trước' : 'Previous'}
+                        </button>
+                        <span style={{ fontSize: '0.84rem', color: '#666', fontWeight: 500 }}>
+                          {lang === 'vi'
+                            ? `Trang ${reviewPage} / ${totalReviewPages} (${totalReviews.toLocaleString()} đánh giá)`
+                            : `Page ${reviewPage} of ${totalReviewPages} (${totalReviews.toLocaleString()} reviews)`}
+                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          disabled={reviewPage >= totalReviewPages || loadingReviews}
+                          onClick={() => loadReviews(selectedReviewSkin, reviewPage + 1)}
+                        >
+                          {lang === 'vi' ? 'Trang sau' : 'Next'} →
+                        </button>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="pd-empty-block">
                     <span className="pd-empty-icon">💬</span>
-                    <p>{t('pd_no_reviews', 'No reviews yet. Be the first to share your experience!')}</p>
+                    <p>{t('pd_no_reviews', 'No reviews yet for this filter. Be the first to share your experience!')}</p>
                   </div>
                 )}
               </div>

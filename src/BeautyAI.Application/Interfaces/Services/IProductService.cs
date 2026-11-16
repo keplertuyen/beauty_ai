@@ -30,4 +30,9 @@ public interface IProductService
         int page = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default);
+
+    Task<ProductReviewDto> AddReviewAsync(
+        int? userId,
+        CreateReviewRequest request,
+        CancellationToken cancellationToken = default);
 }

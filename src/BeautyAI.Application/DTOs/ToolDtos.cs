@@ -9,7 +9,8 @@ public record InciAnalysisRequest(
     [property: JsonPropertyName("category")] string? Category = null,
     [property: JsonPropertyName("product_name")] string? ProductName = null,
     [property: JsonPropertyName("condition")] string? Condition = null,
-    [property: JsonPropertyName("skin_type")] string? SkinType = null
+    [property: JsonPropertyName("skin_type")] string? SkinType = null,
+    [property: JsonPropertyName("target_skin_types")] string[]? TargetSkinTypes = null
 );
 
 public record InciAnalysisResponse(

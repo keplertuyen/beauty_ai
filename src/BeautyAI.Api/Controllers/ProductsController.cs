@@ -116,6 +116,24 @@ public class ProductsController : ControllerBase
         });
     }
 
+    [HttpPost("{id}/reviews")]
+    public async Task<IActionResult> AddReview(
+        string id,
+        [FromBody] CreateReviewRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        int? userId = null;
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(idClaim, out var parsed)) userId = parsed;
+        }
+
+        var reqWithId = request with { ProductId = string.IsNullOrWhiteSpace(request.ProductId) ? id : request.ProductId };
+        var review = await _productService.AddReviewAsync(userId, reqWithId, cancellationToken);
+        return StatusCode(StatusCodes.Status201Created, review);
+    }
+
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken = default)
     {

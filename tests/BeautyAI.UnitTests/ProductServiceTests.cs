@@ -92,6 +92,19 @@ public class ProductServiceTests
             };
             return Task.FromResult(((IReadOnlyList<Review>)reviews, reviews.Count));
         }
+
+        public Task<Review> AddReviewAsync(Review review, CancellationToken cancellationToken = default)
+        {
+            review.Id = 999;
+            return Task.FromResult(review);
+        }
+
+        public Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken = default)
+        {
+            product.Id = Products.Count + 1;
+            Products.Add(product);
+            return Task.FromResult(product);
+        }
     }
 
     private class FakeSkinProfileRepository : ISkinProfileRepository
@@ -296,5 +309,41 @@ public class ProductServiceTests
         Assert.Single(result.Items);
         Assert.Equal("Jane Doe", result.Items[0].AuthorName);
         Assert.Equal("Combination", result.Items[0].SkinType);
+    }
+
+    [Fact]
+    public async Task AddReviewAsync_SuccessfullyCreatesReview()
+    {
+        var productRepo = new FakeProductRepository();
+        productRepo.Products.Add(new Product
+        {
+            Id = 1,
+            Code = "P001",
+            Name = "Hydrating Cleanser",
+            Slug = "hydrating-cleanser",
+            IngredientListRaw = "Water, Glycerin"
+        });
+
+        var skinProfileRepo = new FakeSkinProfileRepository();
+        var service = new ProductService(productRepo, skinProfileRepo);
+
+        var request = new CreateReviewRequest(
+            ProductId: "1",
+            AuthorName: "Alice",
+            Rating: 5,
+            SkinType: "Oily",
+            SkinConcerns: "Pores",
+            Content: "Amazing product, thoroughly cleanses without drying!"
+        );
+
+        var review = await service.AddReviewAsync(userId: 1, request);
+
+        Assert.NotNull(review);
+        Assert.Equal(999, review.Id);
+        Assert.Equal(1, review.ProductId);
+        Assert.Equal("Alice", review.AuthorName);
+        Assert.Equal(5, review.Rating);
+        Assert.Equal("Oily", review.SkinType);
+        Assert.Equal("Amazing product, thoroughly cleanses without drying!", review.Content);
     }
 }

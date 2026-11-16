@@ -287,4 +287,18 @@ public class ProductRepository : IProductRepository
 
         return (items, totalCount);
     }
+
+    public async Task<Review> AddReviewAsync(Review review, CancellationToken cancellationToken = default)
+    {
+        _context.Reviews.Add(review);
+        await _context.SaveChangesAsync(cancellationToken);
+        return review;
+    }
+
+    public async Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken = default)
+    {
+        _context.Products.Add(product);
+        await _context.SaveChangesAsync(cancellationToken);
+        return product;
+    }
 }

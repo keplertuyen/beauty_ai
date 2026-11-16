@@ -77,6 +77,18 @@ last_reviewed: 2026-10-30
 | `GET` | `/api/v1/products/{id}/reviews` | ALL | `FR-REV-01` | Danh sách đánh giá sản phẩm (lọc skin_type, phân trang) |
 | `GET` | `/api/v1/products/categories` | ALL | `FR-CAT-02` | Danh sách danh mục sản phẩm |
 | `GET` | `/api/v1/products/brands` | ALL | `FR-CAT-04` | Danh sách thương hiệu mỹ phẩm |
+| `POST` | `/api/v1/products/{id}/reviews` | ALL/AUTH | `FR-REV-03` | Thêm nhận xét đánh giá sản phẩm |
+| `POST` | `/api/v1/reviews` | ALL/AUTH | `FR-REV-03` | Thêm nhận xét đánh giá sản phẩm (endpoint tương thích) |
+| `POST` | `/api/v1/routines/generate` | ALL/AUTH | `FR-ROU-01` | Tự động sinh chu trình AM/PM từ Digital Skin ID |
+| `POST` | `/api/v1/routines/save` | AUTH | `FR-ROU-02` | Lưu chu trình vào danh sách cá nhân |
+| `GET` | `/api/v1/routines/my-routines` | AUTH | `FR-ROU-03` | Danh sách các chu trình routine đã lưu của người dùng |
+| `DELETE` | `/api/v1/routines/{id}` | AUTH | `FR-ROU-04` | Xóa chu trình routine |
+| `POST` | `/api/v1/ai/consult` | ALL/AUTH | `FR-AI-01` | Tư vấn da liễu và mỹ phẩm với Gemini API (Grounding + Guardrails) |
+| `GET` | `/api/v1/admin/dashboard` | ADMIN | `FR-ADM-01` | Bảng điều khiển phân tích tổng quan chỉ số |
+| `GET` | `/api/v1/admin/kpis` | ADMIN | `FR-ADM-02` | 4 thẻ KPI cốt lõi |
+| `GET` | `/api/v1/admin/orders` | ADMIN | `FR-ADM-03` | Danh sách đơn hàng COD quản trị |
+| `PATCH` | `/api/v1/admin/orders/{id}/status` | ADMIN | `FR-ADM-04` | Cập nhật trạng thái đơn hàng (Pending ➔ Delivering ➔ Completed) |
+| `POST` | `/api/v1/admin/products` | ADMIN | `FR-ADM-05` | Thêm sản phẩm mới và dán chuỗi thành phần INCI |
 | `GET` | `/catalog/products` | ALL | `FR-CAT-01`, `04`→`10` | |
 | `GET` | `/catalog/products/{slug}` | ALL | `FR-PDP-01`→`04` | |
 | `GET` | `/catalog/products/{id}/similar` | ALL | `FR-PDP-08` |

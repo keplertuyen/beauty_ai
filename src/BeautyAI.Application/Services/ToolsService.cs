@@ -76,7 +76,7 @@ public class ToolsService : IToolsService
             explicitTargetArea: request.TargetArea,
             skinProfile: requiresSkinId && string.IsNullOrWhiteSpace(request.SkinType) ? null : skinProfile,
             userAllergies: allergyNames,
-            targetSkinTypes: null,
+            targetSkinTypes: request.TargetSkinTypes,
             dbIngredientMap: dbMap
         );
 

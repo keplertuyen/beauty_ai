@@ -4,7 +4,7 @@ import {
   ShoppingBag, Heart, Search, Menu, X, Droplets,
   ChevronDown, User, Settings, LogOut,
   BarChart2, MessageCircle, LayoutDashboard,
-  Package, Layers, MessageSquare, LifeBuoy
+  Package, Layers, MessageSquare, LifeBuoy, Sparkles
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import './Navbar.css';
@@ -25,6 +25,7 @@ export default function Navbar() {
     {
       label: t('nav_explore'),
       children: [
+        { path: '/routines',             icon: <Sparkles size={15} />,     label: lang === 'vi' ? 'Routine Generator' : 'Routine Generator', desc: lang === 'vi' ? 'Tự động tạo routine 0 xung đột' : 'Personalized conflict-free routine' },
         { path: '/ingredient-analyzer',  icon: <Layers size={15} />,       label: t('nav_ingredient'),      desc: t('nav_ingredient_desc') },
       ],
     },

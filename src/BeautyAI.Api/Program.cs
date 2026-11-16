@@ -5,6 +5,7 @@ using BeautyAI.Application.Interfaces.Services;
 using BeautyAI.Application.Services;
 using BeautyAI.Infrastructure.Persistence;
 using BeautyAI.Infrastructure.Persistence.Repositories;
+using BeautyAI.Infrastructure.Providers;
 using BeautyAI.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,7 @@ builder.Services.AddScoped<ISkinProfileRepository, SkinProfileRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IToolRepository, ToolRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IRoutineRepository, RoutineRepository>();
 builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
 builder.Services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -52,6 +54,8 @@ builder.Services.AddScoped<ISkinProfileService, SkinProfileService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IToolsService, ToolsService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IRoutineService, RoutineService>();
+builder.Services.AddHttpClient<IAiSkincareProvider, GeminiSkincareProvider>();
 
 // 5. JWT Authentication
 var jwtSecret = builder.Configuration["JWT_SECRET"] ?? "BeautyAI_SuperSecret_Dermatology_Key_2026_AtLeast32Chars!";

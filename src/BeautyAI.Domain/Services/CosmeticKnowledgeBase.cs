@@ -217,6 +217,21 @@ public static class CosmeticKnowledgeBase
         ["galactomyces ferment filtrate"] = new("Galactomyces Ferment", "HeroActive", "Radiance Bio-Ferment", "Nutrient-dense probiotic ferment that boosts clarity, hydration, and glow.", new[] { "Glass-Skin Clarity", "Hydration" }, "None", 0, 0, true),
         ["bifida ferment lysate"] = new("Bifida Ferment Lysate", "HeroActive", "Microbiome Barrier Ferment", "Probiotic lysate that strengthens skin resilience against environmental sensitivity.", new[] { "Microbiome Support", "Barrier Resilience" }, "None", 0, 0, true),
         ["saccharomyces ferment filtrate"] = new("Saccharomyces Ferment", "Hydration", "Amino-Rich Ferment", "Replenishes essential minerals and amino acids for supple hydration.", new[] { "Nutrient Hydration" }, "None", 0, 0, true),
+        ["vaccinium myrtillus fruit extract"] = new("Bilberry Fruit Extract", "SoothingBotanical", "Antioxidant Berry Extract", "Rich in anthocyanin antioxidants and natural fruit organic acids that brighten dull skin.", new[] { "Antioxidant Radiance" }, "GentleBotanical", 0, 0, true),
+        ["vaccinium myrtillus (bilberry) fruit extract"] = new("Bilberry Fruit Extract", "SoothingBotanical", "Antioxidant Berry Extract", "Rich in anthocyanin antioxidants and natural fruit organic acids that brighten dull skin.", new[] { "Antioxidant Radiance" }, "GentleBotanical", 0, 0, true),
+        ["saccharum officinarum extract"] = new("Sugar Cane Extract", "Exfoliant", "Botanical Glycolic Source", "Natural sugar cane extract that gently smooths surface texture and hydrates.", new[] { "Gentle Texture Smoothing" }, "GentleBotanical", 0, 1, false),
+        ["saccharum officinarum (sugar cane) extract"] = new("Sugar Cane Extract", "Exfoliant", "Botanical Glycolic Source", "Natural sugar cane extract that gently smooths surface texture and hydrates.", new[] { "Gentle Texture Smoothing" }, "GentleBotanical", 0, 1, false),
+        ["acer saccharum extract"] = new("Sugar Maple Extract", "SoothingBotanical", "Smoothing Botanical Extract", "Natural botanical extract that helps polish dull surface cells for brighter skin.", new[] { "Radiance Support" }, "GentleBotanical", 0, 0, false),
+        ["acer saccharum (sugar maple) extract"] = new("Sugar Maple Extract", "SoothingBotanical", "Smoothing Botanical Extract", "Natural botanical extract that helps polish dull surface cells for brighter skin.", new[] { "Radiance Support" }, "GentleBotanical", 0, 0, false),
+        ["citrus aurantium dulcis fruit extract"] = new("Sweet Orange Fruit Extract", "Exfoliant", "Citrus Fruit Acid Extract", "Natural citrus fruit extract used for brightening and mild fruit-acid renewal.", new[] { "Brightening" }, "SensoryEssentialOil", 0, 1, false),
+        ["citrus aurantium dulcis (orange) fruit extract"] = new("Sweet Orange Fruit Extract", "Exfoliant", "Citrus Fruit Acid Extract", "Natural citrus fruit extract used for brightening and mild fruit-acid renewal.", new[] { "Brightening" }, "SensoryEssentialOil", 0, 1, false),
+        ["citrus limon fruit extract"] = new("Lemon Fruit Extract", "Exfoliant", "Citrus Fruit Acid Extract", "Natural lemon fruit extract rich in citric acid and vitamin C to brighten tone; can tingle on sensitive skin.", new[] { "Tone Brightening" }, "SensoryEssentialOil", 0, 1, false),
+        ["citrus limon (lemon) fruit extract"] = new("Lemon Fruit Extract", "Exfoliant", "Citrus Fruit Acid Extract", "Natural lemon fruit extract rich in citric acid and vitamin C to brighten tone; can tingle on sensitive skin.", new[] { "Tone Brightening" }, "SensoryEssentialOil", 0, 1, false),
+        ["terminalia ferdinandiana fruit extract"] = new("Kakadu Plum Extract", "HeroActive", "Vitamin C Superfruit", "Australian superfruit naturally rich in Vitamin C to boost skin radiance and defend against stress.", new[] { "Vitamin C Radiance", "Antioxidant Defense" }, "GentleBotanical", 0, 0, true),
+        ["nephelium lappaceum extract"] = new("Rambutan Extract", "HeroActive", "Botanical Retinol Booster", "Plant active that supports collagen vitality, hydration, and smoother fine lines.", new[] { "Gentle Firming" }, "GentleBotanical", 0, 0, true),
+        ["pinus strobus bark extract"] = new("White Pine Bark Extract", "SoothingBotanical", "Brightening Bark Antioxidant", "Polyphenol-rich pine bark extract that calms oxidative stress and promotes even skin tone.", new[] { "Tone Clarity" }, "GentleBotanical", 0, 0, false),
+        ["galactoarabinan"] = new("Galactoarabinan (Larch Tree Extract)", "Hydration", "Moisture-Lock Polysaccharide", "Plant polysaccharide from larch trees that reduces moisture loss and helps gentle actives work evenly.", new[] { "Barrier Hydration" }, "None", 0, 0, false),
+        ["leuconostoc/radish root ferment filtrate"] = new("Radish Root Ferment Filtrate", "PreservativeStability", "Probiotic Antimicrobial Peptide", "Natural peptide ferment derived from radish root that gently preserves the formula.", Array.Empty<string>(), "None", 0, 0, false),
 
         // ── 4. NOURISHING PLANT OILS, BUTTERS & HAIR CARE ACTIVES ──
         ["butyrospermum parkii butter"] = new("Shea Butter", "BarrierLipid", "Rich Nourishing Butter", "Velvety plant lipid rich in fatty acids that seals in moisture and softens dry skin or lips.", new[] { "Deep Lipid Nourishment", "Moisture Lock" }, "None", 1, 0, true),
@@ -521,11 +536,15 @@ public static class CosmeticKnowledgeBase
         if (lower.Contains("flower water") || lower.Contains("leaf water") || lower.Contains("fruit water") ||
             lower.Contains("extract") || lower.Contains("ferment") || lower.Contains("filtrate") || lower.Contains("juice"))
         {
+            var isGenericDbDesc = string.IsNullOrWhiteSpace(dbIngredient?.Description) ||
+                                  dbIngredient!.Description.Contains("Formulation stabilizing", StringComparison.OrdinalIgnoreCase);
             return new IngredientKnowledgeEntry(
                 CommonName: FormatFriendlyBotanicalName(clean),
                 RoleBucket: "SoothingBotanical",
                 RoleLabel: "Botanical Phyto-Extract",
-                Explanation: dbIngredient?.Description ?? "Plant-derived extract rich in soothing antioxidants and conditioning phytonutrients.",
+                Explanation: !isGenericDbDesc
+                    ? dbIngredient!.Description!
+                    : "Plant-derived extract rich in soothing antioxidants and conditioning phytonutrients.",
                 Benefits: new[] { "Botanical Conditioning", "Antioxidant Support" },
                 ScentTier: "GentleBotanical",
                 ComedogenicRating: 0,
@@ -559,7 +578,7 @@ public static class CosmeticKnowledgeBase
             lower.Contains("edta") || lower.Contains("chlorphenesin") || lower.Contains("bht") || lower.Contains("tocopherol"))
         {
             return new IngredientKnowledgeEntry(
-                CommonName: clean,
+                CommonName: FormatFriendlyBotanicalName(clean),
                 RoleBucket: "PreservativeStability",
                 RoleLabel: "Formula Stabilizer & Preservative",
                 Explanation: "Maintains formula freshness, pH stability, and microbial safety throughout shelf life.",
@@ -572,11 +591,15 @@ public static class CosmeticKnowledgeBase
         }
 
         // Default: Emollient, Texture, Film Former or Carrier Base
+        var isGenericBaseDesc = string.IsNullOrWhiteSpace(dbIngredient?.Description) ||
+                                dbIngredient!.Description.Contains("Formulation stabilizing", StringComparison.OrdinalIgnoreCase);
         return new IngredientKnowledgeEntry(
-            CommonName: clean,
+            CommonName: FormatFriendlyBotanicalName(clean),
             RoleBucket: "BaseTexture",
             RoleLabel: "Texture & Carrier Base",
-            Explanation: dbIngredient?.Description ?? "Supports smooth application, spreadability, and formula stability.",
+            Explanation: !isGenericBaseDesc
+                ? dbIngredient!.Description!
+                : "Supports smooth application, spreadability, and formula stability.",
             Benefits: Array.Empty<string>(),
             ScentTier: "None",
             ComedogenicRating: dbIngredient?.ComedogenicRating ?? 0,
@@ -996,12 +1019,26 @@ public static class CosmeticKnowledgeBase
 
         if (potentActives.Count > 0 && targetArea == "face")
         {
-            cautions.Add(new FormulaCautionItem(
-                Type: "usage-tip",
-                Title: "Sun Protection & Routine Tip",
-                Message: $"Contains resurfacing actives ({string.Join(", ", potentActives)}). Apply broad-spectrum SPF 30+ during the daytime.",
-                IngredientsInvolved: potentActives
-            ));
+            if (string.Equals(userSkin, "Sensitive", StringComparison.OrdinalIgnoreCase))
+            {
+                hasProfileNote = true;
+                profileNoteSummary ??= $"Contains active exfoliating/renewal ingredients ({string.Join(", ", potentActives.Take(3))}) — introduce slowly and patch-test on Sensitive skin.";
+                cautions.Add(new FormulaCautionItem(
+                    Type: "sensitive-note",
+                    Title: "Potent Active Note for Sensitive Skin",
+                    Message: $"Contains resurfacing actives ({string.Join(", ", potentActives)}). Because your Skin ID is Sensitive, start 1–2 times per week, patch-test first, and always apply broad-spectrum SPF 30+ in the daytime.",
+                    IngredientsInvolved: potentActives
+                ));
+            }
+            else
+            {
+                cautions.Add(new FormulaCautionItem(
+                    Type: "usage-tip",
+                    Title: "Sun Protection & Routine Tip",
+                    Message: $"Contains resurfacing actives ({string.Join(", ", potentActives)}). Apply broad-spectrum SPF 30+ during the daytime.",
+                    IngredientsInvolved: potentActives
+                ));
+            }
         }
 
         return (cautions, fragranceDisclosure, hasProfileNote, profileNoteSummary);
@@ -1110,7 +1147,21 @@ public static class CosmeticKnowledgeBase
 
     private static string FormatFriendlyBotanicalName(string rawInci)
     {
-        // E.g. "Rosa Damascena (Rose) Flower Water" -> "Rosa Damascena (Rose) Flower Water"
-        return rawInci.Length > 60 ? rawInci[..57] + "..." : rawInci;
+        if (string.IsNullOrWhiteSpace(rawInci))
+            return rawInci;
+
+        // If INCI has a parenthetical English name like "vaccinium myrtillus (bilberry) fruit extract"
+        // -> turn into "Bilberry Fruit Extract"
+        var match = Regex.Match(rawInci, @"^.*?\(([^)]+)\)\s*(.*)$");
+        if (match.Success)
+        {
+            var englishName = match.Groups[1].Value.Trim();
+            var suffix = match.Groups[2].Value.Trim();
+            var combined = string.IsNullOrWhiteSpace(suffix) ? englishName : $"{englishName} {suffix}";
+            return System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(combined.ToLowerInvariant());
+        }
+
+        var titled = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(rawInci.Trim().ToLowerInvariant());
+        return titled.Length > 60 ? titled[..57] + "..." : titled;
     }
 }

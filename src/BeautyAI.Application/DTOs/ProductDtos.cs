@@ -121,6 +121,18 @@ public record ProductReviewDto(
     DateTime CreatedAt
 );
 
+public record CreateReviewRequest(
+    string? ProductId = null,
+    string? AuthorId = null,
+    string? AuthorName = null,
+    int Rating = 5,
+    string? SkinType = null,
+    string? SkinConcerns = null,
+    string? Content = null,
+    string? ReviewText = null,
+    int? IsRecommended = null
+);
+
 public record ProductFilterParams(
     string? Query = null,
     string? Category = null,

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Bot, User } from 'lucide-react';
+import { Bot, User, ShoppingBag } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
 import { chatWithBot, getFAQ } from '../services/api';
 import './ExpertConsult.css';
@@ -98,11 +99,59 @@ function ChatMessage({ msg }) {
     );
   }
 
+  const { addItemToCart } = useApp();
+
   return (
     <div className={`ec-msg-row ${isBot ? 'ec-msg-row--bot' : 'ec-msg-row--user'} animate-fadeIn`}>
       {isBot && <div className="ec-avatar"><Bot size={18} /></div>}
       <div className={`ec-bubble ${isBot ? 'ec-bubble--bot' : 'ec-bubble--user'}`}>
         <MessageText text={msg.text} />
+        {msg.recommendedProducts && msg.recommendedProducts.length > 0 && (
+          <div className="ec-recommended-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            gap: '10px',
+            marginTop: '12px',
+            width: '100%'
+          }}>
+            {msg.recommendedProducts.map(p => (
+              <div key={p.id} style={{
+                background: '#FFF',
+                border: '1px solid rgba(74, 55, 40, 0.12)',
+                borderRadius: '10px',
+                padding: '10px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px'
+              }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <img
+                    src={p.imageUrl || `/images/products/${p.code}.webp`}
+                    alt={p.name}
+                    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', background: '#F9F6F0' }}
+                    onError={(e) => { e.currentTarget.src = '/images/products/placeholder.webp'; }}
+                  />
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontSize: '0.72rem', color: '#888', fontWeight: 600 }}>{p.brandName}</div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2D2520', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#C48B71', fontWeight: 700 }}>${p.priceUsd?.toFixed(2)}</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: '0.76rem', padding: '4px 8px', width: '100%', borderRadius: '6px' }}
+                  onClick={() => {
+                    addItemToCart(p, 1);
+                    toast.success(`Added ${p.name} to cart`);
+                  }}
+                >
+                  <ShoppingBag size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} /> Add to Cart
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       {!isBot && <div className="ec-avatar ec-avatar--user"><User size={18} /></div>}
     </div>
@@ -162,11 +211,13 @@ function ChatTab({ user }) {
     try {
       const userId = user?.user_id || 'guest';
       const res = await chatWithBot({ message: trimmed, user_id: userId });
-      const botText = res.data?.bot_response || res.data?.reply || res.data?.message || t('consult_error_reply');
+      const botText = res.data?.reply || res.data?.bot_response || res.data?.message || t('consult_error_reply');
+      const recs = res.data?.recommendedProducts || res.data?.recommended_products || [];
       const botMsg = {
         id: Date.now() + 1,
         role: 'bot',
         text: botText,
+        recommendedProducts: recs,
         isPathology: res.data?.is_pathology,
         zaloDeepLink: res.data?.zalo_deep_link,
         suggestedAction: res.data?.suggested_action,

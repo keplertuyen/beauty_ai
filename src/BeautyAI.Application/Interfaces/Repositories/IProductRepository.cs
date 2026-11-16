@@ -39,4 +39,8 @@ public interface IProductRepository
         int page = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default);
+
+    Task<Review> AddReviewAsync(Review review, CancellationToken cancellationToken = default);
+
+    Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken = default);
 }

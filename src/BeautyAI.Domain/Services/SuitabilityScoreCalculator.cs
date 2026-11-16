@@ -135,7 +135,7 @@ public static class SuitabilityScoreCalculator
         var rawLower = rawInci.ToLowerInvariant();
         var isFragranceDept = string.Equals(department, "Fragrance", StringComparison.OrdinalIgnoreCase) || targetArea == "fragrance";
 
-        // Soft caution check for Sensitive skin (synthetic fragrance or drying alcohol)
+        // Soft caution check for Sensitive skin (synthetic fragrance, potent resurfacing acids/retinoids, or drying alcohol)
         if (string.Equals(userSkinType, "Sensitive", StringComparison.OrdinalIgnoreCase) && !isFragranceDept)
         {
             if (rawLower.Contains("parfum") || rawLower.Contains("fragrance") || rawLower.Contains("limonene") || rawLower.Contains("linalool"))
@@ -146,6 +146,22 @@ public static class SuitabilityScoreCalculator
                     HasAllergyWarning: false,
                     MatchedAllergen: null,
                     MatchReason: "Zero personal allergy conflicts, but contains fragrance components — patch-test for Sensitive skin.",
+                    HasIngredients: true,
+                    IsNonCosmeticTool: false
+                );
+            }
+
+            if (targetArea == "face" &&
+                (rawLower.Contains("glycolic acid") || rawLower.Contains("lactic acid") || rawLower.Contains("salicylic acid") ||
+                 rawLower.Contains("retinol") || rawLower.Contains("retinal") || rawLower.Contains("benzoyl peroxide") ||
+                 rawLower.Contains("citrus limon") || rawLower.Contains("citrus aurantium")))
+            {
+                return new SuitabilityVerdictResult(
+                    Verdict: "MatchWithNotes",
+                    VerdictLabel: "Match with Notes",
+                    HasAllergyWarning: false,
+                    MatchedAllergen: null,
+                    MatchReason: "Zero personal allergy conflicts, but contains potent exfoliating acids or active extracts — introduce slowly on Sensitive skin.",
                     HasIngredients: true,
                     IsNonCosmeticTool: false
                 );

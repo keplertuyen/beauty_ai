@@ -14,6 +14,7 @@ const Products = lazy(() => import('./pages/Products'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const SkinQuiz = lazy(() => import('./pages/SkinQuiz'));
 const IngredientAnalyzer = lazy(() => import('./pages/IngredientAnalyzer'));
+const RoutineView = lazy(() => import('./pages/RoutineView'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
@@ -85,6 +86,8 @@ function AppContentLayout() {
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/skin-quiz" element={<SkinQuiz />} />
             <Route path="/ingredient-analyzer" element={<IngredientAnalyzer />} />
+            <Route path="/routines" element={<RoutineView />} />
+            <Route path="/routine" element={<RoutineView />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />

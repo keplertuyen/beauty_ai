@@ -1,0 +1,583 @@
+product_id,tier,source,source_url,image_url,matched_brand,matched_name,match_score,status,fetched_at
+P97989778,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-soft-pinch-liquid-blush-P97989778,/images/products/P97989778.webp,Rare Beauty by Selena Gomez,Soft Pinch Liquid Blush,1.000,verified,2026-11-06T09:58:43+00:00
+P377873,1,sephora_page,https://www.sephora.com/product/radiant-creamy-concealer-P377873,/images/products/P377873.webp,NARS,Radiant Creamy Concealer with Hydrating Medium Coverage,0.850,verified,2026-11-06T09:58:51+00:00
+P420652,1,sephora_page,https://www.sephora.com/product/lip-sleeping-mask-P420652?om_mmc=aff-linkshare-redirect-8yaPBDQV8ls&c3ch=Linkshare&c3nid=8yaPBDQV8ls&affid=8yaPBDQV8ls-MFQrUgDf_PdZhyKvVnYjEw&ranEAID=8yaPBDQV8ls&ranMID=2417&ranSiteID=8yaPBDQV8ls-MFQrUgDf_PdZhyKvVnYjEw&ranLinkID=10-1,/images/products/P420652.webp,LANEIGE,Lip Sleeping Mask – Intense Hydration Lip Treatment with Vitamin C,0.933,verified,2026-11-06T09:59:01+00:00
+P281411,1,sephora_page,https://www.sephora.com/product/cream-lip-stain-liquid-lipstick-P281411,/images/products/P281411.webp,SEPHORA COLLECTION,Cream Lip Stain 10HR Liquid Lipstick,0.909,verified,2026-11-06T10:00:56+00:00
+P67988453,1,sephora_page,https://www.sephora.com/product/gloss-bomb-universal-lip-luminizer-P67988453,/images/products/P67988453.webp,Fenty Beauty by Rihanna,Gloss Bomb Universal Lip Gloss Luminizer,1.000,verified,2026-11-06T10:01:03+00:00
+P87985432,1,sephora_page,https://www.sephora.com/product/pro-filtr-soft-matte-longwear-foundation-P87985432,/images/products/P87985432.webp,Fenty Beauty by Rihanna,Pro Filt’r Soft Matte Longwear Liquid Foundation,1.000,verified,2026-11-06T10:01:14+00:00
+P2855,1,sephora_page,https://www.sephora.com/product/blush-P2855,/images/products/P2855.webp,NARS,Talc-Free Powder Blush,0.850,verified,2026-11-06T10:01:19+00:00
+P202633,1,sephora_page,https://www.sephora.com/product/brow-wiz-P202633,/images/products/P202633.webp,Anastasia Beverly Hills,Brow Wiz® Ultra-Slim Precision Eyebrow Defining Pencil,0.857,verified,2026-11-06T10:01:27+00:00
+P109908,1,sephora_page,https://www.sephora.com/product/translucent-loose-setting-powder-P109908,/images/products/P109908.webp,Laura Mercier,Translucent Loose Longwear Setting Powder,0.889,verified,2026-11-06T10:01:36+00:00
+P427417,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-niacinamide-10-zinc-1-P427417,/images/products/P427417.webp,The Ordinary,Niacinamide 10% + Zinc 1%  Serum for Oily Skin,0.850,verified,2026-11-06T10:01:42+00:00
+P427419,1,sephora_page,https://www.sephora.com/product/the-ordinary-hyaluronic-acid-2-b5-hydrating-serum-P427419,/images/products/P427419.webp,The Ordinary,Hyaluronic Acid 2% + B5 Hydrating Serum with Ceramides,0.933,verified,2026-11-06T11:49:46+00:00
+P236816,,,,,,,,not_found,2026-11-06T11:53:38+00:00
+P453814,1,sephora_page,https://www.sephora.com/product/dior-lip-glow-oil-hydrating-high-shine-gloss-P519637,,DIOR,Lip Glow Oil Hydrating High-Shine Gloss,0.000,rejected,2026-11-06T11:53:46+00:00
+P453814,,,,,,,,not_found,2026-11-06T11:53:46+00:00
+P263504,,,,,,,,not_found,2026-11-06T11:53:53+00:00
+P378284,1,sephora_page,https://www.sephora.com/product/double-wear-stay-in-place-lightweight-matte-foundation-with-36-hour-wear-P520286,/images/products/P378284.webp,Estée Lauder,NEW Double Wear Stay-in-Place Lightweight Longwear Matte Foundation with 36H Wear,0.850,verified,2026-11-06T11:54:02+00:00
+P393401,1,sephora_page,https://www.sephora.com/product/luminous-silk-natural-glow-blurring-liquid-foundation-with-24-hour-wear-P519887,,Armani Beauty,Luminous Silk Natural Glow Blurring Liquid Foundation with 24 Hour Wear,0.444,rejected,2026-11-06T11:54:10+00:00
+P393401,,,,,,,,not_found,2026-11-06T11:54:10+00:00
+P384060,1,sephora_page,https://www.sephora.com/product/dipbrow-pomade-P384060,/images/products/P384060.webp,Anastasia Beverly Hills,"DIPBROW® Waterproof, Smudge-Proof Brow Pomade",1.000,verified,2026-11-06T11:54:20+00:00
+P404832,,,,,,,,not_found,2026-11-06T11:54:26+00:00
+P409523,1,sephora_page,https://www.sephora.com/product/vice-lipstick-P409523,/images/products/P409523.webp,Urban Decay,Vice Hydrating Lipstick,1.000,verified,2026-11-06T11:54:36+00:00
+P404831,,,,,,,,not_found,2026-11-06T11:54:42+00:00
+P245205,,,,,,,,not_found,2026-11-06T11:54:50+00:00
+P133707,1,sephora_page,https://www.sephora.com/product/24-7-glide-on-eye-pencil-P133707,/images/products/P133707.webp,Urban Decay,24/7 Glide-On Waterproof Eyeliner Pencil,1.000,verified,2026-11-06T11:54:59+00:00
+P427406,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-glycolic-acid-7-toning-solution-P427406,,The Ordinary,Glycolic Acid 7% Exfoliating and Brightening Daily Toner,0.000,rejected,2026-11-06T11:55:07+00:00
+P427406,,,,,,,,not_found,2026-11-06T11:55:07+00:00
+P442563,1,sephora_page,https://www.sephora.com/product/aha-30-bha-2-peeling-solution-P442563,/images/products/P442563.webp,The Ordinary,AHA 30% + BHA 2% High-Strength Peeling Solution for Brightening,0.850,verified,2026-11-06T11:55:16+00:00
+P381000,1,sephora_page,https://www.sephora.com/product/better-than-sex-mascara-P381000,/images/products/P381000.webp,Too Faced,Better Than Sex Volumizing & Lengthening Mascara,1.000,verified,2026-11-06T11:55:26+00:00
+P428224,,,,,,,,not_found,2026-11-06T11:55:32+00:00
+P456151,1,sephora_page,https://www.sephora.com/product/kosas-revealer-concealer-P456151,,Kosas,Revealer Super Creamy + Brightening Concealer with Caffeine and Hyaluronic Acid,0.625,rejected,2026-11-06T11:55:40+00:00
+P456151,,,,,,,,not_found,2026-11-06T11:55:40+00:00
+P432298,1,sephora_page,https://www.sephora.com/product/born-this-way-super-coverage-multi-use-concealer-with-hyaluronic-acid-P432298,/images/products/P432298.webp,Too Faced,Born This Way Super Coverage Multi-Use Concealer with Hyaluronic Acid,0.850,verified,2026-11-06T11:55:47+00:00
+P434104,1,sephora_page,https://www.sephora.com/product/hollywood-flawless-filter-P434104,/images/products/P434104.webp,Charlotte Tilbury,Hollywood Flawless Filter,1.000,verified,2026-11-06T11:55:58+00:00
+P39787544,1,sephora_page,https://www.sephora.com/product/stunna-lip-paint-P39787544,/images/products/P39787544.webp,Fenty Beauty by Rihanna,Stunna Lip Paint Longwear Fluid Lip Color,1.000,verified,2026-11-06T11:56:09+00:00
+P433526,1,sephora_page,https://www.sephora.com/product/airbrush-flawless-finish-setting-powder-P433526,,Charlotte Tilbury,Airbrush Flawless Finish Refillable Blurring & Setting Powder,0.000,rejected,2026-11-06T11:56:17+00:00
+P433526,,,,,,,,not_found,2026-11-06T11:56:17+00:00
+P186805,1,sephora_page,https://www.sephora.com/product/dior-addict-lip-maximizer-plumping-gloss-P186805,/images/products/P186805.webp,DIOR,Dior Addict Lip Maximizer Plumping Gloss,1.000,verified,2026-11-06T11:56:28+00:00
+P38855877,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-positive-light-liquid-luminizer-highlight-P38855877,/images/products/P38855877.webp,Rare Beauty by Selena Gomez,Positive Light Liquid Luminizer Highlight,1.000,verified,2026-11-06T11:56:37+00:00
+P18975403,1,sephora_page,https://www.sephora.com/product/match-stix-matte-skinstick-P18975403,/images/products/P18975403.webp,Fenty Beauty by Rihanna,Match Stix Matte Contour Skinstick,1.000,verified,2026-11-06T11:56:46+00:00
+P64879845,1,sephora_page,https://www.sephora.com/product/killawatt-freestyle-highlighter-P64879845,/images/products/P64879845.webp,Fenty Beauty by Rihanna,Killawatt Freestyle Highlighter,1.000,verified,2026-11-06T11:56:55+00:00
+P443563,1,sephora_page,https://www.sephora.com/product/glowy-lip-balm-P443563,/images/products/P443563.webp,LANEIGE,Lip Glowy Balm – Lightweight Hydration Lip Treatment with Shea Butter,0.850,verified,2026-11-06T11:57:03+00:00
+P406080,1,sephora_page,https://www.sephora.com/product/brazilian-bum-bum-visibly-firming-refillable-body-cream-p406080-P406080,,Sol de Janeiro,Brazilian Bum Bum Visibly Firming Refillable Body Cream with Caffeine-Rich Guaranà,0.000,rejected,2026-11-06T11:57:09+00:00
+P406080,,,,,,,,not_found,2026-11-06T11:57:09+00:00
+P397517,,,,,,,,not_found,2026-11-06T11:57:16+00:00
+P174213,,,,,,,,not_found,2026-11-06T11:57:22+00:00
+P63087293,,,,,,,,not_found,2026-11-06T11:57:28+00:00
+P409118,,,,,,,,not_found,2026-11-06T11:57:35+00:00
+P444154,1,sephora_page,https://www.sephora.com/product/glowgasm-beauty-highlighter-wand-P444154,/images/products/P444154.webp,Charlotte Tilbury,Beauty Highlighter Wand,1.000,verified,2026-11-06T11:57:44+00:00
+P422077,1,sephora_page,https://www.sephora.com/product/radiant-creamy-concealer-mini-P422077,/images/products/P422077.webp,NARS,Mini Radiant Creamy Concealer with Medium Coverage,0.850,verified,2026-11-06T11:57:52+00:00
+P228913,1,sephora_page,https://www.sephora.com/product/beautyblender-P228913,/images/products/P228913.webp,Beautyblender,ORIGINAL Beautyblender® Makeup Sponge,1.000,verified,2026-11-06T11:58:04+00:00
+P430932,,,,,,,,not_found,2026-11-06T11:58:10+00:00
+P433516,1,sephora_page,https://www.sephora.com/product/lip-cheat-lip-liner-P433516,/images/products/P433516.webp,Charlotte Tilbury,Lip Cheat Long-Lasting Waterproof Lip Liner,0.850,verified,2026-11-06T11:58:17+00:00
+P309813,1,sephora_page,https://www.sephora.com/product/eyeshadow-P309813,/images/products/P309813.webp,Urban Decay,24/7 Eyeshadow,1.000,verified,2026-11-06T11:58:28+00:00
+P424915,,,,,,,,not_found,2026-11-06T11:58:34+00:00
+P78834,,,,,,,,not_found,2026-11-06T11:58:39+00:00
+P384099,1,sephora_page,https://www.sephora.com/product/naked3-P384099,/images/products/P384099.webp,Urban Decay,Naked3 Soft Pink Eyeshadow Palette,0.850,verified,2026-11-06T11:58:46+00:00
+P416200,1,sephora_page,https://www.sephora.com/product/soft-matte-complete-concealer-P416200,/images/products/P416200.webp,NARS,Soft Matte Complete Full Coverage Longwear Concealer with Hyaluronic Acid,0.850,verified,2026-11-06T11:58:53+00:00
+P427421,1,sephora_page,https://www.sephora.com/product/protini-tm-polypeptide-cream-P427421,/images/products/P427421.webp,Drunk Elephant,Protini™ Polypeptide Firming Refillable Moisturizer with Peptides,0.850,verified,2026-11-06T11:59:02+00:00
+P293605,,,,,,,,not_found,2026-11-06T11:59:09+00:00
+P411387,1,sephora_page,https://www.sephora.com/product/kale-spinach-green-tea-age-prevention-cleanser-P411387,,Youth To The People,Superfood Gentle Antioxidant Refillable Cleanser with Kale & Green Tea​,0.000,rejected,2026-11-06T11:59:16+00:00
+P411387,,,,,,,,not_found,2026-11-06T11:59:16+00:00
+P417238,,,,,,,,not_found,2026-11-06T11:59:22+00:00
+P455418,1,sephora_page,https://www.sephora.com/product/ilia-super-serum-skin-tint-spf-40-P455418,/images/products/P455418.webp,ILIA,Super Serum Skin Tint SPF 40 - Hydrating Foundation,0.933,verified,2026-11-06T11:59:33+00:00
+P253818,1,sephora_page,https://www.sephora.com/product/stay-all-day-waterproof-liquid-eye-liner-P253818,/images/products/P253818.webp,stila,Stay All Day® Waterproof Liquid Eye Liner,1.000,verified,2026-11-06T11:59:41+00:00
+P466123,1,sephora_page,https://www.sephora.com/product/glow-recipe-watermelon-glow-niacinamide-dew-drops-P466123,,Glow Recipe,Watermelon Glow Niacinamide Dew Drops Serum,0.000,rejected,2026-11-06T11:59:49+00:00
+P466123,,,,,,,,not_found,2026-11-06T11:59:49+00:00
+P458268,1,sephora_page,https://www.sephora.com/product/charlotte-tilbury-mini-pillow-talk-lip-duo-P458268,/images/products/P458268.webp,Charlotte Tilbury,Mini Pillow Talk Lipstick & Liner Set,1.000,verified,2026-11-06T11:59:57+00:00
+P441101,1,sephora_page,https://www.sephora.com/product/the-dewy-skin-cream-P441101,,Tatcha,The Dewy Skin Cream Hydrating & Firming Refillable Moisturizer,0.000,rejected,2026-11-06T12:00:05+00:00
+P441101,,,,,,,,not_found,2026-11-06T12:00:05+00:00
+P448854,1,sephora_page,https://www.sephora.com/product/shineon-lip-jelly-P448854,,Tower 28 Beauty,ShineOn Lip Jelly Hydrating Non-Sticky Lip Oil,0.000,rejected,2026-11-06T12:00:12+00:00
+P448854,,,,,,,,not_found,2026-11-06T12:00:12+00:00
+P290636,1,sephora_page,https://www.sephora.com/product/hoola-matte-bronzer-P290636?om_mmc=aff-linkshare-redirect-8yaPBDQV8ls&c3ch=Linkshare&c3nid=8yaPBDQV8ls&affid=8yaPBDQV8ls-OECtsL5rAbY4rgJQvmALtg&ranEAID=8yaPBDQV8ls&ranMID=2417&ranSiteID=8yaPBDQV8ls-OECtsL5rAbY4rgJQvmALtg&ranLinkID=10-1&browserdefault=true,/images/products/P290636.webp,Benefit Cosmetics,Hoola Matte Powder Bronzer,0.850,verified,2026-11-06T12:00:20+00:00
+P278610,,,,,,,,not_found,2026-11-06T12:00:28+00:00
+P418218,1,sephora_page,https://www.sephora.com/product/the-water-cream-P418218,,Tatcha,The Water Cream Pore Minimizing Refillable Gel Moisturizer,0.000,rejected,2026-11-06T12:00:36+00:00
+P418218,,,,,,,,not_found,2026-11-06T12:00:36+00:00
+P377710,1,sephora_page,https://www.sephora.com/product/love-shine-lip-oil-stick-P377710,,Yves Saint Laurent,Loveshine Lip Oil Stick,0.000,rejected,2026-11-06T12:00:44+00:00
+P377710,,,,,,,,not_found,2026-11-06T12:00:44+00:00
+P479343,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-warm-wishes-effortless-bronzer-sticks-P479343,/images/products/P479343.webp,Rare Beauty by Selena Gomez,Warm Wishes Effortless Cream Bronzer Stick,0.850,verified,2026-11-06T12:00:52+00:00
+P403812,1,sephora_page,https://www.sephora.com/product/tartelette-in-bloom-clay-eyeshadow-palette-P403812,/images/products/P403812.webp,tarte,tartelette™ in bloom Amazonian clay eyeshadow palette,0.850,verified,2026-11-06T12:01:01+00:00
+P455936,1,sephora_page,https://www.sephora.com/product/summer-fridays-lip-butter-balm-P455936,/images/products/P455936.webp,Summer Fridays,Lip Butter Balm Treatment for Hydration + Nourishing Shine,0.850,verified,2026-11-06T12:01:11+00:00
+P434002,1,sephora_page,https://www.sephora.com/product/hollywood-contour-wand-P434002,/images/products/P434002.webp,Charlotte Tilbury,Hollywood Contour Wand,1.000,verified,2026-11-06T12:01:20+00:00
+P433530,1,sephora_page,https://www.sephora.com/product/matte-revolution-lipstick-P433530,/images/products/P433530.webp,Charlotte Tilbury,Matte Revolution Hydrating Lipstick,0.857,verified,2026-11-06T12:01:27+00:00
+P427420,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-buffet-P427420,,The Ordinary,Multi-Peptide + Hyaluronic Acid Serum for Firmness and Elasticity,0.545,rejected,2026-11-06T12:01:33+00:00
+P427420,,,,,,,,not_found,2026-11-06T12:01:33+00:00
+P436148,1,sephora_page,https://www.sephora.com/product/beauty-bento-bounce-shimmer-eyeshadow-trio-P436148,/images/products/P436148.webp,Kaja,Eye Bento Bouncy Eyeshadow Trio,1.000,verified,2026-11-06T12:01:42+00:00
+P387906,,,,,,,,not_found,2026-11-06T12:01:50+00:00
+P407636,,,,,,,,not_found,2026-11-06T12:01:56+00:00
+P432500,,,,,,,,not_found,2026-11-06T12:02:02+00:00
+P58930227,1,sephora_page,https://www.sephora.com/product/soft-glam-eyeshadow-palette-P58930227,/images/products/P58930227.webp,Anastasia Beverly Hills,Soft Glam Eyeshadow Palette,1.000,verified,2026-11-06T12:02:13+00:00
+P432668,1,sephora_page,https://www.sephora.com/product/d-bronzi-tm-anti-pollution-sunshine-serum-P432668,,Drunk Elephant,D-Bronzi™ Bronzing Drops with Peptides,0.667,rejected,2026-11-06T12:02:22+00:00
+P432668,,,,,,,,not_found,2026-11-06T12:02:22+00:00
+P311138,,,,,,,,not_found,2026-11-06T12:02:30+00:00
+P433402,1,sephora_page,https://www.sephora.com/product/easy-bake-loose-baking-setting-powder-P433402,/images/products/P433402.webp,HUDA BEAUTY,Easy Bake Blurring Loose Baking & Setting Powder,0.923,verified,2026-11-06T12:02:38+00:00
+P409317,,,,,,,,not_found,2026-11-06T12:02:44+00:00
+P441813,1,sephora_page,https://www.sephora.com/product/hydro-grip-primer-P441813?om_mmc=aff-linkshare-redirect-QFGLnEolOWg&c3ch=Linkshare&c3nid=QFGLnEolOWg&affid=QFGLnEolOWg-id65ZzlGZlWT.xapYDTMOQ&ranEAID=QFGLnEolOWg&ranMID=2417&ranSiteID=QFGLnEolOWg-id65ZzlGZlWT.xapYDTMOQ&ranLinkID=10-1&browserdefault=true,/images/products/P441813.webp,MILK MAKEUP,Hydro Grip Hydrating Makeup Primer with Hyaluronic Acid + Niacinamide,0.850,verified,2026-11-06T12:02:53+00:00
+P264900,1,sephora_page,https://www.sephora.com/product/the-porefessional-face-primer-P264900,/images/products/P264900.webp,Benefit Cosmetics,The POREfessional Pore Minimizing Primer,1.000,verified,2026-11-06T12:03:01+00:00
+P421275,1,sephora_page,https://www.sephora.com/product/acne-healing-dots-P421275,,Peace Out,Salicylic Acid & Hydrocolloid Acne Treatment Pimple Patches,0.500,rejected,2026-11-06T12:03:09+00:00
+P421275,,,,,,,,not_found,2026-11-06T12:03:09+00:00
+P422083,1,sephora_page,https://www.sephora.com/product/translucent-loose-setting-powder-mini-P422083,/images/products/P422083.webp,Laura Mercier,Mini Translucent Loose Longwear Setting Powder,0.909,verified,2026-11-06T12:03:17+00:00
+P467607,1,sephora_page,https://www.sephora.com/product/charlotte-tilbury-mini-hollywood-flawless-filter-P467607,/images/products/P467607.webp,Charlotte Tilbury,Mini Hollywood Flawless Filter,1.000,verified,2026-11-06T12:03:27+00:00
+P289307,1,sephora_page,https://www.sephora.com/product/they-re-real-lengthening-volumizing-mascara-P289307,/images/products/P289307.webp,Benefit Cosmetics,They're Real! Lengthening Mascara,1.000,verified,2026-11-06T12:03:35+00:00
+P427301,1,sephora_page,https://www.sephora.com/product/natural-radiant-longwear-foundation-P427301,/images/products/P427301.webp,NARS,Natural Radiant Longwear Full Coverage Foundation,0.850,verified,2026-11-06T12:03:46+00:00
+P470025,1,sephora_page,https://www.sephora.com/product/fenty-beauty-rihanna-eaze-drop-blurring-skin-tint-P470025,/images/products/P470025.webp,Fenty Beauty by Rihanna,Eaze Drop Blurring Skin Tint,1.000,verified,2026-11-06T12:03:54+00:00
+P284716,1,sephora_page,https://www.sephora.com/product/eyeshadow-primer-potion-tube-original-P284716,/images/products/P284716.webp,Urban Decay,Eyeshadow Primer Potion,1.000,verified,2026-11-06T12:04:03+00:00
+P448869,,,,,,,,not_found,2026-11-06T12:04:11+00:00
+P430969,1,sephora_page,https://www.sephora.com/product/artist-color-pencil-P430969,/images/products/P430969.webp,MAKE UP FOR EVER,Artist Color Pencil Long-Lasting Lip Liner,0.850,verified,2026-11-06T12:04:22+00:00
+P454380,,,,,,,,not_found,2026-11-06T12:04:29+00:00
+P447376,1,sephora_page,https://www.sephora.com/product/no-7-bonding-oil-P447376,/images/products/P447376.webp,Olaplex,No. 7 Bonding Frizz Reduction & Heat Protectant Hair Oil,0.850,verified,2026-11-06T12:04:35+00:00
+P400259,1,sephora_page,https://www.sephora.com/product/c-firma-day-serum-P400259,/images/products/P400259.webp,Drunk Elephant,C-Firma Fresh Vitamin-C Day Serum,1.000,verified,2026-11-06T12:04:46+00:00
+P248407,1,sephora_page,https://www.sephora.com/product/ultra-repair-cream-intense-hydration-P248407,/images/products/P248407.webp,First Aid Beauty,Ultra Repair® Cream Intense Hydration – Face and Body Moisturizer for Skin Repair,0.850,verified,2026-11-06T12:04:56+00:00
+P230234,,,,,,,,not_found,2026-11-06T12:05:04+00:00
+P427413,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-lactic-acid-10-ha-2-P427413,/images/products/P427413.webp,The Ordinary,Lactic Acid 10% + HA 2% High-Strength Exfoliating Serum for Uneven Texture,0.850,verified,2026-11-06T12:05:14+00:00
+P410532,1,sephora_page,https://www.sephora.com/product/vanish-seamless-finish-foundation-stick-P410532,/images/products/P410532.webp,Hourglass,Vanish™ Seamless Finish Foundation Stick,0.850,verified,2026-11-06T12:05:23+00:00
+P409239,1,sephora_page,https://www.sephora.com/product/gimme-brow-P409239,/images/products/P409239.webp,Benefit Cosmetics,Gimme Brow+ Tinted Volumizing Eyebrow Gel,1.000,verified,2026-11-06T12:05:34+00:00
+P392246,1,sephora_page,https://www.sephora.com/product/t-l-c-framboos-tm-glycolic-night-serum-P392246,/images/products/P392246.webp,Drunk Elephant,T.L.C. Framboos™ Glycolic Resurfacing Night Serum,0.875,verified,2026-11-06T12:05:42+00:00
+P500423,1,sephora_page,https://www.sephora.com/product/multi-peptide-lash-brow-serum-P500423,/images/products/P500423.webp,The Ordinary,"Multi-Peptide Lash and Brow Serum for Thicker, Fuller Looking Lashes & Brows",0.850,verified,2026-11-06T12:05:50+00:00
+P377784,1,sephora_page,https://www.sephora.com/product/waterproof-contour-eye-pencil-P377784,/images/products/P377784.webp,SEPHORA COLLECTION,12 Hour Colorful Contour Pencil Eyeliner,0.909,verified,2026-11-06T12:06:00+00:00
+P74312,1,sephora_page,https://www.sephora.com/product/moondust-liquid-glitter-eyeliner-P74312,,Urban Decay,Moondust Liquid Glitter Eyeliner ,0.500,rejected,2026-11-06T12:06:06+00:00
+P74312,,,,,,,,not_found,2026-11-06T12:06:06+00:00
+P229406,,,,,,,,not_found,2026-11-06T12:06:14+00:00
+P308201,1,sephora_page,https://www.sephora.com/product/teint-idole-ultra-24h-long-wear-foundation-P308201,,Lancôme,Teint Idole Ultra Wear Natural Matte Foundation with Hyaluronic Acid & Vitamin E,0.000,rejected,2026-11-06T12:06:24+00:00
+P308201,,,,,,,,not_found,2026-11-06T12:06:24+00:00
+P7880,1,sephora_page,https://www.sephora.com/product/soy-face-cleanser-P7880,/images/products/P7880.webp,fresh,Soy Hydrating Gentle Face Cleanser,1.000,verified,2026-11-06T12:06:33+00:00
+P427416,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-caffeine-solution-5-egcg-P427416,/images/products/P427416.webp,The Ordinary,Caffeine Solution 5% + EGCG Depuffing Eye Serum for Dark Circles,0.850,verified,2026-11-06T12:06:39+00:00
+P479338,1,sephora_page,https://www.sephora.com/product/nars-light-reflecting-advance-skincare-foundation-P479338,,NARS,Light Reflecting Skin Improving Medium Coverage Foundation with Cacao Peptides,0.429,rejected,2026-11-06T12:06:46+00:00
+P479338,,,,,,,,not_found,2026-11-06T12:06:46+00:00
+P421813,1,sephora_page,https://www.sephora.com/product/mattetrance-lipstick-P421813,,PAT McGRATH LABS,MatteTrance™ Lipstick,0.500,rejected,2026-11-06T12:06:53+00:00
+P421813,,,,,,,,not_found,2026-11-06T12:06:53+00:00
+P408219,1,sephora_page,https://www.sephora.com/product/precisely-my-brow-pencil-P408219,/images/products/P408219.webp,Benefit Cosmetics,"Precisely, My Brow Pencil Waterproof Micro-Precision Eyebrow Definer",0.875,verified,2026-11-06T12:07:00+00:00
+P378821,1,sephora_page,https://www.sephora.com/product/24-7-moondust-eyeshadow-P378821,/images/products/P378821.webp,Urban Decay,24/7 Moondust Glittery Eyeshadow,0.889,verified,2026-11-06T12:07:11+00:00
+P85225585,1,sephora_page,https://www.sephora.com/product/diamond-bomb-all-over-diamond-veil-P85225585,/images/products/P85225585.webp,Fenty Beauty by Rihanna,Diamond Bomb All-Over Diamond Veil,1.000,verified,2026-11-06T12:07:17+00:00
+P394534,1,sephora_page,https://www.sephora.com/product/black-opium-P394534,/images/products/P394534.webp,Yves Saint Laurent,Black Opium Eau de Parfum with Coffee & White Flowers,0.850,verified,2026-11-06T12:07:25+00:00
+P469502,1,sephora_page,https://www.sephora.com/product/paula-s-choice-skin-perfecting-2-bha-liquid-exfoliant-P469502,,Paula's Choice,Skin Perfecting 2% BHA Exfoliating Toner for Clear Skin,0.000,rejected,2026-11-06T12:07:34+00:00
+P469502,,,,,,,,not_found,2026-11-06T12:07:34+00:00
+P415777,,,,,,,,not_found,2026-11-06T12:07:41+00:00
+P377723,1,sephora_page,https://www.sephora.com/product/ambient-lighting-powder-P377723,/images/products/P377723.webp,Hourglass,Ambient® Lighting Finishing Powder,0.857,verified,2026-11-06T12:07:51+00:00
+P441814,1,sephora_page,https://www.sephora.com/product/hydro-grip-primer-mini-P441814,/images/products/P441814.webp,MILK MAKEUP,Mini Hydro Grip Hydrating Makeup Primer with Hyaluronic Acid + Niacinamide,0.850,verified,2026-11-06T12:07:59+00:00
+P384963,1,sephora_page,https://www.sephora.com/product/ambient-lighting-blush-collection-P384963,/images/products/P384963.webp,Hourglass,Ambient Lighting Blush Collection,1.000,verified,2026-11-06T12:08:06+00:00
+P409800,,,,,,,,not_found,2026-11-06T12:08:12+00:00
+P461147,1,sephora_page,https://www.sephora.com/product/charlotte-tilbury-airbrush-flawless-setting-spray-P461147,/images/products/P461147.webp,Charlotte Tilbury,Airbrush Flawless Hydrating & Waterproof Setting Spray,0.850,verified,2026-11-06T12:08:21+00:00
+P394639,,,,,,,,not_found,2026-11-06T12:08:29+00:00
+P19700127,1,sephora_page,https://www.sephora.com/product/fenty-beauty-rihanna-cheeks-out-freestyle-cream-blush-P19700127,/images/products/P19700127.webp,Fenty Beauty by Rihanna,Cheeks Out Freestyle Cream Blush,1.000,verified,2026-11-06T12:08:37+00:00
+P49848448,,,,,,,,not_found,2026-11-06T12:08:43+00:00
+P309308,1,sephora_page,https://www.sephora.com/product/good-genes-all-in-one-lactic-acid-treatment-P309308,,Sunday Riley,Good Genes All-In-One Lactic Acid Serum For Dark Spots And Uneven Texture,0.000,rejected,2026-11-06T12:08:51+00:00
+P309308,,,,,,,,not_found,2026-11-06T12:08:51+00:00
+P64546856,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-liquid-touch-brightening-concealer-P64546856,/images/products/P64546856.webp,Rare Beauty by Selena Gomez,Liquid Touch Brightening Concealer,1.000,verified,2026-11-06T12:09:01+00:00
+P247355,,,,,,,,not_found,2026-11-06T12:09:09+00:00
+P433172,1,sephora_page,https://www.sephora.com/product/no-4-bond-maintenance-shampoo-P433172,/images/products/P433172.webp,Olaplex,"No.4 Bond Maintenance®  Strengthening, Hydrating Hair Repair Shampoo for Medium Hair",0.850,verified,2026-11-06T12:09:18+00:00
+P88779809,1,sephora_page,https://www.sephora.com/product/pro-filt-r-instant-retouch-concealer-P88779809,/images/products/P88779809.webp,Fenty Beauty by Rihanna,Pro Filt’r Instant Retouch Longwear Liquid Concealer,1.000,verified,2026-11-06T12:09:27+00:00
+P467451,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-stay-vulnerable-melting-blush-P467451,/images/products/P467451.webp,Rare Beauty by Selena Gomez,Stay Vulnerable Melting Cream Blush,1.000,verified,2026-11-06T12:09:38+00:00
+P441831,1,sephora_page,https://www.sephora.com/product/olaplex-no-6-bond-smoother-reparative-styling-creme-P441831,,Olaplex,No. 6 Bond Smoother Frizz Control Styling Hair Cream,0.625,rejected,2026-11-06T12:09:46+00:00
+P441831,,,,,,,,not_found,2026-11-06T12:09:46+00:00
+P427414,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-natural-moisturizing-factors-ha-P427414,,The Ordinary,Natural Moisturizing Factors + Hyaluronic Acid Daily Moisturizer,0.545,rejected,2026-11-06T12:09:55+00:00
+P427414,,,,,,,,not_found,2026-11-06T12:09:55+00:00
+P449342,1,sephora_page,https://www.sephora.com/product/beachplease-tinted-balm-blush-P449342,/images/products/P449342.webp,Tower 28 Beauty,BeachPlease Lip + Cheek Dewy Cream Blush,0.909,verified,2026-11-06T12:10:04+00:00
+P12495,1,sephora_page,https://www.sephora.com/product/coco-mademoiselle-P12495,/images/products/P12495.webp,CHANEL,COCO MADEMOISELLE Eau de Parfum,1.000,verified,2026-11-06T12:10:10+00:00
+P421485,,,,,,,,not_found,2026-11-06T12:10:16+00:00
+P444048,1,sephora_page,https://www.sephora.com/product/bum-bum-jet-set-P444048,/images/products/P444048.webp,Sol de Janeiro,Brazilian Bum Bum Jet Set,0.857,verified,2026-11-06T12:10:24+00:00
+P433173,1,sephora_page,https://www.sephora.com/product/no-5-bond-maintenance-conditioner-P433173,/images/products/P433173.webp,Olaplex,"No.5 Bond Maintenance® Strengthening, Moisturizing Hair Repair Conditioner for Medium Hair",0.850,verified,2026-11-06T12:10:32+00:00
+P442831,1,sephora_page,https://www.sephora.com/product/multi-peptide-serum-for-hair-density-P442831,/images/products/P442831.webp,The Ordinary,"Multi-Peptide Serum for Hair Density for Thicker, Fuller Looking Hair",0.850,verified,2026-11-06T12:10:40+00:00
+P73124556,1,sephora_page,https://www.sephora.com/product/match-stix-shimmer-skinstick-P73124556,/images/products/P73124556.webp,Fenty Beauty by Rihanna,Match Stix Shimmer Skinstick,1.000,verified,2026-11-06T12:10:47+00:00
+P458219,1,sephora_page,https://www.sephora.com/product/glow-recipe-watermelon-glow-pha-bha-pore-tight-toner-P458219,/images/products/P458219.webp,Glow Recipe,Watermelon Glow PHA + BHA Pore-Tight Toner,1.000,verified,2026-11-06T12:10:57+00:00
+P43818047,,,,,,,,not_found,2026-11-06T12:11:05+00:00
+P437097,,,,,,,,not_found,2026-11-06T12:11:12+00:00
+P386335,,,,,,,,not_found,2026-11-06T12:11:20+00:00
+P440307,1,sephora_page,https://www.sephora.com/product/superberry-hydrate-glow-dream-mask-P440307,/images/products/P440307.webp,Youth To The People,Superberry Hydrate + Glow Dream Night Cream + Mask with Vitamin C,0.941,verified,2026-11-06T12:11:27+00:00
+P421481,1,sephora_page,https://www.sephora.com/product/brazilian-crush-body-fragrance-mist-mini-P421481,,Sol de Janeiro,Mini Cheirosa 62 Bum Bum Hair & Body Perfume Mist,0.000,rejected,2026-11-06T12:11:35+00:00
+P421481,,,,,,,,not_found,2026-11-06T12:11:35+00:00
+P284507,1,sephora_page,https://www.sephora.com/product/sephora-colorful-waterproof-eyeshadow-eyeliner-multi-stick-P284507,/images/products/P284507.webp,SEPHORA COLLECTION,Sephora Colorful® Waterproof Eyeshadow & Eyeliner Multi-Stick,1.000,verified,2026-11-06T12:11:43+00:00
+P427536,,,,,,,,not_found,2026-11-06T12:11:49+00:00
+P417312,1,sephora_page,https://www.sephora.com/product/brazilian-crush-body-fragrance-mist-P417312,,Sol de Janeiro,Cheirosa 62 Bum Bum Hair & Body Refillable Perfume Mist,0.000,rejected,2026-11-06T12:11:57+00:00
+P417312,,,,,,,,not_found,2026-11-06T12:11:57+00:00
+P429952,1,sephora_page,https://www.sephora.com/product/jet-lag-mask-P429952,/images/products/P429952.webp,Summer Fridays,Jet Lag Mask + Moisturizer Deep Hydration Treatment with Ceramides,0.850,verified,2026-11-06T12:12:05+00:00
+P454762,1,sephora_page,https://www.sephora.com/product/dior-rosy-glow-blush-P454762,/images/products/P454762.webp,DIOR,Rosy Glow Powder Blush,0.850,verified,2026-11-06T12:12:12+00:00
+P503711,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-positive-light-silky-touch-highlighter-P503711,/images/products/P503711.webp,Rare Beauty by Selena Gomez,Positive Light Silky Touch Highlighter,1.000,verified,2026-11-06T12:12:20+00:00
+P473708,1,sephora_page,https://www.sephora.com/product/fenty-beauty-rihanna-gloss-bomb-heat-universal-lip-luminizer-plumper-P473708,/images/products/P473708.webp,Fenty Beauty by Rihanna,Gloss Bomb Heat Universal Lip Luminizer + Plumper,1.000,verified,2026-11-06T12:12:28+00:00
+P415438,,,,,,,,not_found,2026-11-06T12:12:35+00:00
+P305132,,,,,,,,not_found,2026-11-06T12:12:40+00:00
+P427415,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-100-organic-cold-pressed-rose-hip-seed-oil-P427415,/images/products/P427415.webp,The Ordinary,100% Organic Cold-Pressed Rose Hip Seed Oil for Skin Elascicity,0.900,verified,2026-11-06T12:12:49+00:00
+P481114,1,sephora_page,https://www.sephora.com/product/makeup-by-mario-moisture-glow-tm-plumping-lip-serum-P481114,/images/products/P481114.webp,MAKEUP BY MARIO,MoistureGlow™ Plumping Lip Serum,0.850,verified,2026-11-06T12:12:59+00:00
+P9889,,,,,,,,not_found,2026-11-06T12:13:05+00:00
+P433523,1,sephora_page,https://www.sephora.com/product/luxury-eyeshadow-palette-P433523,/images/products/P433523.webp,Charlotte Tilbury,Luxury Eyeshadow Palette,1.000,verified,2026-11-06T12:13:16+00:00
+P401715,,,,,,,,not_found,2026-11-06T12:13:23+00:00
+P450887,1,sephora_page,https://www.sephora.com/product/nude-obsessions-eyeshadow-palette-P450887,/images/products/P450887.webp,HUDA BEAUTY,Nude Obsessions Eyeshadow Palette,1.000,verified,2026-11-06T12:13:33+00:00
+P467754,1,sephora_page,https://www.sephora.com/product/charlotte-tilbury-mini-airbrush-flawless-finish-setting-powder-P467754,,Charlotte Tilbury,Mini Airbrush Flawless Finish Refillable Blurring & Setting Powder,0.000,rejected,2026-11-06T12:13:41+00:00
+P467754,,,,,,,,not_found,2026-11-06T12:13:41+00:00
+P269122,1,sephora_page,https://www.sephora.com/product/alpha-beta-peel-extra-strength-daily-peel-P269122,,Dr. Dennis Gross Skincare,"Alpha Beta® Extra Strength Exfoliating AHA/BHA Peel Pads for Pores, Dark Spots & Texture",0.600,rejected,2026-11-06T12:13:48+00:00
+P269122,,,,,,,,not_found,2026-11-06T12:13:48+00:00
+P255506,1,sephora_page,https://www.sephora.com/product/flowerbomb-P255506,,Viktor&Rolf,Flowerbomb Eau de Parfum with Vanilla & Jasmine,0.000,rejected,2026-11-06T12:13:55+00:00
+P255506,,,,,,,,not_found,2026-11-06T12:13:55+00:00
+P427647,,,,,,,,not_found,2026-11-06T12:14:00+00:00
+P55978864,1,sephora_page,https://www.sephora.com/product/sun-stalk-r-instant-warmth-bronzer-P55978864,/images/products/P55978864.webp,Fenty Beauty by Rihanna,Sun Stalk'r Instant Warmth Powder Bronzer,0.923,verified,2026-11-06T12:14:10+00:00
+P388225,1,sephora_page,https://www.sephora.com/product/naked2-basics-P388225,/images/products/P388225.webp,Urban Decay,Naked2 Basics Matte Eyeshadow Palette,0.889,verified,2026-11-06T12:14:21+00:00
+P404827,1,sephora_page,https://www.sephora.com/product/brow-definer-P404827,,Anastasia Beverly Hills,"Brow Definer 3-in-1 Easy Define, Fill, & Detail Eyebrow Pencil",0.500,rejected,2026-11-06T12:14:30+00:00
+P404827,,,,,,,,not_found,2026-11-06T12:14:30+00:00
+P456218,1,sephora_page,https://www.sephora.com/product/supergoop-glowscreen-sunscreen-spf-40-P456218,/images/products/P456218.webp,Supergoop!,Glowscreen SPF 40 Sunscreen with Hyaluronic Acid + Niacinamide,0.933,verified,2026-11-06T12:14:40+00:00
+P432502,1,sephora_page,https://www.sephora.com/product/backstage-face-glow-maximizer-palette-P517565,/images/products/P432502.webp,DIOR,Backstage Glow Maximizer Face Palette,0.889,verified,2026-11-06T12:14:48+00:00
+P431750,1,sephora_page,https://www.sephora.com/product/limitless-lash-mascara-P431750,/images/products/P431750.webp,ILIA,Limitless Lash Mascara - Clean Lengthening Mascara,1.000,verified,2026-11-06T12:14:58+00:00
+P393411,,,,,,,,not_found,2026-11-06T12:15:05+00:00
+P404830,,,,,,,,not_found,2026-11-06T12:15:13+00:00
+P406576,,,,,,,,not_found,2026-11-06T12:15:19+00:00
+P393356,,,,,,,,not_found,2026-11-06T12:15:24+00:00
+P482750,1,sephora_page,https://www.sephora.com/product/tarte-maracuja-juicy-lip-plump-P482750,,tarte,maracuja juicy lip plumping gloss,0.000,rejected,2026-11-06T12:15:35+00:00
+P482750,,,,,,,,not_found,2026-11-06T12:15:35+00:00
+P422568,,,,,,,,not_found,2026-11-06T12:15:42+00:00
+P87987897,,,,,,,,not_found,2026-11-06T12:15:49+00:00
+P404797,,,,,,,,not_found,2026-11-06T12:15:57+00:00
+P434101,1,sephora_page,https://www.sephora.com/product/eyes-to-mesmerize-cream-eyeshadow-P434101,/images/products/P434101.webp,Charlotte Tilbury,Eyes To Mesmerise Cream Eyeshadow,0.850,verified,2026-11-06T12:16:07+00:00
+P458747,1,sephora_page,https://www.sephora.com/product/patrick-ta-major-headlines-cream-powder-blush-duo-P458747,,PATRICK TA,Major Headlines Double-Take Crème & Powder Blush Duo,0.000,rejected,2026-11-06T12:16:16+00:00
+P458747,,,,,,,,not_found,2026-11-06T12:16:16+00:00
+P210575,1,sephora_page,https://www.sephora.com/product/veil-mineral-primer-P210575,/images/products/P210575.webp,Hourglass,Veil Mineral Primer,1.000,verified,2026-11-06T12:16:23+00:00
+P406712,1,sephora_page,https://www.sephora.com/product/b-hydra-intensive-hydration-gel-P406712,/images/products/P406712.webp,Drunk Elephant,B-Hydra™ Intensive Hydration Serum with Hyaluronic Acid,0.857,verified,2026-11-06T12:16:30+00:00
+P439926,1,sephora_page,https://www.sephora.com/product/a-passioni-retinol-cream-P439926,,Drunk Elephant,A-Passioni™ Retinol Cream,0.667,rejected,2026-11-06T12:16:39+00:00
+P439926,,,,,,,,not_found,2026-11-06T12:16:39+00:00
+P122751,1,sephora_page,https://www.sephora.com/product/almost-lipstick-P122751,/images/products/P122751.webp,CLINIQUE,Almost Lipstick in Black Honey and Pink Honey,0.850,verified,2026-11-06T12:16:49+00:00
+P392516,1,sephora_page,https://www.sephora.com/product/roller-lash-curling-lifting-mascara-P392516,/images/products/P392516.webp,Benefit Cosmetics,Roller Lash Curling & Lifting Mascara ,1.000,verified,2026-11-06T12:16:59+00:00
+P378111,,,,,,,,not_found,2026-11-06T12:17:07+00:00
+P407907,,,,,,,,not_found,2026-11-06T12:17:15+00:00
+P461148,1,sephora_page,https://www.sephora.com/product/charlotte-tilbury-mini-airbrush-flawless-setting-spray-P461148,/images/products/P461148.webp,Charlotte Tilbury,Mini Airbrush Flawless Hydrating & Waterproof Setting Spray,0.850,verified,2026-11-06T12:17:25+00:00
+P266811,,,,,,,,not_found,2026-11-06T12:17:32+00:00
+P411540,,,,,,,,not_found,2026-11-06T12:17:39+00:00
+P431180,,,,,,,,not_found,2026-11-06T12:17:46+00:00
+P399623,1,sephora_page,https://www.sephora.com/product/luminous-dewy-skin-mist-P399623,/images/products/P399623.webp,Tatcha,Luminous Dewy Skin Mist 2-in-1 Hydrator & Finishing Spray,0.850,verified,2026-11-06T12:17:57+00:00
+P69304,1,sephora_page,https://www.sephora.com/product/brow-gel-P69304,,Anastasia Beverly Hills,Clear Brow Gel Flexible Medium-Hold Eyebrow Setter,0.615,rejected,2026-11-06T12:18:05+00:00
+P69304,,,,,,,,not_found,2026-11-06T12:18:05+00:00
+P422455,,,,,,,,not_found,2026-11-06T12:18:12+00:00
+P431852,1,sephora_page,https://www.sephora.com/product/lust-lip-gloss-P431852,/images/products/P431852.webp,PAT McGRATH LABS,LUST: Lip Gloss,1.000,verified,2026-11-06T12:18:20+00:00
+P302923,1,sephora_page,https://www.sephora.com/product/pure-radiant-tinted-moisturizer-spf-30-pa-P302923,/images/products/P302923.webp,NARS,Pure Radiant Tinted Moisturizer Broad Spectrum SPF 30,1.000,verified,2026-11-06T12:18:30+00:00
+P468685,1,sephora_page,https://www.sephora.com/product/kosas-cloud-set-baked-setting-smoothing-talc-free-vegan-powder-P468685,/images/products/P468685.webp,Kosas,Cloud Set Baked Setting & Smoothing Talc-Free Vegan Powder,1.000,verified,2026-11-06T12:18:40+00:00
+P412090,1,sephora_page,https://www.sephora.com/product/moroccanoil-treatment-P412090,/images/products/P412090.webp,Moroccanoil,Moroccanoil Treatment Hair Oil,1.000,verified,2026-11-06T12:18:48+00:00
+P442840,1,sephora_page,https://www.sephora.com/product/skinfix-barrier-strengthening-and-moisturizing-triple-lipid-peptide-refillable-cream-with-b-l3-P442840,,Skinfix,Triple Lipid-Peptide Cream Refillable Barrier Moisturizer with Ceramides,0.000,rejected,2026-11-06T12:18:55+00:00
+P442840,,,,,,,,not_found,2026-11-06T12:18:55+00:00
+P420913,,,,,,,,not_found,2026-11-06T12:19:03+00:00
+P472327,,,,,,,,not_found,2026-11-06T12:19:10+00:00
+P390722,1,sephora_page,https://www.sephora.com/product/prisme-libre-loose-powder-P390722,,Givenchy,Prisme Libre Illuminating & Color Correcting Loose Powder,0.615,rejected,2026-11-06T12:19:19+00:00
+P390722,,,,,,,,not_found,2026-11-06T12:19:19+00:00
+P453225,1,sephora_page,https://www.sephora.com/product/tatcha-the-kissu-lip-mask-P453225,/images/products/P453225.webp,Tatcha,The Kissu Hydrating & Plumping Lip Mask,0.850,verified,2026-11-06T12:19:27+00:00
+P421996,1,sephora_page,https://www.sephora.com/product/ultra-facial-cream-P421996?gad_source=2&gad_campaignid=24234403400&gclid=CjwKCAiAkrbXBhB2EiwA2y1E3vWGPiMti9tr8Kxdmo-aCUTJ5EcngNm_szGIZF-228wPzHYGODp8sxoCFCQQAvD_BwE,,Kiehl's Since 1851,Ultra Facial Refillable Moisturizing Cream with Squalane and Pro-Ceramides,0.000,rejected,2026-11-06T12:19:34+00:00
+P421996,,,,,,,,not_found,2026-11-06T12:19:34+00:00
+P432504,1,sephora_page,https://www.sephora.com/product/backstage-eyeshadow-palette-P432504,/images/products/P432504.webp,DIOR,BACKSTAGE Eyeshadow Palette,1.000,verified,2026-11-06T12:19:41+00:00
+P444989,1,sephora_page,https://www.sephora.com/product/kp-bump-eraser-body-scrub-with-10-aha-P444989,/images/products/P444989.webp,First Aid Beauty,KP Bump Eraser Body Scrub with 10% AHA – Body Exfoliant for Keratosis Pilaris,0.850,verified,2026-11-06T12:19:48+00:00
+P443842,,,,,,,,not_found,2026-11-06T12:19:54+00:00
+P425318,1,sephora_page,https://www.sephora.com/product/brazilian-bum-bum-cream-mini-P425318,,Sol de Janeiro,Mini Brazilian Bum Bum Visibly Firming Refillable Body Cream with Caffeine-Rich Guaranà,0.000,rejected,2026-11-06T12:20:03+00:00
+P425318,,,,,,,,not_found,2026-11-06T12:20:03+00:00
+P469825,1,sephora_page,https://www.sephora.com/product/saie-dew-blush-liquid-cheek-blush-P469825,/images/products/P469825.webp,Saie,Dew Blush™ Liquid Cream Blush,0.850,verified,2026-11-06T12:20:14+00:00
+P419506,,,,,,,,not_found,2026-11-06T12:20:21+00:00
+P441880,,,,,,,,not_found,2026-11-06T12:20:26+00:00
+P427418,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-granactive-retinoid-2-emulsion-P427418,/images/products/P427418.webp,The Ordinary,Granactive Retinoid 2% Emulsion for Wrinkles and Uneven Texture,0.850,verified,2026-11-06T12:20:36+00:00
+P468353,1,sephora_page,https://www.sephora.com/product/danessa-myricks-colorfix-24-hour-cream-color-P468353,/images/products/P468353.webp,Danessa Myricks Beauty,"Colorfix - Multi-Use Eye, Cheek & Lip Waterproof Liquid Pigment",0.850,verified,2026-11-06T12:20:46+00:00
+P413458,,,,,,,,not_found,2026-11-06T12:20:53+00:00
+P297524,1,sephora_page,https://www.sephora.com/product/clear-improvement-active-charcoal-mask-to-clear-pores-P297524,/images/products/P297524.webp,Origins,Clear Improvement™ Active Charcoal Face Mask to Clear Pores,0.850,verified,2026-11-06T12:21:01+00:00
+P465757,1,sephora_page,https://www.sephora.com/product/fenty-beauty-rihanna-gloss-bomb-cream-color-drip-lip-cream-P465757,/images/products/P465757.webp,Fenty Beauty by Rihanna,Gloss Bomb Cream Color Drip Lip Cream,1.000,verified,2026-11-06T12:21:12+00:00
+P391759,1,sephora_page,https://www.sephora.com/product/tartelette-amazonian-clay-matte-eyeshadow-palette-P391759,/images/products/P391759.webp,tarte,tartelette™ Amazonian clay matte eyeshadow palette,0.850,verified,2026-11-06T12:21:19+00:00
+P109936,,,,,,,,not_found,2026-11-06T12:21:28+00:00
+P218431,1,sephora_page,https://www.sephora.com/product/touche-eclat-radiance-perfecting-pen-P218431,,Yves Saint Laurent,Touche Éclat Awakening Concealer Click Pen,0.615,rejected,2026-11-06T12:21:36+00:00
+P218431,,,,,,,,not_found,2026-11-06T12:21:36+00:00
+P411848,1,sephora_page,https://www.sephora.com/product/multi-stick-P411848,/images/products/P411848.webp,ILIA,Multi-Stick Cream Blush + Highlighter + Lip Tint,1.000,verified,2026-11-06T12:21:43+00:00
+P395532,,,,,,,,not_found,2026-11-06T12:21:50+00:00
+P45433019,,,,,,,,not_found,2026-11-06T12:21:55+00:00
+P461537,1,sephora_page,https://www.sephora.com/product/tatcha-the-rice-wash-skin-softening-cleanser-P461537,/images/products/P461537.webp,Tatcha,The Rice Wash Soft Skin Cleanser,0.850,verified,2026-11-06T12:22:04+00:00
+P427411,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-azelaic-acid-suspension-10-P427411,/images/products/P427411.webp,The Ordinary,Azelaic Acid Suspension 10% Cream for Redness and Blemish-Prone Skin,0.850,verified,2026-11-06T12:22:11+00:00
+P427412,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-alpha-arbutin-2-ha-P427412,,The Ordinary,Alpha Arbutin 2% + Hyaluronic Acid for Hyperpigmentation,0.000,rejected,2026-11-06T12:22:18+00:00
+P427412,,,,,,,,not_found,2026-11-06T12:22:18+00:00
+P378145,1,sephora_page,https://www.sephora.com/product/long-wear-waterproof-cream-eyeshadow-stick-P378145,/images/products/P378145.webp,Bobbi Brown,Long-Wear Waterproof Cream Eyeshadow Stick,0.909,verified,2026-11-06T12:22:27+00:00
+P379832,1,sephora_page,https://www.sephora.com/product/pro-double-blenders-P379832,/images/products/P379832.webp,Beautyblender,Beautyblender® pro,1.000,verified,2026-11-06T12:22:38+00:00
+P69300,1,sephora_page,https://www.sephora.com/product/brow-powder-duo-P69300,,Anastasia Beverly Hills,Brow Powder Duo Dual-Shade Fill & Define,0.429,rejected,2026-11-06T12:22:44+00:00
+P69300,,,,,,,,not_found,2026-11-06T12:22:44+00:00
+P395615,1,sephora_page,https://www.sephora.com/product/instant-detox-mask-P395615,/images/products/P395615.webp,Caudalie,Pore Minimizing Instant Detox Mask,1.000,verified,2026-11-06T12:22:55+00:00
+P388628,,,,,,,,not_found,2026-11-06T12:23:01+00:00
+P126301,1,sephora_page,https://www.sephora.com/product/take-the-day-off-cleansing-balm-P126301,/images/products/P126301.webp,CLINIQUE,Take The Day Off™ Makeup Removing Cleansing Balm						,0.850,verified,2026-11-06T12:23:10+00:00
+P428661,1,sephora_page,https://www.sephora.com/product/the-silk-canvas-P428661,/images/products/P428661.webp,Tatcha,The Silk Canvas Protective Primer,1.000,verified,2026-11-06T12:23:17+00:00
+P426340,1,sephora_page,https://www.sephora.com/product/polished-rice-enzyme-powder-P426340,/images/products/P426340.webp,Tatcha,The Rice Polish Foaming Enzyme Powder,1.000,verified,2026-11-06T12:23:25+00:00
+P427385,,,,,,,,not_found,2026-11-06T12:23:32+00:00
+P286513,1,sephora_page,https://www.sephora.com/product/retractable-brow-pencil-waterproof-P286513,/images/products/P286513.webp,SEPHORA COLLECTION,Retractable EyeBrow Pencil - Waterproof,0.850,verified,2026-11-06T12:23:42+00:00
+P439061,,,,,,,,not_found,2026-11-06T12:23:50+00:00
+P416057,,,,,,,,not_found,2026-11-06T12:23:57+00:00
+P258612,1,sephora_page,https://www.sephora.com/product/chance-eau-tendre-P258612,/images/products/P258612.webp,CHANEL,CHANCE EAU TENDRE Eau de Toilette,1.000,verified,2026-11-06T12:24:07+00:00
+P13046537,,,,,,,,not_found,2026-11-06T12:24:15+00:00
+P88779810,,,,,,,,not_found,2026-11-06T12:24:20+00:00
+P449116,1,sephora_page,https://www.sephora.com/product/born-in-roma-P449116,/images/products/P449116.webp,Valentino,Donna Born in Roma Eau de Parfum with Bourbon Vanilla & Jasmine,0.850,verified,2026-11-06T12:24:27+00:00
+P469503,1,sephora_page,https://www.sephora.com/product/paula-s-choice-mini-skin-perfecting-2-bha-liquid-exfoliant-P469503,,Paula's Choice,Mini Skin Perfecting 2% BHA Exfoliating Toner for Clear Skin,0.000,rejected,2026-11-06T12:24:36+00:00
+P469503,,,,,,,,not_found,2026-11-06T12:24:36+00:00
+P468341,1,sephora_page,https://www.sephora.com/product/anastasia-beverly-hills-brow-freeze-styling-wax-P468341,,Anastasia Beverly Hills,Brow Freeze® Flexible-Hold Clear Lifting & Sculpting Wax,0.625,rejected,2026-11-06T12:24:44+00:00
+P468341,,,,,,,,not_found,2026-11-06T12:24:44+00:00
+P434548,,,,,,,,not_found,2026-11-06T12:24:51+00:00
+P447791,,,,,,,,not_found,2026-11-06T12:24:58+00:00
+P417985,1,sephora_page,https://www.sephora.com/product/outrageous-effect-volume-lip-gloss-P417985,/images/products/P417985.webp,SEPHORA COLLECTION,Outrageous Plump Hydrating Lip Gloss,0.850,verified,2026-11-06T12:25:09+00:00
+P502185,1,sephora_page,https://www.sephora.com/product/triclone-skin-tech-medium-coverage-foundation-with-fermented-arnica-P502185?om_mmc=aff-linkshare-redirect-8yaPBDQV8ls&c3ch=Linkshare&c3nid=8yaPBDQV8ls&affid=8yaPBDQV8ls-_ynsh1xxXHj5MLTByLE28g&ranEAID=8yaPBDQV8ls&ranMID=2417&ranSiteID=8yaPBDQV8ls-_ynsh1xxXHj5MLTByLE28g&ranLinkID=10-1&browserdefault=true,/images/products/P502185.webp,Haus Labs,Triclone Skin Tech Medium Coverage Foundation with Fermented Arnica,1.000,verified,2026-11-06T12:25:19+00:00
+P392245,1,sephora_page,https://www.sephora.com/product/virgin-marula-tm-luxury-facial-oil-P392245,/images/products/P392245.webp,Drunk Elephant,Virgin Marula Luxury Face Oil,1.000,verified,2026-11-06T12:25:29+00:00
+P393718,1,sephora_page,https://www.sephora.com/product/luna-sleeping-night-oil-P393718,/images/products/P393718.webp,Sunday Riley,Luna Sleeping Retinoid Night Oil,1.000,verified,2026-11-06T12:25:38+00:00
+P443840,1,sephora_page,https://www.sephora.com/product/caffeine-eye-cream-P443840,/images/products/P443840.webp,The INKEY List,Caffeine De-puffing + Dark Circle Eye Cream,0.850,verified,2026-11-06T12:25:48+00:00
+P405601,,,,,,,,not_found,2026-11-06T12:25:55+00:00
+P500636,1,sephora_page,https://www.sephora.com/product/kind-words-lip-liner-P500636,/images/products/P500636.webp,Rare Beauty by Selena Gomez,Kind Words Lip Liner,1.000,verified,2026-11-06T12:26:05+00:00
+P454042,1,sephora_page,https://www.sephora.com/product/hourglass-vanish-airbrush-concealer-P454042,/images/products/P454042.webp,Hourglass,Vanish Airbrush Full Coverage Longwear Concealer,0.850,verified,2026-11-06T12:26:16+00:00
+P219001,1,sephora_page,https://www.sephora.com/product/24-7-glide-on-lip-pencil-P219001,,Urban Decay,24/7 Glide-On Waterproof Lip Liner,0.000,rejected,2026-11-06T12:26:22+00:00
+P219001,,,,,,,,not_found,2026-11-06T12:26:22+00:00
+P448702,,,,,,,,not_found,2026-11-06T12:26:31+00:00
+P461483,1,sephora_page,https://www.sephora.com/product/olaplex-no-0-intensive-bond-building-hair-treatment-P461483,/images/products/P461483.webp,Olaplex,No. 0 Intensive Bond Building Hair Treatment for Deep Repair & Strengthening,0.850,verified,2026-11-06T12:26:40+00:00
+P468691,1,sephora_page,https://www.sephora.com/product/merit-shade-slick-tinted-lip-oil-P468691,/images/products/P468691.webp,MERIT,Shade Slick Hydrating Tinted Lip Oil,0.909,verified,2026-11-06T12:26:49+00:00
+P398009,,,,,,,,not_found,2026-11-06T12:26:55+00:00
+P270594,,,,,,,,not_found,2026-11-06T12:27:01+00:00
+P39784685,1,sephora_page,https://www.sephora.com/product/invisimatte-blotting-powder-P39784685,/images/products/P39784685.webp,Fenty Beauty by Rihanna,Invisimatte Instant Setting + Blotting Powder,1.000,verified,2026-11-06T12:27:10+00:00
+P382309,1,sephora_page,https://www.sephora.com/product/ambient-lighting-palette-P382309,/images/products/P382309.webp,Hourglass,Ambient® Lighting Palette,1.000,verified,2026-11-06T12:27:21+00:00
+P403322,,,,,,,,not_found,2026-11-06T12:27:27+00:00
+P387589,,,,,,,,not_found,2026-11-06T12:27:34+00:00
+P443845,1,sephora_page,https://www.sephora.com/product/hyaluronic-acid-hydrating-face-serum-P443845,/images/products/P443845.webp,The INKEY List,Hyaluronic Acid (HA) Hydrating Face Serum,0.850,verified,2026-11-06T12:27:41+00:00
+P416563,1,sephora_page,https://www.sephora.com/product/squalane-vitamin-c-rose-oil-P416563,/images/products/P416563.webp,Biossance,Vitamin C Rose Brightening and Firming Face Oil + Squalane,0.857,verified,2026-11-06T12:27:50+00:00
+P454348,1,sephora_page,https://www.sephora.com/product/dior-dior-forever-skin-correct-concealer-P454348,/images/products/P454348.webp,DIOR,Dior Forever Skin Correct Full-Coverage Concealer,1.000,verified,2026-11-06T12:28:00+00:00
+P94421,1,sephora_page,https://www.sephora.com/product/vinoperfect-brightening-dark-spot-serum-vitamin-c-alternative-P94421,/images/products/P94421.webp,Caudalie,Vinoperfect Brightening Dark Spot Serum Vitamin C Alternative,0.875,verified,2026-11-06T12:28:09+00:00
+P400701,,,,,,,,not_found,2026-11-06T12:28:17+00:00
+P1272,1,sephora_page,https://www.sephora.com/product/benetint-cheek-lip-stain-P1272,,Benefit Cosmetics,Benetint Lip & Cheek Stain Sheer Buildable Liquid Blush Tint,0.000,rejected,2026-11-06T12:28:25+00:00
+P1272,,,,,,,,not_found,2026-11-06T12:28:25+00:00
+P468693,1,sephora_page,https://www.sephora.com/product/merit-flush-balm-cream-blush-P468693,/images/products/P468693.webp,MERIT,Flush Balm Cream Blush,1.000,verified,2026-11-06T12:28:33+00:00
+P448530,1,sephora_page,https://www.sephora.com/product/the-ordinary-salicylic-acid-2-masque-P448530,,The Ordinary,Salicylic Acid 2% Masque Clarifying Charcoal & Clay Mask for Blemish Prone Skin,0.000,rejected,2026-11-06T12:28:40+00:00
+P448530,,,,,,,,not_found,2026-11-06T12:28:40+00:00
+P384996,,,,,,,,not_found,2026-11-06T12:28:46+00:00
+P428819,1,sephora_page,https://www.sephora.com/product/watermelon-pink-juice-moisturizer-P428819,,Glow Recipe,Watermelon Pink Juice Refillable Oil-Free Face Moisturizer,0.000,rejected,2026-11-06T12:28:54+00:00
+P428819,,,,,,,,not_found,2026-11-06T12:28:54+00:00
+P19267373,,,,,,,,not_found,2026-11-06T12:29:01+00:00
+P467760,1,sephora_page,https://www.sephora.com/product/dior-rouge-dior-lipstick-P467760,/images/products/P467760.webp,DIOR,Rouge Dior Refillable Lipstick,1.000,verified,2026-11-06T12:29:11+00:00
+P04546871,,,,,,,,not_found,2026-11-06T12:29:18+00:00
+P379509,,,,,,,,not_found,2026-11-06T12:29:24+00:00
+P402036,,,,,,,,not_found,2026-11-06T12:29:32+00:00
+P163103,1,sephora_page,https://www.sephora.com/product/bright-crystal-P163103,/images/products/P163103.webp,Versace,Bright Crystal Eau de Toilette,0.850,verified,2026-11-06T12:29:41+00:00
+P04897543,1,sephora_page,https://www.sephora.com/product/pro-filtr-instant-retouch-primer-P04897543,/images/products/P04897543.webp,Fenty Beauty by Rihanna,Pro Filt'r Instant Retouch Primer,1.000,verified,2026-11-06T12:29:48+00:00
+P462699,1,sephora_page,https://www.sephora.com/product/glow-recipe-plum-plump-hyaluronic-acid-serum-P462699,/images/products/P462699.webp,Glow Recipe,Plum Plump™ Hyaluronic Acid Hydrating Serum,0.850,verified,2026-11-06T12:29:58+00:00
+P417936,1,sephora_page,https://www.sephora.com/product/rose-deep-hydration-facial-toner-P417936,/images/products/P417936.webp,fresh,Rose & Hyaluronic Acid Deep Hydration Toner,1.000,verified,2026-11-06T12:30:07+00:00
+P384059,1,sephora_page,https://www.sephora.com/product/brush-12-P384059,,Anastasia Beverly Hills,Dual-Ended Firm Angled Eyebrow Brush #12,0.308,rejected,2026-11-06T12:30:14+00:00
+P384059,,,,,,,,not_found,2026-11-06T12:30:14+00:00
+P423925,1,sephora_page,https://www.sephora.com/product/sugar-glow-kit-P423925,/images/products/P423925.webp,Anastasia Beverly Hills,Sugar Glow Kit® Powder Highlighters,0.850,verified,2026-11-06T12:30:26+00:00
+P479712,,,,,,,,not_found,2026-11-06T12:30:34+00:00
+P503714,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-under-eye-brightener-P503714,/images/products/P503714.webp,Rare Beauty by Selena Gomez,Positive Light Under Eye Brightener,1.000,verified,2026-11-06T12:30:42+00:00
+P448502,,,,,,,,not_found,2026-11-06T12:30:50+00:00
+P67339785,,,,,,,,not_found,2026-11-06T12:30:58+00:00
+P12790,1,sephora_page,https://www.sephora.com/product/bronzing-powder-P12790,/images/products/P12790.webp,NARS,Laguna Talc-Free Bronzer Powder,0.850,verified,2026-11-06T12:31:07+00:00
+P472072,1,sephora_page,https://www.sephora.com/product/sol-de-janeiro-brazilian-crush-cheriosa-40-hair-body-fragrance-mist-P472072,,Sol de Janeiro,Cheirosa 40 Hair & Body Perfume Mist,0.000,rejected,2026-11-06T12:31:15+00:00
+P472072,,,,,,,,not_found,2026-11-06T12:31:15+00:00
+P448102,1,sephora_page,https://www.sephora.com/product/libre-eau-de-parfum-P448102,/images/products/P448102.webp,Yves Saint Laurent,Libre Eau De Parfum with Orange Blossom & Lavender,0.850,verified,2026-11-06T12:31:22+00:00
+P398775,,,,,,,,not_found,2026-11-06T12:31:30+00:00
+P244437,1,sephora_page,https://www.sephora.com/product/eyelash-curler-P244437,/images/products/P244437.webp,Shiseido,Eyelash Curler,1.000,verified,2026-11-06T12:31:40+00:00
+P418804,,,,,,,,not_found,2026-11-06T12:31:47+00:00
+P462720,,,,,,,,not_found,2026-11-06T12:31:55+00:00
+P404916,1,sephora_page,https://www.sephora.com/product/soulfood-nourishing-hair-mask-P404916,/images/products/P404916.webp,amika,Soulfood Nourishing Hair Mask,1.000,verified,2026-11-06T12:32:05+00:00
+P423935,1,sephora_page,https://www.sephora.com/product/tartelette-toasted-eyeshadow-palette-P423935,,tarte,tartelette™ toasted Amazonian clay eyeshadow palette,0.600,rejected,2026-11-06T12:32:15+00:00
+P423935,,,,,,,,not_found,2026-11-06T12:32:15+00:00
+P394624,,,,,,,,not_found,2026-11-06T12:32:23+00:00
+P503679,1,sephora_page,https://www.sephora.com/product/makeup-by-mario-surreal-foundation-P503679,,MAKEUP BY MARIO,SurrealSkin® Luminous Hydrating Foundation,0.571,rejected,2026-11-06T12:32:30+00:00
+P503679,,,,,,,,not_found,2026-11-06T12:32:30+00:00
+P469856,,,,,,,,not_found,2026-11-06T12:32:36+00:00
+P386464,1,sephora_page,https://www.sephora.com/product/hairdresser-s-invisible-oil-primer-P386464,,Bumble and bumble,Hairdresser’s Invisible Oil Heat Protectant Leave In Conditioner Primer,0.000,rejected,2026-11-06T12:32:43+00:00
+P386464,,,,,,,,not_found,2026-11-06T12:32:43+00:00
+P183919,,,,,,,,not_found,2026-11-06T12:32:51+00:00
+P443833,1,sephora_page,https://www.sephora.com/product/salicylic-acid-acne-blackhead-cleanser-P443833,/images/products/P443833.webp,The INKEY List,Salicylic Acid Acne + Blackhead Cleanser,0.850,verified,2026-11-06T12:33:01+00:00
+P140906,,,,,,,,not_found,2026-11-06T12:33:07+00:00
+P11487778,,,,,,,,not_found,2026-11-06T12:33:16+00:00
+P467977,1,sephora_page,https://www.sephora.com/product/tarte-maracuja-juicy-lip-P467977,,tarte,maracuja juicy lip hydrating balm gloss,0.000,rejected,2026-11-06T12:33:23+00:00
+P467977,,,,,,,,not_found,2026-11-06T12:33:23+00:00
+P500637,,,,,,,,not_found,2026-11-06T12:33:29+00:00
+P2866,,,,,,,,not_found,2026-11-06T12:33:36+00:00
+P248404,1,sephora_page,https://www.sephora.com/product/face-cleanser-P248404,/images/products/P248404.webp,First Aid Beauty,Ultra Gentle Pure Skin Cream-to-Foam Face Cleanser with Colloidal Oatmeal + Glycerin,0.850,verified,2026-11-06T12:33:45+00:00
+P482262,1,sephora_page,https://www.sephora.com/product/dior-backstage-concealer-P482262,/images/products/P482262.webp,DIOR,Backstage Concealer,1.000,verified,2026-11-06T12:33:54+00:00
+P479327,1,sephora_page,https://www.sephora.com/product/glow-recipe-plum-plump-hyaluronic-acid-moisturizer-P479327,,Glow Recipe,Plum Plump Refillable Hyaluronic Acid Moisturizer,0.000,rejected,2026-11-06T12:34:02+00:00
+P479327,,,,,,,,not_found,2026-11-06T12:34:02+00:00
+P456392,,,,,,,,not_found,2026-11-06T12:34:08+00:00
+P446938,1,sephora_page,https://www.sephora.com/product/drunk-elephant-lala-retro-whipped-moisturizer-with-ceramides-P446938,/images/products/P446938.webp,Drunk Elephant,Lala Retro™ Nourishing Whipped Refillable Moisturizer with Ceramides,0.850,verified,2026-11-06T12:34:17+00:00
+P418507,1,sephora_page,https://www.sephora.com/product/scalp-revival-charcoal-coconut-oil-micro-exfoliating-shampoo-P418507,/images/products/P418507.webp,Briogeo,Scalp Revival Charcoal + Coconut Oil Micro-exfoliating Scalp Scrub Shampoo,1.000,verified,2026-11-06T12:34:27+00:00
+P395697,1,sephora_page,https://www.sephora.com/product/ambient-bronzer-P395697,/images/products/P395697.webp,Hourglass,Ambient® Lighting Bronzer,1.000,verified,2026-11-06T12:34:35+00:00
+P256308,1,sephora_page,https://www.sephora.com/product/chloe-eau-de-parfum-P256308,/images/products/P256308.webp,Chloé,Chloé Eau de Parfum with Rose & Amber,0.850,verified,2026-11-06T12:34:44+00:00
+P446930,,,,,,,,not_found,2026-11-06T12:34:50+00:00
+P480286,1,sephora_page,https://www.sephora.com/product/charlotte-tilbury-beautiful-skin-medium-coverage-liquid-foundation-with-hyaluronic-acid-P480286,/images/products/P480286.webp,Charlotte Tilbury,Beautiful Skin Medium Coverage Liquid Foundation with Hyaluronic Acid,1.000,verified,2026-11-06T12:35:01+00:00
+P392235,1,sephora_page,https://www.sephora.com/product/pure-one-step-camellia-cleansing-oil-P392235,/images/products/P392235.webp,Tatcha,The Camellia Oil 2-in-1 Makeup Remover & Cleanser with Skin Barrier Protection,0.850,verified,2026-11-06T12:35:08+00:00
+P191858,1,sephora_page,https://www.sephora.com/product/daisy-P191858?om_mmc=aff-linkshare-redirect-kXQk6*ivFEQ&c3ch=Linkshare&c3nid=kXQk6*ivFEQ&affid=kXQk6.ivFEQ-KybOzHQREiQ0YZl3FTFuWQ&ranEAID=kXQk6*ivFEQ&ranMID=2417&ranSiteID=kXQk6.ivFEQ-KybOzHQREiQ0YZl3FTFuWQ&ranLinkID=10-1&browserdefault=true,,Marc Jacobs Beauty,Daisy Eau de Toilette with White Florals & Sandalwood,0.000,rejected,2026-11-06T12:35:15+00:00
+P191858,,,,,,,,not_found,2026-11-06T12:35:15+00:00
+P442821,1,sephora_page,https://www.sephora.com/product/glowmotions-P442821,/images/products/P442821.webp,Sol de Janeiro,Glowmotions Glow Body Oil,1.000,verified,2026-11-06T12:35:25+00:00
+P483662,1,sephora_page,https://www.sephora.com/product/hourglass-phantom-volumizing-glossy-balm-P483662,/images/products/P483662.webp,Hourglass,Phantom Volumizing Glossy Lip Balm,0.889,verified,2026-11-06T12:35:35+00:00
+P439941,1,sephora_page,https://www.sephora.com/product/forever-skin-glow-liquid-foundation-24-hour-wear-P520267,,DIOR,Forever Skin Glow Liquid Foundation 24HR Wear with SPF 25,0.000,rejected,2026-11-06T12:35:45+00:00
+P439941,,,,,,,,not_found,2026-11-06T12:35:45+00:00
+P12045,1,sephora_page,https://www.sephora.com/product/grape-water-P12045,/images/products/P12045.webp,Caudalie,Grape Water Moisturizing Face Mist,1.000,verified,2026-11-06T12:35:55+00:00
+P440102,,,,,,,,not_found,2026-11-06T12:36:03+00:00
+P470259,,,,,,,,not_found,2026-11-06T12:36:10+00:00
+P467449,,,,,,,,not_found,2026-11-06T12:36:16+00:00
+P481396,1,sephora_page,https://www.sephora.com/product/kosas-revealer-skin-improving-foundation-spf25-with-hyaluronic-acid-niacinamide-P481396,/images/products/P481396.webp,Kosas,Revealer Skin-Improving Foundation SPF 25 with Hyaluronic Acid and Niacinamide,1.000,verified,2026-11-06T12:36:27+00:00
+P459144,1,sephora_page,https://www.sephora.com/product/charlotte-tilbury-airbrush-flawless-bronzer-P459144,,Charlotte Tilbury,Refillable Airbrush Matte Bronzer,0.000,rejected,2026-11-06T12:36:36+00:00
+P459144,,,,,,,,not_found,2026-11-06T12:36:36+00:00
+P408218,1,sephora_page,https://www.sephora.com/product/goof-proof-brow-pencil-P408218,/images/products/P408218.webp,Benefit Cosmetics,Goof Proof Waterproof Easy Shape & Fill Eyebrow Pencil,1.000,verified,2026-11-06T12:36:44+00:00
+P467038,1,sephora_page,https://www.sephora.com/product/peace-out-retinol-eye-stick-P467038,/images/products/P467038.webp,Peace Out,Retinol Eye Treatment Jelly Stick For Fine Lines & Wrinkles,0.850,verified,2026-11-06T12:36:53+00:00
+P402944,1,sephora_page,https://www.sephora.com/product/silk-pillowcase-standard-queen-P402944,/images/products/P402944.webp,Slip,Silk Pillowcase - Standard/Queen,1.000,verified,2026-11-06T12:37:01+00:00
+P468210,1,sephora_page,https://www.sephora.com/product/saie-slip-tint-dewy-tinted-moisturizer-spf-35-sunscreen-P468210,,Saie,Slip Tint™ Lightweight Tinted Moisturizer with Mineral Zinc SPF 35 and Hyaluronic Acid,0.000,rejected,2026-11-06T12:37:10+00:00
+P468210,,,,,,,,not_found,2026-11-06T12:37:10+00:00
+P433005,1,sephora_page,https://www.sephora.com/product/sephora-colorful-blush-P433005,,SEPHORA COLLECTION,Sephora Colorful® Blush,0.545,rejected,2026-11-06T12:37:16+00:00
+P433005,,,,,,,,not_found,2026-11-06T12:37:16+00:00
+P433206,1,sephora_page,https://www.sephora.com/product/creaseless-concealer-P433206,/images/products/P433206.webp,tarte,maracuja creaseless full coverage radiant undereye concealer,0.850,verified,2026-11-06T12:37:27+00:00
+P419107,,,,,,,,not_found,2026-11-06T12:37:34+00:00
+P411862,1,sephora_page,https://www.sephora.com/product/brazilian-4-play-moisturizing-shower-cream-gel-P411862,,Sol de Janeiro,Brazilian Play Moisturizing Shower Cream-Gel,0.000,rejected,2026-11-06T12:37:41+00:00
+P411862,,,,,,,,not_found,2026-11-06T12:37:41+00:00
+P98364786,1,sephora_page,https://www.sephora.com/product/makeup-by-mario-master-mattes-tm-eyeshadow-palette-P98364786,/images/products/P98364786.webp,MAKEUP BY MARIO,Master Mattes® Eyeshadow Palette: The Original,0.889,verified,2026-11-06T12:37:49+00:00
+P387426,,,,,,,,not_found,2026-11-06T12:37:55+00:00
+P468694,1,sephora_page,https://www.sephora.com/product/merit-the-minimalist-perfecting-complexion-foundation-concealer-stick-P468694,/images/products/P468694.webp,MERIT,The Minimalist Perfecting Complexion Foundation and Concealer Stick,1.000,verified,2026-11-06T12:38:04+00:00
+P218700,,,,,,,,not_found,2026-11-06T12:38:11+00:00
+P411388,1,sephora_page,https://www.sephora.com/product/kale-spinach-hyaluronic-acid-age-prevention-cream-P411388,/images/products/P411388.webp,Youth To The People,Superfood Air-Whip Hydrating Face Moisturizer with Hyaluronic Acid,0.850,verified,2026-11-06T12:38:20+00:00
+P173726,1,sephora_page,https://www.sephora.com/product/super-soft-100-natural-facial-cotton-P173726,/images/products/P173726.webp,Shiseido,"Super-Soft, 100% Natural Facial Cotton",0.850,verified,2026-11-06T12:38:29+00:00
+P410743,,,,,,,,not_found,2026-11-06T12:38:36+00:00
+P421243,,,,,,,,not_found,2026-11-06T12:38:43+00:00
+P377755,,,,,,,,not_found,2026-11-06T12:38:50+00:00
+P427410,1,sephora_page,https://www.sephora.com/product/the-ordinary-deciem-vitamin-c-suspension-23-ha-spheres-2-P427410,,The Ordinary,Vitamin C Suspension 23% + HA Spheres 2% Serum with Pure L-Ascorbic Acid,0.000,rejected,2026-11-06T12:38:56+00:00
+P427410,,,,,,,,not_found,2026-11-06T12:38:56+00:00
+P484039,1,sephora_page,https://www.sephora.com/product/danessa-myricks-beauty-yummy-skin-blurring-balm-powder-P484039,,Danessa Myricks Beauty,Yummy Skin Blurring Balm Powder - Tinted Primer & Foundation ,0.000,rejected,2026-11-06T12:39:03+00:00
+P484039,,,,,,,,not_found,2026-11-06T12:39:03+00:00
+P463036,1,sephora_page,https://www.sephora.com/product/farmacy-honey-halo-ultra-hydrating-ceramide-moisturizer-P463036,/images/products/P463036.webp,Farmacy,Honey Halo Ultra-Hydrating Ceramide Moisturizer,1.000,verified,2026-11-06T12:39:13+00:00
+P31870457,,,,,,,,not_found,2026-11-06T12:39:21+00:00
+P504525,,,,,,,,not_found,2026-11-06T12:39:28+00:00
+P477838,1,sephora_page,https://www.sephora.com/product/makeup-by-mario-ultra-suede-sculpting-lip-pencil-P477838,/images/products/P477838.webp,MAKEUP BY MARIO,Ultra Suede® Sculpting Lip Pencil,1.000,verified,2026-11-06T12:39:38+00:00
+P277222,,,,,,,,not_found,2026-11-06T12:39:44+00:00
+P12420,,,,,,,,not_found,2026-11-06T12:39:52+00:00
+P429903,,,,,,,,not_found,2026-11-06T12:39:58+00:00
+P439058,,,,,,,,not_found,2026-11-06T12:40:04+00:00
+P457223,1,sephora_page,https://www.sephora.com/product/ouai-haircare-detox-shampoo-P457223,/images/products/P457223.webp,OUAI,Detox Clarifying Shampoo with Apple Cider Vinegar,0.850,verified,2026-11-06T12:40:13+00:00
+P270539,1,sephora_page,https://www.sephora.com/product/long-wear-gel-eyeliner-P270539,/images/products/P270539.webp,Bobbi Brown,Long-Wear Waterproof Gel Eyeliner,0.889,verified,2026-11-06T12:40:23+00:00
+P456446,1,sephora_page,https://www.sephora.com/product/tatcha-the-liquid-silk-canvas-featherweight-protective-primer-P456446,/images/products/P456446.webp,Tatcha,The Liquid Silk Canvas: Featherweight Protective Primer,1.000,verified,2026-11-06T12:40:30+00:00
+P421456,1,sephora_page,https://www.sephora.com/product/all-hours-full-coverage-matte-foundation-P421456,/images/products/P421456.webp,Yves Saint Laurent,All Hours Luminous Natural Matte Foundation 24H Longwear SPF 30 with Hyaluronic Acid,0.957,verified,2026-11-06T12:40:38+00:00
+P402718,1,sephora_page,https://www.sephora.com/product/power-couple-lactic-acid-retinol-kit-P402718,/images/products/P402718.webp,Sunday Riley,Power Couple Advanced Retinol and Lactic Acid Duo,1.000,verified,2026-11-06T12:40:49+00:00
+P455364,,,,,,,,not_found,2026-11-06T12:40:56+00:00
+P420533,1,sephora_page,https://www.sephora.com/product/good-girl-P420533,/images/products/P420533.webp,Carolina Herrera,Good Girl Eau de Parfum with Jasmine,0.909,verified,2026-11-06T12:41:06+00:00
+P278317,1,sephora_page,https://www.sephora.com/product/facial-radiance-pads-P278317,/images/products/P278317.webp,First Aid Beauty,Brighten + Glow Facial Radiance Pads with Glycolic + Lactic Acids,0.850,verified,2026-11-06T12:41:17+00:00
+P438619,,,,,,,,not_found,2026-11-06T12:41:23+00:00
+P472324,,,,,,,,not_found,2026-11-06T12:41:31+00:00
+P433987,,,,,,,,not_found,2026-11-06T12:41:38+00:00
+P400207,,,,,,,,not_found,2026-11-06T12:41:47+00:00
+P399330,1,sephora_page,https://www.sephora.com/product/perfect-hair-day-phd-dry-shampoo-P399330,/images/products/P399330.webp,Living Proof,Perfect hair Day (PhD) Dry Shampoo,1.000,verified,2026-11-06T12:41:55+00:00
+P420166,,,,,,,,not_found,2026-11-06T12:42:01+00:00
+P12336,1,sephora_page,https://www.sephora.com/product/rose-face-mask-P12336,/images/products/P12336.webp,fresh,Rose Face Mask,1.000,verified,2026-11-06T12:42:11+00:00
+P302103,1,sephora_page,https://www.sephora.com/product/sugar-advanced-therapy-lip-treatment-P302103,/images/products/P302103.webp,fresh,Sugar Advanced Therapy Treatment Lip Balm,0.850,verified,2026-11-06T12:42:21+00:00
+P468175,1,sephora_page,https://www.sephora.com/product/lawless-forget-filler-lip-plumping-line-smoothing-gloss-P468175,/images/products/P468175.webp,LAWLESS,Forget The Filler Lip Plumper Line Smoothing Gloss,1.000,verified,2026-11-06T12:42:29+00:00
+P429515,1,sephora_page,https://www.sephora.com/product/c-tango-multivitamin-eye-cream-P429515,/images/products/P429515.webp,Drunk Elephant,C-Tango™ Vitamin C Eye Cream,0.850,verified,2026-11-06T12:42:37+00:00
+P399992,1,sephora_page,https://www.sephora.com/product/verb-ghost-weightless-hair-oil-P399992,,Verb,Ghost™ Weightless Hair Oil to Smooth Frizz and Enhance Shine,0.000,rejected,2026-11-06T12:42:45+00:00
+P399992,,,,,,,,not_found,2026-11-06T12:42:45+00:00
+P433811,1,sephora_page,https://www.sephora.com/product/scattered-light-glitter-eye-shadow-P433811,,Hourglass,Scattered Light Glitter Eyeshadow,0.000,rejected,2026-11-06T12:42:54+00:00
+P433811,,,,,,,,not_found,2026-11-06T12:42:54+00:00
+P12573,1,sephora_page,https://www.sephora.com/product/intense-therapy-lip-balm-spf-25-P12573,/images/products/P12573.webp,Jack Black,Intense Therapy Lip Balm SPF 25,1.000,verified,2026-11-06T12:43:02+00:00
+P410400,,,,,,,,not_found,2026-11-06T12:43:08+00:00
+P17484987,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-liquid-touch-concealer-brush-P17484987,/images/products/P17484987.webp,Rare Beauty by Selena Gomez,Liquid Touch Concealer Brush,1.000,verified,2026-11-06T12:43:18+00:00
+P472977,,,,,,,,not_found,2026-11-06T12:43:26+00:00
+P430240,1,sephora_page,https://www.sephora.com/product/veil-translucent-setting-powder-P430240,/images/products/P430240.webp,Hourglass,Veil™ Translucent Setting Powder - Talc Free,0.850,verified,2026-11-06T12:43:34+00:00
+P447519,1,sephora_page,https://www.sephora.com/product/skin-fetish-sublime-perfection-foundation-P447519,/images/products/P447519.webp,PAT McGRATH LABS,Skin Fetish: Sublime Perfection Weightless Foundation,0.850,verified,2026-11-06T12:43:43+00:00
+P481403,1,sephora_page,https://www.sephora.com/product/merit-signature-lip-lightweight-lipstick-P481403,/images/products/P481403.webp,MERIT,Signature Lip Lightweight Lipstick,1.000,verified,2026-11-06T12:43:52+00:00
+P467140,,,,,,,,not_found,2026-11-06T12:44:00+00:00
+P441644,1,sephora_page,https://www.sephora.com/product/superfood-antioxidant-cleanser-mini-P441644,,Youth To The People,Mini Superfood Hydrating Gentle Antioxidant Refillable Cleanser,0.000,rejected,2026-11-06T12:44:09+00:00
+P441644,,,,,,,,not_found,2026-11-06T12:44:09+00:00
+P440700,1,sephora_page,https://www.sephora.com/product/gimme-brow-volumizing-eyebrow-gel-mini-P440700,/images/products/P440700.webp,Benefit Cosmetics,Mini Gimme Brow+ Tinted Volumizing Eyebrow Gel,1.000,verified,2026-11-06T12:44:21+00:00
+P444718,1,sephora_page,https://www.sephora.com/product/the-ordinary-squalane-cleanser-P444718,/images/products/P444718.webp,The Ordinary,Squalane Cleanser Hydrating Makeup Remover,0.850,verified,2026-11-06T12:44:30+00:00
+P377542,1,sephora_page,https://www.sephora.com/product/bb-tinted-treatment-12-hour-primer-broad-spectrum-spf-30-sunscreen-P377542,/images/products/P377542.webp,tarte,BB blur natural matte tinted moisturizer Broad Spectrum SPF 30 Sunscreen,0.900,verified,2026-11-06T12:44:39+00:00
+P425608,1,sephora_page,https://www.sephora.com/product/better-than-sex-mini-P425608,/images/products/P425608.webp,Too Faced,Mini Better Than Sex Volumizing & Lengthening Mascara,1.000,verified,2026-11-06T12:44:49+00:00
+P377533,1,sephora_page,https://www.sephora.com/product/alpha-beta-universal-daily-peel-P377533,/images/products/P377533.webp,Dr. Dennis Gross Skincare,"Alpha Beta® Universal Daily AHA/BHA Exfoliating Peel Pads for Pores, Fine Lines & Texture",0.850,verified,2026-11-06T12:44:59+00:00
+P428222,1,sephora_page,https://www.sephora.com/product/leave-in-conditioner-P428222,/images/products/P428222.webp,OUAI,"North Bondi Conditioning, Detangling, and Frizz Fighting Leave-in Conditioner",0.850,verified,2026-11-06T12:45:09+00:00
+P468206,1,sephora_page,https://www.sephora.com/product/saie-glowy-super-gel-lightweight-dewy-highlighter-P468206,,Saie,Glowy Super™ Gel Lightweight Multipurpose Illuminator & Liquid Highlighter,0.571,rejected,2026-11-06T12:45:16+00:00
+P468206,,,,,,,,not_found,2026-11-06T12:45:16+00:00
+P442744,1,sephora_page,https://www.sephora.com/product/watermelon-glow-ultra-fine-mist-P442744,/images/products/P442744.webp,Glow Recipe,Watermelon Glow Ultra-Fine Mist,1.000,verified,2026-11-06T12:45:25+00:00
+P404758,1,sephora_page,https://www.sephora.com/product/replica-by-fireplace-P404758,/images/products/P404758.webp,Maison Margiela,'REPLICA' By the Fireplace Eau de Toilette with Chestnut,0.850,verified,2026-11-06T12:45:33+00:00
+P151107,,,,,,,,not_found,2026-11-06T12:45:41+00:00
+P500307,1,sephora_page,https://www.sephora.com/product/cherry-treat-conditioning-lip-oil-P500307,,Fenty Beauty by Rihanna,Fenty Treatz Hydrating + Strengthening Lip Oil,0.000,rejected,2026-11-06T12:45:48+00:00
+P500307,,,,,,,,not_found,2026-11-06T12:45:48+00:00
+P425607,,,,,,,,not_found,2026-11-06T12:45:55+00:00
+P437631,1,sephora_page,https://www.sephora.com/product/her-eau-de-parfum-P437631,/images/products/P437631.webp,BURBERRY,"Her Eau de Parfum with Berries, Amber and Musk",0.850,verified,2026-11-06T12:46:03+00:00
+P457508,,,,,,,,not_found,2026-11-06T12:46:10+00:00
+P415747,1,sephora_page,https://www.sephora.com/product/brazilian-kiss-cupua-u-lip-butter-P415747,/images/products/P415747.webp,Sol de Janeiro,Brazilian Kiss Cupuaçu Lip Butter,1.000,verified,2026-11-06T12:46:18+00:00
+P457430,,,,,,,,not_found,2026-11-06T12:46:24+00:00
+P482535,1,sephora_page,https://www.sephora.com/product/glow-recipe-strawberry-smooth-bha-aha-salicylic-acid-serum-P482535,/images/products/P482535.webp,Glow Recipe,Strawberry Smooth BHA + AHA Salicylic Acid Serum,1.000,verified,2026-11-06T12:46:33+00:00
+P443790,,,,,,,,not_found,2026-11-06T12:46:41+00:00
+P470257,1,sephora_page,https://www.sephora.com/product/yves-saint-laurent-mini-black-opium-libre-eau-de-parfum-duo-P470257,/images/products/P470257.webp,Yves Saint Laurent,Mini Black Opium & Libre Eau de Parfum Set,1.000,verified,2026-11-06T12:46:48+00:00
+P61004,1,sephora_page,https://www.sephora.com/product/mineral-veil-P61004,/images/products/P61004.webp,bareMinerals,Original Mineral Veil Talc-Free Loose Setting Powder,0.857,verified,2026-11-06T12:46:57+00:00
+P463071,1,sephora_page,https://www.sephora.com/product/milk-makeup-hydro-grip-set-refresh-spray-P463071,,MILK MAKEUP,Hydro Grip 12HR Dewy Setting Spray With Hyaluronic Acid + Niacinamide,0.571,rejected,2026-11-06T12:47:05+00:00
+P463071,,,,,,,,not_found,2026-11-06T12:47:05+00:00
+P430718,,,,,,,,not_found,2026-11-06T12:47:12+00:00
+P472161,,,,,,,,not_found,2026-11-06T12:47:18+00:00
+P475599,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-perfect-strokes-universal-volumizing-mascara-P475599,/images/products/P475599.webp,Rare Beauty by Selena Gomez,Perfect Strokes Universal Volumizing Mascara,1.000,verified,2026-11-06T12:47:29+00:00
+P456596,,,,,,,,not_found,2026-11-06T12:47:37+00:00
+P459727,1,sephora_page,https://www.sephora.com/product/necessaire-the-body-wash-eucalyptus-nourishing-treatment-cleanse-with-lipid-rich-oils-niacinamide-P459727,,Nécessaire,The Body Wash Eucalyptus - Nourishing Treatment Cleanse With Lipid-Rich Oils + Niacinamide,0.375,rejected,2026-11-06T12:47:43+00:00
+P459727,,,,,,,,not_found,2026-11-06T12:47:43+00:00
+P483156,1,sephora_page,https://www.sephora.com/product/sol-de-janeiro-beija-flor-body-hair-mist-P483156,,Sol de Janeiro,Cheirosa 68 Beija Flor Hair & Body Perfume Mist,0.000,rejected,2026-11-06T12:47:50+00:00
+P483156,,,,,,,,not_found,2026-11-06T12:47:50+00:00
+P128706,1,sephora_page,https://www.sephora.com/product/cils-booster-xl-super-enhancing-mascara-base-P128706,/images/products/P128706.webp,Lancôme,Cils Booster XL Super-Enhancing Mascara Primer,1.000,verified,2026-11-06T12:47:58+00:00
+P451920,1,sephora_page,https://www.sephora.com/product/lip-oil-P451920,/images/products/P451920.webp,Kosas,Wet Lip Oil Plumping Peptide Lip Treatment Gloss,0.923,verified,2026-11-06T12:48:07+00:00
+P261211,1,sephora_page,https://www.sephora.com/product/pro-prime-smudge-proof-eyeshadow-base-P261211,/images/products/P261211.webp,NARS,Pro-Prime™ Smudge Proof Eyeshadow Base,0.850,verified,2026-11-06T12:48:15+00:00
+P270555,1,sephora_page,https://www.sephora.com/product/corrector-P270555,,Bobbi Brown,Waterproof Color Corrector Cream,0.286,rejected,2026-11-06T12:48:22+00:00
+P270555,,,,,,,,not_found,2026-11-06T12:48:22+00:00
+P442594,,,,,,,,not_found,2026-11-06T12:48:29+00:00
+P415771,1,sephora_page,https://www.sephora.com/product/the-essence-plumping-skin-softener-P415771,/images/products/P415771.webp,Tatcha,The Essence Skincare Boosting Treatment,1.000,verified,2026-11-06T12:48:37+00:00
+P426836,1,sephora_page,https://www.sephora.com/product/beste-no-9-jelly-cleanser-P426836,/images/products/P426836.webp,Drunk Elephant,Beste™ No. 9 Jelly Cleanser,0.850,verified,2026-11-06T12:48:48+00:00
+P55849781,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-always-an-optimist-4-in-1-prime-set-mist-P55849781,/images/products/P55849781.webp,Rare Beauty by Selena Gomez,Always An Optimist 4-in-1 Prime & Set Mist,1.000,verified,2026-11-06T12:48:56+00:00
+P429548,1,sephora_page,https://www.sephora.com/product/true-skin-serum-foundation-P429548,/images/products/P429548.webp,ILIA,True Skin Medium Coverage Serum Foundation with Niacinamide,1.000,verified,2026-11-06T12:49:06+00:00
+P433527,,,,,,,,not_found,2026-11-06T12:49:13+00:00
+P393325,1,sephora_page,https://www.sephora.com/product/beyond-perfecting-foundation-concealer-P393325,/images/products/P393325.webp,CLINIQUE,Beyond Perfecting Foundation + Concealer,1.000,verified,2026-11-06T12:49:21+00:00
+P470529,1,sephora_page,https://www.sephora.com/product/glow-recipe-avocado-ceramide-redness-relieft-serum-P470529,/images/products/P470529.webp,Glow Recipe,Avocado Soothing Skin Barrier Serum with Ceramides,1.000,verified,2026-11-06T12:49:28+00:00
+P444149,,,,,,,,not_found,2026-11-06T12:49:35+00:00
+P471242,1,sephora_page,https://www.sephora.com/product/huda-beauty-mini-easy-bake-loose-baking-setting-powder-P471242,/images/products/P471242.webp,HUDA BEAUTY,Mini Easy Bake Loose Baking & Setting Powder,1.000,verified,2026-11-06T12:49:43+00:00
+P422002,,,,,,,,not_found,2026-11-06T12:49:50+00:00
+P111902,1,sephora_page,https://www.sephora.com/product/lights-camera-lashes-P111902,/images/products/P111902.webp,tarte,"lights, camera, lashes™ 4-in-1 volumizing mascara",0.850,verified,2026-11-06T12:49:58+00:00
+P466829,,,,,,,,not_found,2026-11-06T12:50:06+00:00
+P441884,,,,,,,,not_found,2026-11-06T12:50:14+00:00
+P375849,1,sephora_page,https://www.sephora.com/product/facial-treatment-essence-P375849,/images/products/P375849.webp,SK-II,Facial Treatment Essence,0.857,verified,2026-11-06T12:50:22+00:00
+P500061,1,sephora_page,https://www.sephora.com/product/fenty-poutsicle-hydrating-lip-stain-P500061,/images/products/P500061.webp,Fenty Beauty by Rihanna,Poutsicle Hydrating Lip Stain,1.000,verified,2026-11-06T12:50:33+00:00
+P433520,,,,,,,,not_found,2026-11-06T12:50:40+00:00
+P454751,1,sephora_page,https://www.sephora.com/product/anastasia-beverly-hills-clear-brow-gel-mini-P454751,/images/products/P454751.webp,Anastasia Beverly Hills,Mini Clear Brow Gel Flexible Medium-Hold Eyebrow Setter,0.850,verified,2026-11-06T12:50:48+00:00
+P398001,,,,,,,,not_found,2026-11-06T12:50:56+00:00
+P467762,1,sephora_page,https://www.sephora.com/product/glow-recipe-mini-watermelon-glow-pha-bha-pore-tight-toner-P467762,/images/products/P467762.webp,Glow Recipe,Mini Watermelon Glow PHA + BHA Pore-Tight Toner,1.000,verified,2026-11-06T12:51:03+00:00
+P385477,1,sephora_page,https://www.sephora.com/product/miss-dior-blooming-bouquet-P385477,/images/products/P385477.webp,DIOR,Miss Dior Blooming Bouquet,1.000,verified,2026-11-06T12:51:11+00:00
+P471049,1,sephora_page,https://www.sephora.com/product/kosas-air-brow-tinted-clean-volumizing-eyebrow-gel-P471049,/images/products/P471049.webp,Kosas,Air Brow Tinted Clean Volumizing Eyebrow Gel,1.000,verified,2026-11-06T12:51:21+00:00
+P500452,1,sephora_page,https://www.sephora.com/product/softsculpt-transforming-skin-enhancer-P500452,/images/products/P500452.webp,MAKEUP BY MARIO,SoftSculpt Transforming Skin Enhancer®,1.000,verified,2026-11-06T12:51:28+00:00
+P471059,1,sephora_page,https://www.sephora.com/product/patrick-ta-major-sculpt-creme-contour-powder-bronzer-duo-P471059,/images/products/P471059.webp,PATRICK TA,Major Sculpt Crème Contour & Powder Bronzer Duo,1.000,verified,2026-11-06T12:51:38+00:00
+P443352,1,sephora_page,https://www.sephora.com/product/mini-daily-microfoliant-exfoliator-P443352,/images/products/P443352.webp,Dermalogica,Mini Daily Microfoliant Exfoliator,1.000,verified,2026-11-06T12:51:48+00:00
+P436506,,,,,,,,not_found,2026-11-06T12:51:55+00:00
+P426850,,,,,,,,not_found,2026-11-06T12:52:02+00:00
+P456953,1,sephora_page,https://www.sephora.com/product/fable-and-mane-holiroots-trade-hair-treatment-oil-P456953,/images/products/P456953.webp,Fable & Mane,HoliRoots™ Pre-Wash Scalp & Hair Treatment Oil,0.850,verified,2026-11-06T12:52:13+00:00
+P479732,1,sephora_page,https://www.sephora.com/product/the-ordinary-salicylic-acid-2-anhydrous-solution-pore-clearing-serum-P479732,/images/products/P479732.webp,The Ordinary,"Salicylic Acid 2% Anhydrous Solution, Gentle Exfoliating Serum for Blemishes",0.850,verified,2026-11-06T12:52:21+00:00
+P430146,1,sephora_page,https://www.sephora.com/product/superberry-hydrate-glow-oil-P430146,/images/products/P430146.webp,Youth To The People,Superberry Hydrate + Glow Dream Oil with Squalane and Antioxidants,0.850,verified,2026-11-06T12:52:32+00:00
+P481968,1,sephora_page,https://www.sephora.com/product/danessa-myricks-beauty-infinite-chrome-flakes-multichrome-gel-for-eyes-face-P481968,/images/products/P481968.webp,Danessa Myricks Beauty,Infinite Chrome Flakes Multichrome Gel for Eyes & Face,1.000,verified,2026-11-06T12:52:42+00:00
+P393281,1,sephora_page,https://www.sephora.com/product/perk-up-dry-shampoo-P393281,/images/products/P393281.webp,amika,Perk Up Talc-Free Dry Shampoo,1.000,verified,2026-11-06T12:52:50+00:00
+P482745,1,sephora_page,https://www.sephora.com/product/sol-de-janeiro-mini-beija-flor-body-hair-mist-P482745,,Sol de Janeiro,Cheirosa 68 Beija Flor Hair & Body Perfume Mist,0.000,rejected,2026-11-06T12:52:57+00:00
+P482745,,,,,,,,not_found,2026-11-06T12:52:57+00:00
+P446609,1,sephora_page,https://www.sephora.com/product/hot-lips-lipstick-2-0-P446609,/images/products/P446609.webp,Charlotte Tilbury,Hot Lips Lipstick 2,1.000,verified,2026-11-06T12:53:07+00:00
+P202625,1,sephora_page,https://www.sephora.com/product/shadow-insurance-P202625,/images/products/P202625.webp,Too Faced,Shadow Insurance 24-Hour Eyeshadow Primer,1.000,verified,2026-11-06T12:53:17+00:00
+P139005,,,,,,,,not_found,2026-11-06T12:53:26+00:00
+P450511,,,,,,,,not_found,2026-11-06T12:53:33+00:00
+P461188,,,,,,,,not_found,2026-11-06T12:53:42+00:00
+P442830,1,sephora_page,https://www.sephora.com/product/100-plant-derived-squalane-P442830,/images/products/P442830.webp,The Ordinary,100% Plant-Derived Squalane for Skin and Hair Hydration,0.850,verified,2026-11-06T12:53:49+00:00
+P442304,,,,,,,,not_found,2026-11-06T12:53:57+00:00
+P500283,1,sephora_page,https://www.sephora.com/product/phd-hybrid-lip-oil-P500283,/images/products/P500283.webp,Haus Labs,PhD Hybrid Hydrating Tinted Lip Oil,0.850,verified,2026-11-06T12:54:05+00:00
+P427517,1,sephora_page,https://www.sephora.com/product/bad-gal-bang-mascara-P427517,/images/products/P427517.webp,Benefit Cosmetics,BADgal BANG! Volumizing 36-Hour Longwear Mascara,0.850,verified,2026-11-06T12:54:16+00:00
+P287700,,,,,,,,not_found,2026-11-06T12:54:25+00:00
+P439406,1,sephora_page,https://www.sephora.com/product/kayali-vanilla-P439406,,KAYALI,VANILLA | 28 Eau de Parfum,0.000,rejected,2026-11-06T12:54:33+00:00
+P439406,,,,,,,,not_found,2026-11-06T12:54:33+00:00
+P381155,,,,,,,,not_found,2026-11-06T12:54:41+00:00
+P404795,,,,,,,,not_found,2026-11-06T12:54:49+00:00
+P447364,1,sephora_page,https://www.sephora.com/product/mini-creaseless-under-eye-concealer-P447364,/images/products/P447364.webp,tarte,mini maracuja creaseless full coverage radiant undereye concealer,0.850,verified,2026-11-06T12:54:57+00:00
+P407908,1,sephora_page,https://www.sephora.com/product/better-than-sex-waterproof-mascara-P407908,/images/products/P407908.webp,Too Faced,Better Than Sex Volumizing & Lengthening Waterproof Mascara,1.000,verified,2026-11-06T12:55:08+00:00
+P469953,,,,,,,,not_found,2026-11-06T12:55:15+00:00
+P439943,,,,,,,,not_found,2026-11-06T12:55:21+00:00
+P472997,1,sephora_page,https://www.sephora.com/product/saie-sun-melt-natural-cream-bronzer-P472997,/images/products/P472997.webp,Saie,Sun Melt Natural Cream Bronzer,1.000,verified,2026-11-06T12:55:31+00:00
+P475543,1,sephora_page,https://www.sephora.com/product/glow-recipe-guava-vitamin-c-dark-spot-treatment-serum-P475543,/images/products/P475543.webp,Glow Recipe,Guava Vitamin C Dark Spot Brightening Treatment Serum,0.933,verified,2026-11-06T12:55:41+00:00
+P442754,,,,,,,,not_found,2026-11-06T12:55:48+00:00
+P442758,1,sephora_page,https://www.sephora.com/product/mandelic-acid-10-ha-P442758,,The Ordinary,Mandelic Acid 10% + HA Gentle Facial Exfoliating Serum for Hydration,0.000,rejected,2026-11-06T12:55:59+00:00
+P442758,,,,,,,,not_found,2026-11-06T12:55:59+00:00
+P406922,1,sephora_page,https://www.sephora.com/product/hair-oil-P406922,/images/products/P406922.webp,OUAI,Lightweight Heat-Protecting Hair Oil for Frizz Control,0.850,verified,2026-11-06T12:56:09+00:00
+P69517,1,sephora_page,https://www.sephora.com/product/brush-7b-P69517,,Anastasia Beverly Hills,Dual-Ended Angled Powder Eyebrow Brush 7B,0.333,rejected,2026-11-06T12:56:18+00:00
+P69517,,,,,,,,not_found,2026-11-06T12:56:18+00:00
+P430337,,,,,,,,not_found,2026-11-06T12:56:24+00:00
+P34908923,,,,,,,,not_found,2026-11-06T12:56:30+00:00
+P468658,1,sephora_page,https://www.sephora.com/product/innisfree-pore-clearing-clay-mask-P468658,,innisfree,Korean Super Volcanic Pore Detoxing Clay Mask for Oil Control ​,0.533,rejected,2026-11-06T12:56:38+00:00
+P468658,,,,,,,,not_found,2026-11-06T12:56:38+00:00
+P455201,1,sephora_page,https://www.sephora.com/product/too-faced-born-this-way-natural-nudes-eyeshadow-palette-P455201,/images/products/P455201.webp,Too Faced,Born This Way The Natural Nudes Eyeshadow Palette,1.000,verified,2026-11-06T12:56:45+00:00
+P432829,,,,,,,,not_found,2026-11-06T12:56:53+00:00
+P279113,,,,,,,,not_found,2026-11-06T12:57:00+00:00
+P435832,,,,,,,,not_found,2026-11-06T12:57:08+00:00
+P474377,1,sephora_page,https://www.sephora.com/product/tatcha-indigo-overnight-repair-P474377,,Tatcha,Indigo Overnight Repair Redness Reducing Barrier Cream Moisturizer,0.000,rejected,2026-11-06T12:57:14+00:00
+P474377,,,,,,,,not_found,2026-11-06T12:57:14+00:00
+P469488,,,,,,,,not_found,2026-11-06T12:57:22+00:00
+P469065,1,sephora_page,https://www.sephora.com/product/color-wow-dream-coat-supernatural-treatment-spray-for-frizzy-hair-P469065,/images/products/P469065.webp,COLOR WOW,"Dream Coat Supernatural Anti-Frizz, Blow Dry Treatment Spray",0.875,verified,2026-11-06T12:57:31+00:00
+P462353,1,sephora_page,https://www.sephora.com/product/gisou-mini-honey-infused-hair-oil-P462353,/images/products/P462353.webp,Gisou,Mini Honey Infused Hair Oil,1.000,verified,2026-11-06T12:57:40+00:00
+P463072,1,sephora_page,https://www.sephora.com/product/milk-makeup-mini-hydro-grip-set-refresh-spray-P463072,,MILK MAKEUP,Mini Hydro Grip Dewy Long-Lasting Setting Spray With Hyaluronic Acid + Niacinamide,0.588,rejected,2026-11-06T12:57:47+00:00
+P463072,,,,,,,,not_found,2026-11-06T12:57:47+00:00
+P479847,1,sephora_page,https://www.sephora.com/product/k18-mini-leave-in-molecular-repair-mask-P479847,/images/products/P479847.webp,K18 Biomimetic Hairscience,Mini Leave-In Molecular Repair Hair Mask,1.000,verified,2026-11-06T12:57:57+00:00
+P440312,1,sephora_page,https://www.sephora.com/product/lotus-youth-preserve-radiance-renewal-night-cream-P440312,,fresh,Lotus Youth Preserve Radiance Renewal Night Cream,0.333,rejected,2026-11-06T12:58:06+00:00
+P440312,,,,,,,,not_found,2026-11-06T12:58:06+00:00
+P397890,,,,,,,,not_found,2026-11-06T12:58:12+00:00
+P292403,,,,,,,,not_found,2026-11-06T12:58:19+00:00
+P431848,,,,,,,,not_found,2026-11-06T12:58:25+00:00
+P408017,1,sephora_page,https://www.sephora.com/product/the-cleanse-daily-brush-cleaner-P408017,/images/products/P408017.webp,SEPHORA COLLECTION,Daily Brush Cleaner,1.000,verified,2026-11-06T12:58:33+00:00
+P479846,1,sephora_page,https://www.sephora.com/product/leave-in-molecular-repair-mask-P479846,/images/products/P479846.webp,K18 Biomimetic Hairscience,Leave-In Molecular Repair Hair Mask,1.000,verified,2026-11-06T12:58:42+00:00
+P428250,1,sephora_page,https://www.sephora.com/product/peace-out-pores-P428250,,Peace Out,Oil-Absorbing Hydrocolloid Blackhead Remover Strips For Nose and Face,0.462,rejected,2026-11-06T12:58:49+00:00
+P428250,,,,,,,,not_found,2026-11-06T12:58:49+00:00
+P425938,1,sephora_page,https://www.sephora.com/product/mini-luminous-silk-natural-glow-blurring-liquid-foundation-with-24-hour-wear-P520119,,Armani Beauty,Mini Luminous Silk Natural Glow Blurring Liquid Foundation with 24HR Wear,0.526,rejected,2026-11-06T12:58:59+00:00
+P425938,,,,,,,,not_found,2026-11-06T12:58:59+00:00
+P410176,,,,,,,,not_found,2026-11-06T12:59:07+00:00
+P477829,1,sephora_page,https://www.sephora.com/product/tower-28-sunnydays-spf-30-tinted-sunscreen-foundation-P477829,,Tower 28 Beauty,SunnyDays Skin Tint with Mineral Zinc SPF 30,0.000,rejected,2026-11-06T12:59:17+00:00
+P477829,,,,,,,,not_found,2026-11-06T12:59:17+00:00
+P442531,,,,,,,,not_found,2026-11-06T12:59:23+00:00
+P467208,1,sephora_page,https://www.sephora.com/product/lancome-lash-idole-lash-lifting-volumizing-mascara-P467208,/images/products/P467208.webp,Lancôme,Lash Idôle Lengthening & Volumizing Mascara,0.850,verified,2026-11-06T12:59:32+00:00
+P421998,1,sephora_page,https://www.sephora.com/product/midnight-recovery-concentrate-P421998,,Kiehl's Since 1851,Midnight Recovery Concentrate Moisturizing Face Oil Serum,0.000,rejected,2026-11-06T12:59:39+00:00
+P421998,,,,,,,,not_found,2026-11-06T12:59:39+00:00
+P396033,,,,,,,,not_found,2026-11-06T12:59:46+00:00
+P422905,,,,,,,,not_found,2026-11-06T12:59:53+00:00
+P479345,1,sephora_page,https://www.sephora.com/product/rare-beauty-by-selena-gomez-always-an-optimist-soft-radiance-powder-P479345,/images/products/P479345.webp,Rare Beauty by Selena Gomez,Always an Optimist Soft Radiance Setting Powder,1.000,verified,2026-11-06T13:00:03+00:00
