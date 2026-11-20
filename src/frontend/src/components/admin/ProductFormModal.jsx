@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
 
 const ALLOWED_SKIN_TYPES = ['All', 'Oily', 'Dry', 'Combination', 'Sensitive', 'Normal'];
 const ALLOWED_STATUSES = [
@@ -200,10 +199,10 @@ export default function ProductFormModal({
           <button
             type="button"
             onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}
+            className="btn btn-secondary btn-sm"
             aria-label="Close modal"
           >
-            <X size={20} />
+            {lang === 'vi' ? 'Đóng' : 'Close'}
           </button>
         </div>
 

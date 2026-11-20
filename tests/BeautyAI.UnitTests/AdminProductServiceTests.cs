@@ -177,6 +177,19 @@ public class AdminProductServiceTests
             SyncedIngredientsByProduct[productId] = tokens;
             return Task.CompletedTask;
         }
+
+        public Task<AdminAnalyticsDto> GetAdminAnalyticsAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(new AdminAnalyticsDto(
+                TotalProducts: Products.Count,
+                TotalBrands: Brands.Count,
+                TotalReviews: Reviews.Count,
+                AverageRating: 5.0m,
+                CategoryDistribution: new Dictionary<string, int>(),
+                BrandDistribution: new Dictionary<string, int>(),
+                PriceRangeDistribution: new Dictionary<string, int>(),
+                RatingDistribution: new Dictionary<string, int>(),
+                TopProducts: Array.Empty<AdminTopProductDto>()
+            ));
     }
 
     [Fact]

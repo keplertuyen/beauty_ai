@@ -360,7 +360,7 @@ export const translations = {
     sc_sending: 'Đang gửi...',
 
     // Admin Dashboard
-    admin_title: '📊 Admin Dashboard',
+    admin_title: 'Admin Dashboard',
     admin_subtitle: 'Tổng quan phân tích hệ thống BeautyAI',
     admin_live: 'Live Analytics',
     admin_total_products: 'Tổng sản phẩm',
@@ -891,7 +891,7 @@ export const translations = {
     sc_sending: 'Sending...',
 
     // Admin Dashboard
-    admin_title: '📊 Admin Dashboard',
+    admin_title: 'Admin Dashboard',
     admin_subtitle: 'BeautyAI System Analytics Overview',
     admin_live: 'Live Analytics',
     admin_total_products: 'Total Products',

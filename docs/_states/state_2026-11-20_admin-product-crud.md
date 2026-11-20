@@ -30,7 +30,9 @@ last_reviewed: 2026-11-20
    - Áp dụng `[Authorize(Roles = "Admin")]` cho toàn bộ `AdminController`.
    - Thêm `AdminBootstrapper` tự động tạo hoặc nâng cấp tài khoản Admin từ biến môi trường `ADMIN_EMAIL` và `ADMIN_PASSWORD` (>= 8 ký tự, băm PBKDF2, tự nâng cấp hash bcrypt cũ trong `seed_data.sql`).
 4. **Frontend (`AdminProductSection.jsx`, `ProductFormModal.jsx`, `AdminDashboard.jsx`):**
-   - Xây dựng khu vực **Quản Lý Danh Mục Sản Phẩm** trên `/admin` với bảng danh sách, tìm kiếm, bộ lọc Thương hiệu / Danh mục / Trạng thái, phân trang.
+   - Xây dựng khu vực **Quản Lý Danh Mục Sản Phẩm** trên `/admin` với bảng danh sách tách riêng 2 cột Thương hiệu và Danh mục, ô tìm kiếm nhanh (gõ và nhấn `Enter`, không còn nút Search thừa), bộ lọc Thương hiệu / Danh mục / Trạng thái và phân trang.
+   - Tinh gọn giao diện Admin theo phong cách tối giản (loại bỏ toàn bộ icon/emoji gây rối mắt, chia 3 tab làm việc rõ ràng: `Product Catalog (CRUD)`, `COD Orders`, `Analytics & Charts`).
+   - Nâng cấp `GET /api/v1/admin/dashboard` sang truy vấn `GetAdminAnalyticsAsync` tính toán trực tiếp trên 100% dữ liệu thật trong PostgreSQL (Top 10 sản phẩm xếp hạng theo tổng số lượng đánh giá & điểm trung bình thực tế từ bảng `reviews`, phân bố danh mục/thương hiệu/mức giá trên toàn bộ 8,494 sản phẩm).
    - Xây dựng `ProductFormModal` dùng chung cho Thêm mới & Chỉnh sửa với danh sách Brand/Category lấy trực tiếp từ API, chọn loại da phù hợp, trạng thái bán, tồn kho, dung tích và chuỗi INCI.
    - Thêm hộp thoại xác nhận Ngừng bán và nút Khôi phục 1 chạm.
 5. **Kiểm thử & Quality Gate:**

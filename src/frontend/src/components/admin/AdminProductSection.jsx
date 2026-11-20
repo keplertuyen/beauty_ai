@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Edit2, Archive, RotateCcw, Plus, Search, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   getAdminProducts,
@@ -10,6 +9,7 @@ import {
   getBrands,
   getCategories,
 } from '../../services/api';
+import { getProductImage, DEFAULT_PRODUCT_IMAGE } from '../../utils/productImages';
 import ProductFormModal from './ProductFormModal';
 
 export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalogChanged }) {
@@ -43,11 +43,11 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
   }, []);
 
   const loadProducts = useCallback(
-    async (targetPage = page) => {
+    async (targetPage = page, searchOverride = query) => {
       setLoading(true);
       try {
         const res = await getAdminProducts({
-          query: query.trim() || undefined,
+          query: searchOverride.trim() || undefined,
           brand: brandFilter !== 'All' ? brandFilter : undefined,
           category: categoryFilter !== 'All' ? categoryFilter : undefined,
           status: statusFilter !== 'All' ? statusFilter : undefined,
@@ -71,12 +71,14 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
   );
 
   useEffect(() => {
-    loadProducts(1);
+    loadProducts(1, query);
   }, [brandFilter, categoryFilter, statusFilter]);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    loadProducts(1);
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      loadProducts(1, query);
+    }
   };
 
   const openCreateModal = () => {
@@ -109,7 +111,7 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
       }
       setModalOpen(false);
       setEditingProduct(null);
-      await loadProducts(editingProduct?.id ? page : 1);
+      await loadProducts(editingProduct?.id ? page : 1, query);
       if (onCatalogChanged) onCatalogChanged();
     } catch (err) {
       toast.error(
@@ -133,7 +135,7 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
           : `Discontinued "${target.name}". You can restore it anytime.`
       );
       setConfirmDiscontinueProduct(null);
-      await loadProducts(page);
+      await loadProducts(page, query);
       if (onCatalogChanged) onCatalogChanged();
     } catch (err) {
       toast.error(
@@ -154,7 +156,7 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
           ? `Đã khôi phục sản phẩm "${product.name}" sang trạng thái Đang bán`
           : `Restored "${product.name}" to Active status`
       );
-      await loadProducts(page);
+      await loadProducts(page, query);
       if (onCatalogChanged) onCatalogChanged();
     } catch (err) {
       toast.error(
@@ -182,15 +184,11 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
 
     return (
       <span
+        className="ad-status-pill"
         style={{
-          display: 'inline-block',
-          padding: '4px 10px',
-          borderRadius: '12px',
-          fontSize: '0.76rem',
-          fontWeight: 700,
           color,
           background: bg,
-          border: `1px solid ${color}44`,
+          borderColor: `${color}38`,
         }}
       >
         {label}
@@ -210,62 +208,61 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
           marginBottom: '16px',
         }}
       >
-        <div className="ad-section-header" style={{ marginBottom: 0 }}>
-          <span className="ad-section-icon">🧴</span>
-          <h2 className="ad-section-title">
-            {lang === 'vi'
-              ? `Quản Lý Danh Mục Sản Phẩm (${total.toLocaleString()})`
-              : `Product Catalog CRUD (${total.toLocaleString()})`}
-          </h2>
+        <div className="ad-section-header" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
+          <div>
+            <h2 className="ad-section-title">
+              {lang === 'vi'
+                ? `Quản Lý Danh Mục Sản Phẩm (${total.toLocaleString()})`
+                : `Product Catalog Management (${total.toLocaleString()})`}
+            </h2>
+            <p className="ad-section-subtitle">
+              {lang === 'vi'
+                ? 'Tìm kiếm, thêm mới, chỉnh sửa công thức INCI, ngừng bán hoặc khôi phục sản phẩm'
+                : 'Search, create, edit INCI formulas, archive, or restore products'}
+            </p>
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
             type="button"
             className="btn btn-secondary btn-sm"
-            onClick={() => loadProducts(page)}
+            onClick={() => loadProducts(page, query)}
             disabled={loading}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            <RefreshCw size={14} />
             {lang === 'vi' ? 'Làm mới' : 'Refresh'}
           </button>
           <button
             type="button"
             className="btn btn-primary btn-sm"
             onClick={openCreateModal}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            <Plus size={15} />
             {lang === 'vi' ? 'Thêm Sản Phẩm Mới' : 'New Product'}
           </button>
         </div>
       </div>
 
-      {/* Filters bar */}
-      <div
-        className="glass-card"
-        style={{
-          padding: '14px 18px',
-          marginBottom: '16px',
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr 1fr',
-          gap: '12px',
-          alignItems: 'center',
-        }}
-      >
-        <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
-          <input
-            type="text"
-            className="form-input"
-            placeholder={lang === 'vi' ? 'Tìm theo tên, mã SP, thương hiệu...' : 'Search by name, code, brand...'}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button type="submit" className="btn btn-secondary btn-sm" style={{ whiteSpace: 'nowrap' }}>
-            <Search size={14} /> {lang === 'vi' ? 'Tìm' : 'Search'}
-          </button>
-        </form>
+      {/* Filters bar — Clean input (Enter to search, no adjacent Search button) */}
+      <div className="ad-filter-bar glass-card">
+        <input
+          type="search"
+          className="form-input"
+          placeholder={
+            lang === 'vi'
+              ? 'Gõ tên, mã SP, thương hiệu rồi nhấn Enter...'
+              : 'Type name, code, or brand and press Enter...'
+          }
+          value={query}
+          onChange={(e) => {
+            const val = e.target.value;
+            setQuery(val);
+            if (val === '') {
+              loadProducts(1, '');
+            }
+          }}
+          onKeyDown={handleSearchKeyDown}
+          aria-label="Search products"
+        />
 
         <select
           className="form-select"
@@ -308,7 +305,7 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
         </select>
       </div>
 
-      {/* Product table */}
+      {/* Product table — Dedicated Brand and Category columns */}
       <div className="ad-table-card glass-card">
         <div className="ad-table-wrapper">
           <table className="ad-table">
@@ -316,7 +313,8 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
               <tr>
                 <th>Code</th>
                 <th>{lang === 'vi' ? 'Sản Phẩm' : 'Product'}</th>
-                <th>{lang === 'vi' ? 'Thương Hiệu / Danh Mục' : 'Brand / Category'}</th>
+                <th>{lang === 'vi' ? 'Thương Hiệu' : 'Brand'}</th>
+                <th>{lang === 'vi' ? 'Danh Mục' : 'Category'}</th>
                 <th>{lang === 'vi' ? 'Giá Bán' : 'Price'}</th>
                 <th>{lang === 'vi' ? 'Tồn Kho' : 'Stock'}</th>
                 <th>{lang === 'vi' ? 'Trạng Thái' : 'Status'}</th>
@@ -326,7 +324,7 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="ad-table-empty">
+                  <td colSpan={8} className="ad-table-empty">
                     {loading
                       ? lang === 'vi'
                         ? 'Đang tải danh sách sản phẩm...'
@@ -343,30 +341,36 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
                     <tr
                       key={p.id}
                       className="ad-table-row"
-                      style={{ opacity: isDiscontinued ? 0.68 : 1 }}
+                      style={{ opacity: isDiscontinued ? 0.65 : 1 }}
                     >
-                      <td>
-                        <code style={{ fontSize: '0.78rem', color: '#8F755F', fontWeight: 600 }}>{p.code}</code>
-                      </td>
+                      <th scope="row" className="ad-row-header">
+                        <code className="ad-code-text">{p.code}</code>
+                      </th>
                       <td className="ad-product-name-cell">
-                        {p.imageUrl ? (
-                          <img src={p.imageUrl} alt={p.name} className="ad-product-thumb" />
-                        ) : (
-                          <div className="ad-product-thumb-placeholder">💄</div>
-                        )}
-                        <div>
+                        <img
+                          src={getProductImage(p)}
+                          alt={p.name}
+                          className="ad-product-thumb"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
+                          }}
+                        />
+                        <div style={{ minWidth: 0 }}>
                           <span className="ad-product-name" title={p.name}>
                             {p.name}
                           </span>
-                          <div style={{ fontSize: '0.72rem', color: '#888' }}>
+                          <div className="ad-cell-meta">
                             {(p.targetSkinTypes || []).join(', ')}
                             {p.volumeMl ? ` · ${p.volumeMl}ml` : ''}
                           </div>
                         </div>
                       </td>
                       <td>
-                        <span className="badge badge-secondary">{p.brandName}</span>
-                        <div style={{ fontSize: '0.76rem', color: '#666', marginTop: '3px' }}>{p.categoryName}</div>
+                        <span className="ad-brand-text">{p.brandName}</span>
+                      </td>
+                      <td>
+                        <span className="ad-category-chip">{p.categoryName}</span>
                       </td>
                       <td className="ad-price">
                         {formatPrice ? formatPrice(p.priceUsd) : `$${Number(p.priceUsd).toFixed(2)}`}
@@ -378,48 +382,32 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
                       </td>
                       <td>{renderStatusBadge(p.sellingStatus)}</td>
                       <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div className="ad-action-group">
                           <button
                             type="button"
-                            className="btn btn-secondary btn-sm"
+                            className="btn btn-secondary btn-sm ad-action-btn"
                             onClick={() => openEditModal(p)}
                             disabled={processingId === p.id}
-                            title={lang === 'vi' ? 'Chỉnh sửa sản phẩm' : 'Edit product'}
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 10px' }}
                           >
-                            <Edit2 size={13} />
                             {lang === 'vi' ? 'Sửa' : 'Edit'}
                           </button>
 
                           {isDiscontinued ? (
                             <button
                               type="button"
-                              className="btn btn-primary btn-sm"
+                              className="btn btn-primary btn-sm ad-action-btn"
                               onClick={() => handleRestore(p)}
                               disabled={processingId === p.id}
-                              title={lang === 'vi' ? 'Khôi phục bán lại' : 'Restore product'}
-                              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 10px' }}
                             >
-                              <RotateCcw size={13} />
                               {lang === 'vi' ? 'Khôi phục' : 'Restore'}
                             </button>
                           ) : (
                             <button
                               type="button"
-                              className="btn btn-outline btn-sm danger"
+                              className="btn btn-outline btn-sm danger ad-action-btn ad-archive-btn"
                               onClick={() => setConfirmDiscontinueProduct(p)}
                               disabled={processingId === p.id}
-                              title={lang === 'vi' ? 'Ngừng bán (ẩn khỏi cửa hàng)' : 'Discontinue product'}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '4px',
-                                padding: '5px 10px',
-                                color: '#DC2626',
-                                borderColor: '#FCA5A5',
-                              }}
                             >
-                              <Archive size={13} />
                               {lang === 'vi' ? 'Ngừng bán' : 'Archive'}
                             </button>
                           )}
@@ -435,16 +423,8 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
 
         {/* Pagination */}
         {pages > 1 && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 18px',
-              borderTop: '1px solid #EEE',
-            }}
-          >
-            <span style={{ fontSize: '0.82rem', color: '#666' }}>
+          <div className="ad-pagination-bar">
+            <span className="ad-pagination-info">
               {lang === 'vi' ? `Trang ${page} / ${pages}` : `Page ${page} of ${pages}`}
             </span>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -452,17 +432,17 @@ export default function AdminProductSection({ lang = 'vi', formatPrice, onCatalo
                 type="button"
                 className="btn btn-secondary btn-sm"
                 disabled={page <= 1 || loading}
-                onClick={() => loadProducts(page - 1)}
+                onClick={() => loadProducts(page - 1, query)}
               >
-                {lang === 'vi' ? '← Trước' : '← Prev'}
+                {lang === 'vi' ? 'Trước' : 'Previous'}
               </button>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
                 disabled={page >= pages || loading}
-                onClick={() => loadProducts(page + 1)}
+                onClick={() => loadProducts(page + 1, query)}
               >
-                {lang === 'vi' ? 'Sau →' : 'Next →'}
+                {lang === 'vi' ? 'Sau' : 'Next'}
               </button>
             </div>
           </div>

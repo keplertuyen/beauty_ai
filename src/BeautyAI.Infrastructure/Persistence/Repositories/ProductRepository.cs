@@ -441,4 +441,157 @@ public class ProductRepository : IProductRepository
 
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<AdminAnalyticsDto> GetAdminAnalyticsAsync(CancellationToken cancellationToken = default)
+    {
+        var totalProducts = await _context.Products.AsNoTracking().CountAsync(cancellationToken);
+        var totalBrands = await _context.Brands.AsNoTracking().CountAsync(cancellationToken);
+
+        // 1. Full catalog category distribution
+        var catRows = await _context.Products
+            .AsNoTracking()
+            .GroupBy(p => p.Category != null ? p.Category.Name : "Skincare")
+            .Select(g => new { Category = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .ToListAsync(cancellationToken);
+
+        var catDist = catRows.ToDictionary(x => x.Category, x => x.Count);
+
+        // 2. Full catalog brand distribution (top 15 brands by real product count)
+        var brandRows = await _context.Products
+            .AsNoTracking()
+            .GroupBy(p => p.Brand != null ? p.Brand.Name : "BeautyAI")
+            .Select(g => new { Brand = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(15)
+            .ToListAsync(cancellationToken);
+
+        var brandDist = brandRows.ToDictionary(x => x.Brand, x => x.Count);
+
+        // 3. Full catalog price range distribution
+        var budgetCount = await _context.Products.AsNoTracking().CountAsync(p => p.PriceUsd < 25m, cancellationToken);
+        var midCount = await _context.Products.AsNoTracking().CountAsync(p => p.PriceUsd >= 25m && p.PriceUsd < 50m, cancellationToken);
+        var premiumCount = await _context.Products.AsNoTracking().CountAsync(p => p.PriceUsd >= 50m && p.PriceUsd < 100m, cancellationToken);
+        var luxuryCount = await _context.Products.AsNoTracking().CountAsync(p => p.PriceUsd >= 100m, cancellationToken);
+
+        var priceDist = new Dictionary<string, int>
+        {
+            ["Budget (<$25)"] = budgetCount,
+            ["Mid-Range ($25-$50)"] = midCount,
+            ["Premium ($50-$100)"] = premiumCount,
+            ["Luxury (>$100)"] = luxuryCount
+        };
+
+        // 4. Real rating distribution across the reviews table
+        var ratingRows = await _context.Reviews
+            .AsNoTracking()
+            .GroupBy(r => r.Rating)
+            .Select(g => new { Rating = g.Key, Count = g.Count() })
+            .ToListAsync(cancellationToken);
+
+        var ratingDist = new Dictionary<string, int>
+        {
+            ["5"] = 0,
+            ["4"] = 0,
+            ["3"] = 0,
+            ["2"] = 0,
+            ["1"] = 0
+        };
+        long weightedSum = 0;
+        int totalReviews = 0;
+        foreach (var row in ratingRows)
+        {
+            var key = Math.Clamp(row.Rating, 1, 5).ToString();
+            ratingDist[key] = ratingDist.GetValueOrDefault(key) + row.Count;
+            weightedSum += (long)row.Rating * row.Count;
+            totalReviews += row.Count;
+        }
+
+        decimal avgRating = totalReviews > 0
+            ? Math.Round((decimal)weightedSum / totalReviews, 2)
+            : 0m;
+
+        // 5. Real Top 10 Products ranked by verified review count & average rating from the reviews table
+        var topReviewGroups = await _context.Reviews
+            .AsNoTracking()
+            .GroupBy(r => r.ProductId)
+            .Select(g => new
+            {
+                ProductId = g.Key,
+                ReviewsCount = g.Count(),
+                AvgRating = g.Average(r => r.Rating)
+            })
+            .OrderByDescending(x => x.ReviewsCount)
+            .ThenByDescending(x => x.AvgRating)
+            .Take(10)
+            .ToListAsync(cancellationToken);
+
+        var topProductIds = topReviewGroups.Select(x => x.ProductId).ToList();
+        var topProductEntities = await _context.Products
+            .AsNoTracking()
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .Where(p => topProductIds.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id, cancellationToken);
+
+        var topProducts = new List<AdminTopProductDto>();
+        foreach (var grp in topReviewGroups)
+        {
+            if (!topProductEntities.TryGetValue(grp.ProductId, out var p))
+                continue;
+
+            topProducts.Add(new AdminTopProductDto(
+                ProductId: p.Id,
+                Code: p.Code,
+                ProductName: p.Name,
+                BrandName: p.Brand?.Name ?? "BeautyAI",
+                PrimaryCategory: p.Category?.Name ?? "Skincare",
+                PriceUsd: p.PriceUsd,
+                Rating: Math.Round((decimal)grp.AvgRating, 2),
+                ReviewsCount: grp.ReviewsCount,
+                SellingStatus: p.SellingStatus,
+                ImageUrl: !string.IsNullOrWhiteSpace(p.ImageUrl) ? p.ImageUrl : $"/images/products/{p.Code}.webp"
+            ));
+        }
+
+        // Fallback if reviews table is empty in a fresh environment
+        if (topProducts.Count == 0)
+        {
+            var fallbackProducts = await _context.Products
+                .AsNoTracking()
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
+                .OrderBy(p => p.Id)
+                .Take(10)
+                .ToListAsync(cancellationToken);
+
+            foreach (var p in fallbackProducts)
+            {
+                topProducts.Add(new AdminTopProductDto(
+                    ProductId: p.Id,
+                    Code: p.Code,
+                    ProductName: p.Name,
+                    BrandName: p.Brand?.Name ?? "BeautyAI",
+                    PrimaryCategory: p.Category?.Name ?? "Skincare",
+                    PriceUsd: p.PriceUsd,
+                    Rating: 0m,
+                    ReviewsCount: 0,
+                    SellingStatus: p.SellingStatus,
+                    ImageUrl: !string.IsNullOrWhiteSpace(p.ImageUrl) ? p.ImageUrl : $"/images/products/{p.Code}.webp"
+                ));
+            }
+        }
+
+        return new AdminAnalyticsDto(
+            TotalProducts: totalProducts,
+            TotalBrands: totalBrands > 0 ? totalBrands : brandDist.Count,
+            TotalReviews: totalReviews,
+            AverageRating: avgRating,
+            CategoryDistribution: catDist,
+            BrandDistribution: brandDist,
+            PriceRangeDistribution: priceDist,
+            RatingDistribution: ratingDist,
+            TopProducts: topProducts
+        );
+    }
 }

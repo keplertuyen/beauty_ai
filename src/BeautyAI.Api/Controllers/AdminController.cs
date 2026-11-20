@@ -29,80 +29,47 @@ public class AdminController : ControllerBase
     [HttpGet("kpis")]
     public async Task<IActionResult> GetDashboard(CancellationToken cancellationToken = default)
     {
-        var (products, totalProducts) = await _productRepository.GetAdminProductsAsync(
-            new AdminProductFilterParams(PageSize: 100),
-            cancellationToken);
-
-        var orders = await _orderRepository.GetAllOrdersAsync(100, cancellationToken);
-        var brands = await _productRepository.GetBrandsAsync(cancellationToken);
-        var categories = await _productRepository.GetCategoriesAsync(cancellationToken);
+        var analytics = await _productRepository.GetAdminAnalyticsAsync(cancellationToken);
+        var orders = await _orderRepository.GetAllOrdersAsync(500, cancellationToken);
 
         int totalOrders = orders.Count;
         decimal totalRevenue = orders.Sum(o => o.TotalAmountUsd);
         int pendingOrders = orders.Count(o => o.OrderStatus == "Pending");
 
-        // Categories distribution
-        var catDist = products
-            .GroupBy(p => p.Category?.Name ?? "Skincare")
-            .ToDictionary(g => g.Key, g => g.Count());
-
-        // Brands distribution
-        var brandDist = products
-            .GroupBy(p => p.Brand?.Name ?? "BeautyAI")
-            .ToDictionary(g => g.Key, g => g.Count());
-
-        // Price ranges distribution
-        var priceDist = new Dictionary<string, int>
+        var topProducts = analytics.TopProducts.Select(p => new
         {
-            ["Budget (<$25)"] = products.Count(p => p.PriceUsd < 25),
-            ["Mid-Range ($25-$50)"] = products.Count(p => p.PriceUsd >= 25 && p.PriceUsd < 50),
-            ["Premium ($50-$100)"] = products.Count(p => p.PriceUsd >= 50 && p.PriceUsd < 100),
-            ["Luxury (>$100)"] = products.Count(p => p.PriceUsd >= 100)
-        };
-
-        // Rating distribution
-        var ratingDist = new Dictionary<string, int>
-        {
-            ["5"] = (int)(totalProducts * 0.7),
-            ["4"] = (int)(totalProducts * 0.2),
-            ["3"] = (int)(totalProducts * 0.07),
-            ["2"] = (int)(totalProducts * 0.02),
-            ["1"] = (int)(totalProducts * 0.01)
-        };
-
-        var topProducts = products.Take(10).Select(p => new
-        {
-            product_id = p.Id,
-            product_name = p.Name,
-            brand_name = p.Brand?.Name ?? "BeautyAI",
-            primary_category = p.Category?.Name ?? "Skincare",
+            product_id = p.ProductId,
+            code = p.Code,
+            product_name = p.ProductName,
+            brand_name = p.BrandName,
+            primary_category = p.PrimaryCategory,
             price_usd = p.PriceUsd,
-            rating = 5.0,
-            reviews_count = 120,
+            rating = p.Rating,
+            reviews_count = p.ReviewsCount,
             selling_status = p.SellingStatus,
-            image_url = !string.IsNullOrWhiteSpace(p.ImageUrl) ? p.ImageUrl : $"/images/products/{p.Code}.webp"
+            image_url = p.ImageUrl
         }).ToList();
 
         return Ok(new
         {
             kpis = new AdminKpisDto(
-                TotalProducts: totalProducts,
+                TotalProducts: analytics.TotalProducts,
                 TotalOrders: totalOrders,
                 TotalRevenueUsd: Math.Round(totalRevenue, 2),
-                ActiveUsers: Math.Max(12, totalOrders * 2),
+                ActiveUsers: Math.Max(1, totalOrders),
                 PendingOrders: pendingOrders
             ),
             products = new
             {
-                total = totalProducts,
-                total_brands = brands.Count > 0 ? brands.Count : brandDist.Count,
-                avg_rating = 4.8,
-                total_reviews = 1094187
+                total = analytics.TotalProducts,
+                total_brands = analytics.TotalBrands,
+                avg_rating = analytics.AverageRating,
+                total_reviews = analytics.TotalReviews
             },
-            category_distribution = catDist,
-            brand_distribution = brandDist,
-            price_range_distribution = priceDist,
-            rating_distribution = ratingDist,
+            category_distribution = analytics.CategoryDistribution,
+            brand_distribution = analytics.BrandDistribution,
+            price_range_distribution = analytics.PriceRangeDistribution,
+            rating_distribution = analytics.RatingDistribution,
             top_products = topProducts
         });
     }

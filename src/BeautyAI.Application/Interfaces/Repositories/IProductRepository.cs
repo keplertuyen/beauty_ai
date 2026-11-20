@@ -55,4 +55,6 @@ public interface IProductRepository
     Task<Product> UpdateProductAsync(Product product, CancellationToken cancellationToken = default);
 
     Task SyncProductIngredientsAsync(int productId, string ingredientListRaw, CancellationToken cancellationToken = default);
+
+    Task<AdminAnalyticsDto> GetAdminAnalyticsAsync(CancellationToken cancellationToken = default);
 }

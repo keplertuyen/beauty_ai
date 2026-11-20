@@ -84,7 +84,7 @@ last_reviewed: 2026-10-30
 | `GET` | `/api/v1/routines/my-routines` | AUTH | `FR-ROU-03` | Danh sách các chu trình routine đã lưu của người dùng |
 | `DELETE` | `/api/v1/routines/{id}` | AUTH | `FR-ROU-04` | Xóa chu trình routine |
 | `POST` | `/api/v1/ai/consult` | ALL/AUTH | `FR-AI-01` | Tư vấn da liễu và mỹ phẩm với Gemini API (Grounding + Guardrails) |
-| `GET` | `/api/v1/admin/dashboard` | ADMIN | `FR-ADM-01` | Bảng điều khiển phân tích tổng quan chỉ số |
+| `GET` | `/api/v1/admin/dashboard` | ADMIN | `FR-ADM-01` | Bảng điều khiển phân tích tổng quan chỉ số (tính toán trực tiếp từ toàn bộ dữ liệu sản phẩm và đánh giá thật trong PostgreSQL) |
 | `GET` | `/api/v1/admin/kpis` | ADMIN | `FR-ADM-01` | 4 thẻ KPI cốt lõi |
 | `GET` | `/api/v1/admin/orders` | ADMIN | `FR-ADM-06` | Danh sách đơn hàng COD quản trị |
 | `PATCH` | `/api/v1/admin/orders/{id}/status` | ADMIN | `FR-ADM-06` | Cập nhật trạng thái đơn hàng (Pending ➔ Delivering ➔ Completed) |

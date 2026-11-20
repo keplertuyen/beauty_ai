@@ -8,6 +8,31 @@ public record AdminKpisDto(
     int PendingOrders
 );
 
+public record AdminTopProductDto(
+    int ProductId,
+    string Code,
+    string ProductName,
+    string BrandName,
+    string PrimaryCategory,
+    decimal PriceUsd,
+    decimal Rating,
+    int ReviewsCount,
+    string SellingStatus,
+    string? ImageUrl
+);
+
+public record AdminAnalyticsDto(
+    int TotalProducts,
+    int TotalBrands,
+    int TotalReviews,
+    decimal AverageRating,
+    Dictionary<string, int> CategoryDistribution,
+    Dictionary<string, int> BrandDistribution,
+    Dictionary<string, int> PriceRangeDistribution,
+    Dictionary<string, int> RatingDistribution,
+    IReadOnlyList<AdminTopProductDto> TopProducts
+);
+
 public record AdminProductDto(
     int Id,
     string Code,
