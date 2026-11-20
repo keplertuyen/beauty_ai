@@ -1,7 +1,7 @@
 ---
 doc: change-review
 title: CHANGE-ADMIN-PRODUCT-CRUD — Review
-status: approved
+status: signed
 precedence: 6
 owner: reviewer
 last_reviewed: 2026-11-20

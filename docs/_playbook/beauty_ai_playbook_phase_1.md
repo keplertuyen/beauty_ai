@@ -373,24 +373,33 @@ LIMIT 10;"
 
 ---
 
-## ▸ Nhiệm vụ 4.3 — Admin Dashboard Tinh Gọn
+## ▸ Nhiệm vụ 4.3 — Admin Dashboard & Product CRUD Hoàn Chỉnh
 
-- **Mục tiêu:** Cung cấp giao diện quản trị cho Admin theo dõi chỉ số, quản lý sản phẩm và xử lý đơn hàng.
+- **Mục tiêu:** Cung cấp giao diện quản trị cho Admin theo dõi chỉ số, quản lý trọn vòng đời sản phẩm (CRUD + Soft Delete + Restore) và xử lý đơn hàng.
 - **Tệp liên quan:**
   - `src/BeautyAI.Api/Controllers/AdminController.cs`
+  - `src/BeautyAI.Application/Services/AdminProductService.cs`
+  - `src/BeautyAI.Application/Services/AdminBootstrapper.cs`
   - `src/frontend/src/pages/AdminDashboard.jsx`
+  - `src/frontend/src/components/admin/AdminProductSection.jsx`
+  - `src/frontend/src/components/admin/ProductFormModal.jsx`
 
 ### Các bước thực hiện chi tiết:
-1. Xây dựng các API Admin:
-   - `GET /api/v1/admin/kpis`: Trả về tổng sản phẩm, tổng đơn, doanh thu và số người dùng.
-   - `POST /api/v1/admin/products`: Form thêm sản phẩm mới kèm ô dán chuỗi INCI thô.
-   - `PATCH /api/v1/admin/orders/{id}/status`: Đổi trạng thái đơn (`Pending` ➔ `Delivering` ➔ `Completed`).
-2. Kết nối giao diện `AdminDashboard.jsx`.
-3. Bảo vệ toàn bộ route `/admin` bằng Authorization middleware kiểm tra role `ADMIN`.
+1. Xây dựng các API Admin (bảo vệ bởi `[Authorize(Roles = "Admin")]`):
+   - `GET /api/v1/admin/dashboard` & `GET /api/v1/admin/kpis`: Trả về tổng sản phẩm, tổng đơn, doanh thu và số người dùng.
+   - `GET /api/v1/admin/products`: Danh sách sản phẩm quản trị hỗ trợ tìm kiếm (`query`), lọc `brand`, `category`, `status` (`Active` / `Draft` / `Discontinued`) và phân trang.
+   - `GET /api/v1/admin/products/{id}`: Chi tiết sản phẩm quản trị.
+   - `POST /api/v1/admin/products`: Tạo sản phẩm mới kèm bóc tách & đồng bộ chuỗi INCI vào `product_ingredients`.
+   - `PUT /api/v1/admin/products/{id}`: Cập nhật sản phẩm, tự động đồng bộ lại `product_ingredients` khi chuỗi INCI thay đổi, giữ nguyên giá đơn hàng lịch sử.
+   - `DELETE /api/v1/admin/products/{id}`: Ngừng bán sản phẩm (soft delete: `selling_status = Discontinued`), ẩn khỏi cửa hàng nhưng giữ nguyên đánh giá và đơn hàng cũ.
+   - `PATCH /api/v1/admin/products/{id}/restore`: Khôi phục sản phẩm đã ngừng bán về trạng thái `Active`.
+   - `PATCH /api/v1/admin/orders/{id}/status`: Đổi trạng thái đơn (`Pending` ➔ `Delivering` ➔ `Completed` / `Cancelled`).
+2. Kết nối giao diện `AdminDashboard.jsx` cùng bảng `AdminProductSection.jsx` và form dùng chung `ProductFormModal.jsx`.
+3. Khởi tạo tài khoản Admin an toàn từ biến môi trường `ADMIN_EMAIL` / `ADMIN_PASSWORD` qua `AdminBootstrapper` (băm PBKDF2).
 
 ### ✅ Xong khi:
-- [ ] Đăng nhập tài khoản Admin vào được `/admin`.
-- [ ] Thêm thử 1 sản phẩm mới thành công và đổi được trạng thái đơn hàng.
+- [x] Đăng nhập tài khoản Admin vào được `/admin` (khách vãng lai / `Customer` bị chặn `401` / `403`).
+- [x] Thêm mới, tìm kiếm, chỉnh sửa giá/INCI, ngừng bán (ẩn khỏi catalog) và khôi phục sản phẩm thành công; đổi được trạng thái đơn hàng.
 
 ---
 

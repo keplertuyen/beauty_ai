@@ -167,12 +167,15 @@ CREATE TABLE products (
     ingredient_list_raw TEXT NOT NULL, -- Raw INCI ingredient string from packaging
     target_skin_types VARCHAR(50)[] NOT NULL, -- ARRAY['Oily', 'Combination']
     stock_quantity INT DEFAULT 100 NOT NULL CHECK (stock_quantity >= 0),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+    selling_status VARCHAR(20) DEFAULT 'Active' NOT NULL, -- 'Active' | 'Draft' | 'Discontinued' (ADR-014 soft delete)
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NULL
 );
 CREATE INDEX idx_products_code ON products(code);
 CREATE INDEX idx_products_slug ON products(slug);
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_brand ON products(brand_id);
+CREATE INDEX idx_products_selling_status ON products(selling_status);
 
 CREATE TABLE product_ingredients (
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
@@ -517,8 +520,15 @@ Your mission is to provide evidence-based skincare routine guidance and product 
 | **Orders** | `POST` | `/api/v1/orders` | `201 Created` | Đặt hàng thanh toán COD |
 | | `GET` | `/api/v1/orders/my-orders` | `200 OK` | Xem lịch sử các đơn hàng đã đặt |
 | **AI** | `POST` | `/api/v1/ai/consult` | `200 OK` | Chat tư vấn mỹ phẩm với Gemini API |
-| **Admin** | `GET` | `/api/v1/admin/kpis` | `200 OK` | Xem thẻ chỉ số tổng quan |
-| | `POST` | `/api/v1/admin/products` | `201 Created` | Thêm sản phẩm mới và dán chuỗi INCI |
+| **Admin** | `GET` | `/api/v1/admin/dashboard` | `200 OK` | Xem bảng điều khiển & phân bổ danh mục |
+| | `GET` | `/api/v1/admin/kpis` | `200 OK` | Xem thẻ chỉ số tổng quan |
+| | `GET` | `/api/v1/admin/products` | `200 OK` | Danh sách sản phẩm quản trị (lọc, tìm kiếm, phân trang) |
+| | `GET` | `/api/v1/admin/products/{id}` | `200 OK` | Chi tiết sản phẩm quản trị |
+| | `POST` | `/api/v1/admin/products` | `201 Created` | Thêm sản phẩm mới và đồng bộ chuỗi INCI |
+| | `PUT` | `/api/v1/admin/products/{id}` | `200 OK` | Cập nhật sản phẩm & đồng bộ lại INCI khi thay đổi |
+| | `DELETE` | `/api/v1/admin/products/{id}` | `204 No Content` | Ngừng bán sản phẩm (soft delete: `Discontinued`) |
+| | `PATCH` | `/api/v1/admin/products/{id}/restore` | `200 OK` | Khôi phục sản phẩm về trạng thái `Active` |
+| | `GET` | `/api/v1/admin/orders` | `200 OK` | Danh sách đơn hàng COD quản trị |
 | | `PATCH` | `/api/v1/admin/orders/{id}/status`| `200 OK` | Cập nhật trạng thái đơn COD |
 
 ---

@@ -1,7 +1,7 @@
 ---
 doc: change-tasks
 title: CHANGE-ADMIN-PRODUCT-CRUD — Tasks
-status: in-progress
+status: done
 precedence: 5
 owner: pm-dev-lead
 last_reviewed: 2026-11-20

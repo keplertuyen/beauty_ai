@@ -376,11 +376,12 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 - **Điều kiện chấp nhận:**
   - `AC-01.1` **Given** tài khoản `ADMIN` truy cập `/admin`, **When** trang tải xong, **Then** hiển thị 4 thẻ số liệu thống kê trực quan: Tổng số sản phẩm đang bán, Tổng số đơn hàng phát sinh, Tổng doanh thu lũy kế (USD $), và Tổng số tài khoản khách hàng.
 
-### FR-ADM-02 [Must-Have] Quản lý sản phẩm & Nhập chuỗi thành phần INCI (CRUD)
+### FR-ADM-02 [Must-Have] Quản lý sản phẩm & Nhập chuỗi thành phần INCI (CRUD hoàn chỉnh)
 - **Điều kiện chấp nhận:**
-  - `AC-02.1` **Given** trang Quản lý sản phẩm, **When** Admin bấm *"Thêm sản phẩm mới"*, **Then** Admin có thể nhập: Tên sản phẩm, Thương hiệu, Danh mục, Giá bán USD ($), Dung tích, Tồn kho, Link ảnh và đặc biệt là **Ô dán chuỗi thành phần INCI thô**.
-  - `AC-02.2` **Given** Admin dán chuỗi INCI thô và bấm lưu, **Then** hệ thống tự động bóc tách và tạo liên kết trong bảng `product_ingredients`.
-  - `AC-02.3` **Given** sản phẩm đã có, **When** Admin chỉnh sửa giá hoặc tồn kho, **Then** thông tin được cập nhật tức thì trên trang Catalog ngoài website.
+  - `AC-02.1` **Given** trang Quản lý sản phẩm, **When** Admin mở danh sách hoặc bấm *"Thêm sản phẩm mới"*, **Then** Admin có thể tìm kiếm, lọc theo Thương hiệu / Danh mục / Trạng thái bán (`Active`, `Draft`, `Discontinued`), phân trang, và nhập: Tên sản phẩm, Thương hiệu, Danh mục, Giá bán USD ($), Dung tích (ml), Tồn kho, Loại da phù hợp, Trạng thái bán, Link ảnh và **Ô dán chuỗi thành phần INCI thô**.
+  - `AC-02.2` **Given** Admin dán hoặc sửa chuỗi INCI thô và bấm lưu, **Then** hệ thống tự động bóc tách và đồng bộ lại liên kết trong bảng `product_ingredients` (không fallback âm thầm nếu chọn sai thương hiệu/danh mục).
+  - `AC-02.3` **Given** sản phẩm đã có, **When** Admin chỉnh sửa giá, tồn kho hoặc thông tin sản phẩm, **Then** thông tin mới và `updated_at` được cập nhật tức thì trên Catalog ngoài website nhưng **không** làm thay đổi giá trên các đơn hàng cũ đã tạo (`BR-ORDER-05`).
+  - `AC-02.4` **Given** sản phẩm đang bán (`Active`), **When** Admin chọn *"Ngừng bán"* (`DELETE /api/v1/admin/products/{id}`), **Then** sản phẩm chuyển sang trạng thái `Discontinued` (soft delete): ẩn khỏi danh mục khách hàng, trang chi tiết và chặn đặt mua mới, nhưng bảo toàn 100% đánh giá (`reviews`) và lịch sử đơn hàng. Admin có thể bấm *"Khôi phục"* (`PATCH /api/v1/admin/products/{id}/restore`) bất kỳ lúc nào để mở bán lại với đúng ID cũ.
 
 ### FR-ADM-03 [Must-Have] Quản lý và đổi trạng thái đơn hàng COD
 - **Điều kiện chấp nhận:**

@@ -144,7 +144,7 @@ flowchart LR
 |---|---|---|---|---|
 | **T4.1** | **Routine Generator & Nút "Chat-to-Cart"** | 12 giờ | `RoutineView.jsx` & Domain Routine Generator | Thuật toán sinh Routine AM/PM tự động từ Digital Skin ID; Nút **Chat-to-Cart** thêm cả bộ vào giỏ trong 1 click; Lưu routine vào `saved_routines`. |
 | **T4.2** | **Tích hợp Trợ lý Da liễu AI (Gemini API)** | 10 giờ | `GeminiSkincareProvider` trong Infrastructure | Khung chat AI; Grounding danh mục sản phẩm của sàn; Cá nhân hóa theo Skin ID; Rào chắn y tế không chẩn đoán bệnh nặng. |
-| **T4.3** | **Admin Dashboard tinh gọn** | 10 giờ | `AdminDashboard.jsx` & API Admin | 4 thẻ KPI tổng quan; CRUD sản phẩm & ô nhập chuỗi thành phần INCI; Đổi trạng thái đơn hàng (`Pending` ➔ `Delivering` ➔ `Completed`). |
+| **T4.3** | **Admin Dashboard & Product CRUD hoàn chỉnh** | 10 giờ | `AdminDashboard.jsx`, `AdminProductSection.jsx`, `ProductFormModal.jsx` & `AdminProductService` | 4 thẻ KPI tổng quan; CRUD sản phẩm hoàn chỉnh (Liệt kê/Tìm kiếm/Lọc/Phân trang, Thêm mới, Sửa giá/tồn kho/INCI tự đồng bộ `product_ingredients`, Ngừng bán soft-delete `selling_status = Discontinued` & Khôi phục); Bảo vệ `[Authorize(Roles = "Admin")]` + `AdminBootstrapper` từ biến môi trường; Đổi trạng thái đơn hàng (`Pending` ➔ `Delivering` ➔ `Completed` / `Cancelled`). |
 | **T4.4** | **Tổng duyệt Demo, Slide & Launch PROD** | 8 giờ | Toàn bộ hệ thống | Kiểm tra `./syntheprise gate` Clean; Chạy thử nghiệm kịch bản Happy Path Demo từ A đến Z; Chuẩn bị slide và tài liệu thuyết minh. |
 
 🎯 **MỐC QUALITY GATE 4 (Cuối Tuần 4 — Bàn Giao & Launch):**
