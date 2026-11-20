@@ -181,8 +181,9 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.IngredientListRaw).HasColumnName("ingredient_list_raw").IsRequired();
             entity.Property(e => e.TargetSkinTypes).HasColumnName("target_skin_types").HasColumnType("varchar(50)[]");
             entity.Property(e => e.StockQuantity).HasColumnName("stock_quantity").HasDefaultValue(100);
+            entity.Property(e => e.SellingStatus).HasColumnName("selling_status").HasMaxLength(20).HasDefaultValue("Active").IsRequired();
             entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Ignore(e => e.UpdatedAtUtc);
+            entity.Property(e => e.UpdatedAtUtc).HasColumnName("updated_at");
 
             entity.HasOne(e => e.Brand)
                 .WithMany(b => b.Products)

@@ -15,6 +15,7 @@ public class Product : BaseEntity<int>
     public required string IngredientListRaw { get; set; }
     public string[] TargetSkinTypes { get; set; } = Array.Empty<string>();
     public int StockQuantity { get; set; } = 100;
+    public string SellingStatus { get; set; } = "Active";
 
     // Navigation properties
     public Brand? Brand { get; set; }

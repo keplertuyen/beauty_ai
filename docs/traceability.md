@@ -39,6 +39,9 @@ Tạo chuỗi liên kết xuyên suốt từ mục tiêu kinh doanh đến đi�
 | BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-03 | AC-CHAT-03 | TC-CHAT-03 | WG-P7-03 | — | v1.0 | Ready for implementation |
 | BO-05 Handoff tư vấn viên Zalo | FR-CHAT-07 | AC-CHAT-07 | TC-CHAT-07 | WG-P7-05 | — | v1.0 | Ready for implementation |
 | BO-07 Quản trị sàn & danh mục | FR-ADM-01 | AC-ADM-01 | TC-ADM-01 | WG-P8-02 | — | v1.0 | Ready for implementation |
+| BO-07 Quản trị sản phẩm CRUD & Soft Delete | FR-ADM-02 | AC-ADM-02-05..12 | TC-ADM-CRUD-01..08 | CHANGE-ADMIN-PRODUCT-CRUD | change/change-admin-product-crud | v1.0 | Implemented |
+| BO-07 Phân quyền API Admin | NFR-SEC-02 | AC-SEC-ADM-01..03 | TC-ADM-SEC-01 | CHANGE-ADMIN-PRODUCT-CRUD | change/change-admin-product-crud | v1.0 | Implemented |
+| BO-07 Khởi tạo tài khoản Admin từ biến môi trường | FR-ADM-17 | AC-ADM-17-01..05 | TC-ADM-BOOT-01 | CHANGE-ADMIN-PRODUCT-CRUD | change/change-admin-product-crud | v1.0 | Implemented |
 | BO-07 Nhật ký kiểm toán an ninh | FR-ADM-10 | AC-ADM-10 | TC-ADM-10 | WG-P8-01 | — | v1.0 | Ready for implementation |
 
 ## Rules

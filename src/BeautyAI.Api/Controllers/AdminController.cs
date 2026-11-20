@@ -1,33 +1,36 @@
-using System.Text.RegularExpressions;
 using BeautyAI.Application.DTOs;
 using BeautyAI.Application.Interfaces.Repositories;
-using BeautyAI.Domain.Entities;
+using BeautyAI.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeautyAI.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/admin")]
+[Authorize(Roles = "Admin")]
 public class AdminController : ControllerBase
 {
     private readonly IProductRepository _productRepository;
     private readonly IOrderRepository _orderRepository;
+    private readonly IAdminProductService _adminProductService;
 
     public AdminController(
         IProductRepository productRepository,
-        IOrderRepository orderRepository)
+        IOrderRepository orderRepository,
+        IAdminProductService adminProductService)
     {
         _productRepository = productRepository;
         _orderRepository = orderRepository;
+        _adminProductService = adminProductService;
     }
 
     [HttpGet("dashboard")]
     [HttpGet("kpis")]
     public async Task<IActionResult> GetDashboard(CancellationToken cancellationToken = default)
     {
-        var (products, totalProducts) = await _productRepository.GetProductsAsync(
-            new ProductFilterParams(PageSize: 100),
-            null,
+        var (products, totalProducts) = await _productRepository.GetAdminProductsAsync(
+            new AdminProductFilterParams(PageSize: 100),
             cancellationToken);
 
         var orders = await _orderRepository.GetAllOrdersAsync(100, cancellationToken);
@@ -76,6 +79,7 @@ public class AdminController : ControllerBase
             price_usd = p.PriceUsd,
             rating = 5.0,
             reviews_count = 120,
+            selling_status = p.SellingStatus,
             image_url = !string.IsNullOrWhiteSpace(p.ImageUrl) ? p.ImageUrl : $"/images/products/{p.Code}.webp"
         }).ToList();
 
@@ -157,47 +161,111 @@ public class AdminController : ControllerBase
         return Ok(new { message = $"Order {id} status updated to {request.Status}." });
     }
 
+    [HttpGet("products")]
+    public async Task<IActionResult> GetProducts(
+        [FromQuery(Name = "q")] string? q = null,
+        [FromQuery(Name = "query")] string? query = null,
+        [FromQuery] string? category = null,
+        [FromQuery] string? brand = null,
+        [FromQuery] string? status = null,
+        [FromQuery] int page = 1,
+        [FromQuery(Name = "per_page")] int perPage = 10,
+        CancellationToken cancellationToken = default)
+    {
+        var filter = new AdminProductFilterParams(
+            Query: !string.IsNullOrWhiteSpace(query) ? query : q,
+            Category: category,
+            Brand: brand,
+            Status: status,
+            Page: page,
+            PageSize: perPage
+        );
+
+        var result = await _adminProductService.GetProductsAsync(filter, cancellationToken);
+        return Ok(new
+        {
+            products = result.Items,
+            total = result.Total,
+            page = result.Page,
+            per_page = result.PageSize,
+            pages = result.Pages
+        });
+    }
+
+    [HttpGet("products/{id:int}")]
+    public async Task<IActionResult> GetProductById(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var product = await _adminProductService.GetProductByIdAsync(id, cancellationToken);
+        if (product == null)
+            return NotFound(new { detail = $"Product with ID {id} not found." });
+
+        return Ok(product);
+    }
+
     [HttpPost("products")]
     public async Task<IActionResult> CreateProduct(
         [FromBody] CreateProductAdminRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(request?.Name))
-            return BadRequest(new { detail = "Product name is required." });
-        if (string.IsNullOrWhiteSpace(request?.IngredientListRaw))
-            return BadRequest(new { detail = "INCI ingredient list is required." });
-
-        var brands = await _productRepository.GetBrandsAsync(cancellationToken);
-        var brand = brands.FirstOrDefault(b =>
-            !string.IsNullOrWhiteSpace(request.BrandName) &&
-            b.Name.Equals(request.BrandName.Trim(), StringComparison.OrdinalIgnoreCase)) ?? brands.FirstOrDefault();
-
-        var categories = await _productRepository.GetCategoriesAsync(cancellationToken);
-        var category = categories.FirstOrDefault(c =>
-            !string.IsNullOrWhiteSpace(request.CategoryName) &&
-            c.Name.Equals(request.CategoryName.Trim(), StringComparison.OrdinalIgnoreCase)) ?? categories.FirstOrDefault();
-
-        var code = "P" + DateTime.UtcNow.Ticks.ToString()[^8..];
-        var slug = Regex.Replace(request.Name.ToLowerInvariant(), @"[^a-z0-9]+", "-").Trim('-');
-
-        var product = new Product
+        try
         {
-            Code = code,
-            Name = request.Name.Trim(),
-            Slug = slug,
-            BrandId = brand?.Id ?? 1,
-            CategoryId = category?.Id ?? 1,
-            Department = "Skincare",
-            PriceUsd = Math.Max(1.0m, request.PriceUsd),
-            IngredientListRaw = request.IngredientListRaw.Trim(),
-            TargetSkinTypes = request.TargetSkinTypes ?? new[] { "All" },
-            Description = request.Description ?? "Premium skincare formulation parsed by BeautyAI.",
-            ImageUrl = !string.IsNullOrWhiteSpace(request.ImageUrl) ? request.ImageUrl : $"/images/products/{code}.webp",
-            StockQuantity = 100
-        };
+            var created = await _adminProductService.CreateProductAsync(request, cancellationToken);
+            return StatusCode(StatusCodes.Status201Created, created);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { detail = ex.Message });
+        }
+    }
 
-        var created = await _productRepository.CreateProductAsync(product, cancellationToken);
+    [HttpPut("products/{id:int}")]
+    public async Task<IActionResult> UpdateProduct(
+        int id,
+        [FromBody] UpdateProductAdminRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var updated = await _adminProductService.UpdateProductAsync(id, request, cancellationToken);
+            return Ok(updated);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { detail = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { detail = ex.Message });
+        }
+    }
 
-        return StatusCode(StatusCodes.Status201Created, created);
+    [HttpDelete("products/{id:int}")]
+    public async Task<IActionResult> DiscontinueProduct(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var discontinued = await _adminProductService.DiscontinueProductAsync(id, cancellationToken);
+        if (!discontinued)
+            return NotFound(new { detail = $"Product with ID {id} not found." });
+
+        return NoContent();
+    }
+
+    [HttpPatch("products/{id:int}/restore")]
+    public async Task<IActionResult> RestoreProduct(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var restored = await _adminProductService.RestoreProductAsync(id, cancellationToken);
+            return Ok(restored);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { detail = ex.Message });
+        }
     }
 }

@@ -24,6 +24,7 @@ public class ProductRepository : IProductRepository
             .Include(p => p.Brand)
             .Include(p => p.Category)
                 .ThenInclude(c => c!.Parent)
+            .Where(p => p.SellingStatus == "Active")
             .AsNoTracking();
 
         // 1. Text Search (Query) — Tokenized multi-word search for Brand, Name, Category, Description
@@ -144,7 +145,7 @@ public class ProductRepository : IProductRepository
             .Include(p => p.ProductIngredients)
                 .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == id && p.SellingStatus == "Active", cancellationToken);
     }
 
     public async Task<Product?> GetProductByCodeOrSlugAsync(string codeOrSlug, CancellationToken cancellationToken = default)
@@ -156,7 +157,9 @@ public class ProductRepository : IProductRepository
             .Include(p => p.ProductIngredients)
                 .ThenInclude(pi => pi.Ingredient)
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Code == codeOrSlug || p.Slug == codeOrSlug, cancellationToken);
+            .FirstOrDefaultAsync(
+                p => (p.Code == codeOrSlug || p.Slug == codeOrSlug) && p.SellingStatus == "Active",
+                cancellationToken);
     }
 
     public async Task<IReadOnlyList<Category>> GetCategoriesAsync(CancellationToken cancellationToken = default)
@@ -186,7 +189,7 @@ public class ProductRepository : IProductRepository
             .Include(p => p.Brand)
             .Include(p => p.Category)
             .AsNoTracking()
-            .Where(p => p.Id != productId && p.CategoryId == categoryId);
+            .Where(p => p.Id != productId && p.CategoryId == categoryId && p.SellingStatus == "Active");
 
         if (allergyBlacklist != null && allergyBlacklist.Any())
         {
@@ -300,5 +303,142 @@ public class ProductRepository : IProductRepository
         _context.Products.Add(product);
         await _context.SaveChangesAsync(cancellationToken);
         return product;
+    }
+
+    public async Task<(IReadOnlyList<Product> Items, int TotalCount)> GetAdminProductsAsync(
+        AdminProductFilterParams filter,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(filter.Query))
+        {
+            var rawQuery = filter.Query.Trim();
+            var tokens = rawQuery.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var token in tokens)
+            {
+                var t = token.ToLower();
+                query = query.Where(p =>
+                    p.Name.ToLower().Contains(t) ||
+                    p.Code.ToLower().Contains(t) ||
+                    (p.Brand != null && p.Brand.Name.ToLower().Contains(t)) ||
+                    (p.Category != null && p.Category.Name.ToLower().Contains(t)));
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Category) &&
+            !string.Equals(filter.Category, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            var cat = filter.Category.Trim();
+            query = query.Where(p => p.Category != null && (p.Category.Name == cat || p.Category.Slug == cat));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Brand) &&
+            !string.Equals(filter.Brand, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            var b = filter.Brand.Trim();
+            query = query.Where(p => p.Brand != null && (p.Brand.Name == b || p.Brand.Slug == b));
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Status) &&
+            !string.Equals(filter.Status, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            var st = filter.Status.Trim();
+            query = query.Where(p => p.SellingStatus == st);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var page = Math.Max(1, filter.Page);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
+
+        var items = await query
+            .OrderByDescending(p => p.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
+    public async Task<Product?> GetAdminProductByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Products
+            .Include(p => p.Brand)
+            .Include(p => p.Category)
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+    }
+
+    public async Task<bool> SlugExistsAsync(string slug, int? excludeProductId = null, CancellationToken cancellationToken = default)
+    {
+        return await _context.Products
+            .AsNoTracking()
+            .AnyAsync(
+                p => p.Slug == slug && (!excludeProductId.HasValue || p.Id != excludeProductId.Value),
+                cancellationToken);
+    }
+
+    public async Task<Product> UpdateProductAsync(Product product, CancellationToken cancellationToken = default)
+    {
+        _context.Products.Update(product);
+        await _context.SaveChangesAsync(cancellationToken);
+        return product;
+    }
+
+    public async Task SyncProductIngredientsAsync(int productId, string ingredientListRaw, CancellationToken cancellationToken = default)
+    {
+        var existingLinks = await _context.ProductIngredients
+            .Where(pi => pi.ProductId == productId)
+            .ToListAsync(cancellationToken);
+
+        if (existingLinks.Count > 0)
+        {
+            _context.ProductIngredients.RemoveRange(existingLinks);
+        }
+
+        if (string.IsNullOrWhiteSpace(ingredientListRaw))
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+            return;
+        }
+
+        var tokens = CosmeticKnowledgeBase.SplitInciList(ingredientListRaw);
+        if (tokens.Count == 0)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+            return;
+        }
+
+        var allIngredients = await _context.Ingredients
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        var ingredientMap = allIngredients
+            .Where(i => !string.IsNullOrWhiteSpace(i.InciName))
+            .GroupBy(i => i.InciName.Trim().ToLowerInvariant())
+            .ToDictionary(g => g.Key, g => g.First().Id);
+
+        var addedIngredientIds = new HashSet<int>();
+        var position = 1;
+
+        foreach (var rawToken in tokens)
+        {
+            var key = rawToken.Trim().ToLowerInvariant();
+            if (ingredientMap.TryGetValue(key, out var ingredientId) && addedIngredientIds.Add(ingredientId))
+            {
+                _context.ProductIngredients.Add(new ProductIngredient
+                {
+                    ProductId = productId,
+                    IngredientId = ingredientId,
+                    PositionOrder = position
+                });
+            }
+            position++;
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

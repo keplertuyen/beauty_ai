@@ -8,15 +8,69 @@ public record AdminKpisDto(
     int PendingOrders
 );
 
+public record AdminProductDto(
+    int Id,
+    string Code,
+    string Name,
+    string Slug,
+    int BrandId,
+    string BrandName,
+    int CategoryId,
+    string CategoryName,
+    string Department,
+    decimal PriceUsd,
+    int? VolumeMl,
+    int StockQuantity,
+    string SellingStatus,
+    string? Description,
+    string? ImageUrl,
+    string IngredientListRaw,
+    string[] TargetSkinTypes,
+    decimal Rating,
+    int ReviewsCount,
+    DateTime CreatedAtUtc,
+    DateTime? UpdatedAtUtc
+);
+
+public record AdminProductFilterParams(
+    string? Query = null,
+    string? Category = null,
+    string? Brand = null,
+    string? Status = null,
+    int Page = 1,
+    int PageSize = 10
+);
+
 public record CreateProductAdminRequest(
     string Name,
-    string? BrandName,
-    string? CategoryName,
-    decimal PriceUsd,
-    string IngredientListRaw,
+    string? BrandName = null,
+    string? CategoryName = null,
+    decimal PriceUsd = 0m,
+    string IngredientListRaw = "",
     string[]? TargetSkinTypes = null,
     string? Description = null,
-    string? ImageUrl = null
+    string? ImageUrl = null,
+    int StockQuantity = 100,
+    int? VolumeMl = null,
+    string? SellingStatus = "Active",
+    int? BrandId = null,
+    int? CategoryId = null
+);
+
+public record UpdateProductAdminRequest(
+    string Name,
+    string? BrandName = null,
+    string? CategoryName = null,
+    decimal PriceUsd = 0m,
+    string IngredientListRaw = "",
+    string[]? TargetSkinTypes = null,
+    string? Description = null,
+    string? ImageUrl = null,
+    int StockQuantity = 100,
+    int? VolumeMl = null,
+    string? SellingStatus = "Active",
+    int? BrandId = null,
+    int? CategoryId = null
 );
 
 public record UpdateOrderStatusRequest(

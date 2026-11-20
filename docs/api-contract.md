@@ -85,10 +85,15 @@ last_reviewed: 2026-10-30
 | `DELETE` | `/api/v1/routines/{id}` | AUTH | `FR-ROU-04` | Xóa chu trình routine |
 | `POST` | `/api/v1/ai/consult` | ALL/AUTH | `FR-AI-01` | Tư vấn da liễu và mỹ phẩm với Gemini API (Grounding + Guardrails) |
 | `GET` | `/api/v1/admin/dashboard` | ADMIN | `FR-ADM-01` | Bảng điều khiển phân tích tổng quan chỉ số |
-| `GET` | `/api/v1/admin/kpis` | ADMIN | `FR-ADM-02` | 4 thẻ KPI cốt lõi |
-| `GET` | `/api/v1/admin/orders` | ADMIN | `FR-ADM-03` | Danh sách đơn hàng COD quản trị |
-| `PATCH` | `/api/v1/admin/orders/{id}/status` | ADMIN | `FR-ADM-04` | Cập nhật trạng thái đơn hàng (Pending ➔ Delivering ➔ Completed) |
-| `POST` | `/api/v1/admin/products` | ADMIN | `FR-ADM-05` | Thêm sản phẩm mới và dán chuỗi thành phần INCI |
+| `GET` | `/api/v1/admin/kpis` | ADMIN | `FR-ADM-01` | 4 thẻ KPI cốt lõi |
+| `GET` | `/api/v1/admin/orders` | ADMIN | `FR-ADM-06` | Danh sách đơn hàng COD quản trị |
+| `PATCH` | `/api/v1/admin/orders/{id}/status` | ADMIN | `FR-ADM-06` | Cập nhật trạng thái đơn hàng (Pending ➔ Delivering ➔ Completed) |
+| `GET` | `/api/v1/admin/products` | ADMIN | `FR-ADM-02` | Danh sách sản phẩm quản trị (lọc `query`, `brand`, `category`, `status`, phân trang) |
+| `GET` | `/api/v1/admin/products/{id}` | ADMIN | `FR-ADM-02` | Chi tiết sản phẩm quản trị (kể cả `Draft`, `Discontinued`) |
+| `POST` | `/api/v1/admin/products` | ADMIN | `FR-ADM-02` | Thêm sản phẩm mới và đồng bộ chuỗi thành phần INCI |
+| `PUT` | `/api/v1/admin/products/{id}` | ADMIN | `FR-ADM-02` | Cập nhật sản phẩm và đồng bộ lại INCI khi có thay đổi |
+| `DELETE` | `/api/v1/admin/products/{id}` | ADMIN | `FR-ADM-02` | Ngừng bán sản phẩm (soft delete: `selling_status = Discontinued`) |
+| `PATCH` | `/api/v1/admin/products/{id}/restore` | ADMIN | `FR-ADM-02` | Khôi phục sản phẩm đã ngừng bán về trạng thái `Active` |
 | `GET` | `/catalog/products` | ALL | `FR-CAT-01`, `04`→`10` | |
 | `GET` | `/catalog/products/{slug}` | ALL | `FR-PDP-01`→`04` | |
 | `GET` | `/catalog/products/{id}/similar` | ALL | `FR-PDP-08` |

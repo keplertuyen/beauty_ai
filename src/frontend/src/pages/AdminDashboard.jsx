@@ -15,9 +15,9 @@ import {
   getDashboard,
   getAdminOrders,
   updateAdminOrderStatus,
-  createAdminProduct
 } from '../services/api';
 import { useApp } from '../context/AppContext';
+import AdminProductSection from '../components/admin/AdminProductSection';
 import './AdminDashboard.css';
 
 /* ── Palette ── */
@@ -79,19 +79,7 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
-
-  // Add Product Modal state
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [submittingProduct, setSubmittingProduct] = useState(false);
-  const [productForm, setProductForm] = useState({
-    name: '',
-    brandName: '',
-    categoryName: 'Moisturizer',
-    priceUsd: '',
-    ingredientListRaw: '',
-    targetSkinTypes: 'All, Oily, Combination',
-    description: ''
-  });
+  const [authErrorStatus, setAuthErrorStatus] = useState(null);
 
   const handleLogout = () => {
     logout();
@@ -100,9 +88,16 @@ export default function AdminDashboard() {
 
   const loadDashboard = () => {
     getDashboard()
-      .then(res => setData(res.data))
+      .then(res => {
+        setData(res.data);
+        setAuthErrorStatus(null);
+        setError(false);
+      })
       .catch(err => {
         console.error(err);
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          setAuthErrorStatus(err.response.status);
+        }
         setError(true);
       })
       .finally(() => setLoading(false));
@@ -132,48 +127,6 @@ export default function AdminDashboard() {
       toast.error(lang === 'vi' ? 'Không thể cập nhật trạng thái đơn' : 'Failed to update order status');
     } finally {
       setUpdatingOrderId(null);
-    }
-  };
-
-  const handleCreateProductSubmit = async (e) => {
-    e.preventDefault();
-    if (!productForm.name.trim() || !productForm.ingredientListRaw.trim()) {
-      toast.error(lang === 'vi' ? 'Vui lòng điền tên sản phẩm và chuỗi thành phần INCI' : 'Please provide product name and INCI ingredients string');
-      return;
-    }
-
-    setSubmittingProduct(true);
-    try {
-      const skinTypes = productForm.targetSkinTypes
-        ? productForm.targetSkinTypes.split(',').map(s => s.trim()).filter(Boolean)
-        : ['All'];
-
-      await createAdminProduct({
-        name: productForm.name.trim(),
-        brandName: productForm.brandName.trim() || 'BeautyAI',
-        categoryName: productForm.categoryName.trim() || 'Skincare',
-        priceUsd: parseFloat(productForm.priceUsd) || 28.0,
-        ingredientListRaw: productForm.ingredientListRaw.trim(),
-        targetSkinTypes: skinTypes,
-        description: productForm.description.trim() || 'Premium parsed skincare formulation.'
-      });
-
-      toast.success(lang === 'vi' ? 'Thêm sản phẩm mới thành công!' : 'Product created successfully!');
-      setShowAddModal(false);
-      setProductForm({
-        name: '',
-        brandName: '',
-        categoryName: 'Moisturizer',
-        priceUsd: '',
-        ingredientListRaw: '',
-        targetSkinTypes: 'All, Oily, Combination',
-        description: ''
-      });
-      loadDashboard();
-    } catch (err) {
-      toast.error(err.response?.data?.detail || (lang === 'vi' ? 'Lỗi khi tạo sản phẩm' : 'Failed to create product'));
-    } finally {
-      setSubmittingProduct(false);
     }
   };
 
@@ -207,11 +160,32 @@ export default function AdminDashboard() {
     return (
       <div className="ad-error">
         <BarChart2 size={48} />
-        <h2>{t('admin_error_title')}</h2>
-        <p>{t('admin_error_loading')}</p>
-        <button className="btn btn-primary" onClick={() => window.location.reload()}>
-          {t('admin_try_again')}
-        </button>
+        <h2>
+          {authErrorStatus
+            ? lang === 'vi'
+              ? 'Yêu Cầu Quyền Quản Trị (Admin)'
+              : 'Admin Authorization Required'
+            : t('admin_error_title')}
+        </h2>
+        <p>
+          {authErrorStatus === 401
+            ? lang === 'vi'
+              ? 'Vui lòng đăng nhập bằng tài khoản Admin để truy cập bảng điều khiển quản trị.'
+              : 'Please sign in with an Admin account to access the Admin Console.'
+            : authErrorStatus === 403
+              ? lang === 'vi'
+                ? 'Tài khoản hiện tại không có quyền Admin (403 Forbidden).'
+                : 'Your current account does not have Admin privileges (403 Forbidden).'
+              : t('admin_error_loading')}
+        </p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <Link to="/" className="btn btn-secondary">
+            {lang === 'vi' ? 'Về Trang Chủ' : 'Back to Home'}
+          </Link>
+          <button className="btn btn-primary" onClick={() => window.location.reload()}>
+            {t('admin_try_again')}
+          </button>
+        </div>
       </div>
     );
   }
@@ -334,14 +308,6 @@ export default function AdminDashboard() {
             <p className="ad-page-subtitle">{t('admin_subtitle')}</p>
           </div>
           <div className="ad-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => setShowAddModal(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '20px', padding: '8px 16px' }}
-            >
-              <Plus size={16} />
-              <span>{lang === 'vi' ? 'Thêm Sản Phẩm Mới (INCI)' : 'Add New Product (INCI)'}</span>
-            </button>
             <div className="ad-header-badge">
               <span className="ad-live-dot" />
               {t('admin_live')}
@@ -676,166 +642,12 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {/* ══ ADD PRODUCT MODAL (INCI INGESTION) ════════════ */}
-        {showAddModal && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.55)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 9999,
-              padding: '20px'
-            }}
-          >
-            <div
-              className="glass-card animate-scaleIn"
-              style={{
-                background: '#FFF',
-                maxWidth: '650px',
-                width: '100%',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                borderRadius: '16px',
-                padding: '28px',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid #EEE', paddingBottom: '12px' }}>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#2D2520' }}>
-                  {lang === 'vi' ? 'Thêm Mỹ Phẩm Mới & Nhập Bảng INCI' : 'Add New Cosmetic & INCI Ingredients'}
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <form onSubmit={handleCreateProductSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div>
-                  <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                    {lang === 'vi' ? 'Tên Sản Phẩm *' : 'Product Name *'}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="e.g. Ceramide Barrier Rescue Moisturizer"
-                    required
-                    value={productForm.name}
-                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                      {lang === 'vi' ? 'Thương Hiệu' : 'Brand Name'}
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="e.g. Paula's Choice, The Ordinary"
-                      value={productForm.brandName}
-                      onChange={(e) => setProductForm({ ...productForm, brandName: e.target.value })}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                      {lang === 'vi' ? 'Phân Loại' : 'Category'}
-                    </label>
-                    <select
-                      className="form-select"
-                      value={productForm.categoryName}
-                      onChange={(e) => setProductForm({ ...productForm, categoryName: e.target.value })}
-                    >
-                      <option value="Cleanser">Cleanser</option>
-                      <option value="Toner">Toner</option>
-                      <option value="Serum">Serum / Treatment</option>
-                      <option value="Moisturizer">Moisturizer</option>
-                      <option value="Sunscreen">Sunscreen (SPF)</option>
-                      <option value="Eye Cream">Eye Care</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div>
-                    <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                      {lang === 'vi' ? 'Giá Bán (USD) *' : 'Price (USD) *'}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      className="form-input"
-                      placeholder="35.00"
-                      required
-                      value={productForm.priceUsd}
-                      onChange={(e) => setProductForm({ ...productForm, priceUsd: e.target.value })}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                      {lang === 'vi' ? 'Loại Da Phù Hợp' : 'Target Skin Types'}
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="All, Dry, Oily, Sensitive"
-                      value={productForm.targetSkinTypes}
-                      onChange={(e) => setProductForm({ ...productForm, targetSkinTypes: e.target.value })}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', color: '#B3261E' }}>
-                    {lang === 'vi' ? 'Chuỗi Thành Phần INCI Bao Bì (Raw Ingredients Text) *' : 'Raw Packaging INCI String *'}
-                  </label>
-                  <p style={{ margin: '0 0 6px 0', fontSize: '0.78rem', color: '#666' }}>
-                    {lang === 'vi'
-                      ? 'Dán chuỗi thành phần từ vỏ hộp. Hệ thống AI sẽ tự động bóc tách từng hoạt chất và lập chỉ mục an toàn.'
-                      : 'Paste ingredients text directly. BeautyAI automatically extracts individual actives and indexes safety rules.'}
-                  </p>
-                  <textarea
-                    className="form-textarea"
-                    rows={4}
-                    required
-                    placeholder="Water/Aqua/Eau, Glycerin, Niacinamide, Salicylic Acid, Ceramide NP, Sodium Hyaluronate..."
-                    value={productForm.ingredientListRaw}
-                    onChange={(e) => setProductForm({ ...productForm, ingredientListRaw: e.target.value })}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowAddModal(false)}
-                  >
-                    {lang === 'vi' ? 'Hủy' : 'Cancel'}
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={submittingProduct}
-                  >
-                    {submittingProduct ? (lang === 'vi' ? 'Đang lưu...' : 'Ingesting...') : (lang === 'vi' ? 'Lưu & Khởi Tạo Sản Phẩm' : 'Save Product')}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        {/* ══ PRODUCT CATALOG CRUD SECTION ════════════════ */}
+        <AdminProductSection
+          lang={lang}
+          formatPrice={formatPrice}
+          onCatalogChanged={loadDashboard}
+        />
 
       </div>
     </div>

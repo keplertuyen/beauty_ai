@@ -105,6 +105,25 @@ public class ProductServiceTests
             Products.Add(product);
             return Task.FromResult(product);
         }
+
+        public Task<(IReadOnlyList<Product> Items, int TotalCount)> GetAdminProductsAsync(
+            AdminProductFilterParams filter,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(((IReadOnlyList<Product>)Products, Products.Count));
+
+        public Task<Product?> GetAdminProductByIdAsync(int id, CancellationToken cancellationToken = default) =>
+            Task.FromResult(Products.FirstOrDefault(p => p.Id == id));
+
+        public Task<bool> SlugExistsAsync(string slug, int? excludeProductId = null, CancellationToken cancellationToken = default) =>
+            Task.FromResult(Products.Any(p =>
+                p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase) &&
+                (!excludeProductId.HasValue || p.Id != excludeProductId.Value)));
+
+        public Task<Product> UpdateProductAsync(Product product, CancellationToken cancellationToken = default) =>
+            Task.FromResult(product);
+
+        public Task SyncProductIngredientsAsync(int productId, string ingredientListRaw, CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
     }
 
     private class FakeSkinProfileRepository : ISkinProfileRepository

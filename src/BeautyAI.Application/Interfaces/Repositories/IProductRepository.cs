@@ -43,4 +43,16 @@ public interface IProductRepository
     Task<Review> AddReviewAsync(Review review, CancellationToken cancellationToken = default);
 
     Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken = default);
+
+    Task<(IReadOnlyList<Product> Items, int TotalCount)> GetAdminProductsAsync(
+        AdminProductFilterParams filter,
+        CancellationToken cancellationToken = default);
+
+    Task<Product?> GetAdminProductByIdAsync(int id, CancellationToken cancellationToken = default);
+
+    Task<bool> SlugExistsAsync(string slug, int? excludeProductId = null, CancellationToken cancellationToken = default);
+
+    Task<Product> UpdateProductAsync(Product product, CancellationToken cancellationToken = default);
+
+    Task SyncProductIngredientsAsync(int productId, string ingredientListRaw, CancellationToken cancellationToken = default);
 }

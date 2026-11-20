@@ -58,6 +58,11 @@ public class OrderService : IOrderService
                 throw new InvalidOperationException($"Product #{reqItem.ProductId} does not exist.");
             }
 
+            if (!string.Equals(product.SellingStatus, "Active", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Product '{product.Name}' is no longer available for purchase.");
+            }
+
             if (product.StockQuantity < reqItem.Quantity)
             {
                 throw new InvalidOperationException($"Insufficient stock for '{product.Name}'. Available: {product.StockQuantity}.");

@@ -119,6 +119,11 @@ export const submitContact = (data) => API.post('/consultation/contact', data);
 export const getDashboard = () => API.get('/admin/dashboard');
 export const getAdminOrders = (limit = 50) => API.get('/admin/orders', { params: { limit } });
 export const updateAdminOrderStatus = (id, status) => API.patch(`/admin/orders/${id}/status`, { status });
+export const getAdminProducts = (params) => API.get('/admin/products', { params });
+export const getAdminProduct = (id) => API.get(`/admin/products/${id}`);
 export const createAdminProduct = (data) => API.post('/admin/products', data);
+export const updateAdminProduct = (id, data) => API.put(`/admin/products/${id}`, data);
+export const deleteAdminProduct = (id) => API.delete(`/admin/products/${id}`);
+export const restoreAdminProduct = (id) => API.patch(`/admin/products/${id}/restore`);
 
 export default API;

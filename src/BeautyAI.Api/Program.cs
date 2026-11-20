@@ -55,6 +55,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IToolsService, ToolsService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRoutineService, RoutineService>();
+builder.Services.AddScoped<IAdminProductService, AdminProductService>();
+builder.Services.AddScoped<AdminBootstrapper>();
 builder.Services.AddHttpClient<IAiSkincareProvider, GeminiSkincareProvider>();
 
 // 5. JWT Authentication
@@ -87,6 +89,39 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+// Ensure schema migration & optional env-driven Admin account bootstrap
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("AdminBootstrap");
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<BeautyAIDbContext>();
+        if (db.Database.IsRelational())
+        {
+            await db.Database.ExecuteSqlRawAsync(@"
+                ALTER TABLE products ADD COLUMN IF NOT EXISTS selling_status VARCHAR(20) NOT NULL DEFAULT 'Active';
+                ALTER TABLE products ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NULL;
+                CREATE INDEX IF NOT EXISTS idx_products_selling_status ON products(selling_status);
+            ");
+        }
+
+        var adminEmail = builder.Configuration["ADMIN_EMAIL"];
+        var adminPassword = builder.Configuration["ADMIN_PASSWORD"];
+        var adminFullName = builder.Configuration["ADMIN_FULL_NAME"];
+
+        var bootstrapper = scope.ServiceProvider.GetRequiredService<AdminBootstrapper>();
+        var bootstrapped = await bootstrapper.EnsureAdminUserAsync(adminEmail, adminPassword, adminFullName);
+        if (!bootstrapped)
+        {
+            logger.LogWarning("Admin account bootstrap skipped: set ADMIN_EMAIL and ADMIN_PASSWORD (>= 8 chars) in environment to provision or activate an Admin user.");
+        }
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Database schema ensure or Admin bootstrap skipped during startup.");
+    }
+}
 
 app.UseCors();
 app.UseAuthentication();

@@ -87,12 +87,15 @@ CREATE TABLE IF NOT EXISTS products (
     ingredient_list_raw TEXT NOT NULL, -- Raw INCI ingredient string from packaging
     target_skin_types VARCHAR(50)[] NOT NULL, -- ARRAY['Oily', 'Combination']
     stock_quantity INT DEFAULT 100 NOT NULL CHECK (stock_quantity >= 0),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
+    selling_status VARCHAR(20) DEFAULT 'Active' NOT NULL, -- 'Active' | 'Draft' | 'Discontinued'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NULL
 );
 CREATE INDEX IF NOT EXISTS idx_products_code ON products(code);
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
+CREATE INDEX IF NOT EXISTS idx_products_selling_status ON products(selling_status);
 
 -- 6. PRODUCT INGREDIENTS JOIN TABLE
 CREATE TABLE IF NOT EXISTS product_ingredients (
