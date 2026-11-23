@@ -4,7 +4,7 @@ title: Product Requirements Document (PRD) — BeautyAI Phase 1 (MVP Launch)
 status: stable
 precedence: 3
 owner: BA / Product Owner
-last_reviewed: 2026-10-26
+last_reviewed: 2026-11-23
 ---
 
 # PRODUCT REQUIREMENTS DOCUMENT (PRD) — BEAUTYAI PHASE 1 (MVP)
@@ -123,8 +123,8 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ### FR-CAT-03 [Must-Have] Lọc theo Loại da & Khoảng giá
 - **Điều kiện chấp nhận:**
-  - `AC-03.1` **Given** thanh công cụ lọc bên trái, **When** tôi chọn Loại da (`Da dầu`, `Da khô`, `Da hỗn hợp`, `Da nhạy cảm`), **Then** danh sách sản phẩm lập tức làm mới chỉ hiển thị các sản phẩm được dán nhãn tương thích với loại da đó.
-  - `AC-03.2` **Given** thanh trượt giá (Price Slider), **When** tôi kéo chọn khoảng giá từ 200.000₫ đến 500.000₫, **Then** các sản phẩm ngoài khoảng giá này sẽ bị ẩn đi.
+  - `AC-03.1` **Given** thanh công cụ lọc bên trái, **When** tôi chọn Loại da (`Oily`, `Dry`, `Combination`, `Normal`, `Sensitive`), **Then** danh sách sản phẩm lập tức làm mới chỉ hiển thị các sản phẩm được dán nhãn tương thích với loại da đó.
+  - `AC-03.2` **Given** bộ lọc khoảng giá (Price Filter USD `$`), **When** tôi chọn khoảng giá từ `$15` đến `$50`, **Then** các sản phẩm ngoài khoảng giá này sẽ bị ẩn đi.
 
 ### FR-CAT-04 [Must-Have] Sắp xếp sản phẩm
 - **Điều kiện chấp nhận:**
@@ -132,14 +132,14 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ### FR-CAT-05 [Must-Have] Quản lý Chip bộ lọc
 - **Điều kiện chấp nhận:**
-  - `AC-05.1` **Given** tôi đang áp dụng 3 điều kiện lọc (Da dầu, Dưới 500k, Thương hiệu Paula's Choice), **When** danh sách hiển thị, **Then** phía trên lưới sản phẩm xuất hiện 3 thẻ Chip tương ứng. Bấm icon `x` trên từng chip sẽ xóa điều kiện đó; bấm *"Xóa tất cả"* sẽ reset toàn bộ bộ lọc về mặc định.
+  - `AC-05.1` **Given** tôi đang áp dụng 3 điều kiện lọc (Oily Skin, Under $50, Thương hiệu Paula's Choice), **When** danh sách hiển thị, **Then** phía trên lưới sản phẩm xuất hiện 3 thẻ Chip tương ứng. Bấm icon `x` trên từng chip sẽ xóa điều kiện đó; bấm *"Xóa tất cả"* sẽ reset toàn bộ bộ lọc về mặc định.
 
 ### FR-CAT-06 [Must-Have — USP] Bộ lọc độc quyền "An toàn cho da tôi" (Allergy Filter Toggle)
 - **Mô tả:** Công tắc lọc cá nhân hóa tối thượng giúp loại bỏ hoàn toàn các sản phẩm chứa thành phần dị ứng của khách hàng.
 - **Tiền điều kiện:** Người dùng đã đăng nhập và đã cấu hình ít nhất 1 chất trong `Allergy Blacklist`.
 - **Điều kiện chấp nhận:**
   - `AC-06.1` **Given** tôi là khách vãng lai hoặc chưa có chất dị ứng nào trong Blacklist, **When** tôi xem trang Catalog, **Then** công tắc *"An toàn cho da tôi"* bị làm mờ (disabled) kèm tooltip giải thích: *"Vui lòng đăng nhập và thiết lập danh sách dị ứng trong Skin ID để dùng tính năng này."*
-  - `AC-06.2` **Given** tôi đã đăng nhập và có dị ứng với `Alcohol Denat` (Cồn khô), **When** tôi bật công tắc *"An toàn cho da tôi"*, **Then** hệ thống ngay lập tức lọc bỏ toàn bộ sản phẩm có chứa `Alcohol Denat` ra khỏi danh sách hiển thị, đảm bảo 100% sản phẩm còn lại an toàn tuyệt đối với tôi.
+  - `AC-06.2` **Given** tôi đã đăng nhập và có dị ứng với `Alcohol Denat` (Cồn khô), **When** tôi bật công tắc *"An toàn cho da tôi"*, **Then** hệ thống ngay lập tức lọc bỏ toàn bộ sản phẩm có chứa `Alcohol Denat` cũng như các mỹ phẩm thiếu bảng INCI từ hãng ra khỏi danh sách hiển thị (vẫn giữ dụng cụ vật lý `Tools & Brushes`), đảm bảo 100% sản phẩm mỹ phẩm còn lại an toàn với tôi.
 
 ---
 
@@ -195,7 +195,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
     1. Loại da chính (1 trong 4 loại): `Da dầu (Oily)`, `Da khô (Dry)`, `Da hỗn hợp (Combination)`, `Da thường (Normal)`.
     2. Độ nhạy cảm da: Công tắc bật/tắt `Da nhạy cảm (Sensitive Skin)`.
     3. Mối quan tâm về da (chọn tối đa 5): `Mụn ẩn / Mụn viêm`, `Thâm nám / Tàn nhang`, `Lỗ chân lông to`, `Lão hóa / Nếp nhăn`, `Khô ráp / Bong tróc`, `Đỏ rát / Dễ kích ứng`.
-  - `AC-01.2` **Given** tôi bấm *"Lưu hồ sơ da"*, **Then** dữ liệu được cập nhật tức thời vào CSDL và áp dụng ngay lập tức cho các thuật toán tính Match Score và AI tư vấn.
+  - `AC-01.2` **Given** tôi bấm *"Lưu hồ sơ da"*, **Then** dữ liệu được cập nhật tức thời vào CSDL và áp dụng ngay lập tức cho các thuật toán đánh giá kết luận độ phù hợp (`Suitability Verdict`) và AI tư vấn.
 
 ### FR-SKIN-02 [Must-Have — USP] Quản lý danh sách đen dị ứng (Allergy Blacklist)
 - **Mô tả:** Nơi người dùng ghi nhận tất cả các thành phần hóa học họ không thể sử dụng.
@@ -218,8 +218,8 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
   - `AC-01.1` **Given** tôi vào trang thiết lập hồ sơ da `/skin-profile`, **When** màn hình hiển thị, **Then** hiển thị form 1 trang duy nhất với đúng 3 bước theo thứ tự y khoa:
     - **Bước 1 (Cơ địa nền tảng — Loại da):** 5 thẻ lựa chọn trực quan: `Oily` (Da dầu), `Dry` (Da khô), `Combination` (Hỗn hợp), `Normal` (Da thường), `Sensitive` (Da nhạy cảm).
     - **Bước 2 (Vùng cấm kỵ an toàn — Blacklist Dị ứng):** Khung quản lý hoạt chất dị ứng cá nhân, cho phép nhập tên hoặc chọn nhanh các chất kích ứng phổ biến (`Alcohol Denat` / Cồn khô, `Fragrance/Parfum` / Hương liệu, `Paraben`, `BHA`, `Sulfate`...) kèm ô ghi chú triệu chứng (VD: *"gây mẩn đỏ châm chích"*).
-    - **Bước 3 (Nhu cầu cải thiện — Vấn đề da & Mục tiêu):** Chọn các vấn đề da ưu tiên (`Acne`, `Aging`, `DarkSpots`, `Pores`, `Sensitivity`, `Dehydration`), Mục tiêu chăm sóc (`Primary Goal`: Giảm mụn, Chống lão hóa, Cấp ẩm...) và Mức ngân sách dự kiến (`Low`: < 500k, `Medium`: 500k-1.5tr, `High`: > 1.5tr).
-  - `AC-01.2` **Given** tôi bấm *"Lưu hồ sơ Digital Skin ID"*, **Then** toàn bộ dữ liệu (Loại da, Blacklist dị ứng, Vấn đề da, Mục tiêu) được lưu đồng thời vào CSDL trong một transaction duy nhất, và hệ thống tự động cập nhật lại Match Score % của toàn bộ sản phẩm trên sàn.
+    - **Bước 3 (Nhu cầu cải thiện — Vấn đề da & Mục tiêu):** Chọn các vấn đề da ưu tiên (`Acne`, `Aging`, `DarkSpots`, `Pores`, `Sensitivity`, `Dehydration`), Mục tiêu chăm sóc (`Primary Goal`: Giảm mụn, Chống lão hóa, Cấp ẩm...) và Mức ngân sách dự kiến (`Low`: < $30, `Medium`: $30–$75, `High`: > $75).
+  - `AC-01.2` **Given** tôi bấm *"Lưu hồ sơ Digital Skin ID"*, **Then** toàn bộ dữ liệu (Loại da, Blacklist dị ứng, Vấn đề da, Mục tiêu) được lưu đồng thời vào CSDL trong một transaction duy nhất, và hệ thống tự động cập nhật lại kết luận `Suitability Verdict` của toàn bộ sản phẩm trên sàn.
 
 ### FR-ROUTINE-02 [Must-Have] Tự động sinh chu trình Routine chuẩn AM/PM
 - **Quy tắc nghiệp vụ:** Bắt buộc có Kem chống nắng vào buổi sáng (`BR-ROUTINE-01`).
@@ -372,9 +372,11 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 
 ## 4.14. Module 14 — Quản Trị Sàn Tinh Gọn (M14: Admin Console)
 
-### FR-ADM-01 [Must-Have] Bảng điều khiển KPI kinh doanh (Dashboard)
+### FR-ADM-01 [Must-Have] Bảng điều khiển KPI kinh doanh & Thống kê dữ liệu thật (Dashboard & Analytics)
 - **Điều kiện chấp nhận:**
-  - `AC-01.1` **Given** tài khoản `ADMIN` truy cập `/admin`, **When** trang tải xong, **Then** hiển thị 4 thẻ số liệu thống kê trực quan: Tổng số sản phẩm đang bán, Tổng số đơn hàng phát sinh, Tổng doanh thu lũy kế (USD $), và Tổng số tài khoản khách hàng.
+  - `AC-01.1` **Given** tài khoản `ADMIN` truy cập `/admin`, **When** trang tải xong, **Then** hiển thị 4 thẻ số liệu thống kê trực quan: Tổng số sản phẩm trong hệ thống, Tổng số đơn hàng phát sinh, Tổng doanh thu lũy kế (USD $), và Đơn hàng chờ xử lý (`Pending`).
+  - `AC-01.2` **Given** tab *Analytics & Charts*, **When** Admin xem báo cáo, **Then** hệ thống hiển thị Top 10 sản phẩm theo tổng lượt đánh giá & điểm sao thực tế, cùng biểu đồ phân bố theo Danh mục, Thương hiệu, Phân khúc giá và Điểm đánh giá được tính toán trực tiếp trên 8.494 sản phẩm và 1.09 triệu đánh giá thật trong PostgreSQL.
+  - `AC-01.3` **Given** hệ thống khởi động, **Then** `AdminBootstrapper` tự động khởi tạo hoặc đồng bộ tài khoản Admin từ biến môi trường (`ADMIN_EMAIL`, `ADMIN_PASSWORD`) với băm mật khẩu PBKDF2 an toàn.
 
 ### FR-ADM-02 [Must-Have] Quản lý sản phẩm & Nhập chuỗi thành phần INCI (CRUD hoàn chỉnh)
 - **Điều kiện chấp nhận:**
@@ -404,7 +406,7 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
    - **INV-02:** Toàn bộ hệ thống chạy chuẩn duy nhất một loại tiền tệ là **USD ($)** trong Phase 1 (đồng bộ 100% với Sephora dataset); tính năng chuyển đổi song tệ (VND/USD) và bản địa hóa Tiếng Việt (i18n) thuộc Phase 2.
 4. **Tính khả dụng & Trải nghiệm (Usability - NFR-UI):**
    - Giao diện web chuẩn Responsive mượt mà trên cả máy tính bàn (Desktop) và điện thoại di động (Mobile).
-   - Bảng so sánh sản phẩm hỗ trợ cuộn ngang mượt mà khi xem trên màn hình nhỏ.
+   - Bảng thành phần INCI 3 tầng và khay giỏ hàng (`CartDrawer`) hiển thị trực quan, không gây quá tải thông tin.
 
 ---
 
@@ -413,6 +415,6 @@ BeautyAI là nền tảng thương mại điện tử mỹ phẩm kết hợp **
 Mỗi tính năng của Phase 1 chỉ được đánh dấu là **HOÀN THÀNH (DONE)** khi thỏa mãn đầy đủ 5 tiêu chí:
 1. Giao diện frontend hoạt động chính xác theo đúng mô tả Given/When/Then, không phát sinh lỗi console.
 2. API backend C# .NET 10 xử lý chuẩn, có validation dữ liệu đầu vào và xử lý ngoại lệ toàn cục.
-3. Bộ kiểm thử kiến trúc `BeautyAI.ArchitectureTests` chạy XANH 100% (không vi phạm bất biến INV-01 và Clean Architecture).
+3. Bộ kiểm thử kiến trúc `BeautyAI.ArchitectureTests` (12/12 tests) và `BeautyAI.UnitTests` (46/46 tests) chạy XANH 100% (không vi phạm bất biến INV-01, Clean Architecture và Admin Authorization).
 4. Kiểm tra chất lượng `./syntheprise gate` đạt trạng thái **Clean** (0 lỗi, 0 cảnh báo).
 5. Kịch bản chạy thử nghiệm xuyên suốt (Happy Path Demo) hoạt động hoàn hảo phục vụ bảo vệ đồ án tốt nghiệp.

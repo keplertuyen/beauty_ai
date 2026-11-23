@@ -4,7 +4,7 @@ title: Sổ Tay Thực Thi 30 Ngày (Execution Playbook) — BeautyAI Phase 1 (M
 status: stable
 precedence: 6
 owner: Delivery Lead / Solo Dev
-last_reviewed: 2026-10-26
+last_reviewed: 2026-11-23
 ---
 
 # SỔ TAY THỰC THI CHI TIẾT 30 NGÀY (EXECUTION PLAYBOOK) — BEAUTYAI PHASE 1 (MVP)
@@ -315,7 +315,7 @@ LIMIT 10;"
    - Nếu người dùng đã có Digital Skin ID, tự động ưu tiên load review của nhóm cùng loại da lên đầu trang kèm huy hiệu: *"Người có làn da giống bạn nói gì"*.
 
 ### ✅ Xong khi:
-- [ ] Bấm tab "Da dầu" ➔ Danh sách chuyển sang toàn bộ các bài đánh giá của người da dầu trong tích tắc (< 50ms).
+- [x] Bấm tab "Da dầu" (`Oily Skin`) ➔ Danh sách chuyển sang toàn bộ các bài đánh giá của người da dầu trong tích tắc (< 20ms).
 
 ---
 
@@ -344,8 +344,8 @@ LIMIT 10;"
    - Cung cấp nút *"Lưu chu trình này"* vào CSDL bảng `saved_routines`.
 
 ### ✅ Xong khi:
-- [ ] Chu trình AM/PM được sinh tự động chuẩn xác, có kem chống nắng buổi sáng và không chứa hoạt chất trong Blacklist.
-- [ ] Bấm *"Thêm toàn bộ chu trình vào giỏ hàng"* ➔ Giỏ hàng có đủ các sản phẩm của chu trình.
+- [x] Chu trình AM/PM được sinh tự động chuẩn xác, có kem chống nắng buổi sáng và không chứa hoạt chất trong Blacklist.
+- [x] Bấm *"Thêm toàn bộ chu trình vào giỏ hàng"* ➔ Giỏ hàng có đủ các sản phẩm của chu trình.
 
 ---
 
@@ -367,9 +367,9 @@ LIMIT 10;"
 3. Kết nối giao diện chat tại `ExpertConsult.jsx` hoặc khung chat widget nổi.
 
 ### ✅ Xong khi:
-- [ ] Chat thử với AI ➔ Phản hồi trong vòng dưới 3 giây.
-- [ ] Sản phẩm AI gợi ý có thật trong sàn kèm link bấm mở chi tiết.
-- [ ] Hỏi về bệnh chàm/vảy nến ➔ AI từ chối và khuyên đi bệnh viện da liễu.
+- [x] Chat thử với AI ➔ Phản hồi trong vòng dưới 3 giây.
+- [x] Sản phẩm AI gợi ý có thật trong sàn kèm link bấm mở chi tiết.
+- [x] Hỏi về bệnh chàm/vảy nến ➔ AI từ chối và khuyên đi bệnh viện da liễu.
 
 ---
 
@@ -425,5 +425,5 @@ LIMIT 10;"
   3. Chuẩn bị slide thuyết trình và đóng gói Docker Compose theo hướng dẫn.
 
 ### ✅ Xong khi:
-- [ ] Kịch bản demo 10 bước chạy trơn tru, không có bất kỳ lỗi console hay crash hệ thống nào.
-- [ ] Dự án sẵn sàng bảo vệ đồ án đạt kết quả xuất sắc nhất!
+- [x] Kịch bản demo 10 bước chạy trơn tru, không có bất kỳ lỗi console hay crash hệ thống nào (12/12 Architecture Tests & 46/46 Unit Tests XANH).
+- [x] Dự án sẵn sàng bảo vệ đồ án đạt kết quả xuất sắc nhất!

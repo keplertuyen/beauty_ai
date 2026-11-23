@@ -31,12 +31,12 @@
 ### 🟢 Phase 1 — Triển khai cho đồ án:
 1. **Duyệt danh mục sản phẩm:** Cây danh mục 2-3 cấp (Chăm sóc da -> Làm sạch -> Sữa rửa mặt / Tẩy trang...).
 2. **Tìm kiếm sản phẩm:** Tìm theo tên sản phẩm, tên thương hiệu hoặc từ khóa hoạt chất (ví dụ: gõ "Niacinamide").
-3. **Lọc theo Loại da & Khoảng giá:** Lọc sản phẩm phù hợp da dầu, khô, nhạy cảm... và thanh trượt khoảng giá (VND).
+3. **Lọc theo Loại da & Khoảng giá:** Lọc sản phẩm phù hợp da dầu, khô, nhạy cảm... và thanh trượt khoảng giá (USD $).
 4. **Sắp xếp kết quả:** Theo giá tăng/giảm, đánh giá sao cao nhất, bán chạy/phổ biến.
 5. **Hiển thị & xóa bộ lọc:** Danh sách các chip bộ lọc đang áp dụng, có nút xóa từng filter và "Xóa tất cả".
 6. **Lọc riêng "An toàn cho da tôi" *(USP)*:** 
    - Công tắc (toggle switch) dành cho user đã đăng nhập và có Digital Skin ID.
-   - Khi bật: Tự động loại bỏ toàn bộ sản phẩm chứa thành phần trong **Allergy Blacklist** của user đó.
+   - Khi bật: Tự động loại bỏ toàn bộ sản phẩm chứa thành phần trong **Allergy Blacklist** của user đó và các mỹ phẩm thiếu bảng INCI từ hãng (vẫn giữ dụng cụ vật lý `Tools & Brushes`).
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
 - *Lọc theo chứng nhận (Vegan / Cruelty-Free / Clean) & Lọc loại trừ "Free-of" chi tiết:* Tốn rất nhiều công chuẩn hóa dữ liệu từng sản phẩm; chỉ đưa vào danh mục thuộc tính mở rộng ở Phase 2.
@@ -98,26 +98,24 @@
 
 ---
 
-## 5. SKIN QUIZ & ROUTINE BUILDER
+## 5. DIGITAL SKIN ID 1 CHẠM & ROUTINE BUILDER (CHAT-TO-CART)
 
 ### 🟢 Phase 1 — Triển khai cho đồ án (USP Cốt lõi):
-1. **Bộ câu hỏi chẩn đoán sơ bộ (4-5 bước):**
-   - Câu 1: Cảm giác da sau khi rửa mặt 30 phút? (Xác định loại da).
-   - Câu 2: Vấn đề da ưu tiên cải thiện nhất? (Mụn / Sạm / Lão hóa...).
-   - Câu 3: Mức độ nhạy cảm của da? (Dễ ửng đỏ / Bình thường).
-   - Câu 4: Ngân sách dự kiến cho chu trình dưỡng da?
-2. **Tính toán gợi ý theo thuật toán phân tầng:**
-   - Lọc danh mục phù hợp -> Khớp loại da -> Trừ điểm tuyệt đối (-1000) với sản phẩm dính Allergy Blacklist -> Chọn sản phẩm tối ưu trong ngân sách.
-3. **Hiển thị Routine Builder AM/PM trực quan:**
-   - **AM (Buổi sáng):** Làm sạch -> Cân bằng/Đặc trị -> Dưỡng ẩm -> **Chống nắng (Bắt buộc)**.
-   - **PM (Buổi tối):** Tẩy trang -> Làm sạch -> Đặc trị -> Dưỡng ẩm.
-4. **Giải thích lý do đề xuất:** Nêu rõ tại sao bộ sản phẩm này phù hợp với tình trạng da đã chọn.
-5. **Cảnh báo xung đột trong routine:** Kiểm tra xem các bước trong cùng buổi có chứa hoạt chất kỵ nhau hay không.
-6. **Chat-to-Cart *(Tính năng Wow)*:** Nút bấm *"Thêm toàn bộ Routine vào giỏ hàng"* (tự động đưa cả 3-5 sản phẩm vào giỏ cùng lúc).
-7. **Lưu routine vào hồ sơ:** Lưu lại kết quả để user xem lại trong trang cá nhân mà không cần làm lại quiz.
+1. **Thiết lập Digital Skin ID 1 chạm (30 giây) theo thứ tự y khoa:**
+   - Bước 1 (Cơ địa nền tảng): Chọn loại da (`Oily`, `Dry`, `Combination`, `Normal`, `Sensitive`).
+   - Bước 2 (Vùng cấm kỵ an toàn): Khai báo hoặc chọn nhanh các chất trong **Allergy Blacklist** (`Alcohol Denat`, `Fragrance`, `Paraben`, `Sulfate`...).
+   - Bước 3 (Nhu cầu cải thiện & Ngân sách): Chọn vấn đề da ưu tiên (`Acne`, `Aging`, `DarkSpots`, `Pores`, `Sensitivity`, `Dehydration`), mục tiêu chính và mức ngân sách (`Low`, `Medium`, `High`).
+2. **Tính toán gợi ý theo thuật toán phân tầng (`RoutineService`):**
+   - Lọc danh mục phù hợp -> Khớp loại da -> Loại trừ tuyệt đối sản phẩm dính Allergy Blacklist -> Kiểm tra 0 xung đột hoạt chất nội bộ qua 12 quy tắc y khoa -> Chọn sản phẩm tối ưu trong ngân sách.
+3. **Hiển thị Routine Builder AM/PM trực quan (`/routines`):**
+   - **AM (Buổi sáng):** Làm sạch -> Cân bằng/Chống oxy hóa -> Dưỡng ẩm -> **Chống nắng (Bắt buộc)**.
+   - **PM (Buổi tối):** Làm sạch kép -> Đặc trị chuyên sâu -> Kem dưỡng phục hồi ban đêm.
+4. **Giải thích lý do đề xuất & Kiểm tra xung đột tự động:** Nêu rõ công năng từng bước và đảm bảo các bước trong cùng buổi không chứa hoạt chất kỵ nhau.
+5. **Chat-to-Cart *(Tính năng Wow)*:** Nút bấm *"Thêm toàn bộ Routine vào giỏ hàng"* (tự động đưa trọn bộ sản phẩm của chu trình vào giỏ chỉ trong 1 click).
+6. **Lưu & Quản lý routine cá nhân:** Lưu chu trình vào bảng `saved_routines` (`Morning`, `Night`, `Treatment`) để xem lại hoặc xóa trong hồ sơ cá nhân.
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
-- *Làm lại quiz & so sánh với routine cũ theo dòng thời gian.*
+- *Bài trắc nghiệm chẩn đoán da đa tầng nâng cao & so sánh với routine cũ theo dòng thời gian.*
 - *Xuất routine ra file PDF / chia sẻ lên mạng xã hội.*
 
 ---
@@ -198,16 +196,16 @@
 
 ---
 
-## 11. TRỢ LÝ AI (AI SKINCARE ASSISTANT)
+## 11. TRỢ LÝ AI (AI SKINCARE ASSISTANT — LUMI)
 
 ### 🟢 Phase 1 — Triển khai cho đồ án (USP Cốt lõi):
-1. **Giao diện Chatbot:** Khung chat dạng widget nổi ở góc màn hình hoặc trang chat riêng biệt (`/chat`).
-2. **Kết nối mô hình AI (Google Gemini API):** Sử dụng model Gemini 1.5 Flash / Pro với độ trễ thấp và chi phí tối ưu.
-3. **Grounding dữ liệu sản phẩm:** AI được nạp ngữ cảnh danh mục sản phẩm của sàn để khi tư vấn chu trình, AI sẽ giới thiệu chính xác các sản phẩm đang có bán trên web kèm link/hình ảnh.
-4. **Cá nhân hóa theo hồ sơ da:** AI tự động đọc Digital Skin ID của người dùng (nếu đã đăng nhập) để chào hỏi và đưa ra lời khuyên tránh các chất dị ứng của họ.
-5. **System Prompt kiểm soát an toàn:**
-   - Đóng vai trò chuyên viên tư vấn mỹ phẩm.
-   - Tuyệt đối không chẩn đoán bệnh da liễu nặng (như chàm, vảy nến, viêm da mủ); khi gặp từ khóa bệnh lý, AI lịch sự khuyên người dùng đến bệnh viện khám chuyên khoa.
+1. **Giao diện Tư vấn Chuyên gia AI (`/expert-consult`):** Trang tư vấn trực quan có thẻ sản phẩm tương tác trực tiếp với nút *"Add to Cart"* ngay trong khung chat.
+2. **Kết nối mô hình AI (Google Gemini 2.5 Flash + Scientific Rule-Based Fallback):** Sử dụng model `gemini-2.5-flash` qua `GeminiSkincareProvider` (tầng Infrastructure Adapter) với độ trễ thấp, kèm cơ chế dự phòng dựa trên bộ quy tắc khoa học (Rule-based Fallback) vận hành mượt mà ngay cả khi offline hoặc hết quota API.
+3. **Grounding dữ liệu sản phẩm:** AI được nạp ngữ cảnh danh mục sản phẩm còn hàng của sàn (giá chuẩn USD `$`) để khi tư vấn chu trình, AI sẽ giới thiệu chính xác các sản phẩm đang có bán trên web kèm thẻ sản phẩm, giá bán và nút mua nhanh.
+4. **Cá nhân hóa theo hồ sơ da:** AI tự động đọc Digital Skin ID của người dùng (nếu đã đăng nhập) để chào hỏi và loại bỏ 100% các sản phẩm chứa chất trong **Allergy Blacklist** của họ.
+5. **System Prompt kiểm soát an toàn y khoa (Clinical Guardrails):**
+   - Đóng vai trò chuyên viên tư vấn mỹ phẩm & chăm sóc da khoa học.
+   - Tuyệt đối không chẩn đoán hoặc kê đơn cho bệnh da liễu nặng (như chàm bội nhiễm, vảy nến, viêm da mủ, nhiễm nấm); khi gặp từ khóa bệnh lý lâm sàng, AI lịch sự khuyên người dùng đến bệnh viện khám bác sĩ chuyên khoa da liễu.
    - Ngăn chặn các câu hỏi ngoài phạm vi làm đẹp (Prompt guardrail).
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
@@ -222,14 +220,14 @@
 ### 🟢 Phase 1 — Triển khai cho đồ án (Thế mạnh dữ liệu lớn):
 1. **Xem danh sách đánh giá trên trang sản phẩm (PDP):**
    - Hiển thị điểm số trung bình (sao 1-5) và biểu đồ phân bổ số lượng đánh giá theo sao.
-   - Hiển thị danh sách review thực tế từ tập dữ liệu 1 triệu records.
+   - Hiển thị danh sách review thực tế từ tập dữ liệu 1.09 triệu records (truy vấn siêu tốc < 20ms nhờ chỉ mục kép B-Tree `idx_reviews_product_skin`).
 2. **Lọc đánh giá theo Loại da & Vấn đề da *(Tính năng cực kỳ giá trị)*:**
-   - Người dùng có thể lọc: *"Chỉ xem đánh giá từ những người có DA DẦU"* hoặc *"DA NHẠY CẢM"*.
+   - Người dùng có thể lọc: *"Chỉ xem đánh giá từ những người có DA DẦU (`Oily`)"*, *"DA KHÔ (`Dry`)"*, *"DA HỖN HỢP (`Combination`)"*, *"DA THƯỜNG (`Normal`)"*.
    - Giúp khách hàng xem đúng trải nghiệm của người có cơ địa tương đồng.
-3. **"Người có làn da giống bạn nói gì" (Tổng hợp thông minh):**
-   - Nếu user đã có Digital Skin ID, trang PDP tự động ưu tiên hiển thị các review của nhóm người dùng có cùng loại da lên đầu trang.
-4. **Viết đánh giá cho sản phẩm đã mua:**
-   - Form cho phép khách hàng đã mua gửi số sao, nhận xét và tick chọn loại da của mình lúc đánh giá.
+3. **"Người có làn da giống bạn nói gì" (Banner cá nhân hóa 1 chạm):**
+   - Nếu user đã có Digital Skin ID, trang PDP hiển thị nút lọc 1 chạm và ưu tiên hiển thị các review của nhóm người dùng có cùng loại da.
+4. **Viết đánh giá cho sản phẩm:**
+   - Form cho phép khách hàng gửi số sao, nhận xét và chọn loại da của mình lúc đánh giá (`POST /api/v1/products/{id}/reviews`).
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
 - *Hệ thống bình chọn đánh giá hữu ích (Upvote/Helpful).*
@@ -237,18 +235,25 @@
 
 ---
 
-## 13. QUẢN TRỊ SÀN (ADMIN DASHBOARD TINH GỌN)
+## 13. QUẢN TRỊ SÀN (ADMIN CONSOLE & PRODUCT CRUD HOÀN CHỈNH)
 
 ### 🟢 Phase 1 — Triển khai cho đồ án:
-1. **Bảng điều khiển tổng quan (Dashboard):** Các thẻ KPI chính: Tổng số sản phẩm, tổng đơn hàng, tổng doanh thu, số lượng người dùng.
-2. **Quản lý sản phẩm (Product CRUD):** Thêm mới, chỉnh sửa thông tin sản phẩm, cập nhật giá, hình ảnh, danh mục và nhập chuỗi thành phần INCI.
-3. **Quản lý đơn hàng (Order Management):** Xem danh sách đơn hàng mới, đổi trạng thái đơn (`Chờ xử lý` -> `Đang giao hàng` -> `Hoàn thành` / `Hủy đơn`).
-4. **Quản lý danh mục & thương hiệu:** CRUD danh mục cấp 1, cấp 2 và danh sách thương hiệu.
-5. **Quản lý từ điển thành phần cơ bản:** Xem và thêm mới các thành phần INCI chính kèm phân loại công năng.
+1. **Bảo mật phân quyền & Khởi tạo tự động (`[Authorize(Roles = "Admin")]` & `AdminBootstrapper`):**
+   - Toàn bộ API `/api/v1/admin/*` được bảo vệ nghiêm ngặt bởi role `Admin`.
+   - Tự động khởi tạo hoặc nâng cấp tài khoản Admin từ biến môi trường (`ADMIN_EMAIL`, `ADMIN_PASSWORD`) với băm mật khẩu PBKDF2 (600.000 vòng lặp).
+2. **Bảng điều khiển tổng quan & Phân tích dữ liệu thật (`Analytics & Charts`):**
+   - 4 thẻ KPI chính: Tổng số sản phẩm, tổng đơn hàng, tổng doanh thu (USD `$`), đơn hàng chờ xử lý.
+   - Thống kê trực tiếp trên 100% dữ liệu thật trong PostgreSQL: Top 10 sản phẩm theo tổng lượt đánh giá & điểm sao thực tế, biểu đồ phân bố theo Danh mục, Thương hiệu, Phân khúc giá và Điểm đánh giá trên toàn bộ 8.494 sản phẩm.
+3. **Quản lý sản phẩm trọn vòng đời (`Product Catalog CRUD` & Soft Delete — `ADR-014`):**
+   - Tìm kiếm nhanh (gõ từ khóa nhấn `Enter`), lọc theo Thương hiệu, Danh mục, Trạng thái bán (`Active`, `Draft`, `Discontinued`) và phân trang.
+   - Thêm mới & Chỉnh sửa sản phẩm qua `ProductFormModal`: cập nhật giá USD (`$`), tồn kho, dung tích, loại da mục tiêu, hình ảnh và chuỗi thành phần INCI (tự động bóc tách và đồng bộ lại bảng `product_ingredients`).
+   - **Ngừng bán (Soft Delete — `DELETE /api/v1/admin/products/{id}`):** Chuyển `selling_status = Discontinued`, ẩn khỏi Catalog/PDP khách hàng và chặn đặt mua mới nhưng bảo toàn 100% đánh giá (`reviews`) và đơn hàng lịch sử (`order_items`).
+   - **Khôi phục 1 chạm (`PATCH /api/v1/admin/products/{id}/restore`):** Mở bán lại sản phẩm về trạng thái `Active` giữ nguyên ID và lịch sử.
+4. **Quản lý đơn hàng COD (`COD Orders`):** Xem danh sách đơn hàng kèm cảnh báo xung đột đã xác nhận, đổi trạng thái đơn (`Pending` -> `Delivering` -> `Completed` / `Cancelled`).
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
 - *Xuất báo cáo doanh thu ra file Excel.*
-- *Quản lý cấu hình tỷ giá USD/VND (Phase 1 chốt toàn bộ hệ thống chạy chuẩn 1 loại tiền tệ là VND).*
+- *Quản lý cấu hình tỷ giá đa tiền tệ USD/VND (Phase 1 chốt toàn bộ hệ thống chạy chuẩn 1 loại tiền tệ là USD `$` đồng bộ với Sephora dataset).*
 - *Nhật ký kiểm toán (Audit log ghi nhận thao tác của admin).*
 - *Giao diện xem lại và gắn nhãn các phiên hội thoại AI Chatbot.*
 
@@ -257,9 +262,9 @@
 ## 14. TRANG NỘI DUNG TĨNH & HỖ TRỢ (STATIC CONTENT)
 
 ### 🟢 Phase 1 — Triển khai cho đồ án:
-1. **Trang FAQ & Hướng dẫn mua hàng:** Các câu hỏi thường gặp về cách tra cứu thành phần, thanh toán và giao hàng.
-2. **Trang phương pháp tính Safety Score & Thuật toán đề xuất:** Giải thích ngắn gọn về cách hệ thống tính điểm tương thích da để chứng minh tính khoa học của đồ án.
-3. **Trang Chính sách bảo mật & Điều khoản sử dụng:** Nội dung cơ bản khẳng định tôn trọng dữ liệu nhạy cảm (Skin Profile) của người dùng.
+1. **Trang Trung tâm hỗ trợ & FAQ (`/support`):** Các câu hỏi thường gặp về cách tra cứu thành phần INCI, thiết lập Digital Skin ID, thanh toán COD và giao hàng.
+2. **Phương pháp đánh giá độ phù hợp (`Suitability Verdict`) & Thuật toán đề xuất:** Giải thích minh bạch về nguyên lý đối chiếu thành phần INCI 3 tầng theo cơ địa da cá nhân (tuân thủ bất biến **INV-01**: tuyệt đối không chấm điểm `SafetyScore` chung chung).
+3. **Chính sách bảo mật & Điều khoản sử dụng:** Nội dung khẳng định tôn trọng dữ liệu nhạy cảm (Digital Skin ID & Allergy Blacklist) của người dùng.
 4. **Trang 404 & Trang thông báo lỗi thân thiện.**
 
 ### 🔴 Phase 2 — Tạm hoãn sang tương lai:
@@ -282,7 +287,7 @@ flowchart LR
         T31["Giỏ hàng & Conflict"] --> T32["Checkout COD"] --> T33["Review theo loại da"]
     end
     subgraph W4["Tuần 4: AI & Đóng gói"]
-        T41["Skin Quiz & Chat-to-Cart"] --> T42["Gemini Chatbot"] --> T43["Admin tinh gọn"] --> T44["Test & Báo cáo"]
+        T41["Routine Generator & Chat-to-Cart"] --> T42["Gemini 2.5 Flash Chatbot"] --> T43["Admin CRUD & Soft Delete"] --> T44["Test & Báo cáo"]
     end
     W1 --> W2 --> W3 --> W4
 ```
@@ -290,20 +295,20 @@ flowchart LR
 ### Chi tiết phân bổ công việc theo tuần:
 
 - **Tuần 1: Nền tảng Backend, CSDL & Dữ liệu lớn (Data Foundation)**
-  - Thiết kế bảng CSDL tinh gọn (bỏ các bảng audit, zalo, currency).
-  - Hoàn thành Auth (Đăng ký, Đăng nhập, Profile, Digital Skin ID, Allergy Blacklist).
-  - Chuẩn bị dữ liệu: Seed khoảng 50–100 sản phẩm có bảng thành phần INCI đầy đủ; đưa tập mẫu 1 triệu review vào DB (tối ưu index trên cột `product_id` và `skin_type` để query cực nhanh).
+  - Thiết kế 10 bảng CSDL PostgreSQL 17 tinh gọn (chuẩn hóa tiền tệ USD `$` và mã sản phẩm Sephora `code`).
+  - Hoàn thành Auth (Đăng ký, Đăng nhập PBKDF2 + JWT, Profile, Digital Skin ID thống nhất, Allergy Blacklist).
+  - Chuẩn bị dữ liệu: Nạp 8.494 sản phẩm Sephora kèm bảng thành phần INCI và 12 quy tắc xung đột hoạt chất; nạp 1.09 triệu đánh giá vào DB (tối ưu B-Tree index trên cột `(product_id, skin_type)` truy vấn < 20ms).
 - **Tuần 2: Ghép UI có sẵn & Xây dựng các tính năng INCI Cốt lõi**
   - Xây dựng trang Danh mục sản phẩm với bộ lọc theo loại da và công tắc *"An toàn cho da tôi"*.
   - Xây dựng trang chi tiết sản phẩm (PDP): Bảng INCI 3 tầng, kết luận `Suitability Verdict` dạng chữ, cờ cảnh báo đỏ nếu trùng chất trong Allergy Blacklist.
   - Làm trang Công cụ Phân tích INCI chuyên sâu theo 7 vùng chăm sóc (Blurred Preview Gate + Skin ID 30 giây).
   - Hoàn thiện trang **Danh sách yêu thích (Wishlist)** (So sánh sản phẩm đã chuyển sang Phase 2).
 - **Tuần 3: Giỏ hàng, Phát hiện xung đột, Thanh toán & Review**
-  - Làm trang Giỏ hàng và thuật toán **Smart Conflict Detector** (quét cặp kỵ nhau, cảnh báo vàng).
-  - Luồng Thanh toán COD -> Tạo đơn -> Lịch sử đơn hàng.
-  - Hiển thị danh sách đánh giá tại trang PDP có bộ lọc theo Loại da của người đánh giá (tận dụng dataset).
-- **Tuần 4: AI Skincare Assistant, Skin Quiz, Admin & Tổng duyệt**
-  - Tích hợp Skin Quiz 4 câu hỏi -> Tạo Routine AM/PM -> Nút bấm **Chat-to-Cart** thêm cả bộ vào giỏ.
-  - Tích hợp Chatbot Gemini API tư vấn làm đẹp, cá nhân hóa theo Skin ID và grounding sản phẩm trong shop.
-  - Trang Admin: Quản lý sản phẩm và trạng thái đơn hàng.
-  - Kiểm thử toàn bộ kịch bản thuyết trình từ đầu đến cuối (Happy Path), chuẩn bị slide và tài liệu báo cáo.
+  - Làm trang Giỏ hàng và thuật toán **Smart Conflict Detector** (quét 12 cặp kỵ nhau, cảnh báo viền cam kèm hướng dẫn chia lịch).
+  - Luồng Thanh toán COD -> Tạo đơn (`BA-YYYYMMDD-XXXX`) -> Lịch sử đơn hàng.
+  - Hiển thị danh sách đánh giá tại trang PDP có bộ lọc theo Loại da của người đánh giá (tận dụng dataset 1.09M reviews).
+- **Tuần 4: AI Skincare Assistant, Routine Builder, Admin CRUD & Tổng duyệt**
+  - Thiết lập Digital Skin ID 1 chạm -> Tự động sinh Routine AM/PM (`/routines`) -> Nút bấm **Chat-to-Cart** thêm cả bộ vào giỏ.
+  - Tích hợp Trợ lý AI Lumi (`Gemini 2.5 Flash` + Rule-based Fallback) tư vấn làm đẹp, cá nhân hóa theo Skin ID, rào chắn y khoa và grounding sản phẩm trong shop.
+  - Trang Admin Console (`/admin`): Thống kê dữ liệu thật, Product CRUD hoàn chỉnh (Thêm/Sửa/Tìm kiếm/Lọc/Ngừng bán Soft Delete `Discontinued`/Khôi phục `Restore`) và quản lý trạng thái đơn hàng COD.
+  - Kiểm thử toàn bộ kịch bản thuyết trình từ đầu đến cuối (12/12 Architecture Tests & 46/46 Unit Tests XANH), chuẩn bị slide và tài liệu báo cáo.

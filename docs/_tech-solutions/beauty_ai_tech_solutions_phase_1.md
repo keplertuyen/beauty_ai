@@ -4,7 +4,7 @@ title: Thiết Kế Kỹ Thuật & Kiến Trúc Hệ Thống (Technical Solution
 status: stable
 precedence: 2
 owner: Solution Architect / Tech Lead
-last_reviewed: 2026-10-26
+last_reviewed: 2026-11-23
 ---
 
 # THIẾT KẾ KỸ THUẬT & KIẾN TRÚC HỆ THỐNG — BEAUTYAI PHASE 1 (MVP)
@@ -13,8 +13,8 @@ last_reviewed: 2026-10-26
 > **Ràng buộc công nghệ bắt buộc:**
 > - **Backend:** C# .NET 10 (ASP.NET Core Web API, Entity Framework Core 10 + Dapper).
 > - **Frontend:** React 19 + TypeScript + Vite (khai thác toàn bộ mã nguồn sẵn có tại `docs/_ui-ux_design/phase_1/frontend/`).
-> - **Database:** PostgreSQL 17 chạy Docker cục bộ trên máy Mac ([ADR-013](file:///Users/trucuyen/Documents/beauty_ai/docs/adr/ADR-013-local-mac-test-deployment.md)).
-> - **AI Integration:** Google Gemini API (Grounding sản phẩm sàn + Guardrails y tế).
+> - **Database:** PostgreSQL 17 chạy Docker cục bộ trên máy Mac ([ADR-013](file:///Users/trucuyen/Documents/beauty_ai/docs/adr/ADR-013-docker-compose-deploy-test.md)).
+> - **AI Integration:** Google Gemini 2.5 Flash API (`GeminiSkincareProvider` + Scientific Rule-Based Fallback, Grounding sản phẩm sàn + Guardrails y tế).
 
 ---
 
@@ -35,8 +35,8 @@ Mã nguồn backend được tổ chức thành 4 projects độc lập theo chu
 ┌───────────────────────────────────▼────────────────────────────────────┐
 │                BeautyAI.Application (Tầng Nghiệp Vụ)                   │
 │  - DTO Records (Requests & Responses)                                  │
-│  - Service Interfaces: IAuthService, IProductService, IQuizService...  │
-│  - Repository Interfaces: IProductRepository, IReviewRepository...     │
+│  - Service Interfaces: IAuthService, IProductService, IRoutineService..│
+│  - Repository Interfaces: IProductRepository, IOrderRepository...      │
 │  - TUYỆT ĐỐI KHÔNG phụ thuộc Microsoft.EntityFrameworkCore             │
 │  - TUYỆT ĐỐI KHÔNG phụ thuộc Microsoft.AspNetCore (Không dính HTTP)    │
 └───────────────────┬────────────────────────────────┬───────────────────┘
@@ -45,8 +45,8 @@ Mã nguồn backend được tổ chức thành 4 projects độc lập theo chu
 ┌───────────────────▼──────────────┐ ┌───────────────▼───────────────────┐
 │         BeautyAI.Domain          │ │      BeautyAI.Infrastructure      │
 │  - Core Entities: User, Product..│ │  - AppDbContext (EF Core 10)      │
-│  - Value Objects: MoneyVnd, INCI │ │  - Dapper Repositories (1M Reviews│
-│  - Domain Services:              │ │  - GeminiAiProvider (Adapter Layer│
+│  - Domain Knowledge & Services:  │ │  - Repositories (EF Core + B-Tree)│
+│    + CosmeticKnowledgeBase       │ │  - GeminiSkincareProvider (Adapter│
 │    + SuitabilityScoreCalculator  │ │  - HttpClient quản lý tích hợp    │
 │    + ConflictDetectorService     │ │  - Chịu trách nhiệm kết nối DB    │
 │  - THUẦN C#, 0 DEPENDENCY NUGET  │ │    PostgreSQL 17 qua Docker       │
@@ -54,50 +54,47 @@ Mã nguồn backend được tổ chức thành 4 projects độc lập theo chu
 ```
 
 ## 1.2. Các bất biến kiến trúc bất di bất dịch (Architectural Invariants)
-Hệ thống được giám sát tự động bằng bộ test kiến trúc [`tests/BeautyAI.ArchitectureTests`](file:///Users/trucuyen/Documents/beauty_ai/tests/BeautyAI.ArchitectureTests):
+Hệ thống được giám sát tự động bằng bộ 12 bài test kiến trúc [`tests/BeautyAI.ArchitectureTests`](file:///Users/trucuyen/Documents/beauty_ai/tests/BeautyAI.ArchitectureTests):
 1. **INV-01 (Bất biến tối cao về An toàn Mỹ phẩm):**
-   - Quét toàn bộ mã nguồn và assembly: **Tuyệt đối không** chứa bất kỳ thuộc tính, trường, phương thức hay class nào mang tên (không phân biệt hoa thường): `SafetyScore`, `SafetyRating`, `HazardScore`, `DangerLevel`, `ToxicityScore`, `SafetyLevel`.
-   - *Lý do khoa học:* Mỹ phẩm không có khái niệm an toàn tuyệt đối hay nguy hiểm chung chung; mọi thành phần đều phụ thuộc vào nồng độ và cơ địa nền da của từng người. Mọi điểm số hiển thị đều là **`SuitabilityScore` (Điểm tương thích với hồ sơ da)**.
+   - Quét toàn bộ mã nguồn và assembly (`NoSafetyScoreAnywhereTests`): **Tuyệt đối không** chứa bất kỳ thuộc tính, trường, phương thức hay class nào mang tên (không phân biệt hoa thường): `SafetyScore`, `SafetyRating`, `HazardScore`, `DangerLevel`, `ToxicityScore`, `SafetyLevel`.
+   - *Lý do khoa học:* Mỹ phẩm không có khái niệm an toàn tuyệt đối hay nguy hiểm chung chung; mọi thành phần đều phụ thuộc vào nồng độ và cơ địa nền da của từng người. Mọi đánh giá hiển thị đều là **`SuitabilityVerdict` (Kết luận tương thích dạng chữ với hồ sơ da cá nhân)**.
 2. **INV-02 (Cách ly thư viện bên ngoài - Provider Abstraction):**
-   - `HttpClient` và mọi thư viện bên thứ 3 (Gemini SDK) **chỉ được xuất hiện** trong namespace `BeautyAI.Infrastructure.Providers`. Tầng Application và Domain chỉ gọi qua interface `IAiProvider`.
+   - `HttpClient` và mọi thư viện bên thứ 3 (Gemini API) **chỉ được xuất hiện** trong namespace `BeautyAI.Infrastructure.Providers` (`ProviderLibrariesOnlyInAdapterLayerTests`). Tầng Application và Domain chỉ gọi qua interface `IAiSkincareProvider`.
 3. **INV-03 (Cấm các thư viện cồng kềnh - ADR-009):**
-   - Nghiêm cấm đưa vào dự án: `AutoMapper`, `MediatR`, `Hangfire`, `Quartz`, `StackExchange.Redis`.
-   - Ánh xạ DTO viết bằng tay (Manual Mapping hoặc Extension Methods) để tối đa hiệu năng và minh bạch luồng code.
-4. **INV-04 (Chuẩn tiền tệ duy nhất):**
-   - Toàn bộ giá bán và thanh toán trong Phase 1 sử dụng duy nhất đồng **Việt Nam Đồng (VNĐ)** kiểu dữ liệu số nguyên `BIGINT`.
+   - Nghiêm cấm đưa vào dự án (`ForbiddenPackagesTests`): `AutoMapper`, `MediatR`, `Hangfire`, `Quartz`, `StackExchange.Redis`.
+   - Ánh xạ DTO viết bằng tay (Manual Mapping) để tối đa hiệu năng và minh bạch luồng code.
+4. **INV-04 (Chuẩn tiền tệ & Bảo mật phân quyền Admin):**
+   - Toàn bộ giá bán và thanh toán trong Phase 1 sử dụng duy nhất đồng **Đô la Mỹ (`USD $`, `NUMERIC(10, 2)`)** đồng bộ nguyên bản với tập dữ liệu quốc tế Sephora.
+   - Toàn bộ `AdminController` bắt buộc bảo vệ bởi `[Authorize(Roles = "Admin")]` (kiểm chứng bởi `AdminAuthorizationTests`).
 
 ---
 
 # 2. THIẾT KẾ LƯỢC ĐỒ CƠ SỞ DỮ LIỆU (POSTGRESQL 17 SCHEMA)
 
-Lược đồ CSDL được thiết kế chuẩn hóa bậc 3 (3NF), bổ sung các cột JSONB linh hoạt cho các thuộc tính mở rộng và đánh chỉ mục B-Tree kép chuyên sâu để **xử lý mượt mà tập dữ liệu 1 triệu reviews**:
+Lược đồ CSDL chuẩn hóa 10 bảng (tệp chính thức tại [`docs/db-schema/schema_phase_1.sql`](file:///Users/trucuyen/Documents/beauty_ai/docs/db-schema/schema_phase_1.sql)), sử dụng cột mảng / JSONB linh hoạt và đánh chỉ mục B-Tree kép chuyên sâu để **xử lý mượt mà tập dữ liệu 1.09 triệu reviews dưới 20ms**:
 
 ```sql
 -- ============================================================================
 -- 1. BẢNG NGƯỜI DÙNG & TÀI KHOẢN (USERS)
 -- ============================================================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(50) DEFAULT 'CUSTOMER' NOT NULL CHECK (role IN ('CUSTOMER', 'ADMIN')),
+    password_hash VARCHAR(500) NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     shipping_address TEXT,
+    role VARCHAR(50) DEFAULT 'Customer' NOT NULL CHECK (role IN ('Customer', 'Admin')),
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE
 );
-CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
 -- ============================================================================
 -- 2. HỒ SƠ DIGITAL SKIN ID THỐNG NHẤT (SKIN_PROFILES & USER_ALLERGIES)
 -- ============================================================================
--- Khối thống nhất theo thứ tự y khoa:
--- 1. Cơ địa nền tảng (Loại da)
--- 2. Vùng cấm kỵ an toàn (Blacklist Dị ứng)
--- 3. Nhu cầu cải thiện (Vấn đề da, Mục tiêu & Ngân sách)
--- ============================================================================
-CREATE TABLE skin_profiles (
+CREATE TABLE IF NOT EXISTS skin_profiles (
     id SERIAL PRIMARY KEY,
     user_id INT UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal', 'Sensitive')),
@@ -106,54 +103,53 @@ CREATE TABLE skin_profiles (
     budget_level VARCHAR(50) DEFAULT 'Medium' NOT NULL CHECK (budget_level IN ('Low', 'Medium', 'High')),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE INDEX idx_skin_profiles_user ON skin_profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_skin_profiles_user ON skin_profiles(user_id);
 
 -- Bảng chi tiết con: Hoạt chất dị ứng thuộc khối Digital Skin ID (Chuẩn 3NF)
-CREATE TABLE user_allergies (
+CREATE TABLE IF NOT EXISTS user_allergies (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     ingredient_name VARCHAR(255) NOT NULL,
     note VARCHAR(500),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE INDEX idx_user_allergies_user ON user_allergies(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_allergies_user ON user_allergies(user_id);
 
 -- ============================================================================
 -- 3. TỪ ĐIỂN THÀNH PHẦN HOÁ HỌC (INGREDIENTS — INCI DICTIONARY)
 -- ============================================================================
-CREATE TABLE ingredients (
+CREATE TABLE IF NOT EXISTS ingredients (
     id SERIAL PRIMARY KEY,
     inci_name VARCHAR(255) UNIQUE NOT NULL,
-    vietnamese_name VARCHAR(255) NOT NULL,
-    function_group VARCHAR(100) NOT NULL, -- 'Moisturizing', 'Exfoliating', 'Antioxidant', 'Active', 'Preservative'
-    comedogenic_rating INT DEFAULT 0 CHECK (comedogenic_rating BETWEEN 0 AND 5),
-    irritancy_rating INT DEFAULT 0 CHECK (irritancy_rating BETWEEN 0 AND 5),
+    function_group VARCHAR(100) DEFAULT 'Other' NOT NULL, -- 'Exfoliating', 'Antioxidant', 'Hydrating', 'Soothing', 'Active'
+    description TEXT,
     is_active_ingredient BOOLEAN DEFAULT FALSE NOT NULL,
-    description TEXT
+    comedogenic_rating INT DEFAULT 0 CHECK (comedogenic_rating BETWEEN 0 AND 5),
+    irritation_rating INT DEFAULT 0 CHECK (irritation_rating BETWEEN 0 AND 5)
 );
-CREATE INDEX idx_ingredients_inci ON ingredients(inci_name);
+CREATE INDEX IF NOT EXISTS idx_ingredients_inci ON ingredients(inci_name);
 
 -- ============================================================================
 -- 4. BẢNG DANH MỤC & THƯƠNG HIỆU (CATEGORIES & BRANDS)
 -- ============================================================================
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     parent_id INT REFERENCES categories(id) ON DELETE SET NULL
 );
 
-CREATE TABLE brands (
+CREATE TABLE IF NOT EXISTS brands (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
-    origin_country VARCHAR(100)
+    origin_country VARCHAR(100) DEFAULT 'United States'
 );
 
 -- ============================================================================
 -- 5. BẢNG SẢN PHẨM & LIÊN KẾT THÀNH PHẦN (PRODUCTS & PRODUCT_INGREDIENTS)
 -- ============================================================================
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id SERIAL PRIMARY KEY,
     code VARCHAR(50) UNIQUE NOT NULL, -- Original Sephora Product Code (e.g. 'P473671')
     name VARCHAR(255) NOT NULL,
@@ -163,7 +159,7 @@ CREATE TABLE products (
     price_usd NUMERIC(10, 2) NOT NULL CHECK (price_usd >= 0),
     volume_ml INT,
     description TEXT,
-    image_url VARCHAR(500), -- Relative static path (e.g. '/images/products/P505461.webp') or verified CDN URL. Real images are stored as optimized 800px WebP files under frontend public/images/products/. Never store binary/base64 data directly in PostgreSQL.
+    image_url VARCHAR(500), -- Relative static path (e.g. '/images/products/P505461.webp')
     ingredient_list_raw TEXT NOT NULL, -- Raw INCI ingredient string from packaging
     target_skin_types VARCHAR(50)[] NOT NULL, -- ARRAY['Oily', 'Combination']
     stock_quantity INT DEFAULT 100 NOT NULL CHECK (stock_quantity >= 0),
@@ -171,24 +167,24 @@ CREATE TABLE products (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NULL
 );
-CREATE INDEX idx_products_code ON products(code);
-CREATE INDEX idx_products_slug ON products(slug);
-CREATE INDEX idx_products_category ON products(category_id);
-CREATE INDEX idx_products_brand ON products(brand_id);
-CREATE INDEX idx_products_selling_status ON products(selling_status);
+CREATE INDEX IF NOT EXISTS idx_products_code ON products(code);
+CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
+CREATE INDEX IF NOT EXISTS idx_products_selling_status ON products(selling_status);
 
-CREATE TABLE product_ingredients (
+CREATE TABLE IF NOT EXISTS product_ingredients (
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
     ingredient_id INT REFERENCES ingredients(id) ON DELETE CASCADE,
     position_order INT NOT NULL,
     PRIMARY KEY (product_id, ingredient_id)
 );
-CREATE INDEX idx_prod_ing_ingredient ON product_ingredients(ingredient_id);
+CREATE INDEX IF NOT EXISTS idx_prod_ing_ingredient ON product_ingredients(ingredient_id);
 
 -- ============================================================================
 -- 6. BẢNG QUY TẮC XUNG ĐỘT HOẠT CHẤT (CONFLICT_RULES)
 -- ============================================================================
-CREATE TABLE conflict_rules (
+CREATE TABLE IF NOT EXISTS conflict_rules (
     id SERIAL PRIMARY KEY,
     active_ingredient_a VARCHAR(255) NOT NULL,
     active_ingredient_b VARCHAR(255) NOT NULL,
@@ -198,9 +194,9 @@ CREATE TABLE conflict_rules (
 );
 
 -- ============================================================================
--- 7. BẢNG ĐÁNH GIÁ SẢN PHẨM (REVIEWS) — TỐI ƯU CHO 1 TRIỆU RECORDS
+-- 7. BẢNG ĐÁNH GIÁ SẢN PHẨM (REVIEWS) — TỐI ƯU CHO 1.09 TRIỆU RECORDS
 -- ============================================================================
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
     id BIGSERIAL PRIMARY KEY,
     product_id INT REFERENCES products(id) ON DELETE CASCADE,
     product_code VARCHAR(50), -- Sephora code for direct ETL mapping
@@ -213,50 +209,49 @@ CREATE TABLE reviews (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
--- CHỈ MỤC B-TREE TỐI ƯU TRUY VẤN LỌC REVIEW 1M DƯỚI 50MS
-CREATE INDEX idx_reviews_product_skin ON reviews(product_id, skin_type);
-CREATE INDEX idx_reviews_product_rating ON reviews(product_id, rating);
-CREATE INDEX idx_reviews_product_code ON reviews(product_code);
+-- CHỈ MỤC B-TREE TỐI ƯU TRUY VẤN LỌC REVIEW 1M DƯỚI 20MS
+CREATE INDEX IF NOT EXISTS idx_reviews_product_skin ON reviews(product_id, skin_type);
+CREATE INDEX IF NOT EXISTS idx_reviews_product_rating ON reviews(product_id, rating);
+CREATE INDEX IF NOT EXISTS idx_reviews_product_code ON reviews(product_code);
 
 -- ============================================================================
 -- 8. BẢNG ĐƠN HÀNG & CHI TIẾT ĐƠN HÀNG (ORDERS & ORDER_ITEMS)
 -- ============================================================================
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
-    order_code VARCHAR(50) UNIQUE NOT NULL,
     user_id INT REFERENCES users(id) ON DELETE SET NULL,
     recipient_name VARCHAR(255) NOT NULL,
-    recipient_phone VARCHAR(20) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
     shipping_address TEXT NOT NULL,
-    notes TEXT,
     payment_method VARCHAR(50) DEFAULT 'COD' NOT NULL,
+    payment_status VARCHAR(50) DEFAULT 'Pending' NOT NULL,
     order_status VARCHAR(50) DEFAULT 'Pending' NOT NULL CHECK (order_status IN ('Pending', 'Delivering', 'Completed', 'Cancelled')),
-    subtotal_usd NUMERIC(10, 2) NOT NULL CHECK (subtotal_usd >= 0),
-    discount_usd NUMERIC(10, 2) DEFAULT 0,
     total_amount_usd NUMERIC(10, 2) NOT NULL CHECK (total_amount_usd >= 0),
+    conflict_acknowledged BOOLEAN DEFAULT FALSE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-CREATE INDEX idx_orders_user ON orders(user_id);
-CREATE INDEX idx_orders_status ON orders(order_status);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(order_status);
 
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
     order_id INT REFERENCES orders(id) ON DELETE CASCADE,
     product_id INT REFERENCES products(id) ON DELETE RESTRICT,
-    product_name VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
     unit_price_usd NUMERIC(10, 2) NOT NULL CHECK (unit_price_usd >= 0),
-    quantity INT NOT NULL CHECK (quantity > 0)
+    total_price_usd NUMERIC(10, 2) NOT NULL CHECK (total_price_usd >= 0)
 );
 
 -- ============================================================================
 -- 10. BẢNG LƯU CHU TRÌNH DƯỠNG DA (SAVED_ROUTINES)
 -- ============================================================================
-CREATE TABLE saved_routines (
+CREATE TABLE IF NOT EXISTS saved_routines (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    routine_name VARCHAR(255) DEFAULT 'Chu trình chuẩn của tôi',
-    am_routine JSONB NOT NULL, -- Danh sách sản phẩm buổi sáng
-    pm_routine JSONB NOT NULL, -- Danh sách sản phẩm buổi tối
+    routine_name VARCHAR(255) NOT NULL,
+    routine_type VARCHAR(50) DEFAULT 'Morning' NOT NULL CHECK (routine_type IN ('Morning', 'Night', 'Treatment')),
+    items JSONB NOT NULL,
+    notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 ```
@@ -269,14 +264,14 @@ Hệ thống tận dụng trực tiếp bộ dữ liệu thực tế có sẵn t
 
 ### 3.1. Nguồn Dữ Liệu Thực Tế Khai Thác
 1. **Sản phẩm & Thương hiệu (`docs/_data/cleaned/products_cleaned.csv`)**:
-   - Gồm 8.495 sản phẩm mỹ phẩm thật từ Sephora (2.420 sản phẩm chuyên mục Skincare).
-   - ETL nạp vào bảng `brands`, `categories`, và `products` (chuẩn hóa giá tiền sang VNĐ với tỷ giá 1 USD = 25.000 VNĐ, lưu mã gốc vào cột `code`).
+   - Gồm 8.494 sản phẩm mỹ phẩm thật từ Sephora (bao phủ 9 ngành hàng và 62 danh mục con, trong đó có 2.420 sản phẩm chuyên mục Skincare).
+   - ETL nạp vào bảng `brands`, `categories`, và `products` (giữ nguyên giá gốc chuẩn USD `price_usd`, lưu mã gốc vào cột `code`, trạng thái `selling_status = 'Active'`).
    - Bóc tách chuỗi `ingredients` phân tách bằng dấu phẩy để nạp vào bảng `ingredients` và `product_ingredients`.
 2. **Đánh giá Khách hàng (`docs/_data/cleaned/reviews_cleaned.csv`)**:
    - Gồm **1.094.197 dòng đánh giá thật** có phân loại da (`skin_type`: `combination`, `dry`, `oily`, `normal`, `unknown`).
    - ETL chuẩn hóa `INITCAP(skin_type)` thành (`Combination`, `Dry`, `Oily`, `Normal`, `Unknown`) và nạp vào bảng `reviews` liên kết theo `product_code` / `product_id`.
 3. **Quy tắc mua kèm Routine (`docs/_data/cleaned/apriori_rules.csv`)**:
-   - Gồm 15.259 luật kết hợp Apriori (`antecedent -> consequent`) hỗ trợ gợi ý routine và sản phẩm mua kèm.
+   - Gồm 15.259 luật kết hợp Apriori (`antecedent -> consequent`) hỗ trợ gợi ý routine và sản phẩm tương đồng.
 
 ### 3.2. 12 Bộ Quy Tắc Xung Đột Hoạt Chất Y Khoa (Curated Conflict Rules)
 
@@ -405,33 +400,54 @@ public record UpdateDigitalSkinIdRequest(
 );
 public record AddAllergyRequest(string IngredientName, string? Note);
 
-// 3. Product & INCI DTOs
-public record ProductSummaryDto(int Id, string Name, string Slug, string BrandName, decimal PriceUsd, string? ImageUrl, int? MatchScore, bool HasAllergyWarning);
-public record ProductDetailDto(
-    int Id, string Name, string Slug, string BrandName, string CategoryName,
-    decimal PriceUsd, int? VolumeMl, string? Description, string? ImageUrl,
-    int? MatchScore, bool HasAllergyWarning, List<string> AllergyViolations,
-    List<ProductIngredientDto> Ingredients, FunctionDistributionDto FunctionDistribution
+// 3. Product & 3-Tier INCI Formula Breakdown DTOs
+public record ProductSummaryDto(
+    int Id, string Code, string Name, string Slug, string BrandName, string CategoryName,
+    decimal PriceUsd, int? VolumeMl, string? ImageUrl, decimal Rating, int ReviewsCount,
+    string[] TargetSkinTypes, string SuitabilityVerdict, string SuitabilityLabel,
+    bool HasAllergyWarning, string? MatchedAllergen = null, string? SuitabilityReason = null,
+    bool HasIngredients = true, bool IsNonCosmeticTool = false, string Department = "Skincare"
 );
-public record ProductIngredientDto(int Id, string InciName, string FunctionGroup, string? Description, int IrritancyRating, int ComedogenicRating, bool IsAllergy);
-public record FunctionDistributionDto(int MoisturizingPercent, int ActiveTreatmentPercent, int SoothingPercent, int OtherPercent);
 
-// 4. Conflict DTOs
-public record CheckConflictRequest(List<int> ProductIds);
-public record ConflictAlertDto(string ProductAName, string ProductBName, string IngredientAName, string IngredientBName, string Severity, string Reason, string Recommendation);
+public record ProductDetailDto(
+    int Id, string Code, string Name, string Slug, string BrandName, string CategoryName,
+    decimal PriceUsd, int? VolumeMl, string? Description, string? ImageUrl,
+    string IngredientListRaw, decimal Rating, int ReviewsCount, string[] TargetSkinTypes,
+    int StockQuantity, IReadOnlyList<ProductIngredientDto> Ingredients,
+    string SuitabilityVerdict, string SuitabilityLabel, bool HasAllergyWarning,
+    string? MatchedAllergen = null, string? SuitabilityReason = null,
+    bool HasIngredients = true, bool IsNonCosmeticTool = false, string Department = "Skincare",
+    ProductFormulaBreakdownDto? FormulaBreakdown = null
+);
+
+public record ProductFormulaBreakdownDto(
+    string TargetArea, string BenefitsTitle, IReadOnlyList<string> Benefits,
+    IReadOnlyList<KeyIngredientDto> KeyIngredients, IReadOnlyList<FunctionalGroupDto> FunctionalGroups,
+    IReadOnlyList<FormulaCautionDto> Cautions, string? FragranceDisclosure,
+    int TotalIngredientsCount, IReadOnlyList<string> RawInciList
+);
+
+// 4. Conflict & INCI Analyzer Tool DTOs
+public record ConflictCheckRequest(IReadOnlyList<int> ProductIds);
+public record ConflictDetailDto(string ProductA, string ProductB, string IngredientA, string IngredientB, string Severity, string Reason, string Recommendation);
+public record ConflictCheckResponse(bool HasConflict, IReadOnlyList<ConflictDetailDto> Conflicts);
 
 // 5. Routine DTOs (Generated from Digital Skin ID)
-public record GenerateRoutineRequest(string? SkinType, string? BudgetLevel);
-public record RoutineResultDto(List<ProductSummaryDto> AmRoutine, List<ProductSummaryDto> PmRoutine, decimal TotalCostUsd, List<ConflictAlertDto> InternalConflicts);
+public record GenerateRoutineRequest(string? SkinType = null, string? BudgetLevel = null, List<string>? SkinConcerns = null, string? PrimaryGoal = null);
+public record RoutineStepDto(int StepOrder, string StepName, string Timing, string Description, ProductSummaryDto Product);
+public record RoutineResultDto(List<ProductSummaryDto> AmRoutine, List<ProductSummaryDto> PmRoutine, List<RoutineStepDto> DetailedSteps, decimal TotalCostUsd, List<ConflictDetailDto> InternalConflicts);
+public record SaveRoutineRequest(string RoutineName, string RoutineType, List<int> ProductIds, string? Notes = null);
 
-// 6. Order DTOs
+// 6. Order DTOs (COD — No CouponCode in Phase 1)
 public record CreateOrderItemRequest(int ProductId, int Quantity);
-public record CreateOrderRequest(string RecipientName, string RecipientPhone, string ShippingAddress, string? Notes, string? CouponCode, List<CreateOrderItemRequest> Items);
-public record OrderSummaryDto(int Id, string OrderCode, string OrderStatus, decimal TotalAmountUsd, DateTime CreatedAtUtc, List<string> ProductNames);
+public record CreateOrderRequest(string RecipientName, string PhoneNumber, string ShippingAddress, string? Notes = null, bool ConflictAcknowledged = false, IReadOnlyList<CreateOrderItemRequest>? Items = null);
+public record OrderDto(int OrderId, string OrderCode, string RecipientName, string PhoneNumber, string ShippingAddress, string PaymentMethod, string PaymentStatus, string Status, decimal TotalUsd, bool ConflictAcknowledged, DateTime CreatedAt, IReadOnlyList<OrderItemDto> Items);
 
-// 7. Review DTOs
-public record ReviewDto(long Id, string AuthorName, int Rating, string SkinType, string? SkinConcerns, string? Content, DateTime CreatedAtUtc);
-public record PaginatedList<T>(List<T> Items, int Page, int PageSize, int TotalItems, int TotalPages);
+// 7. Review & Admin DTOs
+public record ProductReviewDto(long Id, int ProductId, string AuthorName, int Rating, string SkinType, string? SkinConcerns, string? Content, DateTime CreatedAt);
+public record AdminKpisDto(int TotalProducts, int TotalOrders, decimal TotalRevenueUsd, int ActiveUsers, int PendingOrders);
+public record AdminProductDto(int Id, string Code, string Name, string Slug, int BrandId, string BrandName, int CategoryId, string CategoryName, string Department, decimal PriceUsd, int? VolumeMl, int StockQuantity, string SellingStatus, string? Description, string? ImageUrl, string IngredientListRaw, string[] TargetSkinTypes, decimal Rating, int ReviewsCount, DateTime CreatedAtUtc, DateTime? UpdatedAtUtc);
+public record PagedResult<T>(IReadOnlyList<T> Items, int Total, int Page, int PageSize, int Pages);
 ```
 
 ---
@@ -439,57 +455,56 @@ public record PaginatedList<T>(List<T> Items, int Page, int PageSize, int TotalI
 # 6. TÍCH HỢP TRỢ LÝ AI GEMINI (INFRASTRUCTURE ADAPTER)
 
 ## 6.1. Cấu hình Provider trong `BeautyAI.Infrastructure.Providers`
-Tuân thủ nghiêm ngặt **Bài 4 của Test kiến trúc** (`ProviderLibrariesOnlyInAdapterLayerTests`), class kết nối HTTP trực tiếp với Google Gemini chỉ nằm trong Infrastructure:
+Tuân thủ nghiêm ngặt **Bài 4 của Test kiến trúc** (`ProviderLibrariesOnlyInAdapterLayerTests`), interface `IAiSkincareProvider` nằm tại tầng Application và class kết nối HTTP trực tiếp với Google Gemini 2.5 Flash chỉ nằm trong Infrastructure (`GeminiSkincareProvider`), đi kèm cơ chế dự phòng dựa trên bộ quy tắc khoa học (`GenerateRuleBasedFallback`):
 
 ```csharp
 namespace BeautyAI.Infrastructure.Providers;
 
-public interface IAiSkincareProvider
-{
-    Task<string> ConsultAsync(string userMessage, SkinProfileDto? profile, List<ProductSummaryDto> availableProducts, CancellationToken ct = default);
-}
-
 public class GeminiSkincareProvider : IAiSkincareProvider
 {
     private readonly HttpClient _httpClient;
-    private readonly string _apiKey;
+    private readonly string? _apiKey;
 
     public GeminiSkincareProvider(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _apiKey = configuration["GEMINI_API_KEY"] ?? throw new InvalidOperationException("Missing GEMINI_API_KEY");
+        _apiKey = configuration["GEMINI_API_KEY"] ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY");
     }
 
-    public async Task<string> ConsultAsync(string userMessage, SkinProfileDto? profile, List<ProductSummaryDto> availableProducts, CancellationToken ct = default)
+    public async Task<string> ConsultAsync(
+        string userMessage,
+        DigitalSkinIdDto? skinId,
+        IReadOnlyList<ProductSummaryDto> availableProducts,
+        CancellationToken cancellationToken = default)
     {
-        // 1. Build System Prompt với Grounding & Guardrails
-        var systemInstruction = BuildSystemPrompt(profile, availableProducts);
+        // 1. Build System Instruction với Grounding & Guardrails
+        var systemPrompt = BuildSystemPrompt(skinId, availableProducts);
         
-        // 2. Gửi request POST tới endpoint Gemini API
-        // https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={_apiKey}
+        // 2. Nếu có API Key, gọi POST tới Gemini 2.5 Flash API:
+        // https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}
         
-        // 3. Nhận phản hồi, lọc kiểm duyệt an toàn và trả về câu trả lời cho người dùng
-        return "Nội dung phản hồi tư vấn chuẩn xác...";
+        // 3. Nếu offline hoặc hết quota, tự động fallback sang GenerateRuleBasedFallback
+        return GenerateRuleBasedFallback(userMessage, skinId, availableProducts);
     }
 }
 ```
 
 ## 6.2. Mẫu System Prompt chuẩn hóa cho Gemini API (Global English)
 ```text
-You are the AI Dermatology & Skincare Advisor for the BeautyAI e-commerce platform.
+You are Lumi, the AI Dermatology & Skincare Advisor for the BeautyAI platform.
 Your mission is to provide evidence-based skincare routine guidance and product recommendations.
 
-[CURRENT USER DIGITAL SKIN ID]
+[USER DIGITAL SKIN ID]
 - Skin Type: {SkinType}
-- Allergy Blacklist (STRICT PROHIBITION): {AllergyList}
-- Primary Skin Concerns: {Concerns}
+- Safety Blacklist (STRICT ALLERGEN PROHIBITION): {AllergyList}
+- Primary Concerns: {Concerns}
 - Primary Skincare Goal: {PrimaryGoal}
-- Budget Level: {BudgetLevel}
+- Budget Preference: {BudgetLevel}
 
 [AVAILABLE IN-STOCK PRODUCT CATALOG]
 {ProductsJson}
 
-[STRICT MEDICAL & ETHICAL GUARDRAILS]
+[STRICT CLINICAL & ETHICAL GUARDRAILS]
 1. ZERO-ALLERGY TOLERANCE: Absolutely NEVER recommend any product containing ingredients listed in the user's Allergy Blacklist.
 2. MEDICAL BOUNDARY: Never diagnose or prescribe treatments for severe clinical dermatological conditions (cystic acne conglobata, infected eczema, psoriasis, fungal infections). Advise consulting a board-certified dermatologist when encountering clinical pathology.
 3. GROUNDING CONSTRAINT: ONLY recommend products from the [AVAILABLE IN-STOCK PRODUCT CATALOG] above, displaying the exact product name and price in USD ($).
@@ -502,42 +517,50 @@ Your mission is to provide evidence-based skincare routine guidance and product 
 
 | Nhóm chức năng | Method | Endpoint URL | Mã phản hồi | Mô tả tóm tắt |
 |---|---|---|---|---|
-| **Auth** | `POST` | `/api/v1/auth/register` | `201 Created` | Đăng ký tài khoản khách hàng mới |
+| **Auth** | `POST` | `/api/v1/auth/register` | `200 OK` | Đăng ký tài khoản khách hàng mới (băm PBKDF2, trả JWT) |
 | | `POST` | `/api/v1/auth/login` | `200 OK` | Đăng nhập nhận JWT Token |
-| | `GET` | `/api/v1/auth/me` | `200 OK` | Lấy thông tin tài khoản hiện tại |
-| | `PUT` | `/api/v1/auth/profile` | `200 OK` | Cập nhật họ tên, SĐT, địa chỉ |
+| | `GET` | `/api/v1/auth/me` | `200 OK` | Lấy thông tin tài khoản hiện tại kèm Digital Skin ID |
+| | `PUT` | `/api/v1/auth/profile` | `200 OK` | Cập nhật họ tên, SĐT, địa chỉ nhận hàng |
 | **Digital Skin ID** | `GET` | `/api/v1/skin-profile` | `200 OK` | Lấy trọn bộ hồ sơ Digital Skin ID thống nhất (kèm danh sách dị ứng) |
 | | `PUT` | `/api/v1/skin-profile` | `200 OK` | Cập nhật hồ sơ da (Loại da, Dị ứng, Vấn đề da, Mục tiêu, Ngân sách) |
 | | `POST` | `/api/v1/skin-profile/allergies` | `201 Created` | Thêm chất dị ứng vào Blacklist |
 | | `DELETE` | `/api/v1/skin-profile/allergies/{id}` | `204 No Content` | Xóa chất dị ứng khỏi Blacklist |
-| **Catalog** | `GET` | `/api/v1/products` | `200 OK` | Lọc danh mục, tìm kiếm, toggle an toàn |
-| | `GET` | `/api/v1/products/{slug}` | `200 OK` | Chi tiết sản phẩm, INCI, Match Score |
-| | `GET` | `/api/v1/products/{id}/reviews` | `200 OK` | Lọc 1M reviews theo loại da |
-| **Tools & Routine**| `POST` | `/api/v1/tools/analyze-inci` | `200 OK` | Dán văn bản bóc tách bảng thành phần |
-| | `POST` | `/api/v1/tools/check-conflict` | `200 OK` | Quét xung đột hoạt chất trong giỏ |
+| **Catalog & Reviews** | `GET` | `/api/v1/products` | `200 OK` | Lọc danh mục, tìm kiếm, lọc loại da/giá, toggle `safe_for_me` |
+| | `GET` | `/api/v1/products/{id}` | `200 OK` | Chi tiết sản phẩm (theo ID/Slug/Code), Bảng INCI 3 tầng, `SuitabilityVerdict` |
+| | `GET` | `/api/v1/products/{id}/similar` | `200 OK` | Gợi ý sản phẩm tương tự cùng danh mục (tự động loại trừ chất dị ứng) |
+| | `GET` | `/api/v1/products/categories` | `200 OK` | Danh sách danh mục sản phẩm |
+| | `GET` | `/api/v1/products/brands` | `200 OK` | Danh sách thương hiệu mỹ phẩm |
+| | `GET` | `/api/v1/products/{id}/reviews` | `200 OK` | Lọc 1.09M reviews theo loại da (`skin_type`) & phân trang (< 20ms) |
+| | `POST` | `/api/v1/products/{id}/reviews` | `201 Created` | Gửi nhận xét đánh giá mới cho sản phẩm |
+| | `POST` | `/api/v1/reviews` | `201 Created` | Gửi nhận xét đánh giá sản phẩm (endpoint tương thích) |
+| **Tools & Routine**| `POST` | `/api/v1/tools/analyze-inci` | `200 OK` | Phân tích bảng thành phần INCI 3 tầng theo 7 vùng chăm sóc (`[Authorize]`) |
+| | `GET` | `/api/v1/tools/skintype-guide` | `200 OK` | Cẩm nang hoạt chất theo loại da và vùng chăm sóc (`[Authorize]`) |
+| | `POST` | `/api/v1/tools/check-conflict` | `200 OK` | Quét xung đột hoạt chất trong giỏ hàng theo 12 quy tắc y khoa |
 | | `POST` | `/api/v1/routines/generate` | `200 OK` | Tự động sinh chu trình Routine AM/PM từ Digital Skin ID |
-| | `POST` | `/api/v1/routines/save` | `201 Created` | Lưu chu trình vào hồ sơ cá nhân |
-| **Orders** | `POST` | `/api/v1/orders` | `201 Created` | Đặt hàng thanh toán COD |
-| | `GET` | `/api/v1/orders/my-orders` | `200 OK` | Xem lịch sử các đơn hàng đã đặt |
-| **AI** | `POST` | `/api/v1/ai/consult` | `200 OK` | Chat tư vấn mỹ phẩm với Gemini API |
-| **Admin** | `GET` | `/api/v1/admin/dashboard` | `200 OK` | Xem bảng điều khiển & phân bổ danh mục |
-| | `GET` | `/api/v1/admin/kpis` | `200 OK` | Xem thẻ chỉ số tổng quan |
-| | `GET` | `/api/v1/admin/products` | `200 OK` | Danh sách sản phẩm quản trị (lọc, tìm kiếm, phân trang) |
-| | `GET` | `/api/v1/admin/products/{id}` | `200 OK` | Chi tiết sản phẩm quản trị |
-| | `POST` | `/api/v1/admin/products` | `201 Created` | Thêm sản phẩm mới và đồng bộ chuỗi INCI |
+| | `POST` | `/api/v1/routines/save` | `201 Created` | Lưu chu trình vào hồ sơ cá nhân (`[Authorize]`) |
+| | `GET` | `/api/v1/routines/my-routines` | `200 OK` | Lấy danh sách các chu trình đã lưu (`[Authorize]`) |
+| | `DELETE` | `/api/v1/routines/{id}` | `204 No Content` | Xóa chu trình đã lưu (`[Authorize]`) |
+| **Orders** | `POST` | `/api/v1/orders` | `201 Created` | Đặt hàng thanh toán COD, trừ tồn kho, sinh mã `BA-YYYYMMDD-XXXX` |
+| | `GET` | `/api/v1/orders/my-orders` | `200 OK` | Xem lịch sử các đơn hàng COD đã đặt |
+| **AI** | `POST` | `/api/v1/ai/consult` | `200 OK` | Tư vấn mỹ phẩm với Gemini 2.5 Flash + thẻ sản phẩm gợi ý tương tác |
+| **Admin** (`Admin` role) | `GET` | `/api/v1/admin/dashboard` | `200 OK` | Bảng điều khiển KPI & thống kê dữ liệu thật trên 8.494 SP & 1.09M reviews |
+| | `GET` | `/api/v1/admin/kpis` | `200 OK` | Xem 4 thẻ chỉ số KPI tổng quan |
+| | `GET` | `/api/v1/admin/products` | `200 OK` | Danh sách sản phẩm quản trị (lọc `query`, `brand`, `category`, `status`, phân trang) |
+| | `GET` | `/api/v1/admin/products/{id}` | `200 OK` | Chi tiết sản phẩm quản trị ở mọi trạng thái |
+| | `POST` | `/api/v1/admin/products` | `201 Created` | Thêm sản phẩm mới và đồng bộ chuỗi INCI vào `product_ingredients` |
 | | `PUT` | `/api/v1/admin/products/{id}` | `200 OK` | Cập nhật sản phẩm & đồng bộ lại INCI khi thay đổi |
-| | `DELETE` | `/api/v1/admin/products/{id}` | `204 No Content` | Ngừng bán sản phẩm (soft delete: `Discontinued`) |
+| | `DELETE` | `/api/v1/admin/products/{id}` | `204 No Content` | Ngừng bán sản phẩm (soft delete: `selling_status = Discontinued`) |
 | | `PATCH` | `/api/v1/admin/products/{id}/restore` | `200 OK` | Khôi phục sản phẩm về trạng thái `Active` |
 | | `GET` | `/api/v1/admin/orders` | `200 OK` | Danh sách đơn hàng COD quản trị |
-| | `PATCH` | `/api/v1/admin/orders/{id}/status`| `200 OK` | Cập nhật trạng thái đơn COD |
+| | `PATCH` | `/api/v1/admin/orders/{id}/status`| `200 OK` | Cập nhật trạng thái đơn COD (`Pending` ➔ `Delivering` ➔ `Completed` / `Cancelled`) |
 
 ---
 
 # 8. MÔI TRƯỜNG TRIỂN KHAI & CHẠY THỬ NGHIỆM (LOCAL DOCKER RUNBOOK)
 
-Hệ thống được đóng gói chạy kiểm thử cục bộ hoàn toàn trên máy Mac theo đúng [ADR-013](file:///Users/trucuyen/Documents/beauty_ai/docs/adr/ADR-013-local-mac-test-deployment.md):
+Hệ thống được đóng gói chạy kiểm thử cục bộ hoàn toàn trên máy Mac theo đúng [ADR-013](file:///Users/trucuyen/Documents/beauty_ai/docs/adr/ADR-013-docker-compose-deploy-test.md):
 - **PostgreSQL 17 Container:** Chạy trên cổng 5432 qua Docker Compose.
-- **Backend API:** Chạy tại `http://localhost:5000` (Swagger UI tại `http://localhost:5000/openapi/v1.json`).
+- **Backend API:** Chạy tại `http://localhost:5000` (OpenAPI spec tại `http://localhost:5000/openapi/v1.json`).
 - **Frontend React:** Chạy tại `http://localhost:5173` qua Vite dev server.
 - **Lệnh điều hành chuẩn:**
   ```bash

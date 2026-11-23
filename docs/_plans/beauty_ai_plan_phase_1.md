@@ -4,7 +4,7 @@ title: Kế Hoạch Chi Tiết 30 Ngày (Master Plan Phase 1 MVP) — BeautyAI P
 status: stable
 precedence: 5
 owner: Project Manager / Tech Lead
-last_reviewed: 2026-10-26
+last_reviewed: 2026-11-23
 ---
 
 # KẾ HOẠCH CHI TIẾT 30 NGÀY (MASTER PLAN) — BEAUTYAI PHASE 1 (MVP)
@@ -34,7 +34,7 @@ last_reviewed: 2026-10-26
 4. **Luồng E-Commerce hoàn chỉnh:**
    - Khách vãng lai ➔ Đăng ký tài khoản ➔ Thiết lập Digital Skin ID (kèm Blacklist Dị ứng) ➔ Duyệt Catalog ➔ Xem PDP ➔ Thêm giỏ hàng cảnh báo xung đột ➔ Đặt hàng COD ➔ Admin duyệt đơn.
 5. **Chất lượng mã nguồn:**
-   - Toàn bộ 11 bài kiểm thử kiến trúc `BeautyAI.ArchitectureTests` và unit tests XANH 100%.
+   - Toàn bộ 12 bài kiểm thử kiến trúc `BeautyAI.ArchitectureTests` và 46 bài unit tests (`BeautyAI.UnitTests`) XANH 100%.
    - `./syntheprise gate` đạt trạng thái **Clean** (0 lỗi, 0 cảnh báo).
 
 ## 1.2. Phân bổ ngân sách thời gian cho Solo Developer
@@ -94,9 +94,9 @@ flowchart LR
 | **T1.4** | **Xây dựng API Auth & Digital Skin ID** | 12 giờ | C# .NET 10 Web API | Đăng ký, Đăng nhập (JWT), Đổi mật khẩu, Cập nhật thông tin, Cập nhật hồ sơ da, Thêm/Xóa Allergy Blacklist. |
 
 🎯 **MỐC QUALITY GATE 1 (Cuối Tuần 1):**
-- [ ] Docker PostgreSQL 17 chạy ổn định tại port 5432.
-- [ ] 100% API Auth & Skin Profile test qua Swagger/Postman đạt Status 200 OK.
-- [ ] `./scripts/test` chạy XANH toàn bộ các bài test kiến trúc.
+- [x] Docker PostgreSQL 17 chạy ổn định tại port 5432.
+- [x] 100% API Auth & Skin Profile test qua Swagger/Postman đạt Status 200 OK.
+- [x] `./scripts/test` chạy XANH toàn bộ các bài test kiến trúc.
 
 ---
 
@@ -113,9 +113,9 @@ flowchart LR
 | **T2.5** | **Hoàn thiện Danh sách yêu thích (Wishlist)** | 4 giờ | `Wishlist.jsx`, `AppContext.jsx` | Thả tim/bỏ tim sản phẩm trên Catalog & PDP; Hiển thị danh sách yêu thích kèm kết luận `Suitability Verdict` và cảnh báo dị ứng; Nút *Clear All* (Product Compare chuyển sang Phase 2). |
 
 🎯 **MỐC QUALITY GATE 2 (Cuối Tuần 2):**
-- [ ] Người dùng xem được danh mục, lọc theo loại da và công tắc an toàn hoạt động chính xác.
-- [ ] Trang PDP hiển thị bảng INCI 3 tầng dễ hiểu, kết luận dạng chữ và banner cảnh báo đỏ xuất hiện khi trùng chất dị ứng.
-- [ ] Công cụ phân tích thành phần yêu cầu đăng nhập/Skin ID và bóc tách chuẩn xác theo từng vùng chăm sóc.
+- [x] Người dùng xem được danh mục, lọc theo loại da và công tắc an toàn hoạt động chính xác.
+- [x] Trang PDP hiển thị bảng INCI 3 tầng dễ hiểu, kết luận dạng chữ và banner cảnh báo đỏ xuất hiện khi trùng chất dị ứng.
+- [x] Công cụ phân tích thành phần yêu cầu đăng nhập/Skin ID và bóc tách chuẩn xác theo từng vùng chăm sóc.
 
 ---
 
@@ -131,8 +131,8 @@ flowchart LR
 | **T3.4** | **Tích hợp Reviews 1M trên trang PDP** | 10 giờ | Bảng `reviews` đã đánh chỉ mục B-Tree | Hiển thị điểm sao trung bình; Tab lọc đánh giá theo loại da (*"Xem người có DA DẦU nói gì"*); Ưu tiên bài viết cùng loại da với khách. |
 
 🎯 **MỐC QUALITY GATE 3 (Cuối Tuần 3):**
-- [ ] Luồng mua sắm thông suốt từ thêm giỏ hàng ➔ giỏ hàng cảnh báo xung đột ➔ đặt hàng COD thành công.
-- [ ] Danh sách review trên PDP lọc theo loại da siêu tốc dưới 50ms nhờ B-Tree index.
+- [x] Luồng mua sắm thông suốt từ thêm giỏ hàng ➔ giỏ hàng cảnh báo xung đột ➔ đặt hàng COD thành công.
+- [x] Danh sách review trên PDP lọc theo loại da siêu tốc dưới 50ms nhờ B-Tree index.
 
 ---
 
@@ -148,9 +148,9 @@ flowchart LR
 | **T4.4** | **Tổng duyệt Demo, Slide & Launch PROD** | 8 giờ | Toàn bộ hệ thống | Kiểm tra `./syntheprise gate` Clean; Chạy thử nghiệm kịch bản Happy Path Demo từ A đến Z; Chuẩn bị slide và tài liệu thuyết minh. |
 
 🎯 **MỐC QUALITY GATE 4 (Cuối Tuần 4 — Bàn Giao & Launch):**
-- [ ] Toàn bộ hệ sinh thái chạy mượt mà không lỗi.
-- [ ] Kịch bản thuyết trình bảo vệ đồ án diễn ra trơn tru từ A đến Z.
-- [ ] `./syntheprise gate` và `./scripts/test` XANH 100%.
+- [x] Toàn bộ hệ sinh thái chạy mượt mà không lỗi.
+- [x] Kịch bản thuyết trình bảo vệ đồ án diễn ra trơn tru từ A đến Z.
+- [x] `./syntheprise gate` và `./scripts/test` XANH 100%.
 
 ---
 
