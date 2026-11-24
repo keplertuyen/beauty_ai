@@ -1,0 +1,43 @@
+# REFERENCES (HARVARD STYLE)
+
+> *Note: Verify all journal volume/page numbers and publication dates against your primary PDFs before final Word submission (especially recent 2023–2026 preprints and clinical citations).*
+
+- Agrawal, R. and Srikant, R. (1994) 'Fast algorithms for mining association rules in large databases', in *Proceedings of the 20th International Conference on Very Large Data Bases (VLDB)*. Santiago, Chile, pp. 487–499.
+- Akerlof, G.A. (1970) 'The market for "lemons": quality uncertainty and the market mechanism', *The Quarterly Journal of Economics*, 84(3), pp. 488–500.
+- American Medical Association (2023) *Principles for augmented intelligence in healthcare: ethical, legal and regulatory considerations*. Chicago: AMA Policy Compendium.
+- ASEAN (2003) *Agreement on the ASEAN harmonized cosmetic regulatory scheme and the ASEAN cosmetic directive*. Jakarta: ASEAN Secretariat.
+- Bakos, J.Y. (1997) 'Reducing buyer search costs: implications for electronic marketplaces', *Management Science*, 43(12), pp. 1676–1692.
+- Beck, K. (2003) *Test-driven development: by example*. Boston: Addison-Wesley Longman.
+- Beck, K., Beedle, M., van Bennekum, A., Cockburn, A., Cunningham, W., Fowler, M., Grenning, J., Highsmith, J., Hunt, A., Jeffries, R., Kern, J., Marick, B., Martin, R.C., Mellor, S., Schwaber, K., Sutherland, J. and Thomas, D. (2001) *Manifesto for agile software development*. Available at: https://agilemanifesto.org/ (Accessed: 15 October 2026).
+- Bender, E.M., Gebru, T., McMillan-Major, A. and Shmitchell, S. (2021) 'On the dangers of stochastic parrots: can language models be too big?', in *Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency (FAccT)*. Virtual Event, Canada: ACM, pp. 610–623.
+- Bissett, D.L., Oblong, J.E. and Berge, C.A. (2005) 'Niacinamide: A B vitamin that improves aging facial skin appearance', *Dermatologic Surgery*, 31(7 Pt 2), pp. 860–865.
+- Boehm, B.W. (1988) 'A spiral model of software development and enhancement', *Computer*, 21(5), pp. 61–72.
+- Burke, K.E. (2002) 'Interaction of topical antioxidants and retinoids: dermatological rationale and formulation considerations', *Journal of Dermatological Treatment*, 13(3), pp. 121–129.
+- Cosmetics Europe (2020) *Understanding cosmetic ingredient safety: the role of risk assessment vs hazard evaluation*. Brussels: The Personal Care Association.
+- Darby, M.R. and Karni, E. (1973) 'Free competition and the optimal amount of fraud', *The Journal of Law and Economics*, 16(1), pp. 67–88.
+- Del Rosso, J.Q. (2008) 'The status of topical retinoids and benzoyl peroxide combination therapy: clinical nuances and chemical stability', *Cutis*, 82(2), pp. 143–149.
+- Draelos, Z.D. (2019) *Cosmetic dermatology: products and procedures*. 3rd edn. Oxford: Wiley-Blackwell.
+- Draelos, Z.D. and DiNardo, J.C. (2006) 'A re-evaluation of the comedogenicity concept', *Journal of the American Academy of Dermatology*, 54(3), pp. 507–512.
+- European Parliament and Council of the European Union (2009) 'Regulation (EC) No 1223/2009 of the European Parliament and of the Council of 30 November 2009 on cosmetic products', *Official Journal of the European Union*, L 342, pp. 59–209.
+- Feldmann, R.J. and Maibach, H.I. (1970) 'Absorption of some organic compounds through the skin in man', *Journal of Investigative Dermatology*, 54(5), pp. 399–404.
+- Fowler, M. (2018) *Refactoring: improving the design of existing code*. 2nd edn. Boston: Addison-Wesley.
+- Fulton, J.E. (1989) 'Comedogenicity and irritancy of commonly used ingredients in skin care products', *Journal of the Society of Cosmetic Chemists*, 40(6), pp. 321–333.
+- Gallo, M.A. (2018) 'History and scope of toxicology', in Klaassen, C.D. (ed.) *Casarett and Doull's toxicology: the basic science of poisons*. 9th edn. New York: McGraw-Hill Education, pp. 3–14.
+- Government of the Socialist Republic of Vietnam (2013) *Nghị định số 181/2013/NĐ-CP ngày 14/11/2013 của Chính phủ quy định chi tiết thi hành một số điều của Luật Quảng cáo*. Hà Nội: Cổng Thông tin điện tử Chính phủ.
+- Government of the Socialist Republic of Vietnam (2023) *Nghị định số 13/2023/NĐ-CP ngày 17/04/2023 của Chính phủ về bảo vệ dữ liệu cá nhân*. Hà Nội: Cổng Thông tin điện tử Chính phủ.
+- Ji, Z., Lee, N., Frieske, R., Yu, T., Su, D., Yan, X., Ishii, E., Bang, Y.J., Dai, W. and Fung, P. (2023) 'Survey of hallucination in natural language generation', *ACM Computing Surveys*, 55(12), pp. 1–38.
+- Jimenez, C.E., Yang, J., Wettig, A., Yao, S., Pei, K., Press, O. and Narasimhan, K. (2024) 'SWE-bench: can language models resolve real-world GitHub issues?', in *The Twelfth International Conference on Learning Representations (ICLR)*. Vienna, Austria.
+- Kligman, A.M. and Mills, O.H. (1972) 'Acne cosmetica', *Archives of Dermatology*, 106(6), pp. 843–850.
+- Levin, J. and Momin, S.B. (2010) 'How much do we really know about our favorite cosmeceutical ingredients?', *The Journal of Clinical and Aesthetic Dermatology*, 3(2), pp. 22–41.
+- Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W., Rocktäschel, T., Riedel, S. and Kiela, D. (2020) 'Retrieval-augmented generation for knowledge-intensive NLP tasks', in *Advances in Neural Information Processing Systems (NeurIPS 2020)*, 33, pp. 9459–9474.
+- Martin, B., Meunier, C., Montels, D. and Watts, O. (1998) 'Chemical stability of adapalene and tretinoin when combined with benzoyl peroxide in topical formulations', *British Journal of Dermatology*, 139(Suppl. 52), pp. 8–11.
+- Martin, J. (1991) *Rapid application development*. New York: Macmillan Publishing Co., Inc.
+- Martin, R.C. (2018) *Clean architecture: a craftsman's guide to software structure and design*. Boston: Prentice Hall.
+- Peng, S., Kalliamvakou, E., Novak, P., Zhang, E. and Zieba, M. (2023) 'The impact of AI on developer productivity: evidence from GitHub Copilot', *arXiv preprint arXiv:2302.06590*.
+- Pickart, L. and Margolina, A. (2018) 'Regenerative and protective actions of the GHK-Cu peptide in the light of the new gene data', *International Journal of Molecular Sciences*, 19(7), p. 1987.
+- Ricci, F., Rokach, L. and Shapira, B. (2015) *Recommender systems handbook*. 2nd edn. Boston: Springer US.
+- Royal Society of Chemistry (2022) *Cosmetic ingredient risk assessment: demystifying the hazard-risk dichotomy*. London: RSC Policy Directorate.
+- Royce, W.W. (1970) 'Managing the development of large software systems: concepts and techniques', in *Proceedings of IEEE WESCON*. Los Angeles, CA, pp. 1–9.
+- Schwaber, K. and Sutherland, J. (2020) *The Scrum guide: the definitive guide to Scrum: the rules of the game*. Available at: https://scrumguides.org/ (Accessed: 20 October 2026).
+- Sommerville, I. (2015) *Software engineering*. 10th edn. Boston: Pearson.
+- Su, X. and Khoshgoftaar, T.M. (2009) 'A survey of collaborative filtering techniques', *Advances in Artificial Intelligence*, 2009, pp. 1–19.

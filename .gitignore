@@ -64,3 +64,4 @@ CLAUDE.local.md
 .agent-local/
 .local/
 Library/
+.neon

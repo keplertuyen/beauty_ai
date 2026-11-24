@@ -13,6 +13,34 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load .env.local / .env files if present (for Neon / Lakebase local execution)
+var candidateDirs = new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory, Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../../")) };
+foreach (var dir in candidateDirs)
+{
+    foreach (var envFile in new[] { Path.Combine(dir, ".env.local"), Path.Combine(dir, ".env") })
+    {
+        if (File.Exists(envFile))
+        {
+            foreach (var line in File.ReadAllLines(envFile))
+            {
+                var trimmed = line.Trim();
+                if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith("#")) continue;
+                var parts = trimmed.Split('=', 2);
+                if (parts.Length == 2)
+                {
+                    var key = parts[0].Trim();
+                    var val = parts[1].Trim().Trim('"', '\'');
+                    if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(key)))
+                    {
+                        Environment.SetEnvironmentVariable(key, val);
+                    }
+                    builder.Configuration[key] = val;
+                }
+            }
+        }
+    }
+}
+
 // 1. Controllers & OpenAPI
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -31,9 +59,29 @@ builder.Services.AddCors(options =>
 });
 
 // 3. PostgreSQL Database
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["DATABASE_URL"]
+var rawConnection = builder.Configuration["DATABASE_URL"]
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Host=localhost;Port=5432;Database=beautyai;Username=beautyai;Password=beautyai_dev_secret";
+
+var connectionString = rawConnection;
+if (!string.IsNullOrEmpty(rawConnection) && (rawConnection.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) || rawConnection.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase)))
+{
+    try
+    {
+        var uri = new Uri(rawConnection);
+        var userInfo = uri.UserInfo.Split(':');
+        var username = Uri.UnescapeDataString(userInfo[0]);
+        var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        var database = uri.AbsolutePath.TrimStart('/');
+        connectionString = $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+    }
+    catch
+    {
+        // Fallback to raw connection string
+        connectionString = rawConnection;
+    }
+}
 
 builder.Services.AddDbContext<BeautyAIDbContext>(options =>
 {
@@ -101,8 +149,10 @@ using (var scope = app.Services.CreateScope())
         {
             await db.Database.ExecuteSqlRawAsync(@"
                 ALTER TABLE products ADD COLUMN IF NOT EXISTS selling_status VARCHAR(20) NOT NULL DEFAULT 'Active';
+                ALTER TABLE products ADD COLUMN IF NOT EXISTS department VARCHAR(50) NOT NULL DEFAULT 'Skincare';
                 ALTER TABLE products ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NULL;
                 CREATE INDEX IF NOT EXISTS idx_products_selling_status ON products(selling_status);
+                CREATE INDEX IF NOT EXISTS idx_products_department ON products(department);
             ");
         }
 
