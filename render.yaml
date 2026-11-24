@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: beautyai-api
+    runtime: docker
+    dockerfilePath: src/BeautyAI.Api/Dockerfile
+    dockerContext: .
+    plan: free
+    region: singapore
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        value: "https://beauty-ai-lyart.vercel.app,http://localhost:5173,http://localhost:5000"
+      - key: JWT_SECRET
+        value: BeautyAI_SuperSecret_Dermatology_Key_2026_AtLeast32Chars!
+      - key: JWT_ISSUER
+        value: beautyai-api
+      - key: JWT_AUDIENCE
+        value: beautyai-clients
+      - key: JWT_EXPIRATION_DAYS
+        value: "7"

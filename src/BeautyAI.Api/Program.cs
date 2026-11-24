@@ -41,6 +41,13 @@ foreach (var dir in candidateDirs)
     }
 }
 
+// Bind to Cloud hosting PORT if injected (e.g. Render, Railway, Cloud Run)
+var cloudPort = Environment.GetEnvironmentVariable("PORT") ?? builder.Configuration["PORT"];
+if (!string.IsNullOrEmpty(cloudPort))
+{
+    builder.WebHost.UseUrls($"http://+:{cloudPort}");
+}
+
 // 1. Controllers & OpenAPI
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
