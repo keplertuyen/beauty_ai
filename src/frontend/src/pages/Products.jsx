@@ -113,8 +113,11 @@ export default function Products() {
   /* ── Load categories once ─────────────────────────────────── */
   useEffect(() => {
     getCategories()
-      .then(res => setCategories(res.data?.categories || res.data || []))
-      .catch(() => {});
+      .then(res => {
+        const raw = res?.data?.categories ?? (Array.isArray(res?.data) ? res?.data : []);
+        setCategories(Array.isArray(raw) ? raw : []);
+      })
+      .catch(() => setCategories([]));
   }, []);
 
   /* ── Sync URL query/category params on mount/update ──────── */
@@ -155,13 +158,14 @@ export default function Products() {
       if (selectedActives.length) params.active_ingredients = selectedActives.join(',');
 
       const res = await getProducts(params);
-      const data = res.data;
-      const items = data.products || data.items || data || [];
-      const total = data.total ?? items.length;
-      const pages = data.pages ?? Math.ceil(total / PER_PAGE);
+      const data = res?.data;
+      const rawList = data?.products ?? data?.items ?? (Array.isArray(data) ? data : []);
+      const items = Array.isArray(rawList) ? rawList : [];
+      const total = typeof data?.total === 'number' ? data.total : items.length;
+      const pages = typeof data?.pages === 'number' ? data.pages : Math.ceil(total / PER_PAGE);
 
       if (append) {
-        setProducts(prev => [...prev, ...items]);
+        setProducts(prev => [...(Array.isArray(prev) ? prev : []), ...items]);
       } else {
         setProducts(items);
       }
@@ -472,8 +476,8 @@ export default function Products() {
                 </button>
 
                 {/* Primary Departments first */}
-                {categories
-                  .filter(c => c.parentId === null || c.parent_id === null)
+                {(Array.isArray(categories) ? categories : [])
+                  .filter(c => c && (c.parentId === null || c.parent_id === null))
                   .map(cat => {
                     const catName = cat.name || cat;
                     const isSelected = selectedCats.includes(catName);
@@ -500,13 +504,14 @@ export default function Products() {
 
               {/* Subcategories (if a department or subcategory is selected, or expand popular) */}
               {(() => {
+                const catList = Array.isArray(categories) ? categories : [];
                 const activeDeptName = selectedCats.find(c =>
-                  categories.some(cat => (cat.parentId === null || cat.parent_id === null) && cat.name === c)
+                  catList.some(cat => (cat.parentId === null || cat.parent_id === null) && cat.name === c)
                 ) || (selectedCats.length === 0 ? 'Skincare' : null);
 
-                const activeDept = categories.find(c => c.name === activeDeptName);
+                const activeDept = catList.find(c => c.name === activeDeptName);
                 const subCats = activeDept
-                  ? categories.filter(c => (c.parentId === activeDept.id || c.parent_id === activeDept.id))
+                  ? catList.filter(c => (c.parentId === activeDept.id || c.parent_id === activeDept.id))
                   : [];
 
                 if (subCats.length === 0) return null;
