@@ -24,6 +24,15 @@ public class AiController : ControllerBase
         _productRepository = productRepository;
     }
 
+    private static readonly string[] MedicalGuardrailKeywords =
+    [
+        "eczema", "psoriasis", "fungal", "ringworm", "infection", "infected",
+        "corticoid", "corticosteroid", "steroid", "isotretinoin", "prescription",
+        "melanoma", "skin cancer", "anaphylaxis", "severe swelling", "shortness of breath",
+        "pregnant", "pregnancy", "breastfeeding",
+        "viem da", "vay nen", "kem tron", "mung mu", "nhiem trung", "di ung nang", "mang thai"
+    ];
+
     [HttpPost("consult")]
     public async Task<IActionResult> Consult(
         [FromBody] AiConsultRequest request,
@@ -31,6 +40,18 @@ public class AiController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request?.Message))
             return BadRequest(new { detail = "User message cannot be empty." });
+
+        // Stage 1: Deterministic Medical Guardrail (NO LLM call, NO product recommendation — BR-AI-03 / GC-10)
+        if (IsMedicalBoundaryTopic(request.Message))
+        {
+            return Ok(new AiConsultResponse(
+                Reply: "Your question involves a medical or clinical dermatology concern that falls outside cosmetic skincare guidance. BeautyAI Assistant is not a doctor and cannot diagnose conditions or recommend products for active medical symptoms. Please consult a board-certified dermatologist or connect with our specialist via Zalo for safe guidance.",
+                RecommendedProducts: new List<ProductSummaryDto>(),
+                IsPathology: true,
+                ZaloDeepLink: "https://zalo.me/0908123456",
+                SuggestedAction: "Stop applying new active skincare products and seek in-person evaluation from a licensed dermatologist."
+            ));
+        }
 
         DigitalSkinIdDto? skinId = null;
         List<string> userAllergies = new();
@@ -48,7 +69,7 @@ public class AiController : ControllerBase
             }
         }
 
-        var filter = new ProductFilterParams(PageSize: 30);
+        var filter = new ProductFilterParams(PageSize: 120);
         var (products, _) = await _productRepository.GetProductsAsync(filter, userAllergies, cancellationToken);
 
         var productSummaries = products.Select(p => new ProductSummaryDto(
@@ -72,12 +93,21 @@ public class AiController : ControllerBase
 
         var reply = await _aiProvider.ConsultAsync(request.Message, skinId, productSummaries, cancellationToken);
 
-        // Find products mentioned in reply for UI action cards
+        // Stage 6: Match products mentioned in reply against real DB catalog (Code -> Name -> Brand)
         var recommended = productSummaries
-            .Where(p => reply.Contains(p.Name, StringComparison.OrdinalIgnoreCase) ||
-                        (p.BrandName.Length > 3 && reply.Contains(p.BrandName, StringComparison.OrdinalIgnoreCase)))
+            .Where(p =>
+                (!string.IsNullOrWhiteSpace(p.Code) && reply.Contains(p.Code, StringComparison.OrdinalIgnoreCase)) ||
+                reply.Contains(p.Name, StringComparison.OrdinalIgnoreCase))
             .Take(3)
             .ToList();
+
+        if (recommended.Count == 0)
+        {
+            recommended = productSummaries
+                .Where(p => p.BrandName.Length > 3 && reply.Contains(p.BrandName, StringComparison.OrdinalIgnoreCase))
+                .Take(3)
+                .ToList();
+        }
 
         if (recommended.Count == 0 && productSummaries.Count > 0)
         {
@@ -88,5 +118,24 @@ public class AiController : ControllerBase
             Reply: reply,
             RecommendedProducts: recommended
         ));
+    }
+
+    private static bool IsMedicalBoundaryTopic(string message)
+    {
+        var normalized = message.Trim().ToLowerInvariant()
+            .Replace('đ', 'd')
+            .Normalize(System.Text.NormalizationForm.FormD);
+
+        var sb = new System.Text.StringBuilder(normalized.Length);
+        foreach (var c in normalized)
+        {
+            if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)
+            {
+                sb.Append(c);
+            }
+        }
+
+        var ascii = sb.ToString();
+        return MedicalGuardrailKeywords.Any(kw => ascii.Contains(kw, StringComparison.Ordinal));
     }
 }

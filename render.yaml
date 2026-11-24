@@ -21,3 +21,9 @@ services:
         value: beautyai-clients
       - key: JWT_EXPIRATION_DAYS
         value: "7"
+      - key: AI_PROVIDER
+        value: dify
+      - key: DIFY_API_URL
+        value: "https://api.dify.ai/v1"
+      - key: DIFY_API_KEY
+        sync: false

@@ -13,6 +13,8 @@ last_reviewed: 2026-10-25
 > Bắt buộc tuân thủ bất biến: INV-04, INV-05, INV-06, INV-12.
 >
 > 🌐 **Phạm Vi Ngôn Ngữ & Tiền Tệ Phase 1 (MVP):** Nền tảng Phase 1 hoạt động **100% bằng Tiếng Anh (English) và Tiền tệ USD ($)**. Toàn bộ System Prompt chính thức đang chạy là `docs/prompt/01_gemini_advisor_en.md`. Bộ prompt tiếng Việt chuẩn y tế (`docs/prompt/02_gemini_advisor_vi.md`) được lưu trữ dự thảo phục vụ mở rộng đa ngôn ngữ trong Phase 2.
+>
+> 🧩 **Adapter RAG Demo Phase 1 (ADR-015):** Ngoài `GeminiSkincareProvider`, backend hỗ trợ thêm adapter `DifySkincareProvider` (chọn qua `AI_PROVIDER=dify` + `DIFY_API_KEY`) để chạy RAG Knowledge Base trên Dify cho bản demo. Mọi bất biến an toàn (chặn y tế chặng 1 trước khi gọi LLM, ẩn danh hóa `INV-04`, khớp thẻ sản phẩm từ DB `INV-05`, suy giảm có kiểm soát `BR-AI-05`, và ngôn ngữ Tiếng Anh 100%) vẫn giữ nguyên.
 
 ---
 

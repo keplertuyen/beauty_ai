@@ -112,7 +112,16 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRoutineService, RoutineService>();
 builder.Services.AddScoped<IAdminProductService, AdminProductService>();
 builder.Services.AddScoped<AdminBootstrapper>();
-builder.Services.AddHttpClient<IAiSkincareProvider, GeminiSkincareProvider>();
+var aiProviderChoice = (builder.Configuration["AI_PROVIDER"] ?? Environment.GetEnvironmentVariable("AI_PROVIDER") ?? string.Empty).Trim().ToLowerInvariant();
+var hasDifyKey = !string.IsNullOrWhiteSpace(builder.Configuration["DIFY_API_KEY"] ?? builder.Configuration["Dify:ApiKey"] ?? Environment.GetEnvironmentVariable("DIFY_API_KEY"));
+if (aiProviderChoice == "dify" || (string.IsNullOrEmpty(aiProviderChoice) && hasDifyKey))
+{
+    builder.Services.AddHttpClient<IAiSkincareProvider, DifySkincareProvider>();
+}
+else
+{
+    builder.Services.AddHttpClient<IAiSkincareProvider, GeminiSkincareProvider>();
+}
 
 // 5. JWT Authentication
 var jwtSecret = builder.Configuration["JWT_SECRET"] ?? "BeautyAI_SuperSecret_Dermatology_Key_2026_AtLeast32Chars!";

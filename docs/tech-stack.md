@@ -88,7 +88,8 @@ last_reviewed: 2026-10-25
 
 | Tên | Loại | Adapter | Trạng thái | Từ | Ghi chú |
 |---|---|---|---|---|---|
-| Google Gemini | `llm` | `Infrastructure/Providers/Llm/GeminiLlmProvider.cs` | `dự kiến` → `đang dùng` | 2026-11 | Có `NullLlmProvider` dự phòng; ẩn danh hóa bắt buộc (`BR-AI-16`) |
+| Google Gemini | `llm` | `Infrastructure/Providers/GeminiSkincareProvider.cs` | `đang dùng` | 2026-11 | Có rule-based fallback; ẩn danh hóa bắt buộc (`BR-AI-16`) |
+| Dify RAG (Phase 1 Demo) | `llm` | `Infrastructure/Providers/DifySkincareProvider.cs` | `đang dùng` | 2026-11 | Adapter RAG cho demo (`AI_PROVIDER=dify`); gọi REST qua `HttpClient`, không thêm SDK (ADR-015) |
 | Zalo OA (deep link) | `service` | `Infrastructure/Providers/Handoff/ZaloDeepLinkHandoffChannel.cs` | `dự kiến` → `đang dùng` | 2026-12 | Chỉ deep link + mã phiên, **không dùng API** (ADR-006) |
 | VNPay Sandbox | `service` | `Infrastructure/Providers/Payment/VnPaySandboxProvider.cs` | `dự kiến` → `đang dùng` | 2026-12 | Có `MockPaymentProvider` dự phòng |
 | SMTP (email giao dịch) | `service` | `Infrastructure/Providers/Email/SmtpEmailSender.cs` | `dự kiến` | 2027-01 | Có `NoOpEmailSender` dự phòng; phụ thuộc `OQ-02` |
