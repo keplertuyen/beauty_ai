@@ -134,4 +134,28 @@ public class DifySkincareProviderTests
         Assert.DoesNotContain("internal_error", reply);
         Assert.Contains("Disclaimer:", reply);
     }
+
+    [Fact]
+    public async Task ConsultAsync_FallbackFiltersByCategoryAndBudget_ExcludesLipMask()
+    {
+        var products = new List<ProductSummaryDto>
+        {
+            new(1, "P1", "Lip Sleeping Mask", "lip-mask", "LANEIGE", "Lip Balms & Treatments", 24.00m, 20, "", 5.0m, 500, ["Dry"], "Safe", "Compatible", false, "Skincare"),
+            new(2, "P2", "Salicylic Acid Cleanser", "sa-cleanser", "The INKEY List", "Cleansers", 11.99m, 150, "", 4.7m, 300, ["Oily"], "Safe", "Compatible", false, "Skincare"),
+            new(3, "P3", "Luxury Gold Serum", "gold-serum", "LuxuryBrand", "Treatments", 85.00m, 30, "", 4.9m, 100, ["Oily"], "Safe", "Compatible", false, "Skincare"),
+            new(4, "P4", "Niacinamide 10% Serum", "nia-serum", "The Ordinary", "Treatments", 6.00m, 30, "", 4.8m, 900, ["Oily"], "Safe", "Compatible", false, "Skincare"),
+        };
+
+        var handler = new StubHttpMessageHandler(_ => throw new InvalidOperationException("No HTTP call"));
+        using var httpClient = new HttpClient(handler);
+        var provider = new DifySkincareProvider(httpClient, BuildConfig(apiKey: string.Empty));
+
+        var reply = await provider.ConsultAsync("Recommend a cleanser and a serum for oily acne-prone skin under $40", null, products);
+
+        Assert.Contains("Salicylic Acid Cleanser", reply);
+        Assert.Contains("Niacinamide 10% Serum", reply);
+        Assert.DoesNotContain("Lip Sleeping Mask", reply);
+        Assert.DoesNotContain("Luxury Gold Serum", reply);
+        Assert.Contains("Oily skin", reply);
+    }
 }
