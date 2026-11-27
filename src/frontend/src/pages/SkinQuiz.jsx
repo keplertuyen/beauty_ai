@@ -12,50 +12,50 @@ export default function SkinQuiz() {
   const STEPS = [
     {
       id: 'skin_type',
-      question: t('quiz_q_skin_type', 'Loại da của bạn là gì?'),
-      subtitle: t('quiz_sub_skin_type', 'Hãy chọn loại da gần giống nhất với da của bạn'),
+      question: t('quiz_q_skin_type', 'What is your skin type?'),
+      subtitle: t('quiz_sub_skin_type', 'Select the skin type that best describes your skin'),
       type: 'single',
       icon: '🌸',
       options: [
-        { value: 'dry',         label: t('skin_type_dry'),       icon: '🏜️', desc: t('quiz_desc_dry', 'Dễ bong tróc, căng da') },
-        { value: 'oily',        label: t('skin_type_oily'),        icon: '💧', desc: t('quiz_desc_oily', 'Bóng nhờn, lỗ chân lông to') },
-        { value: 'combination', label: t('skin_type_combination'),   icon: '☯️', desc: t('quiz_desc_combination', 'Vùng T dầu, má khô') },
-        { value: 'normal',      label: t('skin_type_normal'),     icon: '🌿', desc: t('quiz_desc_normal', 'Cân bằng, ít vấn đề') },
-        { value: 'sensitive',   label: t('skin_type_sensitive'),  icon: '🌺', desc: t('quiz_desc_sensitive', 'Dễ kích ứng, đỏ da') },
+        { value: 'dry',         label: t('skin_type_dry'),       icon: '🏜️', desc: t('quiz_desc_dry', 'Prone to flakiness and tightness') },
+        { value: 'oily',        label: t('skin_type_oily'),        icon: '💧', desc: t('quiz_desc_oily', 'Excess shine and enlarged pores') },
+        { value: 'combination', label: t('skin_type_combination'),   icon: '☯️', desc: t('quiz_desc_combination', 'Oily T-zone with drier cheeks') },
+        { value: 'normal',      label: t('skin_type_normal'),     icon: '🌿', desc: t('quiz_desc_normal', 'Balanced with few concerns') },
+        { value: 'sensitive',   label: t('skin_type_sensitive'),  icon: '🌺', desc: t('quiz_desc_sensitive', 'Easily irritated or prone to redness') },
       ],
     },
     {
       id: 'concerns',
-      question: t('quiz_q_concerns', 'Vấn đề da chính của bạn?'),
-      subtitle: t('quiz_sub_concerns', 'Có thể chọn nhiều vấn đề cùng một lúc'),
+      question: t('quiz_q_concerns', 'What are your primary skin concerns?'),
+      subtitle: t('quiz_sub_concerns', 'You may select more than one concern'),
       type: 'multi',
       icon: '🔍',
       options: [
-        { value: 'acne',       label: t('quiz_concern_acne', 'Mụn'),           icon: '🫧' },
-        { value: 'aging',      label: t('quiz_concern_aging', 'Lão hóa'),       icon: '⏳' },
-        { value: 'hydration',  label: t('quiz_concern_hydration', 'Thiếu ẩm'),      icon: '💧' },
-        { value: 'dark_spots', label: t('quiz_concern_dark_spots', 'Thâm nám'),      icon: '🌑' },
-        { value: 'pores',      label: t('quiz_concern_pores', 'Lỗ chân lông to'), icon: '🔬' },
-        { value: 'dullness',   label: t('quiz_concern_dullness', 'Da sạm tối'),    icon: '🌙' },
+        { value: 'acne',       label: t('quiz_concern_acne', 'Acne & Blemishes'), icon: '🫧' },
+        { value: 'aging',      label: t('quiz_concern_aging', 'Fine Lines & Aging'), icon: '⏳' },
+        { value: 'hydration',  label: t('quiz_concern_hydration', 'Dehydration'), icon: '💧' },
+        { value: 'dark_spots', label: t('quiz_concern_dark_spots', 'Dark Spots'), icon: '🌑' },
+        { value: 'pores',      label: t('quiz_concern_pores', 'Enlarged Pores'), icon: '🔬' },
+        { value: 'dullness',   label: t('quiz_concern_dullness', 'Dullness'), icon: '🌙' },
       ],
     },
     {
       id: 'budget',
-      question: t('quiz_q_budget', 'Ngân sách của bạn?'),
-      subtitle: t('quiz_sub_budget', 'Chúng tôi sẽ gợi ý sản phẩm phù hợp với túi tiền của bạn'),
+      question: t('quiz_q_budget', 'What is your budget range?'),
+      subtitle: t('quiz_sub_budget', 'We will recommend formulas matched to your budget'),
       type: 'single',
       icon: '💰',
       options: [
-        { value: 20,   label: t('quiz_budget_under_20', 'Dưới $20'),       icon: '🟢', desc: t('quiz_budget_desc_under_20', 'Thân thiện với ví tiền') },
-        { value: 50,   label: '$20 – $50',       icon: '🔵', desc: t('quiz_budget_desc_mid', 'Tầm trung, hiệu quả') },
-        { value: 100,  label: '$50 – $100',      icon: '🟣', desc: t('quiz_budget_desc_high', 'Cao cấp, chất lượng') },
-        { value: 9999, label: t('quiz_budget_unlimited', 'Không giới hạn'),  icon: '👑', desc: t('quiz_budget_desc_unlimited', 'Chỉ cần hiệu quả nhất') },
+        { value: 20,   label: t('quiz_budget_under_20', 'Under $20'), icon: '🟢', desc: t('quiz_budget_desc_under_20', 'Budget-friendly essentials') },
+        { value: 50,   label: '$20 – $50',       icon: '🔵', desc: t('quiz_budget_desc_mid', 'Mid-range, proven actives') },
+        { value: 100,  label: '$50 – $100',      icon: '🟣', desc: t('quiz_budget_desc_high', 'Premium clinical formulas') },
+        { value: 9999, label: t('quiz_budget_unlimited', 'No Limit'), icon: '👑', desc: t('quiz_budget_desc_unlimited', 'Best performance regardless of price') },
       ],
     },
     {
       id: 'category',
-      question: t('quiz_q_category', 'Danh mục sản phẩm?'),
-      subtitle: t('quiz_sub_category', 'Bạn đang tìm kiếm loại sản phẩm nào?'),
+      question: t('quiz_q_category', 'Which product category are you looking for?'),
+      subtitle: t('quiz_sub_category', 'Pick the step you want recommendations for'),
       type: 'single',
       icon: '🛍️',
       options: [
@@ -73,10 +73,10 @@ export default function SkinQuiz() {
 
   /* ─── Loading messages ──────────────────────────────── */
   const LOADING_MSGS = [
-    t('quiz_loading_msg_1', 'Đang phân tích loại da của bạn…'),
-    t('quiz_loading_msg_2', 'Tìm kiếm sản phẩm phù hợp nhất…'),
-    t('quiz_loading_msg_3', 'Kiểm tra thành phần và đánh giá…'),
-    t('quiz_loading_msg_4', 'Chuẩn bị gợi ý dành riêng cho bạn…'),
+    t('quiz_loading_msg_1', 'Analyzing your skin profile…'),
+    t('quiz_loading_msg_2', 'Finding the best formula matches…'),
+    t('quiz_loading_msg_3', 'Checking ingredients and community reviews…'),
+    t('quiz_loading_msg_4', 'Preparing your personalized recommendations…'),
   ];
 
   const [step, setStep]               = useState(0);   // 0-3 = quiz, 4 = results
@@ -155,7 +155,7 @@ export default function SkinQuiz() {
       });
       setProducts(Array.isArray(data) ? data : data?.recommendations ?? []);
     } catch (e) {
-      setError(t('quiz_error_msg', 'Không thể tải gợi ý. Vui lòng thử lại.'));
+      setError(t('quiz_error_msg', 'Unable to load recommendations. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -243,7 +243,7 @@ export default function SkinQuiz() {
               {/* multi-select hint */}
               {currentStep.type === 'multi' && (
                 <div className="quiz-multi-hint">
-                  <span className="badge badge-primary">✓ {t('quiz_select_multiple', 'Chọn nhiều') || 'Chọn nhiều'}</span>
+                  <span className="badge badge-primary">✓ {t('quiz_select_multiple', 'Select multiple') || 'Select multiple'}</span>
                 </div>
               )}
 
@@ -324,10 +324,10 @@ export default function SkinQuiz() {
               ) : error ? (
                 <div className="quiz-error">
                   <div className="quiz-error-icon">😢</div>
-                  <h2>{t('quiz_error_title', 'Ôi! Có lỗi xảy ra') || 'Ôi! Có lỗi xảy ra'}</h2>
+                  <h2>{t('quiz_error_title', 'Something went wrong') || 'Something went wrong'}</h2>
                   <p>{error}</p>
                   <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-                    <button className="btn btn-primary" onClick={fetchResults}>{t('common_retry', 'Thử lại')}</button>
+                    <button className="btn btn-primary" onClick={fetchResults}>{t('common_retry', 'Try Again')}</button>
                     <button className="btn btn-secondary" onClick={restart}>
                       <RotateCcw size={16} /> {t('quiz_restart')}
                     </button>

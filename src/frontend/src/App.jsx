@@ -22,6 +22,7 @@ const Profile = lazy(() => import('./pages/Profile'));
 const ExpertConsult = lazy(() => import('./pages/ExpertConsult'));
 const SupportCenter = lazy(() => import('./pages/SupportCenter'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function PageLoader() {
   const { t } = useApp();
@@ -96,6 +97,7 @@ function AppContentLayout() {
             <Route path="/expert-consult" element={<ExpertConsult />} />
             <Route path="/support" element={<SupportCenter />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>

@@ -117,6 +117,7 @@ builder.Services.AddScoped<ISkinProfileService, SkinProfileService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<IProductCache, MemoryProductCache>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<IToolsService, ToolsService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRoutineService, RoutineService>();
