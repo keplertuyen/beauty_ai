@@ -118,7 +118,8 @@ public class AuthService : IAuthService
             user.FullName,
             user.Phone,
             user.ShippingAddress,
-            skinId
+            skinId,
+            user.Role.ToString()
         );
     }
 
@@ -144,7 +145,30 @@ public class AuthService : IAuthService
             updated.FullName,
             updated.Phone,
             updated.ShippingAddress,
-            skinId
+            skinId,
+            updated.Role.ToString()
         );
+    }
+
+    public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request, CancellationToken ct = default)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.CurrentPassword))
+            throw new ArgumentException("Current password is required.", nameof(request));
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+            throw new ArgumentException("New password must be at least 6 characters.", nameof(request));
+
+        if (request.CurrentPassword == request.NewPassword)
+            throw new ArgumentException("New password must be different from your current password.", nameof(request));
+
+        var user = await _userRepository.GetByIdAsync(userId, ct);
+        if (user == null)
+            throw new KeyNotFoundException($"User with ID {userId} not found.");
+
+        if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+            throw new UnauthorizedAccessException("Current password is incorrect.");
+
+        user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword);
+        await _userRepository.UpdateAsync(user, ct);
     }
 }

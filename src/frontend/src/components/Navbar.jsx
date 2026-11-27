@@ -746,11 +746,7 @@ export default function Navbar() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   type="button"
                 >
-                  {user.avatar_url ? (
-                    <img src={user.avatar_url} alt={user.name} />
-                  ) : (
-                    <span>{user.name?.charAt(0)?.toUpperCase()}</span>
-                  )}
+                  <span>{user.name?.charAt(0)?.toUpperCase() || 'U'}</span>
                 </button>
                 {userMenuOpen && (
                   <div className="user-dropdown">

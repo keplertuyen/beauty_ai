@@ -112,7 +112,7 @@ export const AppProvider = ({ children }) => {
       getMe()
         .then(res => {
           const d = res.data;
-          const resolvedRole = d.role || userRef.current?.role || getRoleFromToken(token) || 'Customer';
+          const resolvedRole = d.role || getRoleFromToken(token) || userRef.current?.role || 'Customer';
           const u = {
             ...d,
             role: resolvedRole,

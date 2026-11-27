@@ -25,23 +25,23 @@ public class ConsultationController : ControllerBase
         {
             new
             {
-                question = "BeautyAI phân tích bảng thành phần INCI như thế nào?",
-                answer = "Hệ thống đối chiếu danh sách thành phần INCI với cơ sở dữ liệu hoạt chất, mức độ gây bít tắc (Comedogenic), khả năng kích ứng và hồ sơ dị ứng cá nhân (Allergy Blacklist) để đưa ra khuyến nghị an toàn cho da."
+                question = "How does BeautyAI analyze INCI ingredient lists?",
+                answer = "Our system cross-references every INCI ingredient against active ingredient roles, comedogenic and irritation reference data, and your personal Allergy Blacklist to deliver a personalized suitability verdict."
             },
             new
             {
-                question = "Làm sao để kiểm tra xung đột hoạt chất trong chu trình skincare?",
-                answer = "Bạn có thể dùng công cụ Ingredient Analyzer hoặc thêm sản phẩm vào giỏ hàng / routine — Smart Conflict Detector sẽ tự động cảnh báo các cặp hoạt chất kỵ nhau (ví dụ Retinol + AHA/BHA) kèm gợi ý tách buổi sáng/tối."
+                question = "How can I check for active ingredient conflicts in my skincare routine?",
+                answer = "Use the Ingredient Analyzer or add products to your Shopping Bag or Routine Builder — our Smart Conflict Detector automatically flags incompatible active pairs (such as Retinol + AHA/BHA) and suggests how to alternate AM/PM schedules."
             },
             new
             {
-                question = "Tôi có thể thanh toán và theo dõi đơn hàng bằng cách nào?",
-                answer = "BeautyAI hỗ trợ thanh toán khi nhận hàng (COD). Sau khi đặt hàng, đội ngũ vận hành sẽ xác nhận, cập nhật mã vận đơn và trạng thái giao hàng trực tiếp trên hệ thống."
+                question = "How do I pay for and track my order?",
+                answer = "BeautyAI currently supports Cash on Delivery (COD) in USD. Once your order is placed, our operations team confirms fulfillment, adds a tracking number, and updates delivery status directly in your order history."
             },
             new
             {
-                question = "Hồ sơ da và danh sách dị ứng của tôi có được bảo mật không?",
-                answer = "Có. Hồ sơ da của bạn được bảo vệ nghiêm ngặt; quản trị viên không thể xem hồ sơ da hay danh sách dị ứng gắn danh tính của bạn."
+                question = "Are my Digital Skin ID and Allergy Blacklist kept private?",
+                answer = "Yes. Your Digital Skin ID is strictly protected; administrators cannot view your personal skin profile or identifiable allergy list."
             }
         };
 
@@ -68,7 +68,7 @@ public class ConsultationController : ControllerBase
             {
                 ticket_code = created.TicketCode,
                 ticket = created,
-                message = $"Đã tiếp nhận yêu cầu hỗ trợ ({created.TicketCode}). Đội ngũ BeautyAI sẽ phản hồi sớm nhất!"
+                message = $"Your support request ({created.TicketCode}) has been received. The BeautyAI team will respond as soon as possible."
             });
         }
         catch (ArgumentException ex)

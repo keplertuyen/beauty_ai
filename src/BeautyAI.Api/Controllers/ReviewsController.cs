@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using BeautyAI.Application.DTOs;
 using BeautyAI.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeautyAI.Api.Controllers;
@@ -17,15 +18,15 @@ public class ReviewsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateReview(
         [FromBody] CreateReviewRequest request,
         CancellationToken cancellationToken = default)
     {
-        int? userId = null;
-        if (User.Identity?.IsAuthenticated == true)
+        var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(idClaim, out var userId))
         {
-            var idClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(idClaim, out var parsed)) userId = parsed;
+            return Unauthorized(new { message = "Authentication is required to submit a review." });
         }
 
         var review = await _productService.AddReviewAsync(userId, request, cancellationToken);

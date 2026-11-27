@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, ShoppingBag, Save, Clock, CheckCircle, XCircle, Truck, ShieldAlert, Plus, Trash2, Fingerprint, MapPin, Phone } from 'lucide-react';
+import { User, ShoppingBag, Save, Clock, CheckCircle, XCircle, Truck, ShieldAlert, Plus, Trash2, Fingerprint, MapPin, Phone, KeyRound } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
-import { updateProfile, getMyOrders, getSkinProfile, updateSkinProfile, addAllergy, removeAllergy } from '../services/api';
+import { updateProfile, changePassword, getMyOrders, getSkinProfile, updateSkinProfile, addAllergy, removeAllergy } from '../services/api';
 import { getProductImage } from '../utils/productImages';
 import './Profile.css';
 
@@ -47,6 +47,8 @@ export default function Profile() {
   });
   const [newAllergy, setNewAllergy] = useState('');
   const [newAllergyNote, setNewAllergyNote] = useState('');
+  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [pwSaving, setPwSaving] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -173,6 +175,35 @@ export default function Profile() {
     }
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!pwForm.currentPassword || !pwForm.newPassword) {
+      toast.error('Please enter your current password and a new password.');
+      return;
+    }
+    if (pwForm.newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters.');
+      return;
+    }
+    if (pwForm.newPassword !== pwForm.confirmPassword) {
+      toast.error('New password and confirmation do not match.');
+      return;
+    }
+    setPwSaving(true);
+    try {
+      await changePassword({
+        currentPassword: pwForm.currentPassword,
+        newPassword: pwForm.newPassword,
+      });
+      setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      toast.success('Password updated successfully.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.response?.data?.detail || 'Unable to change password.');
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '—';
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -203,11 +234,7 @@ export default function Profile() {
         {/* Hero header */}
         <div className="profile-hero glass-card animate-fadeIn">
           <div className="profile-avatar-wrap">
-            {user.avatar_url ? (
-              <img src={user.avatar_url} alt={form.name} className="profile-avatar-img" />
-            ) : (
-              <div className="profile-avatar-placeholder">{avatarInitial}</div>
-            )}
+            <div className="profile-avatar-placeholder">{avatarInitial}</div>
           </div>
           <div className="profile-hero-info">
             <h1 className="profile-name display-font">{form.name || t('profile_user_fallback', 'User')}</h1>
@@ -483,6 +510,66 @@ export default function Profile() {
                       {t('profile_save_btn') || 'Save Changes'}
                     </>
                   )}
+                </button>
+              </form>
+
+              <hr style={{ margin: '2rem 0', border: 'none', borderTop: '1px solid var(--border-subtle)' }} />
+
+              <div className="profile-form-header">
+                <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <KeyRound size={18} />
+                  Change Password
+                </h2>
+                <p className="text-muted" style={{ fontSize: '0.88rem' }}>
+                  Update your account password. Note: existing active sessions remain valid until their JWT expires.
+                </p>
+              </div>
+              <form onSubmit={handleChangePassword} className="profile-form">
+                <div className="form-group">
+                  <label htmlFor="pw-current" className="form-label">Current Password</label>
+                  <input
+                    id="pw-current"
+                    type="password"
+                    className="form-input"
+                    autoComplete="current-password"
+                    required
+                    value={pwForm.currentPassword}
+                    onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="pw-new" className="form-label">New Password (min 6 characters)</label>
+                  <input
+                    id="pw-new"
+                    type="password"
+                    className="form-input"
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
+                    value={pwForm.newPassword}
+                    onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="pw-confirm" className="form-label">Confirm New Password</label>
+                  <input
+                    id="pw-confirm"
+                    type="password"
+                    className="form-input"
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
+                    value={pwForm.confirmPassword}
+                    onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn btn-secondary profile-save-btn"
+                  disabled={pwSaving}
+                >
+                  <KeyRound size={16} />
+                  {pwSaving ? 'Updating Password...' : 'Update Password'}
                 </button>
               </form>
             </div>

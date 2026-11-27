@@ -25,11 +25,17 @@ public record UserProfileDto(
     string FullName,
     string? Phone,
     string? ShippingAddress,
-    DigitalSkinIdDto? SkinProfile
+    DigitalSkinIdDto? SkinProfile,
+    string Role = "Customer"
 );
 
 public record UpdateProfileRequest(
     string FullName,
     string? Phone,
     string? ShippingAddress
+);
+
+public record ChangePasswordRequest(
+    string CurrentPassword,
+    string NewPassword
 );

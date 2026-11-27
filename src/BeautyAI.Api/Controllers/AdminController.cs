@@ -131,17 +131,17 @@ public class AdminController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         if (file == null || file.Length == 0)
-            return BadRequest(new { detail = "Vui lòng chọn tệp ảnh để tải lên." });
+            return BadRequest(new { detail = "Please select an image file to upload." });
 
         if (file.Length > MaxUploadSizeBytes)
-            return BadRequest(new { detail = "Kích thước ảnh tối đa là 5MB." });
+            return BadRequest(new { detail = "Maximum image size is 5MB." });
 
         var ext = Path.GetExtension(file.FileName);
         if (string.IsNullOrWhiteSpace(ext) || !AllowedImageExtensions.Contains(ext))
-            return BadRequest(new { detail = "Chỉ hỗ trợ ảnh định dạng .jpg, .jpeg, .png, .webp." });
+            return BadRequest(new { detail = "Only .jpg, .jpeg, .png, and .webp image formats are supported." });
 
         if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-            return BadRequest(new { detail = "Loại tệp không hợp lệ. Vui lòng chọn tệp ảnh." });
+            return BadRequest(new { detail = "Invalid file type. Please choose an image file." });
 
         var webRoot = string.IsNullOrWhiteSpace(_env.WebRootPath)
             ? Path.Combine(_env.ContentRootPath, "wwwroot")
@@ -456,7 +456,7 @@ public class AdminController : ControllerBase
     {
         var currentAdminId = GetCurrentUserId();
         if (currentAdminId == id && !request.IsActive)
-            return BadRequest(new { detail = "Không thể tự khóa tài khoản quản trị viên đang đăng nhập." });
+            return BadRequest(new { detail = "You cannot deactivate your own active administrator account." });
 
         var updated = await _adminConsoleRepository.UpdateUserStatusAsync(id, request.IsActive, cancellationToken);
         if (updated == null) return NotFound(new { detail = $"User with ID {id} not found." });
@@ -471,7 +471,7 @@ public class AdminController : ControllerBase
     {
         var currentAdminId = GetCurrentUserId();
         if (currentAdminId == id && !string.Equals(request.Role?.Trim(), "Admin", StringComparison.OrdinalIgnoreCase))
-            return BadRequest(new { detail = "Không thể tự hạ quyền tài khoản quản trị viên đang đăng nhập." });
+            return BadRequest(new { detail = "You cannot demote your own active administrator account." });
 
         try
         {

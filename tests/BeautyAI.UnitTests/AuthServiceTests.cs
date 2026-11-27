@@ -154,4 +154,56 @@ public class AuthServiceTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
             authService.LoginAsync(new LoginRequest("valid@beautyai.vn", "WrongPassword!")));
     }
+
+    [Fact]
+    public async Task GetCurrentUserProfileAsync_IncludesRole()
+    {
+        var userRepo = new InMemoryUserRepository();
+        var skinRepo = new InMemorySkinProfileRepository();
+        var hasher = new SimplePasswordHasher();
+        var jwt = new DummyTokenGenerator();
+        var skinService = new SkinProfileService(skinRepo, userRepo);
+        var authService = new AuthService(userRepo, skinRepo, hasher, jwt, skinService);
+
+        var admin = await userRepo.CreateAsync(new User
+        {
+            Email = "admin@beautyai.com",
+            FullName = "Admin User",
+            PasswordHash = hasher.HashPassword("AdminPass123!"),
+            Role = UserRole.Admin
+        });
+
+        var profile = await authService.GetCurrentUserProfileAsync(admin.Id);
+
+        Assert.Equal("Admin", profile.Role);
+        Assert.Equal("admin@beautyai.com", profile.Email);
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_UpdatesHash_AndRejectsInvalidCurrentOrShortNewPassword()
+    {
+        var userRepo = new InMemoryUserRepository();
+        var skinRepo = new InMemorySkinProfileRepository();
+        var hasher = new SimplePasswordHasher();
+        var jwt = new DummyTokenGenerator();
+        var skinService = new SkinProfileService(skinRepo, userRepo);
+        var authService = new AuthService(userRepo, skinRepo, hasher, jwt, skinService);
+
+        var user = await userRepo.CreateAsync(new User
+        {
+            Email = "member@beautyai.com",
+            FullName = "Member",
+            PasswordHash = hasher.HashPassword("OldPass123!"),
+            Role = UserRole.Customer
+        });
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+            authService.ChangePasswordAsync(user.Id, new ChangePasswordRequest("WrongPass", "NewPass456!")));
+
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            authService.ChangePasswordAsync(user.Id, new ChangePasswordRequest("OldPass123!", "123")));
+
+        await authService.ChangePasswordAsync(user.Id, new ChangePasswordRequest("OldPass123!", "NewPass456!"));
+        Assert.True(hasher.VerifyPassword("NewPass456!", user.PasswordHash));
+    }
 }

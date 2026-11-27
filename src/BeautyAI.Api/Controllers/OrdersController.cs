@@ -32,7 +32,7 @@ public class OrdersController : ControllerBase
         {
             return StatusCode(StatusCodes.Status403Forbidden, new
             {
-                message = "Tài khoản Quản trị viên không được phép đặt hàng. Vui lòng sử dụng tài khoản Khách hàng.",
+                message = "Admin accounts cannot place orders. Please use a Customer account.",
                 detail = "Admin accounts cannot place orders. Please use a Customer account."
             });
         }
