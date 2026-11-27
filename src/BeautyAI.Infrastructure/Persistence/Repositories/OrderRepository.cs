@@ -13,10 +13,50 @@ public class OrderRepository : IOrderRepository
         _context = context;
     }
 
+    public async Task<T> ExecuteInTransactionAsync<T>(Func<CancellationToken, Task<T>> action, CancellationToken cancellationToken = default)
+    {
+        if (!_context.Database.IsRelational())
+        {
+            return await action(cancellationToken);
+        }
+
+        var strategy = _context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async () =>
+        {
+            await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                var result = await action(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+                return result;
+            }
+            catch
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        });
+    }
+
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default)
+        => _context.SaveChangesAsync(cancellationToken);
+
     public async Task<IReadOnlyList<Product>> GetProductsByIdsForUpdateAsync(
         IReadOnlyList<int> productIds,
         CancellationToken cancellationToken = default)
     {
+        if (productIds.Count == 0)
+            return Array.Empty<Product>();
+
+        if (_context.Database.IsRelational())
+        {
+            var idArray = productIds.ToArray();
+            return await _context.Products
+                .FromSqlInterpolated($"SELECT * FROM products WHERE id = ANY({idArray}) FOR UPDATE")
+                .Include(p => p.Brand)
+                .ToListAsync(cancellationToken);
+        }
+
         return await _context.Products
             .Include(p => p.Brand)
             .Where(p => productIds.Contains(p.Id))

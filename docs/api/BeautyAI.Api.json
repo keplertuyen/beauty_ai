@@ -3638,6 +3638,12 @@
             "items": {
               "$ref": "#/components/schemas/OrderItemDto"
             }
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

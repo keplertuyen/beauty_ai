@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(500) NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    shipping_address TEXT NULL,
     role VARCHAR(50) DEFAULT 'Customer' NOT NULL CHECK (role IN ('Customer', 'Admin')),
     is_active BOOLEAN DEFAULT TRUE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -80,8 +81,13 @@ CREATE TABLE IF NOT EXISTS products (
     slug VARCHAR(255) UNIQUE NOT NULL,
     brand_id INT REFERENCES brands(id) ON DELETE CASCADE,
     category_id INT REFERENCES categories(id) ON DELETE CASCADE,
+    department VARCHAR(50) DEFAULT 'Skincare' NOT NULL,
     price_usd NUMERIC(10, 2) NOT NULL CHECK (price_usd >= 0),
     volume_ml INT,
+    size_display VARCHAR(100) NULL,
+    loves_count INT DEFAULT 0 NOT NULL,
+    avg_rating NUMERIC(3, 2) NULL,
+    reviews_count INT DEFAULT 0 NOT NULL,
     description TEXT,
     image_url VARCHAR(500),
     ingredient_list_raw TEXT NOT NULL, -- Raw INCI ingredient string from packaging
@@ -127,6 +133,8 @@ CREATE TABLE IF NOT EXISTS reviews (
     skin_type VARCHAR(50) NOT NULL CHECK (skin_type IN ('Oily', 'Dry', 'Combination', 'Normal', 'Unknown')),
     skin_concerns VARCHAR(255),
     content TEXT,
+    is_hidden BOOLEAN DEFAULT FALSE NOT NULL,
+    moderation_reason VARCHAR(500) NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
@@ -134,6 +142,7 @@ CREATE TABLE IF NOT EXISTS reviews (
 CREATE INDEX IF NOT EXISTS idx_reviews_product_skin ON reviews(product_id, skin_type);
 CREATE INDEX IF NOT EXISTS idx_reviews_product_rating ON reviews(product_id, rating);
 CREATE INDEX IF NOT EXISTS idx_reviews_product_code ON reviews(product_code);
+CREATE INDEX IF NOT EXISTS idx_reviews_is_hidden ON reviews(is_hidden);
 
 -- 9. ORDERS & ORDER ITEMS
 CREATE TABLE IF NOT EXISTS orders (
@@ -142,11 +151,14 @@ CREATE TABLE IF NOT EXISTS orders (
     recipient_name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
     shipping_address TEXT NOT NULL,
+    notes TEXT NULL,
     payment_method VARCHAR(50) DEFAULT 'COD' NOT NULL,
     payment_status VARCHAR(50) DEFAULT 'Pending' NOT NULL,
     order_status VARCHAR(50) DEFAULT 'Pending' NOT NULL,
     total_amount_usd NUMERIC(10, 2) NOT NULL CHECK (total_amount_usd >= 0),
     conflict_acknowledged BOOLEAN DEFAULT FALSE NOT NULL,
+    tracking_number VARCHAR(100) NULL,
+    admin_notes TEXT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
@@ -169,3 +181,19 @@ CREATE TABLE IF NOT EXISTS saved_routines (
     notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+
+-- 11. SUPPORT TICKETS (ADMIN CONSOLE V2)
+CREATE TABLE IF NOT EXISTS support_tickets (
+    id SERIAL PRIMARY KEY,
+    ticket_code VARCHAR(32) NOT NULL UNIQUE,
+    user_id INT NULL REFERENCES users(id) ON DELETE SET NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'New',
+    admin_reply TEXT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NULL
+);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_status ON support_tickets(status);

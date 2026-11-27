@@ -52,8 +52,8 @@ public class BeautyAIDbContext : DbContext
 
             entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
             entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.ShippingAddress).HasColumnName("shipping_address");
             entity.Ignore(e => e.UpdatedAtUtc);
-            entity.Ignore(e => e.ShippingAddress); // Currently not in users table schema, stored in memory/order
 
             entity.HasOne(e => e.SkinProfile)
                 .WithOne(p => p.User)
@@ -276,6 +276,7 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.RecipientName).HasColumnName("recipient_name").HasMaxLength(255).IsRequired();
             entity.Property(e => e.PhoneNumber).HasColumnName("phone_number").HasMaxLength(20).IsRequired();
             entity.Property(e => e.ShippingAddress).HasColumnName("shipping_address").IsRequired();
+            entity.Property(e => e.Notes).HasColumnName("notes");
             entity.Property(e => e.PaymentMethod).HasColumnName("payment_method").HasMaxLength(50).HasDefaultValue("COD");
             entity.Property(e => e.PaymentStatus).HasColumnName("payment_status").HasMaxLength(50).HasDefaultValue("Pending");
             entity.Property(e => e.OrderStatus).HasColumnName("order_status").HasMaxLength(50).HasDefaultValue("Pending");

@@ -2760,6 +2760,7 @@ export interface components {
             /** Format: date-time */
             created_at: string;
             items: components["schemas"]["OrderItemDto"][];
+            notes?: null | string;
         };
         OrderItemDto: {
             /** Format: int32 */

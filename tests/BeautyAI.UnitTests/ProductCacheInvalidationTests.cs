@@ -128,6 +128,11 @@ public class ProductCacheInvalidationTests
         private readonly List<Product> _products;
         public StubOrderRepository(List<Product> products) => _products = products;
 
+        public Task<T> ExecuteInTransactionAsync<T>(Func<CancellationToken, Task<T>> action, CancellationToken ct = default)
+            => action(ct);
+
+        public Task SaveChangesAsync(CancellationToken ct = default) => Task.CompletedTask;
+
         public Task<IReadOnlyList<Product>> GetProductsByIdsForUpdateAsync(IReadOnlyList<int> productIds, CancellationToken ct = default)
             => Task.FromResult<IReadOnlyList<Product>>(_products.Where(p => productIds.Contains(p.Id)).ToList());
 

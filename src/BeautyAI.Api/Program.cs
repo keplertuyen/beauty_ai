@@ -203,6 +203,8 @@ using (var scope = app.Services.CreateScope())
                 CREATE INDEX IF NOT EXISTS idx_products_department ON products(department);
                 CREATE INDEX IF NOT EXISTS idx_products_sorting ON products(reviews_count DESC, avg_rating DESC NULLS LAST, loves_count DESC);
 
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS shipping_address TEXT NULL;
+                ALTER TABLE orders ADD COLUMN IF NOT EXISTS notes TEXT NULL;
                 ALTER TABLE orders ADD COLUMN IF NOT EXISTS tracking_number VARCHAR(100) NULL;
                 ALTER TABLE orders ADD COLUMN IF NOT EXISTS admin_notes TEXT NULL;
                 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN NOT NULL DEFAULT FALSE;
@@ -336,7 +338,11 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        logger.LogWarning(ex, "Database schema ensure or Admin bootstrap skipped during startup.");
+        logger.LogError(ex, "Database schema ensure or Admin bootstrap failed during startup.");
+        if (!app.Environment.IsDevelopment())
+        {
+            throw;
+        }
     }
 }
 

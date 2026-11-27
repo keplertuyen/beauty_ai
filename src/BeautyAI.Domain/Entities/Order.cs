@@ -6,6 +6,7 @@ public class Order : BaseEntity<int>
     public string RecipientName { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public string ShippingAddress { get; set; } = string.Empty;
+    public string? Notes { get; set; }
     public string PaymentMethod { get; set; } = "COD";
     public string PaymentStatus { get; set; } = "Pending";
     public string OrderStatus { get; set; } = "Pending";

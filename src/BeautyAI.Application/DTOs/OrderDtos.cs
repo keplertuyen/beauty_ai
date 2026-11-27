@@ -39,5 +39,6 @@ public record OrderDto(
     [property: JsonPropertyName("total_usd")] decimal TotalUsd,
     [property: JsonPropertyName("conflict_acknowledged")] bool ConflictAcknowledged,
     [property: JsonPropertyName("created_at")] DateTime CreatedAt,
-    [property: JsonPropertyName("items")] IReadOnlyList<OrderItemDto> Items
+    [property: JsonPropertyName("items")] IReadOnlyList<OrderItemDto> Items,
+    [property: JsonPropertyName("notes")] string? Notes = null
 );

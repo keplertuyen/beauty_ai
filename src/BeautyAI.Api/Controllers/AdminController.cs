@@ -21,6 +21,7 @@ public class AdminController : ControllerBase
 
     private readonly IProductRepository _productRepository;
     private readonly IOrderRepository _orderRepository;
+    private readonly IOrderService _orderService;
     private readonly IAdminProductService _adminProductService;
     private readonly IAdminConsoleRepository _adminConsoleRepository;
     private readonly IWebHostEnvironment _env;
@@ -29,6 +30,7 @@ public class AdminController : ControllerBase
     public AdminController(
         IProductRepository productRepository,
         IOrderRepository orderRepository,
+        IOrderService orderService,
         IAdminProductService adminProductService,
         IAdminConsoleRepository adminConsoleRepository,
         IWebHostEnvironment env,
@@ -36,6 +38,7 @@ public class AdminController : ControllerBase
     {
         _productRepository = productRepository;
         _orderRepository = orderRepository;
+        _orderService = orderService;
         _adminProductService = adminProductService;
         _adminConsoleRepository = adminConsoleRepository;
         _env = env;
@@ -243,22 +246,33 @@ public class AdminController : ControllerBase
             _ => "Cancelled"
         };
 
-        var success = await _orderRepository.UpdateOrderStatusAsync(
-            id,
-            normalizedStatus,
-            request.TrackingNumber,
-            request.AdminNotes,
-            cancellationToken);
-
-        if (!success) return NotFound(new { detail = $"Order with ID {id} not found." });
-
-        return Ok(new
+        try
         {
-            message = $"Order {id} updated to {normalizedStatus}.",
-            order_status = normalizedStatus,
-            tracking_number = request.TrackingNumber,
-            admin_notes = request.AdminNotes
-        });
+            var success = await _orderService.UpdateOrderStatusAsync(
+                id,
+                normalizedStatus,
+                request.TrackingNumber,
+                request.AdminNotes,
+                cancellationToken);
+
+            if (!success) return NotFound(new { detail = $"Order with ID {id} not found." });
+
+            return Ok(new
+            {
+                message = $"Order {id} updated to {normalizedStatus}.",
+                order_status = normalizedStatus,
+                tracking_number = request.TrackingNumber,
+                admin_notes = request.AdminNotes
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { detail = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { detail = ex.Message });
+        }
     }
 
     // ── PRODUCTS CRUD ──────────────────────────────────────────────

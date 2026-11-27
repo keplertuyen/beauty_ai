@@ -7,15 +7,23 @@ namespace BeautyAI.Application.Services;
 
 public class OrderService : IOrderService
 {
+    private static readonly HashSet<string> ValidStatuses = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Pending", "Delivering", "Completed", "Cancelled"
+    };
+
     private readonly IOrderRepository _orderRepository;
     private readonly IProductCache? _productCache;
+    private readonly IToolsService? _toolsService;
 
     public OrderService(
         IOrderRepository orderRepository,
-        IProductCache? productCache = null)
+        IProductCache? productCache = null,
+        IToolsService? toolsService = null)
     {
         _orderRepository = orderRepository;
         _productCache = productCache;
+        _toolsService = toolsService;
     }
 
     public async Task<OrderDto> CreateOrderAsync(
@@ -46,66 +54,85 @@ public class OrderService : IOrderService
             throw new ArgumentException("No valid cart items provided.");
         }
 
-        var products = await _orderRepository.GetProductsByIdsForUpdateAsync(requestedIds, cancellationToken);
-        var productMap = products.ToDictionary(p => p.Id);
-
-        var orderItems = new List<OrderItem>();
-        decimal totalUsd = 0m;
-
-        foreach (var reqItem in request.Items)
+        // Server-side active ingredient conflict check (never trust client alone)
+        if (_toolsService != null && requestedIds.Count >= 2)
         {
-            if (reqItem.Quantity <= 0)
-                continue;
+            var conflictResult = await _toolsService.CheckCartConflictsAsync(
+                new ConflictCheckRequest(requestedIds),
+                cancellationToken);
 
-            if (!productMap.TryGetValue(reqItem.ProductId, out var product))
+            if (conflictResult.HasConflict && !request.ConflictAcknowledged)
             {
-                throw new InvalidOperationException($"Product #{reqItem.ProductId} does not exist.");
+                throw new InvalidOperationException(
+                    "Your bag contains conflicting active ingredients. Please review and acknowledge the conflict notice before placing your order.");
             }
-
-            if (!string.Equals(product.SellingStatus, "Active", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new InvalidOperationException($"Product '{product.Name}' is no longer available for purchase.");
-            }
-
-            if (product.StockQuantity < reqItem.Quantity)
-            {
-                throw new InvalidOperationException($"Insufficient stock for '{product.Name}'. Available: {product.StockQuantity}.");
-            }
-
-            product.StockQuantity -= reqItem.Quantity;
-
-            var unitPrice = product.PriceUsd;
-            var lineTotal = unitPrice * reqItem.Quantity;
-            totalUsd += lineTotal;
-
-            orderItems.Add(new OrderItem
-            {
-                ProductId = product.Id,
-                Quantity = reqItem.Quantity,
-                UnitPriceUsd = unitPrice,
-                TotalPriceUsd = lineTotal,
-                Product = product
-            });
         }
 
-        var order = new Order
+        var (savedOrder, lockedProducts) = await _orderRepository.ExecuteInTransactionAsync(async txCt =>
         {
-            UserId = userId,
-            RecipientName = request.RecipientName.Trim(),
-            PhoneNumber = request.PhoneNumber.Trim(),
-            ShippingAddress = request.ShippingAddress.Trim(),
-            PaymentMethod = "COD",
-            PaymentStatus = "Pending",
-            OrderStatus = "Pending",
-            TotalAmountUsd = totalUsd,
-            ConflictAcknowledged = request.ConflictAcknowledged,
-            CreatedAtUtc = DateTime.UtcNow,
-            OrderItems = orderItems
-        };
+            var products = await _orderRepository.GetProductsByIdsForUpdateAsync(requestedIds, txCt);
+            var productMap = products.ToDictionary(p => p.Id);
 
-        var savedOrder = await _orderRepository.CreateOrderAsync(order, cancellationToken);
+            var orderItems = new List<OrderItem>();
+            decimal totalUsd = 0m;
 
-        foreach (var product in products)
+            foreach (var reqItem in request.Items)
+            {
+                if (reqItem.Quantity <= 0)
+                    continue;
+
+                if (!productMap.TryGetValue(reqItem.ProductId, out var product))
+                {
+                    throw new InvalidOperationException($"Product #{reqItem.ProductId} does not exist.");
+                }
+
+                if (!string.Equals(product.SellingStatus, "Active", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException($"Product '{product.Name}' is no longer available for purchase.");
+                }
+
+                if (product.StockQuantity < reqItem.Quantity)
+                {
+                    throw new InvalidOperationException($"Insufficient stock for '{product.Name}'. Available: {product.StockQuantity}.");
+                }
+
+                product.StockQuantity -= reqItem.Quantity;
+
+                var unitPrice = product.PriceUsd;
+                var lineTotal = unitPrice * reqItem.Quantity;
+                totalUsd += lineTotal;
+
+                orderItems.Add(new OrderItem
+                {
+                    ProductId = product.Id,
+                    Quantity = reqItem.Quantity,
+                    UnitPriceUsd = unitPrice,
+                    TotalPriceUsd = lineTotal,
+                    Product = product
+                });
+            }
+
+            var order = new Order
+            {
+                UserId = userId,
+                RecipientName = request.RecipientName.Trim(),
+                PhoneNumber = request.PhoneNumber.Trim(),
+                ShippingAddress = request.ShippingAddress.Trim(),
+                Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(),
+                PaymentMethod = "COD",
+                PaymentStatus = "Pending",
+                OrderStatus = "Pending",
+                TotalAmountUsd = totalUsd,
+                ConflictAcknowledged = request.ConflictAcknowledged,
+                CreatedAtUtc = DateTime.UtcNow,
+                OrderItems = orderItems
+            };
+
+            var created = await _orderRepository.CreateOrderAsync(order, txCt);
+            return (created, products);
+        }, cancellationToken);
+
+        foreach (var product in lockedProducts)
         {
             _productCache?.InvalidateProduct(product.Id, product.Code, product.Slug);
         }
@@ -119,6 +146,96 @@ public class OrderService : IOrderService
     {
         var orders = await _orderRepository.GetOrdersByUserIdAsync(userId, cancellationToken);
         return orders.Select(MapToDto).ToList();
+    }
+
+    public async Task<bool> UpdateOrderStatusAsync(
+        int orderId,
+        string newStatus,
+        string? trackingNumber = null,
+        string? adminNotes = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(newStatus) || !ValidStatuses.Contains(newStatus.Trim()))
+        {
+            throw new ArgumentException(
+                $"Invalid status '{newStatus}'. Valid statuses are: Pending, Delivering, Completed, Cancelled.");
+        }
+
+        var normalizedStatus = newStatus.Trim() switch
+        {
+            var s when s.Equals("Pending", StringComparison.OrdinalIgnoreCase) => "Pending",
+            var s when s.Equals("Delivering", StringComparison.OrdinalIgnoreCase) => "Delivering",
+            var s when s.Equals("Completed", StringComparison.OrdinalIgnoreCase) => "Completed",
+            _ => "Cancelled"
+        };
+
+        var (found, restoredProducts) = await _orderRepository.ExecuteInTransactionAsync(async txCt =>
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId, txCt);
+            if (order == null)
+                return (false, (IReadOnlyList<Product>)Array.Empty<Product>());
+
+            var currentStatus = order.OrderStatus;
+            ValidateTransition(currentStatus, normalizedStatus);
+
+            IReadOnlyList<Product> restored = Array.Empty<Product>();
+            var isCancelling = string.Equals(normalizedStatus, "Cancelled", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(currentStatus, "Cancelled", StringComparison.OrdinalIgnoreCase);
+
+            if (isCancelling && order.OrderItems.Count > 0)
+            {
+                var itemProductIds = order.OrderItems.Select(i => i.ProductId).Distinct().ToList();
+                restored = await _orderRepository.GetProductsByIdsForUpdateAsync(itemProductIds, txCt);
+                var map = restored.ToDictionary(p => p.Id);
+                foreach (var item in order.OrderItems)
+                {
+                    if (map.TryGetValue(item.ProductId, out var product))
+                    {
+                        product.StockQuantity += item.Quantity;
+                    }
+                }
+            }
+
+            order.OrderStatus = normalizedStatus;
+            if (trackingNumber != null)
+            {
+                order.TrackingNumber = string.IsNullOrWhiteSpace(trackingNumber) ? null : trackingNumber.Trim();
+            }
+            if (adminNotes != null)
+            {
+                order.AdminNotes = string.IsNullOrWhiteSpace(adminNotes) ? null : adminNotes.Trim();
+            }
+
+            await _orderRepository.SaveChangesAsync(txCt);
+            return (true, restored);
+        }, cancellationToken);
+
+        foreach (var product in restoredProducts)
+        {
+            _productCache?.InvalidateProduct(product.Id, product.Code, product.Slug);
+        }
+
+        return found;
+    }
+
+    private static void ValidateTransition(string currentStatus, string nextStatus)
+    {
+        if (string.Equals(currentStatus, "Cancelled", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Cancelled orders cannot be modified or cancelled again.");
+        }
+
+        if (string.Equals(currentStatus, "Completed", StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(nextStatus, "Completed", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Completed orders cannot transition to another status.");
+        }
+
+        if (string.Equals(currentStatus, "Delivering", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(nextStatus, "Pending", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Delivering orders cannot revert to Pending.");
+        }
     }
 
     private static OrderDto MapToDto(Order order)
@@ -147,7 +264,8 @@ public class OrderService : IOrderService
             TotalUsd: order.TotalAmountUsd,
             ConflictAcknowledged: order.ConflictAcknowledged,
             CreatedAt: order.CreatedAtUtc,
-            Items: items
+            Items: items,
+            Notes: order.Notes
         );
     }
 }
