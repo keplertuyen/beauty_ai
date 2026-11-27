@@ -23,6 +23,7 @@ public class BeautyAIDbContext : DbContext
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<SavedRoutine> SavedRoutines => Set<SavedRoutine>();
+    public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -176,6 +177,10 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.Department).HasColumnName("department").HasMaxLength(50).HasDefaultValue("Skincare");
             entity.Property(e => e.PriceUsd).HasColumnName("price_usd").HasPrecision(10, 2).IsRequired();
             entity.Property(e => e.VolumeMl).HasColumnName("volume_ml");
+            entity.Property(e => e.SizeDisplay).HasColumnName("size_display").HasMaxLength(100);
+            entity.Property(e => e.LovesCount).HasColumnName("loves_count").HasDefaultValue(0);
+            entity.Property(e => e.AvgRating).HasColumnName("avg_rating").HasPrecision(3, 2);
+            entity.Property(e => e.ReviewsCount).HasColumnName("reviews_count").HasDefaultValue(0);
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.ImageUrl).HasColumnName("image_url").HasMaxLength(500);
             entity.Property(e => e.IngredientListRaw).HasColumnName("ingredient_list_raw").IsRequired();
@@ -230,6 +235,8 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.SkinType).HasColumnName("skin_type").HasMaxLength(50).IsRequired();
             entity.Property(e => e.SkinConcerns).HasColumnName("skin_concerns").HasMaxLength(255);
             entity.Property(e => e.Content).HasColumnName("content");
+            entity.Property(e => e.IsHidden).HasColumnName("is_hidden").HasDefaultValue(false);
+            entity.Property(e => e.ModerationReason).HasColumnName("moderation_reason").HasMaxLength(500);
             entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Ignore(e => e.UpdatedAtUtc);
 
@@ -274,6 +281,8 @@ public class BeautyAIDbContext : DbContext
             entity.Property(e => e.OrderStatus).HasColumnName("order_status").HasMaxLength(50).HasDefaultValue("Pending");
             entity.Property(e => e.TotalAmountUsd).HasColumnName("total_amount_usd").HasPrecision(10, 2).IsRequired();
             entity.Property(e => e.ConflictAcknowledged).HasColumnName("conflict_acknowledged").HasDefaultValue(false);
+            entity.Property(e => e.TrackingNumber).HasColumnName("tracking_number").HasMaxLength(100);
+            entity.Property(e => e.AdminNotes).HasColumnName("admin_notes");
             entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Ignore(e => e.UpdatedAtUtc);
 
@@ -322,6 +331,30 @@ public class BeautyAIDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // 13. SupportTicket
+        modelBuilder.Entity<SupportTicket>(entity =>
+        {
+            entity.ToTable("support_tickets");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.TicketCode).HasColumnName("ticket_code").HasMaxLength(32).IsRequired();
+            entity.HasIndex(e => e.TicketCode).IsUnique();
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Name).HasColumnName("name").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Subject).HasColumnName("subject").HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Message).HasColumnName("message").IsRequired();
+            entity.Property(e => e.Status).HasColumnName("status").HasMaxLength(32).HasDefaultValue("New").IsRequired();
+            entity.Property(e => e.AdminReply).HasColumnName("admin_reply");
+            entity.Property(e => e.CreatedAtUtc).HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAtUtc).HasColumnName("updated_at");
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

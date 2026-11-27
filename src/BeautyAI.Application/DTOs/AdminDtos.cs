@@ -54,7 +54,8 @@ public record AdminProductDto(
     decimal Rating,
     int ReviewsCount,
     DateTime CreatedAtUtc,
-    DateTime? UpdatedAtUtc
+    DateTime? UpdatedAtUtc,
+    string? SizeDisplay = null
 );
 
 public record AdminProductFilterParams(
@@ -79,7 +80,9 @@ public record CreateProductAdminRequest(
     int? VolumeMl = null,
     string? SellingStatus = "Active",
     int? BrandId = null,
-    int? CategoryId = null
+    int? CategoryId = null,
+    string? Department = null,
+    string? SizeDisplay = null
 );
 
 public record UpdateProductAdminRequest(
@@ -95,9 +98,149 @@ public record UpdateProductAdminRequest(
     int? VolumeMl = null,
     string? SellingStatus = "Active",
     int? BrandId = null,
-    int? CategoryId = null
+    int? CategoryId = null,
+    string? Department = null,
+    string? SizeDisplay = null
 );
 
 public record UpdateOrderStatusRequest(
-    string Status
+    string Status,
+    string? TrackingNumber = null,
+    string? AdminNotes = null
+);
+
+public record AdminUserDto(
+    int Id,
+    string Email,
+    string FullName,
+    string? Phone,
+    string Role,
+    bool IsActive,
+    int OrdersCount,
+    decimal TotalSpentUsd,
+    DateTime CreatedAtUtc
+);
+
+public record UpdateUserStatusRequest(bool IsActive);
+
+public record UpdateUserRoleRequest(string Role);
+
+public record AdminReviewDto(
+    long Id,
+    int ProductId,
+    string? ProductCode,
+    string ProductName,
+    string? ProductImageUrl,
+    int? UserId,
+    string AuthorName,
+    int Rating,
+    string SkinType,
+    string? Content,
+    bool IsHidden,
+    string? ModerationReason,
+    DateTime CreatedAtUtc
+);
+
+public record UpdateReviewVisibilityRequest(
+    bool IsHidden,
+    string? ModerationReason = null
+);
+
+public record CreateSupportTicketRequest(
+    string Name,
+    string Email,
+    string Subject,
+    string Message
+);
+
+public record SupportTicketDto(
+    int Id,
+    string TicketCode,
+    int? UserId,
+    string Name,
+    string Email,
+    string Subject,
+    string Message,
+    string Status,
+    string? AdminReply,
+    DateTime CreatedAtUtc,
+    DateTime? UpdatedAtUtc
+);
+
+public record UpdateSupportTicketRequest(
+    string Status,
+    string? AdminReply = null
+);
+
+public record AdminIngredientDto(
+    int Id,
+    string InciName,
+    string FunctionGroup,
+    string? Description,
+    bool IsActiveIngredient,
+    int? ComedogenicRating,
+    int? IrritationRating,
+    int ProductsCount
+);
+
+public record UpsertIngredientRequest(
+    string InciName,
+    string FunctionGroup,
+    string? Description = null,
+    bool IsActiveIngredient = false,
+    int? ComedogenicRating = null,
+    int? IrritationRating = null
+);
+
+public record AdminConflictRuleDto(
+    int Id,
+    string ActiveIngredientA,
+    string ActiveIngredientB,
+    string Severity,
+    string Reason,
+    string Recommendation
+);
+
+public record UpsertConflictRuleRequest(
+    string ActiveIngredientA,
+    string ActiveIngredientB,
+    string Severity,
+    string Reason,
+    string Recommendation
+);
+
+public record PagedResultDto<T>(
+    IReadOnlyList<T> Items,
+    int Total,
+    int Page,
+    int PageSize,
+    int Pages
+);
+
+public record AdminBrandDto(
+    int Id,
+    string Name,
+    string Slug,
+    string? OriginCountry,
+    int ProductsCount
+);
+
+public record UpsertBrandRequest(
+    string Name,
+    string? OriginCountry = null
+);
+
+public record AdminCategoryDto(
+    int Id,
+    string Name,
+    string Slug,
+    int? ParentId,
+    string? ParentName,
+    int ProductsCount,
+    int SubCategoriesCount
+);
+
+public record UpsertCategoryRequest(
+    string Name,
+    int? ParentId = null
 );

@@ -8,10 +8,14 @@ namespace BeautyAI.Application.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly IProductCache? _productCache;
 
-    public OrderService(IOrderRepository orderRepository)
+    public OrderService(
+        IOrderRepository orderRepository,
+        IProductCache? productCache = null)
     {
         _orderRepository = orderRepository;
+        _productCache = productCache;
     }
 
     public async Task<OrderDto> CreateOrderAsync(
@@ -100,6 +104,12 @@ public class OrderService : IOrderService
         };
 
         var savedOrder = await _orderRepository.CreateOrderAsync(order, cancellationToken);
+
+        foreach (var product in products)
+        {
+            _productCache?.InvalidateProduct(product.Id, product.Code, product.Slug);
+        }
+
         return MapToDto(savedOrder);
     }
 

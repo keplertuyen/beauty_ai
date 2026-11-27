@@ -10,13 +10,42 @@ public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
     private readonly ISkinProfileRepository _skinProfileRepository;
+    private readonly IProductCache? _productCache;
 
     public ProductService(
         IProductRepository productRepository,
-        ISkinProfileRepository skinProfileRepository)
+        ISkinProfileRepository skinProfileRepository,
+        IProductCache? productCache = null)
     {
         _productRepository = productRepository;
         _skinProfileRepository = skinProfileRepository;
+        _productCache = productCache;
+    }
+
+    private async Task<Product?> ResolveStaticProductAsync(string idOrCodeOrSlug, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(idOrCodeOrSlug))
+            return null;
+
+        var key = idOrCodeOrSlug.Trim();
+        if (_productCache != null && _productCache.TryGetProduct(key, out var cached) && cached != null)
+        {
+            return cached;
+        }
+
+        Product? product = null;
+        if (int.TryParse(key, out var id))
+        {
+            product = await _productRepository.GetProductByIdAsync(id, cancellationToken);
+        }
+        product ??= await _productRepository.GetProductByCodeOrSlugAsync(key, cancellationToken);
+
+        if (product != null)
+        {
+            _productCache?.SetProduct(product, key);
+        }
+
+        return product;
     }
 
     public async Task<PagedResult<ProductSummaryDto>> GetCatalogAsync(
@@ -42,15 +71,10 @@ public class ProductService : IProductService
             filteringBlacklist,
             cancellationToken);
 
-        var productIds = items.Select(p => p.Id).ToList();
-        var reviewStats = await _productRepository.GetProductsReviewStatsAsync(productIds, cancellationToken);
-
         var summaryItems = items.Select(p =>
         {
             var matchResult = SuitabilityScoreCalculator.Calculate(p, skinProfile, allergyNames);
-            var (rating, reviewsCount) = reviewStats.TryGetValue(p.Id, out var stat)
-                ? stat
-                : (5.0m, 0);
+            decimal? rating = p.ReviewsCount > 0 ? p.AvgRating : null;
 
             return new ProductSummaryDto(
                 Id: p.Id,
@@ -63,7 +87,7 @@ public class ProductService : IProductService
                 VolumeMl: p.VolumeMl,
                 ImageUrl: p.ImageUrl,
                 Rating: rating,
-                ReviewsCount: reviewsCount,
+                ReviewsCount: p.ReviewsCount,
                 TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
                 SuitabilityVerdict: matchResult.Verdict,
                 SuitabilityLabel: matchResult.VerdictLabel,
@@ -72,7 +96,9 @@ public class ProductService : IProductService
                 SuitabilityReason: matchResult.MatchReason,
                 HasIngredients: matchResult.HasIngredients,
                 IsNonCosmeticTool: matchResult.IsNonCosmeticTool,
-                Department: p.Department ?? "Skincare"
+                Department: p.Department ?? "Skincare",
+                SizeDisplay: p.SizeDisplay,
+                LovesCount: p.LovesCount
             );
         }).ToList();
 
@@ -93,15 +119,7 @@ public class ProductService : IProductService
         int? currentUserId = null,
         CancellationToken cancellationToken = default)
     {
-        Product? product = null;
-
-        if (int.TryParse(idOrCodeOrSlug, out var id))
-        {
-            product = await _productRepository.GetProductByIdAsync(id, cancellationToken);
-        }
-
-        product ??= await _productRepository.GetProductByCodeOrSlugAsync(idOrCodeOrSlug, cancellationToken);
-
+        var product = await ResolveStaticProductAsync(idOrCodeOrSlug, cancellationToken);
         if (product == null)
             return null;
 
@@ -168,10 +186,11 @@ public class ProductService : IProductService
                 .ToList(),
             FragranceDisclosure: breakdownDomain.FragranceDisclosure,
             TotalIngredientsCount: breakdownDomain.TotalIngredientsCount,
-            RawInciList: breakdownDomain.RawInciTokens
+            RawInciList: breakdownDomain.RawInciTokens,
+            MayContainList: breakdownDomain.MayContainTokens
         );
 
-        var (rating, reviewsCount) = await _productRepository.GetProductReviewStatsAsync(product.Id, cancellationToken);
+        var (rating, reviewsCount, ratingDistribution) = await _productRepository.GetProductReviewStatsAsync(product.Id, cancellationToken);
 
         return new ProductDetailDto(
             Id: product.Id,
@@ -198,7 +217,10 @@ public class ProductService : IProductService
             HasIngredients: matchResult.HasIngredients,
             IsNonCosmeticTool: matchResult.IsNonCosmeticTool,
             Department: product.Department ?? "Skincare",
-            FormulaBreakdown: formulaBreakdownDto
+            FormulaBreakdown: formulaBreakdownDto,
+            SizeDisplay: product.SizeDisplay,
+            LovesCount: product.LovesCount,
+            RatingDistribution: ratingDistribution
         );
     }
 
@@ -208,15 +230,7 @@ public class ProductService : IProductService
         int limit = 6,
         CancellationToken cancellationToken = default)
     {
-        Product? product = null;
-
-        if (int.TryParse(idOrCodeOrSlug, out var id))
-        {
-            product = await _productRepository.GetProductByIdAsync(id, cancellationToken);
-        }
-
-        product ??= await _productRepository.GetProductByCodeOrSlugAsync(idOrCodeOrSlug, cancellationToken);
-
+        var product = await ResolveStaticProductAsync(idOrCodeOrSlug, cancellationToken);
         if (product == null)
             return Array.Empty<ProductSummaryDto>();
 
@@ -237,15 +251,10 @@ public class ProductService : IProductService
             limit,
             cancellationToken);
 
-        var similarIds = similarProducts.Select(p => p.Id).ToList();
-        var reviewStats = await _productRepository.GetProductsReviewStatsAsync(similarIds, cancellationToken);
-
         return similarProducts.Select(p =>
         {
             var match = SuitabilityScoreCalculator.Calculate(p, skinProfile, allergyNames);
-            var (rating, reviewsCount) = reviewStats.TryGetValue(p.Id, out var stat)
-                ? stat
-                : (5.0m, 0);
+            decimal? rating = p.ReviewsCount > 0 ? p.AvgRating : null;
 
             return new ProductSummaryDto(
                 Id: p.Id,
@@ -258,7 +267,7 @@ public class ProductService : IProductService
                 VolumeMl: p.VolumeMl,
                 ImageUrl: p.ImageUrl,
                 Rating: rating,
-                ReviewsCount: reviewsCount,
+                ReviewsCount: p.ReviewsCount,
                 TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
                 SuitabilityVerdict: match.Verdict,
                 SuitabilityLabel: match.VerdictLabel,
@@ -267,31 +276,49 @@ public class ProductService : IProductService
                 SuitabilityReason: match.MatchReason,
                 HasIngredients: match.HasIngredients,
                 IsNonCosmeticTool: match.IsNonCosmeticTool,
-                Department: p.Department ?? "Skincare"
+                Department: p.Department ?? "Skincare",
+                SizeDisplay: p.SizeDisplay,
+                LovesCount: p.LovesCount
             );
         }).ToList();
     }
 
     public async Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default)
     {
+        if (_productCache != null && _productCache.TryGetCategories(out var cached) && cached != null && cached.Count > 0)
+            return cached;
+
         var categories = await _productRepository.GetCategoriesAsync(cancellationToken);
-        return categories.Select(c => new CategoryDto(
+        var result = categories.Select(c => new CategoryDto(
             Id: c.Id,
             Name: c.Name,
             Slug: c.Slug,
             ParentId: c.ParentId
         )).ToList();
+
+        if (result.Count > 0)
+            _productCache?.SetCategories(result);
+
+        return result;
     }
 
     public async Task<IReadOnlyList<BrandDto>> GetBrandsAsync(CancellationToken cancellationToken = default)
     {
+        if (_productCache != null && _productCache.TryGetBrands(out var cached) && cached != null && cached.Count > 0)
+            return cached;
+
         var brands = await _productRepository.GetBrandsAsync(cancellationToken);
-        return brands.Select(b => new BrandDto(
+        var result = brands.Select(b => new BrandDto(
             Id: b.Id,
             Name: b.Name,
             Slug: b.Slug,
             OriginCountry: b.OriginCountry
         )).ToList();
+
+        if (result.Count > 0)
+            _productCache?.SetBrands(result);
+
+        return result;
     }
 
     public async Task<PagedResult<ProductReviewDto>> GetProductReviewsAsync(
@@ -391,6 +418,7 @@ public class ProductService : IProductService
             else if (raw.Contains("dry")) skinType = "Dry";
             else if (raw.Contains("comb")) skinType = "Combination";
             else if (raw.Contains("norm")) skinType = "Normal";
+            else if (raw.Contains("sens")) skinType = "Sensitive";
         }
 
         var review = new Review
@@ -406,6 +434,9 @@ public class ProductService : IProductService
         };
 
         var saved = await _productRepository.AddReviewAsync(review, cancellationToken);
+
+        // Invalidate product cache for this product so review count & rating refresh immediately
+        _productCache?.InvalidateProduct(product.Id, product.Code, product.Slug);
 
         return new ProductReviewDto(
             Id: saved.Id,

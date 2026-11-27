@@ -19,10 +19,14 @@ public class AdminProductService : IAdminProductService
     };
 
     private readonly IProductRepository _productRepository;
+    private readonly IProductCache? _productCache;
 
-    public AdminProductService(IProductRepository productRepository)
+    public AdminProductService(
+        IProductRepository productRepository,
+        IProductCache? productCache = null)
     {
         _productRepository = productRepository;
+        _productCache = productCache;
     }
 
     public async Task<PagedResult<AdminProductDto>> GetProductsAsync(
@@ -40,8 +44,8 @@ public class AdminProductService : IAdminProductService
 
         var dtos = items.Select(p =>
         {
-            var stats = statsMap.TryGetValue(p.Id, out var s) ? s : (5.0m, 0);
-            return MapToDto(p, stats.Item1, stats.Item2);
+            var stats = statsMap.TryGetValue(p.Id, out var s) ? s : ((decimal?)null, 0);
+            return MapToDto(p, stats.Item1 ?? 0m, stats.Item2);
         }).ToList();
 
         var totalPages = totalCount > 0
@@ -65,8 +69,8 @@ public class AdminProductService : IAdminProductService
         if (product == null)
             return null;
 
-        var (rating, count) = await _productRepository.GetProductReviewStatsAsync(id, cancellationToken);
-        return MapToDto(product, rating, count);
+        var (rating, count, _) = await _productRepository.GetProductReviewStatsAsync(id, cancellationToken);
+        return MapToDto(product, rating ?? 0m, count);
     }
 
     public async Task<AdminProductDto> CreateProductAsync(
@@ -76,6 +80,7 @@ public class AdminProductService : IAdminProductService
         if (request == null)
             throw new ArgumentException("Request payload is required.");
 
+        var department = string.IsNullOrWhiteSpace(request.Department) ? "Skincare" : request.Department.Trim();
         var (brand, category, normalizedSkinTypes, normalizedStatus) = await ValidateAndResolveAsync(
             name: request.Name,
             brandId: request.BrandId,
@@ -88,11 +93,15 @@ public class AdminProductService : IAdminProductService
             ingredientListRaw: request.IngredientListRaw,
             targetSkinTypes: request.TargetSkinTypes,
             sellingStatus: request.SellingStatus,
+            department: department,
             cancellationToken: cancellationToken
         );
 
         var code = "P" + DateTime.UtcNow.Ticks.ToString()[^8..];
         var slug = await GenerateUniqueSlugAsync(request.Name, null, cancellationToken);
+        var inciRaw = string.IsNullOrWhiteSpace(request.IngredientListRaw)
+            ? "No ingredients listed"
+            : request.IngredientListRaw.Trim();
 
         var product = new Product
         {
@@ -101,15 +110,16 @@ public class AdminProductService : IAdminProductService
             Slug = slug,
             BrandId = brand.Id,
             CategoryId = category.Id,
-            Department = "Skincare",
+            Department = department,
             PriceUsd = Math.Round(request.PriceUsd, 2),
             VolumeMl = request.VolumeMl,
+            SizeDisplay = string.IsNullOrWhiteSpace(request.SizeDisplay) ? null : request.SizeDisplay.Trim(),
             StockQuantity = request.StockQuantity,
             SellingStatus = normalizedStatus,
-            IngredientListRaw = request.IngredientListRaw.Trim(),
+            IngredientListRaw = inciRaw,
             TargetSkinTypes = normalizedSkinTypes,
             Description = string.IsNullOrWhiteSpace(request.Description)
-                ? "Premium skincare formulation parsed by BeautyAI."
+                ? "Premium cosmetic formulation curated by BeautyAI."
                 : request.Description.Trim(),
             ImageUrl = !string.IsNullOrWhiteSpace(request.ImageUrl)
                 ? request.ImageUrl.Trim()
@@ -118,12 +128,19 @@ public class AdminProductService : IAdminProductService
         };
 
         var created = await _productRepository.CreateProductAsync(product, cancellationToken);
-        await _productRepository.SyncProductIngredientsAsync(created.Id, created.IngredientListRaw, cancellationToken);
+        if (!string.Equals(inciRaw, "No ingredients listed", StringComparison.OrdinalIgnoreCase))
+        {
+            await _productRepository.SyncProductIngredientsAsync(created.Id, created.IngredientListRaw, cancellationToken);
+        }
 
         created.Brand ??= brand;
         created.Category ??= category;
 
-        return MapToDto(created, 5.0m, 0);
+        _productCache?.InvalidateProduct(created.Id, created.Code, created.Slug);
+        _productCache?.InvalidateBrands();
+        _productCache?.InvalidateCategories();
+
+        return MapToDto(created, 0m, 0);
     }
 
     public async Task<AdminProductDto> UpdateProductAsync(
@@ -138,6 +155,10 @@ public class AdminProductService : IAdminProductService
         if (existing == null)
             throw new KeyNotFoundException($"Product with ID {id} not found.");
 
+        var department = string.IsNullOrWhiteSpace(request.Department)
+            ? (existing.Department ?? "Skincare")
+            : request.Department.Trim();
+
         var (brand, category, normalizedSkinTypes, normalizedStatus) = await ValidateAndResolveAsync(
             name: request.Name,
             brandId: request.BrandId,
@@ -150,13 +171,17 @@ public class AdminProductService : IAdminProductService
             ingredientListRaw: request.IngredientListRaw,
             targetSkinTypes: request.TargetSkinTypes,
             sellingStatus: request.SellingStatus ?? existing.SellingStatus,
+            department: department,
             cancellationToken: cancellationToken
         );
 
         var previousName = existing.Name;
+        var previousSlug = existing.Slug;
         var previousInci = existing.IngredientListRaw;
         var newTrimmedName = request.Name.Trim();
-        var newTrimmedInci = request.IngredientListRaw.Trim();
+        var newTrimmedInci = string.IsNullOrWhiteSpace(request.IngredientListRaw)
+            ? "No ingredients listed"
+            : request.IngredientListRaw.Trim();
 
         existing.Name = newTrimmedName;
         if (!string.Equals(previousName, newTrimmedName, StringComparison.OrdinalIgnoreCase))
@@ -168,8 +193,13 @@ public class AdminProductService : IAdminProductService
         existing.Brand = brand;
         existing.CategoryId = category.Id;
         existing.Category = category;
+        existing.Department = department;
         existing.PriceUsd = Math.Round(request.PriceUsd, 2);
         existing.VolumeMl = request.VolumeMl;
+        if (request.SizeDisplay != null)
+        {
+            existing.SizeDisplay = string.IsNullOrWhiteSpace(request.SizeDisplay) ? null : request.SizeDisplay.Trim();
+        }
         existing.StockQuantity = request.StockQuantity;
         existing.SellingStatus = normalizedStatus;
         existing.IngredientListRaw = newTrimmedInci;
@@ -191,8 +221,13 @@ public class AdminProductService : IAdminProductService
             await _productRepository.SyncProductIngredientsAsync(updated.Id, updated.IngredientListRaw, cancellationToken);
         }
 
-        var (rating, count) = await _productRepository.GetProductReviewStatsAsync(updated.Id, cancellationToken);
-        return MapToDto(updated, rating, count);
+        _productCache?.InvalidateProduct(updated.Id, updated.Code, previousSlug);
+        _productCache?.InvalidateProduct(updated.Id, updated.Code, updated.Slug);
+        _productCache?.InvalidateBrands();
+        _productCache?.InvalidateCategories();
+
+        var (rating, count, _) = await _productRepository.GetProductReviewStatsAsync(updated.Id, cancellationToken);
+        return MapToDto(updated, rating ?? 0m, count);
     }
 
     public async Task<bool> DiscontinueProductAsync(
@@ -206,6 +241,7 @@ public class AdminProductService : IAdminProductService
         existing.SellingStatus = "Discontinued";
         existing.UpdatedAtUtc = DateTime.UtcNow;
         await _productRepository.UpdateProductAsync(existing, cancellationToken);
+        _productCache?.InvalidateProduct(existing.Id, existing.Code, existing.Slug);
         return true;
     }
 
@@ -220,9 +256,10 @@ public class AdminProductService : IAdminProductService
         existing.SellingStatus = "Active";
         existing.UpdatedAtUtc = DateTime.UtcNow;
         var updated = await _productRepository.UpdateProductAsync(existing, cancellationToken);
+        _productCache?.InvalidateProduct(updated.Id, updated.Code, updated.Slug);
 
-        var (rating, count) = await _productRepository.GetProductReviewStatsAsync(updated.Id, cancellationToken);
-        return MapToDto(updated, rating, count);
+        var (rating, count, _) = await _productRepository.GetProductReviewStatsAsync(updated.Id, cancellationToken);
+        return MapToDto(updated, rating ?? 0m, count);
     }
 
     private async Task<(Brand Brand, Category Category, string[] SkinTypes, string Status)> ValidateAndResolveAsync(
@@ -237,6 +274,7 @@ public class AdminProductService : IAdminProductService
         string? ingredientListRaw,
         string[]? targetSkinTypes,
         string? sellingStatus,
+        string? department,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -249,7 +287,8 @@ public class AdminProductService : IAdminProductService
             throw new ArgumentException("Stock quantity cannot be negative.");
         if (volumeMl.HasValue && volumeMl.Value <= 0)
             throw new ArgumentException("Volume (ml) must be a positive number.");
-        if (string.IsNullOrWhiteSpace(ingredientListRaw) || ingredientListRaw.Trim().Length < 3)
+        var isToolDept = string.Equals(department?.Trim(), "Tools & Brushes", StringComparison.OrdinalIgnoreCase);
+        if (!isToolDept && (string.IsNullOrWhiteSpace(ingredientListRaw) || ingredientListRaw.Trim().Length < 3))
             throw new ArgumentException("INCI ingredient list is required.");
 
         var brands = await _productRepository.GetBrandsAsync(cancellationToken);
@@ -374,7 +413,8 @@ public class AdminProductService : IAdminProductService
             Rating: rating,
             ReviewsCount: reviewsCount,
             CreatedAtUtc: p.CreatedAtUtc,
-            UpdatedAtUtc: p.UpdatedAtUtc
+            UpdatedAtUtc: p.UpdatedAtUtc,
+            SizeDisplay: p.SizeDisplay
         );
     }
 }

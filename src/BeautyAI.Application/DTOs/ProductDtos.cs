@@ -10,7 +10,7 @@ public record ProductSummaryDto(
     decimal PriceUsd,
     int? VolumeMl,
     string? ImageUrl,
-    decimal Rating,
+    decimal? Rating,
     int ReviewsCount,
     string[] TargetSkinTypes,
     string SuitabilityVerdict,
@@ -20,7 +20,9 @@ public record ProductSummaryDto(
     string? SuitabilityReason = null,
     bool HasIngredients = true,
     bool IsNonCosmeticTool = false,
-    string Department = "Skincare"
+    string Department = "Skincare",
+    string? SizeDisplay = null,
+    int LovesCount = 0
 );
 
 public record ProductDetailDto(
@@ -35,7 +37,7 @@ public record ProductDetailDto(
     string? Description,
     string? ImageUrl,
     string IngredientListRaw,
-    decimal Rating,
+    decimal? Rating,
     int ReviewsCount,
     string[] TargetSkinTypes,
     int StockQuantity,
@@ -48,7 +50,10 @@ public record ProductDetailDto(
     bool HasIngredients = true,
     bool IsNonCosmeticTool = false,
     string Department = "Skincare",
-    ProductFormulaBreakdownDto? FormulaBreakdown = null
+    ProductFormulaBreakdownDto? FormulaBreakdown = null,
+    string? SizeDisplay = null,
+    int LovesCount = 0,
+    IReadOnlyDictionary<int, int>? RatingDistribution = null
 );
 
 public record ProductFormulaBreakdownDto(
@@ -60,7 +65,8 @@ public record ProductFormulaBreakdownDto(
     IReadOnlyList<FormulaCautionDto> Cautions,
     string? FragranceDisclosure,
     int TotalIngredientsCount,
-    IReadOnlyList<string> RawInciList
+    IReadOnlyList<string> RawInciList,
+    IReadOnlyList<string>? MayContainList = null
 );
 
 public record KeyIngredientDto(
@@ -144,7 +150,10 @@ public record ProductFilterParams(
     string? SortBy = "rating",
     bool SafeForMe = false,
     int Page = 1,
-    int PageSize = 20
+    int PageSize = 20,
+    string? ActiveIngredients = null,
+    string? FreeFrom = null,
+    string? HighlightsFilter = null
 );
 
 public record PagedResult<T>(

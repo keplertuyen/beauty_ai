@@ -42,7 +42,8 @@ public record FormulaBreakdownResult(
     IReadOnlyList<FormulaCautionItem> Cautions,
     string? FragranceDisclosure,
     int TotalIngredientsCount,
-    IReadOnlyList<string> RawInciTokens
+    IReadOnlyList<string> RawInciTokens,
+    IReadOnlyList<string>? MayContainTokens = null
 );
 
 public record IngredientKnowledgeEntry(
@@ -430,11 +431,34 @@ public static class CosmeticKnowledgeBase
     /// <summary>
     /// Looks up or classifies an INCI token using the curated knowledge base and intelligent pattern rules.
     /// </summary>
-    public static IngredientKnowledgeEntry LookupIngredient(string rawToken, Ingredient? dbIngredient = null)
+    public static IngredientKnowledgeEntry LookupIngredient(
+        string rawToken,
+        Ingredient? dbIngredient = null,
+        string? department = null,
+        string? categoryName = null)
     {
         var clean = rawToken.Trim();
         var lower = clean.ToLowerInvariant();
         var noParens = Regex.Replace(lower, @"\(.*?\)", "").Trim();
+        var isMakeupDept = string.Equals(department, "Makeup", StringComparison.OrdinalIgnoreCase);
+        var isSunscreenCat = (categoryName ?? "").Contains("sun", StringComparison.OrdinalIgnoreCase) ||
+                             (categoryName ?? "").Contains("spf", StringComparison.OrdinalIgnoreCase);
+
+        // Department-aware override for Titanium Dioxide in Makeup (non-SPF)
+        if (isMakeupDept && !isSunscreenCat && (lower.Contains("titanium dioxide") || lower.Contains("ci 77891")))
+        {
+            return new IngredientKnowledgeEntry(
+                CommonName: "Titanium Dioxide (CI 77891)",
+                RoleBucket: "PigmentColorant",
+                RoleLabel: "Mineral Pigment & Opacifier",
+                Explanation: "Mineral white pigment that provides color opacity, brightness, and coverage in makeup formulas.",
+                Benefits: Array.Empty<string>(),
+                ScentTier: "None",
+                ComedogenicRating: 0,
+                IrritationRating: 0,
+                IsHeroCandidate: false
+            );
+        }
 
         if (Catalog.TryGetValue(lower, out var exact))
             return exact;
@@ -532,7 +556,7 @@ public static class CosmeticKnowledgeBase
             );
         }
 
-        // Check Gentle Botanical Extracts / Waters / Ferments
+        // Check Gentle Botanical Extracts / Waters / Ferments (uncurated fallback: neutral description, not auto-promoted as hero)
         if (lower.Contains("flower water") || lower.Contains("leaf water") || lower.Contains("fruit water") ||
             lower.Contains("extract") || lower.Contains("ferment") || lower.Contains("filtrate") || lower.Contains("juice"))
         {
@@ -541,15 +565,15 @@ public static class CosmeticKnowledgeBase
             return new IngredientKnowledgeEntry(
                 CommonName: FormatFriendlyBotanicalName(clean),
                 RoleBucket: "SoothingBotanical",
-                RoleLabel: "Botanical Phyto-Extract",
+                RoleLabel: "Botanical Conditioning Extract",
                 Explanation: !isGenericDbDesc
                     ? dbIngredient!.Description!
-                    : "Plant-derived extract rich in soothing antioxidants and conditioning phytonutrients.",
-                Benefits: new[] { "Botanical Conditioning", "Antioxidant Support" },
+                    : "Botanical extract included for skin conditioning and formula feel.",
+                Benefits: new[] { "Botanical Conditioning" },
                 ScentTier: "GentleBotanical",
                 ComedogenicRating: 0,
                 IrritationRating: 0,
-                IsHeroCandidate: true
+                IsHeroCandidate: false
             );
         }
 
@@ -677,21 +701,24 @@ public static class CosmeticKnowledgeBase
             );
         }
 
-        var rawTokens = SplitInciList(cleanedRaw);
+        var (rawTokens, mayContainTokens) = SplitInciWithMayContain(cleanedRaw);
         var prodNameLower = (productName ?? "").ToLowerInvariant();
 
         var allergyMatches = new List<string>();
         var analyzedItems = new List<(string Token, IngredientKnowledgeEntry Entry, bool FeaturedInName)>();
         var benefitsSet = new List<string>();
 
-        foreach (var token in rawTokens)
+        foreach (var token in rawTokens.Concat(mayContainTokens))
         {
             var matchedAllergen = MatchAllergenInToken(token, userAllergies);
             if (matchedAllergen != null && !allergyMatches.Contains(matchedAllergen, StringComparer.OrdinalIgnoreCase))
             {
                 allergyMatches.Add(matchedAllergen);
             }
+        }
 
+        foreach (var token in rawTokens)
+        {
             Ingredient? dbIng = null;
             if (dbIngredientMap != null)
             {
@@ -701,7 +728,7 @@ public static class CosmeticKnowledgeBase
                     dbIngredientMap.TryGetValue(key, out dbIng);
             }
 
-            var entry = LookupIngredient(token, dbIng);
+            var entry = LookupIngredient(token, dbIng, department, categoryName);
 
             // Check if ingredient's common name or main word appears in the product title
             var featuredInName = false;
@@ -731,38 +758,46 @@ public static class CosmeticKnowledgeBase
             }
         }
 
-        // Select 3-6 Key Ingredients (Featured in product name first, then HeroCandidates, then top conditioning/hydrating items)
+        // Select 3-6 Key Ingredients (Featured in product name first, then HeroCandidates, then top conditioning/hydrating/base items)
         var keyCandidates = analyzedItems
             .Where(x => x.FeaturedInName || x.Entry.IsHeroCandidate)
             .OrderByDescending(x => x.FeaturedInName)
             .ToList();
 
-        if (keyCandidates.Count < 3)
+        if (keyCandidates.Count < 4)
         {
             var extras = analyzedItems
                 .Except(keyCandidates)
                 .Where(x => x.Entry.RoleBucket != "PreservativeStability" && x.Entry.RoleBucket != "PigmentColorant")
-                .Take(3 - keyCandidates.Count);
+                .Take(4 - keyCandidates.Count);
             keyCandidates.AddRange(extras);
         }
 
-        var selectedKeys = keyCandidates
-            .GroupBy(x => x.Entry.CommonName, StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.First())
-            .Take(6)
-            .Select(x => new KeyIngredientItem(
-                CommonName: x.Entry.CommonName,
-                InciName: x.Token,
-                RoleLabel: x.Entry.RoleLabel,
-                Explanation: x.Entry.Explanation,
-                IsFeaturedInProductName: x.FeaturedInName
-            ))
-            .ToList();
+        // Deduplicate by CommonName AND avoid repeating identical generic fallback explanations
+        var seenExplanations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var selectedKeys = new List<KeyIngredientItem>();
+        foreach (var cand in keyCandidates.GroupBy(x => x.Entry.CommonName, StringComparer.OrdinalIgnoreCase).Select(g => g.First()))
+        {
+            var isGenericFallback = cand.Entry.Explanation.StartsWith("Botanical extract included for", StringComparison.OrdinalIgnoreCase) ||
+                                    cand.Entry.Explanation.StartsWith("Supports smooth application,", StringComparison.OrdinalIgnoreCase);
+            if (isGenericFallback && !seenExplanations.Add(cand.Entry.Explanation))
+                continue;
+
+            selectedKeys.Add(new KeyIngredientItem(
+                CommonName: cand.Entry.CommonName,
+                InciName: cand.Token,
+                RoleLabel: cand.Entry.RoleLabel,
+                Explanation: cand.Entry.Explanation,
+                IsFeaturedInProductName: cand.FeaturedInName
+            ));
+            if (selectedKeys.Count >= 6)
+                break;
+        }
 
         var keyTokenSet = new HashSet<string>(selectedKeys.Select(k => k.InciName), StringComparer.OrdinalIgnoreCase);
 
-        // Group ALL ingredients into digestible Functional Role buckets
-        var functionalGroups = BuildFunctionalGroups(analyzedItems, keyTokenSet);
+        // Group ALL ingredients into digestible Functional Role buckets (Department-aware + May Contain)
+        var functionalGroups = BuildFunctionalGroups(analyzedItems, keyTokenSet, department, targetArea, mayContainTokens);
 
         // Build Category-Aware Cautions & Fragrance Disclosure
         var (cautions, fragranceDisclosure, hasProfileNote, profileNoteSummary) = BuildCautionsAndNotes(
@@ -806,15 +841,22 @@ public static class CosmeticKnowledgeBase
             Cautions: cautions,
             FragranceDisclosure: fragranceDisclosure,
             TotalIngredientsCount: rawTokens.Count,
-            RawInciTokens: rawTokens
+            RawInciTokens: rawTokens,
+            MayContainTokens: mayContainTokens
         );
     }
 
     private static List<FunctionalGroupItem> BuildFunctionalGroups(
         List<(string Token, IngredientKnowledgeEntry Entry, bool FeaturedInName)> items,
-        HashSet<string> keyTokenSet)
+        HashSet<string> keyTokenSet,
+        string? department,
+        string targetArea,
+        IReadOnlyList<string> mayContainTokens)
     {
         var groups = new List<FunctionalGroupItem>();
+        var isMakeup = string.Equals(department, "Makeup", StringComparison.OrdinalIgnoreCase);
+        var isHair = string.Equals(department, "Hair", StringComparison.OrdinalIgnoreCase) || targetArea == "hair";
+        var isFragrance = string.Equals(department, "Fragrance", StringComparison.OrdinalIgnoreCase) || targetArea == "fragrance";
 
         var activesAndHydrators = items
             .Where(x => x.Entry.RoleBucket is "HeroActive" or "Hydration" or "BarrierLipid" or "SoothingBotanical" or "Exfoliant" or "SunFilter" or "HairConditioning")
@@ -823,9 +865,32 @@ public static class CosmeticKnowledgeBase
 
         if (activesAndHydrators.Count > 0)
         {
+            string grpTitle;
+            string grpDesc;
+            if (isMakeup)
+            {
+                grpTitle = "Skin-Conditioning & Hydrating Agents";
+                grpDesc = "Keep skin or lips comfortable, hydrated, and smooth during makeup wear.";
+            }
+            else if (isHair)
+            {
+                grpTitle = "Hair-Conditioning & Scalp Care Agents";
+                grpDesc = "Smooth hair cuticles, improve manageability, and nourish strands or scalp.";
+            }
+            else if (isFragrance)
+            {
+                grpTitle = "Skin-Conditioning & Fixative Agents";
+                grpDesc = "Support fragrance longevity and gentle skin contact.";
+            }
+            else
+            {
+                grpTitle = "Active, Hydrating & Soothing Agents";
+                grpDesc = "Deliver the primary skincare, moisture-binding, and barrier-comforting performance.";
+            }
+
             groups.Add(new FunctionalGroupItem(
-                GroupTitle: "Active, Hydrating & Conditioning Agents",
-                PlainExplanation: "Deliver the primary skincare, moisture-binding, soothing, or hair-conditioning performance.",
+                GroupTitle: grpTitle,
+                PlainExplanation: grpDesc,
                 Count: activesAndHydrators.Count,
                 Ingredients: activesAndHydrators
             ));
@@ -888,6 +953,16 @@ public static class CosmeticKnowledgeBase
                 PlainExplanation: "Keep the formula fresh, pH-balanced, and safe from microbial contamination.",
                 Count: preservatives.Count,
                 Ingredients: preservatives
+            ));
+        }
+
+        if (mayContainTokens != null && mayContainTokens.Count > 0)
+        {
+            groups.Add(new FunctionalGroupItem(
+                GroupTitle: "May Contain (Varies by Shade)",
+                PlainExplanation: "Optional mineral pigments and colorants that vary depending on the specific shade selected.",
+                Count: mayContainTokens.Count,
+                Ingredients: mayContainTokens
             ));
         }
 
@@ -1134,15 +1209,102 @@ public static class CosmeticKnowledgeBase
 
     public static List<string> SplitInciList(string rawText)
     {
-        if (string.IsNullOrWhiteSpace(rawText))
-            return new List<string>();
+        var (mainList, _) = SplitInciWithMayContain(rawText);
+        return mainList;
+    }
 
-        // Split by comma, semicolon, or newline while keeping parenthetical expressions intact
-        return Regex.Split(rawText, @"[,;\n]+")
-            .Select(s => s.Trim().TrimEnd('.'))
-            .Where(s => s.Length > 1 && !string.Equals(s, "No ingredients listed", StringComparison.OrdinalIgnoreCase))
+    public static (List<string> MainIngredients, List<string> MayContainIngredients) SplitInciWithMayContain(string rawText)
+    {
+        if (string.IsNullOrWhiteSpace(rawText))
+            return (new List<string>(), new List<string>());
+
+        var text = rawText.Trim();
+        string mainPart = text;
+        string mayContainPart = string.Empty;
+
+        // Detect "[+/-", "[may contain", "may contain/peut contenir", "may contain (+/-)", "may contain:"
+        var mayMatch = Regex.Match(
+            text,
+            @"(\[\s*\+/-\s*(?:may\s+contain\s*(?:/\s*peut\s+contenir)?\s*:?)?|\[\s*may\s+contain\s*(?:/\s*peut\s+contenir)?\s*:?|may\s+contain\s*(?:/\s*peut\s+contenir)?\s*(?:\(\+/-\))?\s*:|\(\+/-\)\s*may\s+contain\s*:?)",
+            RegexOptions.IgnoreCase
+        );
+
+        if (mayMatch.Success)
+        {
+            mainPart = text[..mayMatch.Index].Trim().TrimEnd(',', ';', '.');
+            mayContainPart = text[(mayMatch.Index + mayMatch.Length)..].Trim();
+            mayContainPart = mayContainPart.TrimEnd(']', '.', ' ');
+            // Remove any leftover French "peut contenir:" prefix
+            mayContainPart = Regex.Replace(mayContainPart, @"^(?:/\s*)?peut\s+contenir\s*:?\s*", "", RegexOptions.IgnoreCase).Trim();
+        }
+
+        var mainTokens = SplitTopLevelCommas(mainPart);
+        var mayTokens = string.IsNullOrWhiteSpace(mayContainPart)
+            ? new List<string>()
+            : SplitTopLevelCommas(mayContainPart);
+
+        return (mainTokens, mayTokens);
+    }
+
+    private static List<string> SplitTopLevelCommas(string input)
+    {
+        var result = new List<string>();
+        if (string.IsNullOrWhiteSpace(input))
+            return result;
+
+        var sb = new System.Text.StringBuilder();
+        int parenDepth = 0;
+        int bracketDepth = 0;
+
+        foreach (char c in input)
+        {
+            if (c == '(')
+            {
+                parenDepth++;
+                sb.Append(c);
+            }
+            else if (c == ')')
+            {
+                if (parenDepth > 0) parenDepth--;
+                sb.Append(c);
+            }
+            else if (c == '[')
+            {
+                bracketDepth++;
+            }
+            else if (c == ']')
+            {
+                if (bracketDepth > 0) bracketDepth--;
+            }
+            else if ((c == ',' || c == ';' || c == '\n') && parenDepth == 0 && bracketDepth == 0)
+            {
+                AddCleanedInciToken(result, sb.ToString());
+                sb.Clear();
+            }
+            else
+            {
+                sb.Append(c);
+            }
+        }
+
+        if (sb.Length > 0)
+        {
+            AddCleanedInciToken(result, sb.ToString());
+        }
+
+        return result
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
+    }
+
+    private static void AddCleanedInciToken(List<string> list, string rawToken)
+    {
+        var cleaned = rawToken.Trim().Trim('.', ' ', '[', ']');
+        cleaned = Regex.Replace(cleaned, @"^(?:\+/-\s*:?\s*|may\s+contain\s*(?:/\s*peut\s+contenir)?\s*:?\s*)", "", RegexOptions.IgnoreCase).Trim();
+        if (cleaned.Length > 1 && !string.Equals(cleaned, "No ingredients listed", StringComparison.OrdinalIgnoreCase))
+        {
+            list.Add(cleaned);
+        }
     }
 
     private static string FormatFriendlyBotanicalName(string rawInci)
@@ -1163,5 +1325,61 @@ public static class CosmeticKnowledgeBase
 
         var titled = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(rawInci.Trim().ToLowerInvariant());
         return titled.Length > 60 ? titled[..57] + "..." : titled;
+    }
+
+    private static readonly Dictionary<string, string[]> ActiveIngredientSynonyms = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["niacinamide"] = new[] { "niacinamide", "nicotinamide" },
+        ["bha"] = new[] { "salicylic acid", "betaine salicylate", "capryloyl salicylic acid" },
+        ["aha"] = new[] { "glycolic acid", "lactic acid", "mandelic acid", "tartaric acid", "malic acid" },
+        ["retinol"] = new[] { "retinol", "retinal", "retinyl palmitate", "retinyl propionate", "hydroxypinacolone retinoate", "adapalene" },
+        ["hyaluronic acid"] = new[] { "hyaluronic acid", "sodium hyaluronate", "hydrolyzed hyaluronic acid", "sodium acetylated hyaluronate" },
+        ["vitamin c"] = new[] { "ascorbic acid", "l-ascorbic acid", "3-o-ethyl ascorbic acid", "tetrahexyldecyl ascorbate", "ascorbyl glucoside", "sodium ascorbyl phosphate", "magnesium ascorbyl phosphate", "ascorbyl tetraisopalmitate" },
+        ["centella"] = new[] { "centella asiatica", "madecassoside", "asiaticoside", "madecassic acid", "asiatic acid" },
+        ["ceramide"] = new[] { "ceramide" },
+        ["peptide"] = new[] { "peptide" }
+    };
+
+    private static readonly Dictionary<string, string> FreeFromToAllergenKey = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["fragrance_free"] = "fragrance",
+        ["paraben_free"] = "paraben",
+        ["alcohol_free"] = "alcohol",
+        ["sulfate_free"] = "sulfate"
+    };
+
+    /// <summary>
+    /// Expands a UI active-ingredient filter key (e.g. "bha", "vitamin c", "niacinamide")
+    /// into lowercase INCI search terms. Unknown keys fall back to the trimmed lowercase key.
+    /// </summary>
+    public static IReadOnlyList<string> ExpandActiveIngredientTerms(string activeKey)
+    {
+        if (string.IsNullOrWhiteSpace(activeKey))
+            return Array.Empty<string>();
+
+        var normalized = activeKey.Trim().ToLowerInvariant();
+        if (ActiveIngredientSynonyms.TryGetValue(normalized, out var synonyms))
+            return synonyms;
+
+        return new[] { normalized };
+    }
+
+    /// <summary>
+    /// Expands a UI free-from claim key (e.g. "fragrance_free", "alcohol_free")
+    /// into lowercase INCI exclusion terms (preserving moisturizing fatty alcohols).
+    /// </summary>
+    public static IReadOnlyList<string> ExpandFreeFromTerms(string freeFromKey)
+    {
+        if (string.IsNullOrWhiteSpace(freeFromKey))
+            return Array.Empty<string>();
+
+        var normalized = freeFromKey.Trim().ToLowerInvariant();
+        if (FreeFromToAllergenKey.TryGetValue(normalized, out var allergenKey) &&
+            AllergenSynonyms.TryGetValue(allergenKey, out var synonyms))
+        {
+            return synonyms;
+        }
+
+        return Array.Empty<string>();
     }
 }

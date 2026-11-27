@@ -25,11 +25,11 @@ public interface IProductRepository
         int limit = 6,
         CancellationToken cancellationToken = default);
 
-    Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(
+    Task<(decimal? AverageRating, int ReviewsCount, IReadOnlyDictionary<int, int> Distribution)> GetProductReviewStatsAsync(
         int productId,
         CancellationToken cancellationToken = default);
 
-    Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
+    Task<Dictionary<int, (decimal? AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
         IEnumerable<int> productIds,
         CancellationToken cancellationToken = default);
 

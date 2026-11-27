@@ -9,7 +9,17 @@ public class Product : BaseEntity<int>
     public int CategoryId { get; set; }
     public string Department { get; set; } = "Skincare";
     public decimal PriceUsd { get; set; }
+    /// <summary>
+    /// DEPRECATED (2026-11-26): integer column, lossy (7.5 mL stored as 8). Not used in any
+    /// calculation; display must use <see cref="SizeDisplay"/>. Kept only for backward
+    /// compatibility of existing DTOs/admin form. Do not build new logic on it — if per-mL
+    /// pricing is ever needed, migrate to numeric(8,2) via ADR first.
+    /// </summary>
     public int? VolumeMl { get; set; }
+    public string? SizeDisplay { get; set; }
+    public int LovesCount { get; set; }
+    public decimal? AvgRating { get; set; }
+    public int ReviewsCount { get; set; }
     public string? Description { get; set; }
     public string? ImageUrl { get; set; }
     public required string IngredientListRaw { get; set; }

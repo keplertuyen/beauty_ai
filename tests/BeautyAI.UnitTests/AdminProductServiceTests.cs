@@ -63,21 +63,21 @@ public class AdminProductServiceTests
             return Task.FromResult((IReadOnlyList<Product>)items);
         }
 
-        public Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(
+        public Task<(decimal? AverageRating, int ReviewsCount, IReadOnlyDictionary<int, int> Distribution)> GetProductReviewStatsAsync(
             int productId,
             CancellationToken cancellationToken = default)
         {
             var count = Reviews.Count(r => r.ProductId == productId);
-            return Task.FromResult((5.0m, count));
+            return Task.FromResult(((decimal?)5.0m, count, (IReadOnlyDictionary<int, int>)new Dictionary<int, int>()));
         }
 
-        public Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
+        public Task<Dictionary<int, (decimal? AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
             IEnumerable<int> productIds,
             CancellationToken cancellationToken = default)
         {
             var dict = productIds.Distinct().ToDictionary(
                 id => id,
-                id => (5.0m, Reviews.Count(r => r.ProductId == id)));
+                id => ((decimal?)5.0m, Reviews.Count(r => r.ProductId == id)));
             return Task.FromResult(dict);
         }
 

@@ -11,6 +11,8 @@ public class Order : BaseEntity<int>
     public string OrderStatus { get; set; } = "Pending";
     public decimal TotalAmountUsd { get; set; }
     public bool ConflictAcknowledged { get; set; }
+    public string? TrackingNumber { get; set; }
+    public string? AdminNotes { get; set; }
 
     public User? User { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

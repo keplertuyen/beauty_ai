@@ -44,14 +44,14 @@ public class ProductServiceTests
         public Task<IReadOnlyList<Brand>> GetBrandsAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult((IReadOnlyList<Brand>)new List<Brand>());
 
-        public Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(int productId, CancellationToken cancellationToken = default) =>
-            Task.FromResult((5.0m, 0));
+        public Task<(decimal? AverageRating, int ReviewsCount, IReadOnlyDictionary<int, int> Distribution)> GetProductReviewStatsAsync(int productId, CancellationToken cancellationToken = default) =>
+            Task.FromResult(((decimal?)5.0m, 0, (IReadOnlyDictionary<int, int>)new Dictionary<int, int>()));
 
-        public Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
+        public Task<Dictionary<int, (decimal? AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
             IEnumerable<int> productIds,
             CancellationToken cancellationToken = default)
         {
-            var dict = productIds.Distinct().ToDictionary(id => id, id => (5.0m, 0));
+            var dict = productIds.Distinct().ToDictionary(id => id, id => ((decimal?)5.0m, 0));
             return Task.FromResult(dict);
         }
 

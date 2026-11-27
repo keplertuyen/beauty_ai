@@ -25,8 +25,18 @@ public class OrdersController : ControllerBase
     [ProducesResponseType(typeof(OrderDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request, CancellationToken cancellationToken)
     {
+        if (User.IsInRole("Admin"))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new
+            {
+                message = "Tài khoản Quản trị viên không được phép đặt hàng. Vui lòng sử dụng tài khoản Khách hàng.",
+                detail = "Admin accounts cannot place orders. Please use a Customer account."
+            });
+        }
+
         var userId = GetCurrentUserId();
         if (!userId.HasValue)
         {

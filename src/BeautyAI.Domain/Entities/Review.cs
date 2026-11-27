@@ -10,6 +10,8 @@ public class Review : BaseEntity<long>
     public string SkinType { get; set; } = "Unknown";
     public string? SkinConcerns { get; set; }
     public string? Content { get; set; }
+    public bool IsHidden { get; set; }
+    public string? ModerationReason { get; set; }
 
     // Navigation properties
     public Product? Product { get; set; }

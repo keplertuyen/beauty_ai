@@ -82,13 +82,15 @@ public class AiController : ControllerBase
             PriceUsd: p.PriceUsd,
             VolumeMl: p.VolumeMl,
             ImageUrl: !string.IsNullOrWhiteSpace(p.ImageUrl) ? p.ImageUrl : $"/images/products/{p.Code}.webp",
-            Rating: 5.0m,
-            ReviewsCount: 0,
+            Rating: p.ReviewsCount > 0 ? p.AvgRating : null,
+            ReviewsCount: p.ReviewsCount,
             TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
             SuitabilityVerdict: "Safe",
             SuitabilityLabel: "Compatible",
             HasAllergyWarning: false,
-            Department: p.Department ?? "Skincare"
+            Department: p.Department ?? "Skincare",
+            SizeDisplay: p.SizeDisplay,
+            LovesCount: p.LovesCount
         )).ToList();
 
         var reply = await _aiProvider.ConsultAsync(request.Message, skinId, productSummaries, cancellationToken);

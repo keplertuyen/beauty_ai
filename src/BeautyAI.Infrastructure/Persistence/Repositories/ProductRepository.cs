@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BeautyAI.Application.DTOs;
 using BeautyAI.Application.Interfaces.Repositories;
 using BeautyAI.Domain.Entities;
@@ -84,6 +85,11 @@ public class ProductRepository : IProductRepository
             query = query.Where(p => p.PriceUsd <= filter.MaxPrice.Value);
         }
 
+        if (filter.MinRating.HasValue && filter.MinRating.Value > 0)
+        {
+            query = query.Where(p => p.ReviewsCount > 0 && p.AvgRating >= filter.MinRating.Value);
+        }
+
         // 6. Safe For Me: Zero-Tolerance Allergy Blacklist Exclusion + Group B Unverified Cosmetic Exclusion
         if (filter.SafeForMe || allergyBlacklist != null)
         {
@@ -111,15 +117,95 @@ public class ProductRepository : IProductRepository
             }
         }
 
-        // 7. Sorting — Priority: Top rated products with verified reviews first, then tie-break by reviews count, then catalog ID (Id ASC)
+        // 6b. Active Ingredients Filter (AND across selected actives, OR across curated INCI synonyms)
+        if (!string.IsNullOrWhiteSpace(filter.ActiveIngredients))
+        {
+            var activeKeys = filter.ActiveIngredients
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (activeKeys.Count > 0)
+            {
+                // Require verified INCI data (excludes non-cosmetic tools & products without ingredient lists)
+                query = query.Where(p =>
+                    !string.IsNullOrEmpty(p.IngredientListRaw) &&
+                    p.IngredientListRaw != "No ingredients listed");
+
+                foreach (var activeKey in activeKeys)
+                {
+                    var terms = CosmeticKnowledgeBase.ExpandActiveIngredientTerms(activeKey);
+                    if (terms.Count > 0)
+                    {
+                        query = query.Where(BuildIngredientContainsAnyExpression(terms));
+                    }
+                }
+            }
+        }
+
+        // 6c. Free-From Claims Filter (excludes forbidden INCI synonyms & products lacking INCI data)
+        if (!string.IsNullOrWhiteSpace(filter.FreeFrom))
+        {
+            var freeFromKeys = filter.FreeFrom
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var excludedTerms = freeFromKeys
+                .SelectMany(CosmeticKnowledgeBase.ExpandFreeFromTerms)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (excludedTerms.Count > 0)
+            {
+                query = query.Where(p =>
+                    !string.IsNullOrEmpty(p.IngredientListRaw) &&
+                    p.IngredientListRaw != "No ingredients listed");
+
+                foreach (var term in excludedTerms)
+                {
+                    var t = term;
+                    query = query.Where(p => !p.IngredientListRaw.ToLower().Contains(t));
+                }
+            }
+        }
+
+        // 6d. Clean Claims / Highlights Filter (AND across selected claims matched in description)
+        if (!string.IsNullOrWhiteSpace(filter.HighlightsFilter))
+        {
+            var highlights = filter.HighlightsFilter
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            foreach (var highlight in highlights)
+            {
+                var hl = highlight.ToLower();
+                query = query.Where(p => p.Description != null && p.Description.ToLower().Contains(hl));
+            }
+        }
+
+        // 7. Sorting — Uses direct columns (avg_rating, reviews_count, loves_count) with zero subqueries!
+        //    Products with 0 reviews (AvgRating == null) are ordered AFTER reviewed products in Top Rated.
         query = (filter.SortBy?.ToLower()) switch
         {
-            "price_asc" => query.OrderBy(p => p.PriceUsd),
-            "price_desc" => query.OrderByDescending(p => p.PriceUsd),
-            "reviews" => query.OrderByDescending(p => p.Reviews.Count),
-            "loves" => query.OrderByDescending(p => p.Reviews.Count),
-            _ => query.OrderByDescending(p => p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : 0.0)
-                      .ThenByDescending(p => p.Reviews.Count)
+            "price_asc" => query.OrderByDescending(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+                                .ThenBy(p => p.PriceUsd)
+                                .ThenByDescending(p => p.LovesCount),
+            "price_desc" => query.OrderByDescending(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+                                 .ThenByDescending(p => p.PriceUsd)
+                                 .ThenByDescending(p => p.LovesCount),
+            "reviews" => query.OrderByDescending(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+                              .ThenByDescending(p => p.ReviewsCount)
+                              .ThenByDescending(p => p.LovesCount),
+            "loves" => query.OrderByDescending(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+                            .ThenByDescending(p => p.LovesCount)
+                            .ThenByDescending(p => p.ReviewsCount),
+            _ => query.OrderByDescending(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+                      .ThenByDescending(p => p.ReviewsCount > 0)
+                      .ThenByDescending(p => p.AvgRating ?? 0m)
+                      .ThenByDescending(p => p.ReviewsCount)
+                      .ThenByDescending(p => p.LovesCount)
                       .ThenBy(p => p.Id)
         };
 
@@ -134,6 +220,24 @@ public class ProductRepository : IProductRepository
             .ToListAsync(cancellationToken);
 
         return (items, totalCount);
+    }
+
+    private static Expression<Func<Product, bool>> BuildIngredientContainsAnyExpression(IReadOnlyList<string> lowerTerms)
+    {
+        var param = Expression.Parameter(typeof(Product), "p");
+        var prop = Expression.Property(param, nameof(Product.IngredientListRaw));
+        var toLowerMethod = typeof(string).GetMethod(nameof(string.ToLower), Type.EmptyTypes)!;
+        var containsMethod = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+        var toLower = Expression.Call(prop, toLowerMethod);
+
+        Expression? body = null;
+        foreach (var term in lowerTerms)
+        {
+            var call = Expression.Call(toLower, containsMethod, Expression.Constant(term));
+            body = body == null ? call : Expression.OrElse(body, call);
+        }
+
+        return Expression.Lambda<Func<Product, bool>>(body ?? Expression.Constant(true), param);
     }
 
     public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -214,38 +318,96 @@ public class ProductRepository : IProductRepository
             }
         }
 
-        return await query
-            .OrderByDescending(p => p.Id)
+        var primaryMatches = await query
+            .OrderByDescending(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+            .ThenByDescending(p => p.ReviewsCount > 0)
+            .ThenByDescending(p => p.LovesCount)
+            .ThenByDescending(p => p.Id)
             .Take(limit)
             .ToListAsync(cancellationToken);
+
+        // If the subcategory has fewer verified-image products than requested, prefer verified-image items from the same parent/department
+        var verifiedCount = primaryMatches.Count(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"));
+        if (verifiedCount < limit && primaryMatches.Count > 0)
+        {
+            var dept = primaryMatches[0].Department;
+            var existingIds = primaryMatches.Select(p => p.Id).Append(productId).ToList();
+            var extraVerified = await _context.Products
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
+                .AsNoTracking()
+                .Where(p => !existingIds.Contains(p.Id) &&
+                            p.Department == dept &&
+                            p.SellingStatus == "Active" &&
+                            p.ImageUrl != null &&
+                            p.ImageUrl.StartsWith("/images/products/"))
+                .OrderByDescending(p => p.ReviewsCount > 0)
+                .ThenByDescending(p => p.LovesCount)
+                .Take(limit - verifiedCount)
+                .ToListAsync(cancellationToken);
+
+            if (extraVerified.Count > 0)
+            {
+                primaryMatches = primaryMatches
+                    .Where(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+                    .Concat(extraVerified)
+                    .Concat(primaryMatches.Where(p => p.ImageUrl == null || !p.ImageUrl.StartsWith("/images/products/") ))
+                    .Take(limit)
+                    .ToList();
+            }
+        }
+
+        return primaryMatches;
     }
 
-    public async Task<(decimal AverageRating, int ReviewsCount)> GetProductReviewStatsAsync(
+    public async Task<(decimal? AverageRating, int ReviewsCount, IReadOnlyDictionary<int, int> Distribution)> GetProductReviewStatsAsync(
         int productId,
         CancellationToken cancellationToken = default)
     {
-        var reviews = await _context.Reviews
-            .Where(r => r.ProductId == productId)
-            .Select(r => r.Rating)
+        var distribution = new Dictionary<int, int>
+        {
+            [5] = 0,
+            [4] = 0,
+            [3] = 0,
+            [2] = 0,
+            [1] = 0
+        };
+
+        var grouped = await _context.Reviews
+            .AsNoTracking()
+            .Where(r => r.ProductId == productId && !r.IsHidden)
+            .GroupBy(r => r.Rating)
+            .Select(g => new { Rating = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
 
-        if (reviews.Count == 0)
-            return (5.0m, 0);
+        int totalCount = 0;
+        long weightedSum = 0;
+        foreach (var g in grouped)
+        {
+            var star = Math.Clamp(g.Rating, 1, 5);
+            distribution[star] = distribution.GetValueOrDefault(star) + g.Count;
+            totalCount += g.Count;
+            weightedSum += (long)star * g.Count;
+        }
 
-        var avg = (decimal)reviews.Average();
-        return (Math.Round(avg, 1), reviews.Count);
+        if (totalCount == 0)
+            return (null, 0, distribution);
+
+        var avg = Math.Round((decimal)weightedSum / totalCount, 1);
+        return (avg, totalCount, distribution);
     }
 
-    public async Task<Dictionary<int, (decimal AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
+    public async Task<Dictionary<int, (decimal? AverageRating, int ReviewsCount)>> GetProductsReviewStatsAsync(
         IEnumerable<int> productIds,
         CancellationToken cancellationToken = default)
     {
         var ids = productIds.Distinct().ToList();
         if (ids.Count == 0)
-            return new Dictionary<int, (decimal AverageRating, int ReviewsCount)>();
+            return new Dictionary<int, (decimal? AverageRating, int ReviewsCount)>();
 
         var stats = await _context.Reviews
-            .Where(r => ids.Contains(r.ProductId))
+            .AsNoTracking()
+            .Where(r => ids.Contains(r.ProductId) && !r.IsHidden)
             .GroupBy(r => r.ProductId)
             .Select(g => new
             {
@@ -257,7 +419,7 @@ public class ProductRepository : IProductRepository
 
         return stats.ToDictionary(
             s => s.ProductId,
-            s => (Math.Round(s.AvgRating, 1), s.Count));
+            s => ((decimal?)Math.Round(s.AvgRating, 1), s.Count));
     }
 
     public async Task<(IReadOnlyList<Review> Items, int TotalCount)> GetProductReviewsAsync(
@@ -269,7 +431,7 @@ public class ProductRepository : IProductRepository
     {
         var query = _context.Reviews
             .AsNoTracking()
-            .Where(r => r.ProductId == productId);
+            .Where(r => r.ProductId == productId && !r.IsHidden);
 
         if (!string.IsNullOrWhiteSpace(skinType) &&
             !string.Equals(skinType, "All", StringComparison.OrdinalIgnoreCase))
@@ -295,6 +457,16 @@ public class ProductRepository : IProductRepository
     {
         _context.Reviews.Add(review);
         await _context.SaveChangesAsync(cancellationToken);
+
+        // Keep denormalized avg_rating and reviews_count on products in sync
+        var (avg, count, _) = await GetProductReviewStatsAsync(review.ProductId, cancellationToken);
+        await _context.Products
+            .Where(p => p.Id == review.ProductId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(p => p.AvgRating, avg)
+                .SetProperty(p => p.ReviewsCount, count),
+                cancellationToken);
+
         return review;
     }
 
@@ -356,7 +528,8 @@ public class ProductRepository : IProductRepository
         var pageSize = Math.Clamp(filter.PageSize, 1, 100);
 
         var items = await query
-            .OrderByDescending(p => p.Id)
+            .OrderByDescending(p => p.ImageUrl != null && p.ImageUrl.StartsWith("/images/products/"))
+            .ThenByDescending(p => p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -485,6 +658,7 @@ public class ProductRepository : IProductRepository
         // 4. Real rating distribution across the reviews table
         var ratingRows = await _context.Reviews
             .AsNoTracking()
+            .Where(r => !r.IsHidden)
             .GroupBy(r => r.Rating)
             .Select(g => new { Rating = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
@@ -514,6 +688,7 @@ public class ProductRepository : IProductRepository
         // 5. Real Top 10 Products ranked by verified review count & average rating from the reviews table
         var topReviewGroups = await _context.Reviews
             .AsNoTracking()
+            .Where(r => !r.IsHidden)
             .GroupBy(r => r.ProductId)
             .Select(g => new
             {

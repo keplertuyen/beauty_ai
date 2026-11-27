@@ -277,13 +277,15 @@ public class RoutineService : IRoutineService
             PriceUsd: p.PriceUsd,
             VolumeMl: p.VolumeMl,
             ImageUrl: imgUrl,
-            Rating: 5.0m,
-            ReviewsCount: 0,
+            Rating: p.ReviewsCount > 0 ? p.AvgRating : null,
+            ReviewsCount: p.ReviewsCount,
             TargetSkinTypes: p.TargetSkinTypes ?? Array.Empty<string>(),
             SuitabilityVerdict: "Highly Recommended",
             SuitabilityLabel: "Safe & Effective",
             HasAllergyWarning: false,
-            Department: p.Department ?? "Skincare"
+            Department: p.Department ?? "Skincare",
+            SizeDisplay: p.SizeDisplay,
+            LovesCount: p.LovesCount
         );
     }
 }

@@ -64,11 +64,19 @@ public class OrderRepository : IOrderRepository
             .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
     }
 
-    public async Task<bool> UpdateOrderStatusAsync(int id, string newStatus, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateOrderStatusAsync(int id, string newStatus, string? trackingNumber = null, string? adminNotes = null, CancellationToken cancellationToken = default)
     {
         var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         if (order == null) return false;
         order.OrderStatus = newStatus;
+        if (trackingNumber != null)
+        {
+            order.TrackingNumber = string.IsNullOrWhiteSpace(trackingNumber) ? null : trackingNumber.Trim();
+        }
+        if (adminNotes != null)
+        {
+            order.AdminNotes = string.IsNullOrWhiteSpace(adminNotes) ? null : adminNotes.Trim();
+        }
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
