@@ -115,23 +115,84 @@ def sync() -> dict[str, int]:
         js = re.sub(r"// BEGIN_VERIFIED_SET.*?// END_VERIFIED_SET", block, js, flags=re.S)
         PRODUCT_IMAGES_JS.write_text(js, encoding="utf-8")
 
-    # 5. Write SQL update script
-    sql_lines = []
+    # 5. Write SQL update script (single fast transaction)
+    val_rows = []
     for pid, url in sorted(sql_map.items()):
         ep = pid.replace("'", "''")
         eu = url.replace("'", "''")
-        sql_lines.append(f"UPDATE products SET image_url = '{eu}' WHERE code = '{ep}';")
-    SQL_OUT.write_text("\n".join(sql_lines) + ("\n" if sql_lines else ""), encoding="utf-8")
+        val_rows.append(f"('{ep}', '{eu}')")
+    if val_rows:
+        sql_text = (
+            "BEGIN;\n"
+            "UPDATE products AS p SET image_url = v.url\n"
+            "FROM (VALUES\n  " + ",\n  ".join(val_rows) + "\n) AS v(code, url)\n"
+            "WHERE p.code = v.code;\n"
+            "COMMIT;\n"
+        )
+    else:
+        sql_text = ""
+    SQL_OUT.write_text(sql_text, encoding="utf-8")
+
+    # 6. Apply SQL directly to PostgreSQL (Neon DATABASE_URL or local Docker) if reachable
+    db_applied = False
+    db_url = None
+    for env_name in (".env.local", ".env"):
+        env_path = REPO / env_name
+        if env_path.exists():
+            for line in env_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line.startswith("DATABASE_URL="):
+                    db_url = line.split("=", 1)[1].strip().strip('"').strip("'")
+                    break
+        if db_url:
+            break
+
+    if db_url and sql_text:
+        try:
+            import psycopg
+            with psycopg.connect(db_url, connect_timeout=15) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "UPDATE products AS p SET image_url = v.url "
+                        "FROM (VALUES " + ",".join(val_rows) + ") AS v(code, url) "
+                        "WHERE p.code = v.code;"
+                    )
+                conn.commit()
+            db_applied = True
+        except Exception:
+            pass
+
+    if not db_applied and sql_text:
+        for cmd in (
+            ["docker", "compose", "exec", "-T", "postgres", "psql", "-q", "-U", "beautyai", "-d", "beautyai", "-f", "-"],
+            ["psql", "-q", "postgresql://beautyai:beautyai_dev_secret@localhost:5432/beautyai", "-f", "-"],
+        ):
+            try:
+                import subprocess
+                res = subprocess.run(
+                    cmd,
+                    input=sql_text,
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                )
+                if res.returncode == 0:
+                    db_applied = True
+                    break
+            except Exception:
+                continue
 
     stats = {
         "verified_local": len(verified_ids),
         "placeholders": len(sql_map) - len(verified_ids),
         "removed_unverified_files": removed,
+        "db_applied": db_applied,
     }
     print(
         f"[sync_image_data] verified={stats['verified_local']} "
         f"placeholders={stats['placeholders']} "
-        f"removed_unverified={stats['removed_unverified_files']}"
+        f"removed_unverified={stats['removed_unverified_files']} "
+        f"db_applied={stats['db_applied']}"
     )
     return stats
 

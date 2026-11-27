@@ -19,7 +19,11 @@ def make_downloader(out_dir: Path, public_prefix: str = "/images/products", time
         with urllib.request.urlopen(req, timeout=timeout_s) as r:
             data = r.read()
         img = Image.open(io.BytesIO(data))
-        if img.mode not in ("RGB",):
+        if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
+            rgba = img.convert("RGBA")
+            bg = Image.new("RGBA", rgba.size, (255, 255, 255, 255))
+            img = Image.alpha_composite(bg, rgba).convert("RGB")
+        elif img.mode != "RGB":
             img = img.convert("RGB")
         img.thumbnail((MAX_SIDE, MAX_SIDE), Image.Resampling.LANCZOS)
         img.save(out_dir / f"{pid}.webp", "WEBP", quality=85)

@@ -7,6 +7,7 @@ Uses psql streaming COPY protocol for sub-minute loading.
 """
 
 import csv
+import heapq
 import json
 import os
 import re
@@ -15,43 +16,21 @@ import sys
 import time
 from pathlib import Path
 
+csv.field_size_limit(10**9)
+
+DEFAULT_REVIEWS_PER_PRODUCT = 50
+VALID_REVIEW_SKIN_TYPES = {"Oily", "Dry", "Combination", "Normal", "Sensitive"}
+
 CATEGORY_IMAGES = {
-    'Skincare': [
-        "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80",
-        "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80",
-        "https://images.unsplash.com/photo-1608248597359-5975e523f669?w=500&q=80",
-        "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=500&q=80",
-        "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=500&q=80",
-    ],
-    'Makeup': [
-        "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&q=80",
-        "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&q=80",
-        "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80",
-        "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&q=80",
-    ],
-    'Fragrance': [
-        "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500&q=80",
-        "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=500&q=80",
-        "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=500&q=80",
-    ],
-    'Hair': [
-        "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=500&q=80",
-        "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=500&q=80",
-    ],
-    'Bath & Body': [
-        "https://images.unsplash.com/photo-1556228722-d0b7197b1202?w=500&q=80",
-        "https://images.unsplash.com/photo-1608248597359-5975e523f669?w=500&q=80",
-    ],
-    'Tools & Brushes': [
-        "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500&q=80",
-        "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&q=80",
-    ],
-    'Men': [
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&q=80",
-        "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&q=80",
-    ],
+    'Skincare': ["/images/placeholders/skincare.svg"],
+    'Makeup': ["/images/placeholders/makeup.svg"],
+    'Fragrance': ["/images/placeholders/fragrance.svg"],
+    'Hair': ["/images/placeholders/hair.svg"],
+    'Bath & Body': ["/images/placeholders/bath-body.svg"],
+    'Tools & Brushes': ["/images/placeholders/tools.svg"],
+    'Men': ["/images/placeholders/skincare.svg"],
 }
-DEFAULT_IMAGE = "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=500&q=80"
+DEFAULT_IMAGE = "/images/placeholders/default.svg"
 
 KNOWN_ACTIVE_INGREDIENTS = {
     'salicylic acid': ('Exfoliating', 'Penetrates deep into pores to dissolve excess sebum and clear acne lesions', True, 0, 1),
@@ -75,7 +54,39 @@ def slugify(text: str) -> str:
     text = re.sub(r'[^a-z0-9]+', '-', text)
     return text.strip('-') or 'unknown'
 
+def _get_db_url() -> str | None:
+    root_dir = Path(__file__).resolve().parent.parent
+    for fname in (".env.local", ".env"):
+        p = root_dir / fname
+        if p.exists():
+            for line in p.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line.startswith("DATABASE_URL="):
+                    return line.split("=", 1)[1].strip().strip('"').strip("'")
+    return os.environ.get("DATABASE_URL")
+
+
+_CONN = None
+
+
+def _get_conn():
+    global _CONN
+    if _CONN is None or _CONN.closed:
+        import psycopg
+        _CONN = psycopg.connect(_get_db_url(), autocommit=True)
+    return _CONN
+
+
 def run_psql(sql: str) -> str:
+    db_url = _get_db_url()
+    if db_url:
+        conn = _get_conn()
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            if cur.description is not None:
+                rows = cur.fetchall()
+                return "\n".join(" | ".join(str(c) for c in r) for r in rows)
+            return ""
     cmd = [
         "docker", "compose", "exec", "-T", "postgres",
         "psql", "-U", "beautyai", "-d", "beautyai", "-c", sql
@@ -83,7 +94,22 @@ def run_psql(sql: str) -> str:
     res = subprocess.run(cmd, capture_output=True, text=True, check=True)
     return res.stdout
 
+
 def run_psql_copy(sql_copy: str, rows_generator):
+    db_url = _get_db_url()
+    if db_url:
+        import io
+        conn = _get_conn()
+        with conn.cursor() as cur:
+            with cur.copy(sql_copy) as copy:
+                buf = io.StringIO()
+                writer = csv.writer(buf, quoting=csv.QUOTE_MINIMAL)
+                for row in rows_generator:
+                    buf.seek(0)
+                    buf.truncate(0)
+                    writer.writerow(row)
+                    copy.write(buf.getvalue())
+        return ""
     cmd = [
         "docker", "compose", "exec", "-T", "postgres",
         "psql", "-U", "beautyai", "-d", "beautyai", "-c", sql_copy
@@ -112,12 +138,26 @@ def main():
         for row in reader:
             all_products.append(row)
 
+    def _loves_val(row):
+        try:
+            return float(row.get('loves_count') or 0)
+        except ValueError:
+            return 0.0
+
+    # Sort products so verified local images get lowest IDs (1..N) and appear first,
+    # while un-crawled products are pushed down (N+1..8494) ordered by popularity.
+    all_products.sort(key=lambda r: (
+        not (r.get('image_url') or '').strip().startswith('/images/products/'),
+        -_loves_val(r),
+        (r.get('product_id') or '').strip(),
+    ))
+
     print(f"Total products to seed: {len(all_products)}")
 
     # 1. Truncate existing product data cleanly
     print("Clearing existing product & review data...")
     run_psql("""
-        TRUNCATE reviews, product_ingredients, products, brands, categories, ingredients RESTART IDENTITY CASCADE;
+        TRUNCATE conflict_rules, reviews, product_ingredients, products, brands, categories, ingredients RESTART IDENTITY CASCADE;
     """)
 
     # 2. Seed Brands
@@ -234,19 +274,40 @@ def main():
 
             raw_ingredients = (p.get('ingredients') or '').strip()
 
-            # Target skin types
+            # Target skin types (evaluate Sensitive independently so soothing/gentle products are never masked)
             if prim == 'Skincare':
                 lower_text = (name + " " + desc + " " + raw_ingredients).lower()
-                if 'oil' in lower_text or 'acne' in lower_text or 'salicylic' in lower_text:
-                    skin_types = "{Oily,Combination}"
-                elif 'dry' in lower_text or 'ceramide' in lower_text or 'rich cream' in lower_text:
-                    skin_types = "{Dry,Normal}"
-                elif 'soothing' in lower_text or 'sensitive' in lower_text or 'centella' in lower_text:
-                    skin_types = "{Dry,Sensitive,Normal}"
-                else:
-                    skin_types = "{Oily,Combination,Normal,Dry}"
+                lower_inci = raw_ingredients.lower()
+                st_set = set()
+                if 'oil' in lower_text or 'acne' in lower_text or 'salicylic' in lower_text or 'blemish' in lower_text:
+                    st_set.update(['Oily', 'Combination'])
+                if 'dry' in lower_text or 'ceramide' in lower_text or 'rich cream' in lower_text or 'hydrat' in lower_text:
+                    st_set.update(['Dry', 'Normal'])
+                if not st_set:
+                    st_set.update(['Oily', 'Combination', 'Normal', 'Dry'])
+
+                has_soothing = any(k in lower_text for k in (
+                    'sensitive', 'soothing', 'calming', 'gentle', 'centella',
+                    'madecassoside', 'panthenol', 'allantoin', 'ceramide', 'oat'
+                ))
+                has_harsh = any(k in lower_inci for k in (
+                    'parfum', 'fragrance', 'alcohol denat', 'sd alcohol'
+                ))
+                if has_soothing and not has_harsh:
+                    st_set.add('Sensitive')
+                elif lower_inci and lower_inci != 'no ingredients listed' and not has_harsh and 'fragrance-free' in lower_text:
+                    st_set.add('Sensitive')
+
+                ordered = [s for s in ('Oily', 'Combination', 'Normal', 'Dry', 'Sensitive') if s in st_set]
+                skin_types = "{" + ",".join(ordered) + "}"
             else:
                 skin_types = "{Normal,Combination,Oily,Dry}"
+
+            raw_size = (p.get('size') or '').strip()
+            size_display = "" if not raw_size or raw_size.upper() == "N/A" else raw_size
+            ml_match = re.search(r'(\d+(?:\.\d+)?)\s*m[lL]\b', size_display)
+            vol_ml = str(int(round(float(ml_match.group(1))))) if ml_match else ""
+            loves_int = int(_loves_val(p))
 
             yield [
                 code,
@@ -256,7 +317,9 @@ def main():
                 category_id,
                 prim,  # department
                 f"{price:.2f}",
-                50,    # volume_ml
+                vol_ml,
+                size_display,
+                loves_int,
                 desc,
                 img_url,
                 raw_ingredients,
@@ -265,7 +328,7 @@ def main():
             ]
 
     sql_copy_products = (
-        "COPY products(code, name, slug, brand_id, category_id, department, price_usd, volume_ml, description, image_url, ingredient_list_raw, target_skin_types, stock_quantity) "
+        "COPY products(code, name, slug, brand_id, category_id, department, price_usd, volume_ml, size_display, loves_count, description, image_url, ingredient_list_raw, target_skin_types, stock_quantity) "
         "FROM STDIN WITH (FORMAT csv, HEADER false, QUOTE '\"', ESCAPE '\"', FORCE_NOT_NULL (ingredient_list_raw));"
     )
     run_psql_copy(sql_copy_products, product_row_generator())
@@ -404,7 +467,8 @@ def main():
 
         INSERT INTO user_allergies (user_id, ingredient_name, note)
         SELECT id, 'Alcohol Denat', 'Causes severe dryness and skin barrier tightness'
-        FROM users WHERE email = 'trang.nguyen@example.com';
+        FROM users u WHERE u.email = 'trang.nguyen@example.com'
+          AND NOT EXISTS (SELECT 1 FROM user_allergies ua WHERE ua.user_id = u.id AND ua.ingredient_name = 'Alcohol Denat');
 
         INSERT INTO skin_profiles (user_id, skin_type, skin_concerns, primary_goal, budget_level)
         SELECT id, 'Dry', ARRAY['Sensitivity', 'Dehydration'], 'Barrier repair and calming irritation', 'High'
@@ -412,14 +476,119 @@ def main():
 
         INSERT INTO user_allergies (user_id, ingredient_name, note)
         SELECT id, 'Fragrance/Parfum', 'Synthetic fragrance triggers contact dermatitis and redness'
-        FROM users WHERE email = 'maianh.tran@example.com';
+        FROM users u WHERE u.email = 'maianh.tran@example.com'
+          AND NOT EXISTS (SELECT 1 FROM user_allergies ua WHERE ua.user_id = u.id AND ua.ingredient_name = 'Fragrance/Parfum');
 
         INSERT INTO skin_profiles (user_id, skin_type, skin_concerns, primary_goal, budget_level)
         SELECT id, 'Combination', ARRAY['Aging', 'DarkSpots'], 'Anti-aging and dark spot brightening in T-zone', 'Medium'
         FROM users WHERE email = 'long.le@example.com' ON CONFLICT (user_id) DO NOTHING;
     """)
 
+    # 7. Seed Product Reviews (capped per product for Neon Free tier) & Sync Product Rating Stats
+    seed_reviews(root_dir, prod_code_to_id)
+    sync_product_review_stats()
+
     print("Step 2 Seeding completed successfully!")
+
+
+def seed_reviews(root_dir: Path, prod_code_to_id: dict[str, int]):
+    """Import up to SEED_REVIEWS_PER_PRODUCT newest reviews per product from reviews_cleaned.csv."""
+    raw_cap = os.environ.get("SEED_REVIEWS_PER_PRODUCT", str(DEFAULT_REVIEWS_PER_PRODUCT)).strip()
+    try:
+        cap = int(raw_cap)
+    except ValueError:
+        cap = DEFAULT_REVIEWS_PER_PRODUCT
+
+    if cap < 0:
+        print("Skipping reviews import (SEED_REVIEWS_PER_PRODUCT < 0).")
+        return
+
+    reviews_csv = root_dir / "docs" / "_data" / "cleaned" / "reviews_cleaned.csv"
+    if not reviews_csv.exists():
+        print(f"Warning: {reviews_csv} not found; skipping reviews import.")
+        return
+
+    cap_label = "unlimited" if cap == 0 else str(cap)
+    print(f"Seeding Reviews from {reviews_csv} (cap={cap_label}/product)...")
+    t0 = time.time()
+
+    selected: dict[str, list] = {}
+    seq = 0
+    with open(reviews_csv, mode="r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            code = (row.get("product_id") or "").strip()
+            if code not in prod_code_to_id:
+                continue
+            date_str = (row.get("submission_time") or "").strip()
+            date_key = date_str[:10] if len(date_str) >= 10 else "2023-01-01"
+            seq += 1
+            item = (date_key, seq, row)
+            bucket = selected.setdefault(code, [])
+            if cap == 0:
+                bucket.append(item)
+            elif len(bucket) < cap:
+                heapq.heappush(bucket, item)
+            elif item[:2] > bucket[0][:2]:
+                heapq.heapreplace(bucket, item)
+
+    def review_row_generator():
+        for code, items in selected.items():
+            pid = prod_code_to_id[code]
+            for date_key, _, r in items:
+                aid = (r.get("author_id") or "").strip()
+                author_name = f"Shopper #{aid}" if aid else "BeautyAI Shopper"
+                try:
+                    rating = min(5, max(1, int(float(r.get("rating") or 5))))
+                except ValueError:
+                    rating = 5
+                raw_st = (r.get("skin_type") or "").strip().capitalize()
+                skin_type = raw_st if raw_st in VALID_REVIEW_SKIN_TYPES else "Unknown"
+                title = (r.get("review_title") or "").strip()
+                body = (r.get("review_text") or "").strip()
+                if title and body:
+                    content = f"{title}\n\n{body}"
+                else:
+                    content = body or title or None
+                yield [pid, code, author_name, rating, skin_type, content, f"{date_key} 00:00:00+00"]
+
+    sql_copy_reviews = (
+        "COPY reviews(product_id, product_code, author_name, rating, skin_type, content, created_at) "
+        "FROM STDIN WITH (FORMAT csv, HEADER false, QUOTE '\"', ESCAPE '\"');"
+    )
+    run_psql_copy(sql_copy_reviews, review_row_generator())
+    run_psql("ANALYZE reviews;")
+    res_rev = run_psql("SELECT COUNT(*), COUNT(DISTINCT product_id) FROM reviews;")
+    print(f"Reviews seeded ({time.time() - t0:.1f}s): {res_rev.strip()}")
+
+
+def sync_product_review_stats():
+    """Recalculate products.avg_rating (1-decimal or NULL) and reviews_count from reviews."""
+    print("Synchronizing products.avg_rating and reviews_count from reviews...")
+    run_psql("""
+        UPDATE products p
+        SET avg_rating = s.avg_rating,
+            reviews_count = s.reviews_count
+        FROM (
+            SELECT p2.id,
+                   r.avg_rating,
+                   COALESCE(r.reviews_count, 0) AS reviews_count
+            FROM products p2
+            LEFT JOIN (
+                SELECT product_id,
+                       ROUND(AVG(LEAST(5, GREATEST(1, rating)))::numeric, 1) AS avg_rating,
+                       COUNT(*)::int AS reviews_count
+                FROM reviews
+                WHERE product_id IS NOT NULL
+                GROUP BY product_id
+            ) r ON r.product_id = p2.id
+        ) s
+        WHERE p.id = s.id;
+    """)
+    run_psql("ANALYZE products;")
+    res_stats = run_psql(
+        "SELECT COUNT(*) FILTER (WHERE reviews_count > 0), COUNT(*) FILTER (WHERE reviews_count = 0) FROM products;"
+    )
+    print(f"Product rating stats synced (with_reviews | zero_reviews): {res_stats.strip()}")
 
 if __name__ == "__main__":
     main()
