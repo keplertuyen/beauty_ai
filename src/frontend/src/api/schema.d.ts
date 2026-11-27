@@ -2730,20 +2730,20 @@ export interface components {
             sizeDisplay?: null | string;
         };
         CreateReviewRequest: {
-            productId?: null | string;
-            authorId?: null | string;
-            authorName?: null | string;
+            product_id?: null | string;
+            author_id?: null | string;
+            author_name?: null | string;
             /**
              * Format: int32
              * @default 5
              */
             rating: number | string;
-            skinType?: null | string;
-            skinConcerns?: null | string;
+            skin_type?: null | string;
+            skin_concerns?: null | string;
             content?: null | string;
-            reviewText?: null | string;
+            review_text?: null | string;
             /** Format: int32 */
-            isRecommended?: null | number | string;
+            is_recommended?: null | number | string;
         };
         CreateSupportTicketRequest: {
             name: string;

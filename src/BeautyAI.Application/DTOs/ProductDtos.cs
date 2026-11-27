@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BeautyAI.Application.DTOs;
 
 public record ProductSummaryDto(
@@ -128,15 +130,15 @@ public record ProductReviewDto(
 );
 
 public record CreateReviewRequest(
-    string? ProductId = null,
-    string? AuthorId = null,
-    string? AuthorName = null,
-    int Rating = 5,
-    string? SkinType = null,
-    string? SkinConcerns = null,
-    string? Content = null,
-    string? ReviewText = null,
-    int? IsRecommended = null
+    [property: JsonPropertyName("product_id")] string? ProductId = null,
+    [property: JsonPropertyName("author_id")] string? AuthorId = null,
+    [property: JsonPropertyName("author_name")] string? AuthorName = null,
+    [property: JsonPropertyName("rating")] int Rating = 5,
+    [property: JsonPropertyName("skin_type")] string? SkinType = null,
+    [property: JsonPropertyName("skin_concerns")] string? SkinConcerns = null,
+    [property: JsonPropertyName("content")] string? Content = null,
+    [property: JsonPropertyName("review_text")] string? ReviewText = null,
+    [property: JsonPropertyName("is_recommended")] int? IsRecommended = null
 );
 
 public record ProductFilterParams(

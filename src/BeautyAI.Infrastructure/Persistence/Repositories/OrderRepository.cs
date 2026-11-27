@@ -51,10 +51,20 @@ public class OrderRepository : IOrderRepository
         if (_context.Database.IsRelational())
         {
             var idArray = productIds.ToArray();
-            return await _context.Products
+            var lockedProducts = await _context.Products
                 .FromSqlInterpolated($"SELECT * FROM products WHERE id = ANY({idArray}) FOR UPDATE")
-                .Include(p => p.Brand)
                 .ToListAsync(cancellationToken);
+
+            // Load Brand navigation separately so EF Core does not compose JOIN over non-composable FOR UPDATE SQL
+            var brandIds = lockedProducts.Select(p => p.BrandId).Distinct().ToList();
+            if (brandIds.Count > 0)
+            {
+                await _context.Brands
+                    .Where(b => brandIds.Contains(b.Id))
+                    .LoadAsync(cancellationToken);
+            }
+
+            return lockedProducts;
         }
 
         return await _context.Products

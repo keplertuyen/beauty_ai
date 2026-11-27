@@ -3288,19 +3288,19 @@
       "CreateReviewRequest": {
         "type": "object",
         "properties": {
-          "productId": {
+          "product_id": {
             "type": [
               "null",
               "string"
             ]
           },
-          "authorId": {
+          "author_id": {
             "type": [
               "null",
               "string"
             ]
           },
-          "authorName": {
+          "author_name": {
             "type": [
               "null",
               "string"
@@ -3315,13 +3315,13 @@
             "format": "int32",
             "default": 5
           },
-          "skinType": {
+          "skin_type": {
             "type": [
               "null",
               "string"
             ]
           },
-          "skinConcerns": {
+          "skin_concerns": {
             "type": [
               "null",
               "string"
@@ -3333,13 +3333,13 @@
               "string"
             ]
           },
-          "reviewText": {
+          "review_text": {
             "type": [
               "null",
               "string"
             ]
           },
-          "isRecommended": {
+          "is_recommended": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "null",

@@ -29,7 +29,18 @@ public class ReviewsController : ControllerBase
             return Unauthorized(new { message = "Authentication is required to submit a review." });
         }
 
-        var review = await _productService.AddReviewAsync(userId, request, cancellationToken);
-        return StatusCode(StatusCodes.Status201Created, review);
+        try
+        {
+            var review = await _productService.AddReviewAsync(userId, request, cancellationToken);
+            return StatusCode(StatusCodes.Status201Created, review);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
     }
 }

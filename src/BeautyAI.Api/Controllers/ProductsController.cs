@@ -232,9 +232,20 @@ public class ProductsController : ControllerBase
             return Unauthorized(new { message = "Authentication is required to submit a review." });
         }
 
-        var reqWithId = request with { ProductId = string.IsNullOrWhiteSpace(request.ProductId) ? id : request.ProductId };
-        var review = await _productService.AddReviewAsync(userId, reqWithId, cancellationToken);
-        return StatusCode(StatusCodes.Status201Created, review);
+        try
+        {
+            var reqWithId = request with { ProductId = string.IsNullOrWhiteSpace(request.ProductId) ? id : request.ProductId };
+            var review = await _productService.AddReviewAsync(userId, reqWithId, cancellationToken);
+            return StatusCode(StatusCodes.Status201Created, review);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
     }
 
     [HttpGet("categories")]
