@@ -161,10 +161,13 @@ for p in ROOT.rglob("*"):
         continue
     # Only check official documentation (repo root, docs/, or AI-config dirs
     # .agents/.claude/.codex). Skip detailed requirement notes under
-    # docs/_requirements/.
+    # docs/_requirements/, academic thesis chapters under docs/_report/, and
+    # generated RAG data exports under docs/_data/.
     if "/" in r and (
         not (r.startswith("docs/") or r.startswith(".agents/") or r.startswith(".claude/") or r.startswith(".codex/"))
         or r.startswith("docs/_requirements/")
+        or r.startswith("docs/_report/")
+        or r.startswith("docs/_data/")
     ):
         continue
     text = read(p)

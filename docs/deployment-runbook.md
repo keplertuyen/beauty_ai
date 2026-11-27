@@ -9,7 +9,36 @@ last_reviewed: 2026-10-25
 
 # SỔ TAY TRIỂN KHAI & MÔI TRƯỜNG — BeautyAI Platform
 
-> Thực thi CON-05 và ADR-013: Triển khai kiểm thử cục bộ bằng Docker Compose (`scripts/deploy-test`) và CI 5 jobs trên GitHub Actions (Precedence 2 — Contracts).
+> Thực thi CON-05, ADR-013 và ADR-016: Triển khai Production trên **Render (API) + Vercel (SPA) + Neon Lakebase (PostgreSQL 17)** và triển khai cục bộ qua Docker Compose (Precedence 2 — Contracts).
+>
+> ---
+>
+> ## 15.0. Triển khai Production (Phase 1 — Render + Vercel + Neon)
+>
+> ### Biến môi trường bắt buộc
+> - **Backend (Render Web Service — `render.yaml`):**
+>   - `ASPNETCORE_ENVIRONMENT=Production`
+>   - `DATABASE_URL` (`sync: false` — Neon PostgreSQL URI, không commit)
+>   - `JWT_SECRET` (`sync: false` — tối thiểu 32 ký tự ngẫu nhiên, tạo bằng `openssl rand -base64 48`; ứng dụng sẽ từ chối khởi động nếu thiếu/ngắn ở Production)
+>   - `JWT_ISSUER=beautyai-api`, `JWT_AUDIENCE=beautyai-clients`, `JWT_EXPIRATION_DAYS=7`
+>   - `CORS_ORIGINS=https://beauty-ai-lyart.vercel.app` (chỉ domain production, không chứa `localhost`)
+>   - `AI_PROVIDER=dify`, `DIFY_API_URL=https://api.dify.ai/v1`, `DIFY_API_KEY` (`sync: false`) hoặc `GEMINI_API_KEY`
+>   - `ADMIN_EMAIL`, `ADMIN_PASSWORD` (≥ 8 ký tự, tùy chọn bootstrap tài khoản Admin)
+> - **Frontend (Vercel — `src/frontend/vercel.json`):**
+>   - `VITE_API_BASE_URL=https://<render-api-domain>/api/v1`
+>   - `VITE_ENABLE_IMAGE_UPLOAD=false` (Phase 1 ẩn nút upload ảnh lên đĩa tạm Render; dùng URL ngoài hoặc `/images/products/*.webp`)
+>
+> ### Migration & Seed dữ liệu
+> 1. **DB mới hoàn toàn:** chạy `docs/db-schema/schema_phase_1.sql`.
+> 2. **DB nâng cấp từ bản cũ:** chạy file idempotent `docs/db-schema/migrations/2026-11-27_phase1_prerelease_schema_sync.sql` (thêm `users.shipping_address`, `orders.notes`, `orders.tracking_number`, `orders.admin_notes`, `reviews.is_hidden`, `support_tickets`, và các cột sắp xếp trên `products`).
+> 3. **Seed dữ liệu:** chạy `python3 scripts/seed_full_database.py` (sản phẩm, INCI, conflict rules) và `python3 scripts/import_reviews.py` (reviews).
+>
+> ### Quy trình xoay (rotate) `JWT_SECRET`
+> 1. Sinh khóa mới trên máy an toàn: `openssl rand -base64 48` (không dán vào chat/commit).
+> 2. Cập nhật biến `JWT_SECRET` trong Render Dashboard → Service → Environment → Save & Redeploy.
+> 3. Cập nhật `.env` local (nếu dev cần giữ phiên ổn định giữa các lần restart). Toàn bộ JWT cũ sẽ tự động bị từ chối sau khi service khởi động lại.
+>
+> *(Lưu ý: Các script `scripts/demo`, `scripts/e2e`, `scripts/backup`, `scripts/restore` và `dotnet ef database update` ở các mục bên dưới thuộc thiết kế mục tiêu Phase 2, chưa sử dụng ở Phase 1.)*
 
 ---
 

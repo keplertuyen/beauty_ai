@@ -10,6 +10,8 @@ last_reviewed: 2026-10-25
 # SỔ TAY QUAN SÁT & VẬN HÀNH — BeautyAI Platform
 
 > Nguồn chân lý về cấu trúc nhật ký Serilog, mã tương quan correlation_id, điểm cuối kiểm tra sức khỏe /health và giám sát sự kiện nghiệp vụ (Precedence 2 — Contracts).
+>
+> **📌 Phase 1 Implemented vs Phase 2 Planned (2026-11-27):** Phase 1 sử dụng `ILogger` chuẩn của ASP.NET Core và endpoint liveness `GET /health` trả về `{"status":"ok","service":"beautyai-api"}`. Serilog file sink 30 ngày, `SensitiveDataMasker`, `ISettingsProvider` đọc `app_settings` và deep health check thuộc Phase 2.
 
 ---
 

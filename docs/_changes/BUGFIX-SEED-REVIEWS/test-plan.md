@@ -2,6 +2,8 @@
 doc: test-plan
 change_id: BUGFIX-SEED-REVIEWS
 status: approved
+title: BUGFIX-SEED-REVIEWS — test-plan
+precedence: 5
 ---
 
 # Test Plan — BUGFIX-SEED-REVIEWS

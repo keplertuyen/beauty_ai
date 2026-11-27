@@ -5,6 +5,7 @@ title: Wire Active Ingredients, Free-From, Clean Claims, URL Filters & Sensitive
 status: approved
 owner: tech-lead
 created: 2026-11-27
+precedence: 5
 ---
 
 # Proposal — BUGFIX-PRODUCT-ACTIVE-FILTERS

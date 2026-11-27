@@ -10,6 +10,8 @@ last_reviewed: 2026-10-25
 # 7. QUY TẮC NGHIỆP VỤ (BUSINESS RULES)
 
 > Quy tắc nghiệp vụ là **sự thật nghiệp vụ không phụ thuộc công nghệ**. Mọi FR ở §8 phải tuân theo các quy tắc này. Khi một quy tắc thay đổi, mọi FR trích dẫn nó phải được rà soát lại (xem §15).
+>
+> **📌 Phase 1 Implemented vs Phase 2 Planned (2026-11-27):** Phase 1 khóa **100% English + USD ($)**, thanh toán **COD** (chưa bật VND/VNPay/Voucher), giỏ hàng & wishlist lưu `localStorage`, và hiển thị **Suitability Verdict dạng chữ** (bỏ hoàn toàn điểm `%` và `SafetyScore`). Các quy tắc VND/VNPay/Voucher bên dưới thuộc phạm vi Phase 2.
 
 ## 7.1. Nhóm Tiền tệ & Giá (`BR-PRICE`)
 

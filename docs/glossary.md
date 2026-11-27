@@ -13,7 +13,9 @@ last_reviewed: 2026-10-25
 |---|---|
 | **INCI** | *International Nomenclature of Cosmetic Ingredients* — hệ danh pháp quốc tế chuẩn hóa tên thành phần mỹ phẩm, bắt buộc in trên nhãn tại EU/US |
 | **Hoạt chất (Active)** | Thành phần có tác dụng sinh học rõ rệt lên da (Retinol, Niacinamide, BHA, AHA, Vitamin C…) |
-| **Safety Score** | Điểm an toàn nội bộ 1–10 do BeautyAI tính, **không** phải chỉ số y tế được công nhận. 10 = lành tính nhất |
+| **Safety Score** | *(Đã loại bỏ theo bất biến `INV-01`)* — BeautyAI không chấm điểm an toàn/nguy hiểm tuyệt đối; thay bằng `Suitability Verdict` cá nhân hóa theo Digital Skin ID |
+| **Suitability Verdict** | Kết luận độ phù hợp dạng chữ cá nhân hóa (`Good Match`, `Match with Notes`, `Not Suitable — Allergy Alert`, `Insufficient INCI Data`) thay thế hoàn toàn điểm `%` / `Safety Score` |
+| **Dify RAG** | Bộ cung cấp tri thức RAG (Retrieval-Augmented Generation) cho AI Skincare Advisor ở Phase 1 (`AI_PROVIDER=dify`, ADR-015), đứng sau tầng Medical Guardrail tất định |
 | **Comedogenic Rating** | Điểm gây bít tắc lỗ chân lông 0–5 theo thang tham khảo ngành. 0 = không gây bít tắc |
 | **Routine** | Chu trình dưỡng da gồm các bước theo thứ tự khoa học, phân theo buổi Sáng (AM) / Tối (PM) |
 | **Conflict (Xung đột hoạt chất)** | Cặp/nhóm hoạt chất không nên dùng cùng một buổi vì tăng nguy cơ kích ứng hoặc giảm hiệu quả |

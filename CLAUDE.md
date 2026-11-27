@@ -32,7 +32,7 @@ A `status: superseded` document is dead. Follow its `superseded_by` field. `proj
 - Operating mode: `solo` | `team` — declared once in `.syntheprise-quality.yml` (`project.mode`, default `team`). Personas exist in both modes; only cadence changes. See `.agents/agents.md`.
 - Stack: fill canonical stack in `docs/architecture.md`; third-party inventory in `docs/tech-stack.md`.
 - Owner: fill delivery owner and client owner.
-- Default UI language: fill per project.
+- Default UI language: **100% English** across the entire web application (Storefront and Admin Console). See `.agents/rules/language.md`.
 - Versioning: the product version (git tag + `CHANGELOG.md`, driven by `/release-baseline`) is separate from the Syntheprise Framework kit version (`VERSION`). See `docs/_guides/16-release-versioning.md`.
 
 ## 2. Invariant rules

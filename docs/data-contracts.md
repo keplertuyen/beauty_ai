@@ -10,7 +10,11 @@ last_reviewed: 2026-10-25
 # HỢP ĐỒNG DỮ LIỆU & LƯỢC ĐỒ THỰC THỂ — BeautyAI Platform
 
 > Nguồn chân lý về mô hình đối tượng, quan hệ, entity C# và lược đồ PostgreSQL vật lý (Precedence 2 — Contracts).
-> Xem tệp DDL DML hoàn chỉnh tại [`docs/db-schema/schema.sql`](docs/db-schema/schema.sql).
+> Xem tệp DDL Phase 1 thực tế tại [`docs/db-schema/schema_phase_1.sql`](docs/db-schema/schema_phase_1.sql) và migration tại [`docs/db-schema/migrations/2026-11-27_phase1_prerelease_schema_sync.sql`](docs/db-schema/migrations/2026-11-27_phase1_prerelease_schema_sync.sql).
+>
+> **📌 Phase 1 Implemented (14 bảng trong `BeautyAIDbContext.cs`) vs Phase 2 Planned:**
+> - **14 bảng Phase 1 đang chạy:** `users` (có `shipping_address`), `skin_profiles`, `user_allergies`, `brands`, `categories`, `ingredients`, `products` (`id: int`, `code: varchar(50)`, `selling_status`, `department`, `size_display`, `loves_count`, `avg_rating`, `reviews_count`), `product_ingredients`, `reviews` (có `is_hidden`, `moderation_reason`), `conflict_rules`, `orders` (có `notes`, `tracking_number`, `admin_notes`), `order_items`, `saved_routines`, `support_tickets`.
+> - **Các bảng mở rộng bên dưới (`Voucher`, `Conversation`, `HandoffRequest`, `AuditLog`, `AppSetting`, `ProductSimilarity`, `AssociationRule`...)** là thiết kế mục tiêu Phase 2.
 
 ---
 

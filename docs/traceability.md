@@ -15,34 +15,34 @@ Tạo chuỗi liên kết xuyên suốt từ mục tiêu kinh doanh đến đi�
 ## Matrix
 | Business Goal | Requirement ID | Acceptance Criteria ID | Test Case ID | Implementation Task / WG | PR / Commit | Release | Status |
 |---|---|---|---|---|---|---|---|
-| BO-01 Tìm kiếm & Lọc thông minh | FR-AUTH-01 | AC-AUTH-01 | TC-AUTH-01 | WG-P2-01 | — | v1.0 | Ready for implementation |
-| BO-01 Tìm kiếm & Lọc thông minh | FR-CAT-01 | AC-CAT-01 | TC-CAT-01 | WG-P3-01 | — | v1.0 | Ready for implementation |
-| BO-01 Tìm kiếm & Lọc thông minh | FR-CAT-02 | AC-CAT-02 | TC-CAT-02 | WG-P3-01 | — | v1.0 | Ready for implementation |
-| BO-04 Minh bạch thành phần INCI | FR-PDP-01 | AC-PDP-01 | TC-PDP-01 | WG-P3-02 | — | v1.0 | Ready for implementation |
-| BO-04 Minh bạch thành phần INCI | FR-PDP-02 | AC-PDP-02 | TC-PDP-02 | WG-P3-02 | — | v1.0 | Ready for implementation |
-| BO-02 Điểm Phù Hợp theo làn da | FR-PDP-03 | AC-PDP-03 | TC-PDP-03 | WG-P3-02 | — | v1.0 | Ready for implementation |
-| BO-03 Cảnh báo dị ứng cá nhân | FR-SKIN-01 | AC-SKIN-01 | TC-SKIN-01 | WG-P4-01 | — | v1.0 | Ready for implementation |
-| BO-03 Cảnh báo dị ứng cá nhân | FR-SKIN-02 | AC-SKIN-02 | TC-SKIN-02 | WG-P4-01 | — | v1.0 | Ready for implementation |
-| BO-01 Chẩn đoán Skin Quiz 4 tầng | FR-QUIZ-01 | AC-QUIZ-01 | TC-QUIZ-01 | WG-P4-02 | — | v1.0 | Ready for implementation |
-| BO-01 Chẩn đoán Skin Quiz 4 tầng | FR-QUIZ-02 | AC-QUIZ-02 | TC-QUIZ-02 | WG-P4-02 | — | v1.0 | Ready for implementation |
-| BO-02 Xây dựng chu trình Routine | FR-QUIZ-03 | AC-QUIZ-03 | TC-QUIZ-03 | WG-P4-03 | — | v1.0 | Ready for implementation |
-| BO-04 Phân tích thành phần INCI | FR-ING-01 | AC-ING-01 | TC-ING-01 | WG-P5-02 | — | v1.0 | Ready for implementation |
-| BO-03 Phát hiện xung đột hoạt chất | FR-CONF-01 | AC-CONF-01 | TC-CONF-01 | WG-P5-01 | — | v1.0 | Ready for implementation |
-| BO-03 Phát hiện xung đột hoạt chất | FR-CONF-02 | AC-CONF-02 | TC-CONF-02 | WG-P5-01 | — | v1.0 | Ready for implementation |
-| BO-01 So sánh sản phẩm song song | FR-COMP-01 | AC-COMP-01 | TC-COMP-01 | WG-P5-04 | — | v1.0 | Ready for implementation |
-| BO-02 Giỏ hàng & phát hiện xung đột | FR-CART-01 | AC-CART-01 | TC-CART-01 | WG-P6-02 | — | v1.0 | Ready for implementation |
-| BO-02 Voucher đa tầng | FR-VOUCH-01 | AC-VOUCH-01 | TC-VOUCH-01 | WG-P6-03 | — | v1.0 | Ready for implementation |
-| BO-02 Đơn hàng & trừ kho nguyên tử | FR-ORD-01 | AC-ORD-01 | TC-ORD-01 | WG-P6-04 | — | v1.0 | Ready for implementation |
-| BO-02 Thanh toán VNPay & COD | FR-PAY-01 | AC-PAY-01 | TC-PAY-01 | WG-P6-05 | — | v1.0 | Ready for implementation |
-| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-01 | AC-CHAT-01 | TC-CHAT-01 | WG-P7-01 | — | v1.0 | Ready for implementation |
-| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-02 | AC-CHAT-02 | TC-CHAT-02 | WG-P7-02 | — | v1.0 | Ready for implementation |
-| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-03 | AC-CHAT-03 | TC-CHAT-03 | WG-P7-03 | — | v1.0 | Ready for implementation |
-| BO-05 Handoff tư vấn viên Zalo | FR-CHAT-07 | AC-CHAT-07 | TC-CHAT-07 | WG-P7-05 | — | v1.0 | Ready for implementation |
-| BO-07 Quản trị sàn & danh mục | FR-ADM-01 | AC-ADM-01 | TC-ADM-01 | WG-P8-02 | — | v1.0 | Ready for implementation |
+| BO-01 Tìm kiếm & Lọc thông minh | FR-AUTH-01 | AC-AUTH-01 | TC-AUTH-01 | WG-P2-01 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-01 Tìm kiếm & Lọc thông minh | FR-CAT-01 | AC-CAT-01 | TC-CAT-01 | WG-P3-01 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-01 Tìm kiếm & Lọc thông minh | FR-CAT-02 | AC-CAT-02 | TC-CAT-02 | WG-P3-01 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-04 Minh bạch thành phần INCI | FR-PDP-01 | AC-PDP-01 | TC-PDP-01 | WG-P3-02 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-04 Minh bạch thành phần INCI | FR-PDP-02 | AC-PDP-02 | TC-PDP-02 | WG-P3-02 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-02 Điểm Phù Hợp theo làn da | FR-PDP-03 | AC-PDP-03 | TC-PDP-03 | WG-P3-02 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-03 Cảnh báo dị ứng cá nhân | FR-SKIN-01 | AC-SKIN-01 | TC-SKIN-01 | WG-P4-01 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-03 Cảnh báo dị ứng cá nhân | FR-SKIN-02 | AC-SKIN-02 | TC-SKIN-02 | WG-P4-01 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-01 Chẩn đoán Skin Quiz 4 tầng | FR-QUIZ-01 | AC-QUIZ-01 | TC-QUIZ-01 | WG-P4-02 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-01 Chẩn đoán Skin Quiz 4 tầng | FR-QUIZ-02 | AC-QUIZ-02 | TC-QUIZ-02 | WG-P4-02 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-02 Xây dựng chu trình Routine | FR-QUIZ-03 | AC-QUIZ-03 | TC-QUIZ-03 | WG-P4-03 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-04 Phân tích thành phần INCI | FR-ING-01 | AC-ING-01 | TC-ING-01 | WG-P5-02 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-03 Phát hiện xung đột hoạt chất | FR-CONF-01 | AC-CONF-01 | TC-CONF-01 | WG-P5-01 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-03 Phát hiện xung đột hoạt chất | FR-CONF-02 | AC-CONF-02 | TC-CONF-02 | WG-P5-01 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-01 So sánh sản phẩm song song | FR-COMP-01 | AC-COMP-01 | TC-COMP-01 | WG-P5-04 | — | v2.0 | Deferred (Phase 2) |
+| BO-02 Giỏ hàng & phát hiện xung đột | FR-CART-01 | AC-CART-01 | TC-CART-01 | WG-P6-02 | release/phase1-prerelease | v1.0 | Implemented (localStorage Phase 1) |
+| BO-02 Voucher đa tầng | FR-VOUCH-01 | AC-VOUCH-01 | TC-VOUCH-01 | WG-P6-03 | — | v2.0 | Deferred (Phase 2) |
+| BO-02 Đơn hàng & trừ kho nguyên tử | FR-ORD-01 | AC-ORD-01 | TC-ORD-01 | WG-P6-04 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-02 Thanh toán VNPay & COD | FR-PAY-01 | AC-PAY-01 | TC-PAY-01 | WG-P6-05 | release/phase1-prerelease | v1.0 | Partial (COD Phase 1; VNPay Phase 2) |
+| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-01 | AC-CHAT-01 | TC-CHAT-01 | WG-P7-01 | release/phase1-prerelease | v1.0 | Implemented (Dify/Gemini + Guardrail) |
+| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-02 | AC-CHAT-02 | TC-CHAT-02 | WG-P7-02 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-05 Trợ lý AI Lumi 3 tầng | FR-CHAT-03 | AC-CHAT-03 | TC-CHAT-03 | WG-P7-03 | release/phase1-prerelease | v1.0 | Implemented |
+| BO-05 Handoff tư vấn viên Zalo | FR-CHAT-07 | AC-CHAT-07 | TC-CHAT-07 | WG-P7-05 | — | v2.0 | Deferred (Phase 2) |
+| BO-07 Quản trị sàn & danh mục | FR-ADM-01 | AC-ADM-01 | TC-ADM-01 | WG-P8-02 | release/phase1-prerelease | v1.0 | Implemented (Admin Console V2) |
 | BO-07 Quản trị sản phẩm CRUD & Soft Delete | FR-ADM-02 | AC-ADM-02-05..12 | TC-ADM-CRUD-01..08 | CHANGE-ADMIN-PRODUCT-CRUD | change/change-admin-product-crud | v1.0 | Implemented |
 | BO-07 Phân quyền API Admin | NFR-SEC-02 | AC-SEC-ADM-01..03 | TC-ADM-SEC-01 | CHANGE-ADMIN-PRODUCT-CRUD | change/change-admin-product-crud | v1.0 | Implemented |
 | BO-07 Khởi tạo tài khoản Admin từ biến môi trường | FR-ADM-17 | AC-ADM-17-01..05 | TC-ADM-BOOT-01 | CHANGE-ADMIN-PRODUCT-CRUD | change/change-admin-product-crud | v1.0 | Implemented |
-| BO-07 Nhật ký kiểm toán an ninh | FR-ADM-10 | AC-ADM-10 | TC-ADM-10 | WG-P8-01 | — | v1.0 | Ready for implementation |
+| BO-07 Nhật ký kiểm toán an ninh | FR-ADM-10 | AC-ADM-10 | TC-ADM-10 | WG-P8-01 | — | v2.0 | Deferred (Phase 2) |
 
 ## Rules
 - Mọi yêu cầu cấp Must bắt buộc có ít nhất 1 AC và 1 Test Case trước khi Dev tiến hành triển khai.

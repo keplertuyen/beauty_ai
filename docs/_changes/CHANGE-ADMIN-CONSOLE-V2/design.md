@@ -2,6 +2,8 @@
 change_id: CHANGE-ADMIN-CONSOLE-V2
 doc: design-and-tasks
 status: approved
+title: CHANGE-ADMIN-CONSOLE-V2 — design
+precedence: 5
 ---
 
 # Design & Tasks — CHANGE-ADMIN-CONSOLE-V2

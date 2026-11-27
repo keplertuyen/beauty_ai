@@ -10,7 +10,8 @@ last_reviewed: 2026-10-25
 # KIẾN TRÚC TỔNG THỂ HỆ THỐNG — BeautyAI Platform
 
 > **Nguồn chân lý về CÁCH hệ thống được xây dựng (Precedence 2 — Contracts).**
-> Xem danh mục 13 ADR độc lập tại [`docs/adr/`](docs/adr/).
+> Xem danh mục ADR độc lập tại [`docs/adr/`](docs/adr/) (bao gồm `ADR-015` Dify RAG và `ADR-016` Phase 1 stack/JWT/cloud deployment).
+> **📌 Phase 1 Implemented vs Phase 2 Planned:** Phase 1 chạy trên Neon PostgreSQL + Render + Vercel, dùng JWT Bearer (`ADR-016`), EF Core 10 (chưa dùng Dapper), và AI provider Dify/Gemini (`ADR-015`). Các thiết kế Cookie httpOnly (`ADR-004`), 7-stage function-calling (`ADR-005`), và VNPay/Zalo OA thuộc lộ trình Phase 2.
 > Xem lược đồ dữ liệu và DDL tại [`docs/data-contracts.md`](docs/data-contracts.md) và [`docs/db-schema/schema.sql`](docs/db-schema/schema.sql).
 > Xem hợp đồng API tại [`docs/api-contract.md`](docs/api-contract.md).
 > Bất biến hệ thống: định nghĩa tại §4.4 dưới đây là bất biến bắt buộc, được bảo vệ bằng Architecture Tests trong CI.

@@ -2,6 +2,8 @@
 doc: requirements-delta
 change_id: BUGFIX-PRODUCT-ACTIVE-FILTERS
 status: approved
+title: BUGFIX-PRODUCT-ACTIVE-FILTERS — requirements-delta
+precedence: 5
 ---
 
 # Requirements Delta — BUGFIX-PRODUCT-ACTIVE-FILTERS

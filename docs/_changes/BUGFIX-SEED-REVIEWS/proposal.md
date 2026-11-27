@@ -5,6 +5,7 @@ title: Preserve & Sync Product Reviews in Database Seeder
 status: approved
 owner: tech-lead
 created: 2026-11-26
+precedence: 5
 ---
 
 # Proposal — BUGFIX-SEED-REVIEWS

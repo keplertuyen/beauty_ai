@@ -2,6 +2,8 @@
 doc: change-design
 change_id: BUGFIX-SEED-REVIEWS
 status: approved
+title: BUGFIX-SEED-REVIEWS — design
+precedence: 5
 ---
 
 # Technical Design — BUGFIX-SEED-REVIEWS

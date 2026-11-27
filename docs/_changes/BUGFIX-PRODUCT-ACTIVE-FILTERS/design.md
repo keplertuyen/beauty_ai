@@ -2,6 +2,8 @@
 doc: change-design
 change_id: BUGFIX-PRODUCT-ACTIVE-FILTERS
 status: approved
+title: BUGFIX-PRODUCT-ACTIVE-FILTERS — design
+precedence: 5
 ---
 
 # Technical Design — BUGFIX-PRODUCT-ACTIVE-FILTERS

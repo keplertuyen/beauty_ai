@@ -11,6 +11,11 @@ last_reviewed: 2026-10-27
 
 > Nguồn chân lý về luồng xác thực JWT Bearer Token, mã hóa mật khẩu PBKDF2 HMAC-SHA256 chuẩn OWASP, kiểm soát truy cập RBAC, header bảo mật và bảo vệ dữ liệu PII da liễu theo Nghị định 13/2023/NĐ-CP (Precedence 2 — Contracts).
 > Bắt buộc tuân thủ: INV-04, INV-07, INV-08.
+>
+> **📌 Phase 1 Implemented vs Phase 2 Planned (ADR-016, 2026-11-27):**
+> - **Đã triển khai ở Phase 1:** PBKDF2-HMAC-SHA256 (600.000 vòng, `FixedTimeEquals`), JWT Bearer HS256 (`JWT_SECRET` ≥ 32 ký tự bắt buộc ở Production, không hardcode), RBAC `[Authorize(Roles = "Admin")]` cho `/api/v1/admin/*`, `[Authorize]` cho tạo Review, `POST /api/v1/auth/change-password`, Rate Limiting 429 cho `/api/v1/auth/*` (20 req/phút) và `/api/v1/ai/*` (15 req/phút), HTTP Security Headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `CSP`) ở cả API và `vercel.json`, HTTPS/HSTS kèm `UseForwardedHeaders`.
+> - **Giới hạn đã ghi nhận ở Phase 1:** **Đổi mật khẩu (`POST /api/v1/auth/change-password`) KHÔNG vô hiệu hóa các JWT cũ đang còn hạn** (vì Phase 1 dùng JWT stateless và chưa có `SecurityStamp` / token blacklist).
+> - **Chuyển sang Phase 2:** Cookie httpOnly + CSRF token, `SecurityStampCheckMiddleware`, khóa tài khoản sau 5 lần sai mật khẩu (`423`), `SensitiveDataMasker`, kiểm tra magic bytes upload ảnh.
 
 ---
 

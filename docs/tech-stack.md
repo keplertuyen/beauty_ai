@@ -12,6 +12,11 @@ last_reviewed: 2026-10-25
 > "Nhà duy nhất" của mọi phụ thuộc bên thứ ba (Precedence 2 — Contracts).
 > Nghiêm cấm tự ý bổ sung hoặc nâng cấp phụ thuộc lớn khi chưa có cập nhật trong tài liệu này (AGENTS.md §2.2).
 > Mọi thư viện bị cấm (AutoMapper, MediatR, Redis, Hangfire) được kiểm soát bởi Architecture Tests trong CI.
+>
+> **📌 Phase 1 Implemented vs Phase 2 Planned (ADR-016, 2026-11-27):**
+> - **Backend Phase 1 đang dùng:** `.NET 10`, `ASP.NET Core 10`, `Microsoft.EntityFrameworkCore 10.0.14`, `Npgsql.EntityFrameworkCore.PostgreSQL 10.0.3`, `Microsoft.AspNetCore.Authentication.JwtBearer 10.0.14`, `System.IdentityModel.Tokens.Jwt 8.23.0`, `Microsoft.AspNetCore.OpenApi 10.0.13`, `Microsoft.Extensions.ApiDescription.Server 10.0.13`, `xUnit 2.9.3`. *(Dapper, FluentValidation, Serilog, Swashbuckle, ClosedXML, Riok.Mapperly chuyển sang Phase 2).*
+> - **Frontend Phase 1 đang dùng (ADR-016):** `React 19.2.8`, `Vite 8.4.0`, `TypeScript ^5.7.3`, `react-router-dom ^7.18.5`, `axios ^1.21.0`, `framer-motion ^14.7.1`, `recharts ^3.10.1`, `lucide-react ^1.62.0`, `react-hot-toast ^2.6.1`, `openapi-typescript ^7.6.1`, `openapi-fetch ^0.13.4`. *(TanStack Query, Zustand, React Hook Form, Zod, Vitest, Playwright chuyển sang Phase 2).*
+> - **Hạ tầng Phase 1:** Neon Lakebase PostgreSQL 17 (cloud) + Render (API Docker) + Vercel (SPA) + Docker Compose (local dev).
 
 ---
 

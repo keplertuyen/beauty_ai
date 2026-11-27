@@ -4,6 +4,8 @@ title: Nâng cấp Admin Console V2 — Left Sidebar Shell, Quản lý toàn di�
 status: approved
 owner: tech-lead
 created_at: 2026-11-27
+doc: change-proposal
+precedence: 5
 ---
 
 # Proposal — CHANGE-ADMIN-CONSOLE-V2

@@ -10,6 +10,8 @@ last_reviewed: 2026-10-25
 # CHIẾN LƯỢC KIỂM THỬ HỆ THỐNG — BeautyAI Platform
 
 > Nguồn chân lý về các tầng kiểm thử: Unit, Integration, Architecture, Golden Test và E2E (Precedence 2 — Contracts).
+>
+> **📌 Phase 1 Implemented vs Phase 2 Planned (2026-11-27):** Phase 1 hiện có `BeautyAI.UnitTests` (80 xUnit tests), `BeautyAI.ArchitectureTests` (13 tests bảo vệ Clean Architecture, `INV-01`, Admin/Review `[Authorize]`), `tests/test_product_images.py` (22 pytest tests), và FE `tsc -b` + `vite build`. `IntegrationTests` (Testcontainers), `GoldenTests`, Vitest và Playwright E2E thuộc kế hoạch Phase 2.
 
 ---
 

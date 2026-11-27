@@ -11,6 +11,10 @@ last_reviewed: 2026-10-30
 
 > Nguồn chân lý về quy ước REST, danh mục endpoint và từ điển mã lỗi (Precedence 2 — Contracts).
 > Thực thi ADR-008: OpenAPI sinh từ code backend C#, DTO frontend sinh tự động từ OpenAPI.
+>
+> **📌 Phase 1 Implemented vs Phase 2 Planned (2026-11-27):**
+> - **Phase 1 ĐÃ TRIỂN KHAI (khớp `docs/api/BeautyAI.Api.json`):** `/health`, `/api/v1/auth/{register,login,me,profile,change-password}`, `/api/v1/skin-profile[/*]`, `/api/v1/products[/{id},/{id}/similar,/{id}/qrcode,/{id}/reviews,/categories,/brands]`, `/api/v1/reviews` (`[Authorize]`), `/api/v1/recommendations/{featured,trending,skinquiz}`, `/api/v1/routines/{generate,save,my-routines,{id}}`, `/api/v1/tools/{analyze-inci,check-conflict,skintype-guide}`, `/api/v1/orders[/*]`, `/api/v1/ai/consult`, `/api/v1/consultation/{faq,contact}`, và toàn bộ `/api/v1/admin/*` (dashboard/kpis, products CRUD/restore/upload, orders, reviews moderation, users status/role, support tickets, ingredients CRUD, conflicts CRUD, brands CRUD, categories CRUD).
+> - **Phase 2 DỰ KIẾN (chưa có endpoint ở Phase 1):** `/catalog/*`, `/quiz/*`, `/cart/*` & `/wishlist/*` (Phase 1 lưu `localStorage`), `/chat/messages` SSE, `/webhooks/vnpay/*`, `/admin/vouchers`, `/admin/exchange-rate`, `/admin/exports/*`, `/admin/audit-logs`, `/admin/handoffs`.
 
 ---
 
