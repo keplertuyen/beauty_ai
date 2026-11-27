@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { User, ShoppingBag, Save, Camera, Clock, CheckCircle, XCircle, Truck, ShieldAlert, Plus, Trash2, Fingerprint } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { User, ShoppingBag, Save, Clock, CheckCircle, XCircle, Truck, ShieldAlert, Plus, Trash2, Fingerprint, MapPin, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
 import { updateProfile, getMyOrders, getSkinProfile, updateSkinProfile, addAllergy, removeAllergy } from '../services/api';
@@ -32,9 +32,10 @@ export default function Profile() {
 
   const [form, setForm] = useState({
     name: '',
+    phone: '',
+    shippingAddress: '',
     gender: '',
     skin_type: '',
-    avatar_url: '',
   });
 
   const [skinProfile, setSkinProfile] = useState({
@@ -58,7 +59,7 @@ export default function Profile() {
       phone: user.phone || '',
       shippingAddress: user.shippingAddress || '',
       gender: user.gender || '',
-      avatar_url: user.avatar_url || '',
+      skin_type: user.skin_type || '',
     });
 
     // Fetch Digital Skin ID from backend
@@ -87,9 +88,9 @@ export default function Profile() {
       }));
       setNewAllergy('');
       setNewAllergyNote('');
-      toast.success(t('allergy_added', `Đã thêm ${newAllergy.trim()} vào Blacklist`));
+      toast.success(t('allergy_added', `Added ${newAllergy.trim()} to Allergy Blacklist`));
     } catch {
-      toast.error(t('allergy_add_failed', 'Không thể thêm chất dị ứng'));
+      toast.error(t('allergy_add_failed', 'Could not add allergen'));
     }
   };
 
@@ -100,9 +101,9 @@ export default function Profile() {
         ...prev,
         allergies: prev.allergies.filter(a => a.id !== id)
       }));
-      toast.success(t('allergy_removed', 'Đã gỡ bỏ khỏi Blacklist'));
+      toast.success(t('allergy_removed', 'Removed from Allergy Blacklist'));
     } catch {
-      toast.error(t('allergy_remove_failed', 'Không thể gỡ bỏ chất dị ứng'));
+      toast.error(t('allergy_remove_failed', 'Could not remove allergen'));
     }
   };
 
@@ -202,14 +203,11 @@ export default function Profile() {
         {/* Hero header */}
         <div className="profile-hero glass-card animate-fadeIn">
           <div className="profile-avatar-wrap">
-            {form.avatar_url ? (
-              <img src={form.avatar_url} alt={form.name} className="profile-avatar-img" />
+            {user.avatar_url ? (
+              <img src={user.avatar_url} alt={form.name} className="profile-avatar-img" />
             ) : (
               <div className="profile-avatar-placeholder">{avatarInitial}</div>
             )}
-            <div className="profile-avatar-badge">
-              <Camera size={14} />
-            </div>
           </div>
           <div className="profile-hero-info">
             <h1 className="profile-name display-font">{form.name || t('profile_user_fallback', 'User')}</h1>
@@ -289,7 +287,7 @@ export default function Profile() {
                 {/* ==================================================== */}
                 <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(143,117,95,0.15)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                    <Fingerprint size={20} color="#C48B71" />
+                    <Fingerprint size={20} color="var(--accent)" />
                     <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#2D2520' }}>
                       {t('skin_id_title') || 'Unified Digital Skin ID Profile'}
                     </h3>
@@ -415,9 +413,9 @@ export default function Profile() {
                             style={{
                               padding: '6px 14px',
                               borderRadius: '20px',
-                              border: isSelected ? '2px solid #C48B71' : '1px solid rgba(143,117,95,0.2)',
-                              background: isSelected ? 'rgba(196,139,113,0.12)' : '#FFF',
-                              color: isSelected ? '#A06148' : '#2D2520',
+                              border: isSelected ? '2px solid var(--accent)' : '1px solid var(--border-subtle)',
+                              background: isSelected ? 'var(--accent-soft)' : '#FFF',
+                              color: isSelected ? 'var(--accent)' : 'var(--text-primary)',
                               fontWeight: isSelected ? 600 : 400,
                               cursor: 'pointer',
                               fontSize: '0.85rem'
@@ -454,17 +452,6 @@ export default function Profile() {
                       </select>
                     </div>
                   </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">{t('profile_avatar_url') || 'Avatar Image URL'}</label>
-                  <input
-                    className="form-input"
-                    type="url"
-                    value={form.avatar_url}
-                    onChange={e => setForm(f => ({ ...f, avatar_url: e.target.value }))}
-                    placeholder="https://example.com/avatar.jpg"
-                  />
                 </div>
 
                 <div className="profile-email-row">
@@ -546,20 +533,46 @@ export default function Profile() {
                           </span>
                         </div>
 
-                        {(order.shipping_address || order.shippingAddress) && (
-                          <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                            <strong>Ship to:</strong> {order.recipient_name || order.recipientName} ({order.phone_number || order.phoneNumber}) — {order.shipping_address || order.shippingAddress}
+                        {(order.shipping_address || order.shippingAddress || order.recipient_name || order.recipientName) && (
+                          <div className="order-shipping">
+                            <span className="order-shipping-label">Ship to</span>
+                            <div className="order-shipping-details">
+                              {(order.recipient_name || order.recipientName) && (
+                                <div className="order-shipping-row order-shipping-recipient">
+                                  <User size={13} />
+                                  <span>{order.recipient_name || order.recipientName}</span>
+                                </div>
+                              )}
+                              {(order.phone_number || order.phoneNumber) && (
+                                <div className="order-shipping-row">
+                                  <Phone size={13} />
+                                  <span>{order.phone_number || order.phoneNumber}</span>
+                                </div>
+                              )}
+                              {(order.shipping_address || order.shippingAddress) && (
+                                <div className="order-shipping-row">
+                                  <MapPin size={13} />
+                                  <span>{order.shipping_address || order.shippingAddress}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
 
                         <div className="order-items">
-                          {(order.items || []).map((item, idx) => (
-                            <div key={idx} className="order-item">
-                              <div className="order-item-emoji" style={{ overflow: 'hidden', padding: 2, background: '#FFF' }}>
+                          {(order.items || []).map((item, idx) => {
+                            const productId = item.product_id ?? item.productId ?? item.id;
+                            const productHref = productId ? `/products/${productId}` : null;
+                            const productName = item.product_name || item.productName || item.name;
+                            const brandName = item.brand_name || item.brandName;
+                            const thumbContent = (
+                              <>
                                 <img
-                                  src={getProductImage(item, 80)}
-                                  alt={item.product_name || item.productName || item.name}
-                                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                  src={getProductImage(item, 144)}
+                                  alt={productName}
+                                  width={72}
+                                  height={72}
+                                  className="order-item-img"
                                   loading="lazy"
                                   referrerPolicy="no-referrer"
                                   onError={(e) => {
@@ -568,23 +581,41 @@ export default function Profile() {
                                   }}
                                 />
                                 <span style={{ display: 'none' }}>💄</span>
-                              </div>
-                              <div className="order-item-info">
-                                <span className="order-item-name">{item.product_name || item.productName || item.name}</span>
-                                <span className="order-item-qty">
-                                  {item.brand_name || item.brandName ? `${item.brand_name || item.brandName} · ` : ''}x{item.quantity}
+                              </>
+                            );
+
+                            return (
+                              <div key={idx} className="order-item">
+                                {productHref ? (
+                                  <Link to={productHref} className="order-item-emoji" aria-label={productName}>
+                                    {thumbContent}
+                                  </Link>
+                                ) : (
+                                  <div className="order-item-emoji">{thumbContent}</div>
+                                )}
+                                <div className="order-item-info">
+                                  {productHref ? (
+                                    <Link to={productHref} className="order-item-name order-item-link">
+                                      {productName}
+                                    </Link>
+                                  ) : (
+                                    <span className="order-item-name">{productName}</span>
+                                  )}
+                                  <span className="order-item-qty">
+                                    {brandName ? `${brandName} · ` : ''}x{item.quantity}
+                                  </span>
+                                </div>
+                                <span className="order-item-price">
+                                  {formatCurrency(
+                                    item.total_price_usd ??
+                                    item.totalPriceUsd ??
+                                    ((item.unit_price_usd ?? item.unitPriceUsd ?? item.price_usd ?? item.price ?? 0) * item.quantity),
+                                    order.exchange_rate
+                                  )}
                                 </span>
                               </div>
-                              <span className="order-item-price">
-                                {formatCurrency(
-                                  item.total_price_usd ??
-                                  item.totalPriceUsd ??
-                                  ((item.unit_price_usd ?? item.unitPriceUsd ?? item.price_usd ?? item.price ?? 0) * item.quantity),
-                                  order.exchange_rate
-                                )}
-                              </span>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         <div className="order-footer">

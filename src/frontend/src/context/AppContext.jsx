@@ -1,17 +1,32 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import {
   login as loginAPI,
   register as registerAPI,
   getMe,
   getProduct,
   checkProductConflicts,
-  toggleWishlist,
-  getWishlist,
 } from '../services/api';
 import toast from 'react-hot-toast';
 import { translations } from './translations';
 
 const AppContext = createContext();
+
+function getRoleFromToken(jwt) {
+  if (!jwt || typeof jwt !== 'string') return null;
+  try {
+    const parts = jwt.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64));
+    return (
+      payload.role ||
+      payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+      null
+    );
+  } catch {
+    return null;
+  }
+}
 
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -23,14 +38,39 @@ export const AppProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  // Phase 1 Scope: Strictly English & USD Only
+  // English & USD Only
   const [lang, setLang] = useState('en');
   const [currency, setCurrency] = useState('USD');
   const [exchangeRate, setExchangeRate] = useState(1);
   const [authLoading, setAuthLoading] = useState(!!token);
+  const isAdmin = String(user?.role || '').toLowerCase() === 'admin';
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      if (!userRef.current) return;
+      setToken(null);
+      setUser(null);
+      setCart([]);
+      setCartCount(0);
+      setWishlist([]);
+      if (!window.location.pathname.startsWith('/admin')) {
+        toast.error(
+          translations.en?.toast_session_expired ||
+            'Your session has expired. Please log in again.'
+        );
+        window.dispatchEvent(new CustomEvent('open-auth-modal'));
+      }
+    };
+    window.addEventListener('auth-expired', handleAuthExpired);
+    return () => window.removeEventListener('auth-expired', handleAuthExpired);
+  }, []);
 
   const changeLanguage = (_newLang) => {
-    // Phase 1 is locked to English (Phase 2 will introduce multi-language)
+    // Locked to English
     setLang('en');
     localStorage.setItem('beautyai_lang', 'en');
     document.documentElement.lang = 'en';
@@ -72,8 +112,10 @@ export const AppProvider = ({ children }) => {
       getMe()
         .then(res => {
           const d = res.data;
+          const resolvedRole = d.role || userRef.current?.role || getRoleFromToken(token) || 'Customer';
           const u = {
             ...d,
+            role: resolvedRole,
             name: d.fullName || d.name || d.email?.split('@')[0],
             fullName: d.fullName || d.name,
             skin_type: d.skinProfile?.skinType || d.skin_type
@@ -155,6 +197,13 @@ export const AppProvider = ({ children }) => {
   }, [getCartStorageKey, refreshCartConflicts]);
 
   const loadCart = useCallback(async (u) => {
+    const activeUser = u || user;
+    if (String(activeUser?.role || '').toLowerCase() === 'admin') {
+      setCart([]);
+      setCartCount(0);
+      setCartConflicts({ has_conflict: false, has_conflicts: false, conflicts: [] });
+      return;
+    }
     const key = getCartStorageKey(u);
     try {
       const raw = localStorage.getItem(key);
@@ -263,6 +312,10 @@ export const AppProvider = ({ children }) => {
     if (!user) {
       toast.error(t('toast_login_required_cart'));
       window.dispatchEvent(new CustomEvent('open-auth-modal'));
+      return;
+    }
+    if (isAdmin) {
+      toast.error(t('toast_admin_cannot_shop', 'Admin accounts are for management only and cannot place orders.'));
       return;
     }
 
@@ -391,7 +444,7 @@ export const AppProvider = ({ children }) => {
 
   return (
     <AppContext.Provider value={{
-      user, setUser, token, cart, cartCount, cartConflicts,
+      user, setUser, token, isAdmin, cart, cartCount, cartConflicts,
       conflictAcknowledged, setConflictAcknowledged,
       wishlist,
       cartOpen, setCartOpen,

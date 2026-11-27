@@ -1,19 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import toast from 'react-hot-toast';
+import { Upload, Image as ImageIcon, X } from 'lucide-react';
+import { uploadAdminProductImage } from '../../services/api';
+import { DEFAULT_PRODUCT_IMAGE } from '../../utils/productImages';
+import { DEPARTMENTS } from './adminConstants';
 
 const ALLOWED_SKIN_TYPES = ['All', 'Oily', 'Dry', 'Combination', 'Sensitive', 'Normal'];
 const ALLOWED_STATUSES = [
-  { value: 'Active', labelVi: 'Đang bán (Active)', labelEn: 'Active (On Sale)' },
-  { value: 'Draft', labelVi: 'Bản nháp (Draft)', labelEn: 'Draft (Hidden)' },
-  { value: 'Discontinued', labelVi: 'Ngừng bán (Discontinued)', labelEn: 'Discontinued (Archived)' },
+  { value: 'Active', label: 'Active (On Sale)' },
+  { value: 'Draft', label: 'Draft (Hidden)' },
+  { value: 'Discontinued', label: 'Discontinued (Archived)' },
 ];
 
 const EMPTY_FORM = {
   name: '',
   brandName: '',
   categoryName: '',
+  department: 'Skincare',
   priceUsd: '',
   stockQuantity: '100',
   volumeMl: '',
+  sizeDisplay: '',
   sellingStatus: 'Active',
   targetSkinTypes: ['All'],
   ingredientListRaw: '',
@@ -29,11 +36,14 @@ export default function ProductFormModal({
   brands = [],
   categories = [],
   submitting = false,
-  lang = 'vi',
 }) {
   const isEdit = Boolean(initialProduct?.id);
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const fileInputRef = useRef(null);
+  const fieldRefs = useRef({});
 
   useEffect(() => {
     if (!isOpen) return;
@@ -44,15 +54,20 @@ export default function ProductFormModal({
         name: initialProduct.name || '',
         brandName: initialProduct.brandName || brands[0]?.name || '',
         categoryName: initialProduct.categoryName || categories[0]?.name || '',
+        department: initialProduct.department || 'Skincare',
         priceUsd: initialProduct.priceUsd != null ? String(initialProduct.priceUsd) : '',
         stockQuantity: initialProduct.stockQuantity != null ? String(initialProduct.stockQuantity) : '100',
         volumeMl: initialProduct.volumeMl != null ? String(initialProduct.volumeMl) : '',
+        sizeDisplay: initialProduct.sizeDisplay || '',
         sellingStatus: initialProduct.sellingStatus || 'Active',
         targetSkinTypes:
           Array.isArray(initialProduct.targetSkinTypes) && initialProduct.targetSkinTypes.length > 0
             ? initialProduct.targetSkinTypes
             : ['All'],
-        ingredientListRaw: initialProduct.ingredientListRaw || '',
+        ingredientListRaw:
+          initialProduct.ingredientListRaw === 'No ingredients listed'
+            ? ''
+            : initialProduct.ingredientListRaw || '',
         description: initialProduct.description || '',
         imageUrl: initialProduct.imageUrl || '',
       });
@@ -65,57 +80,112 @@ export default function ProductFormModal({
     }
   }, [isOpen, initialProduct, brands, categories]);
 
+  // Esc key to close
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !submitting) {
+        onClose?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, submitting, onClose]);
+
   if (!isOpen) return null;
 
+  const isToolDepartment = form.department === 'Tools & Brushes';
+
+  // Mutually exclusive "All" skin type selection
   const toggleSkinType = (skinType) => {
     setForm((prev) => {
-      const exists = prev.targetSkinTypes.includes(skinType);
+      if (skinType === 'All') {
+        return { ...prev, targetSkinTypes: ['All'] };
+      }
+      const withoutAll = prev.targetSkinTypes.filter((s) => s !== 'All');
+      const exists = withoutAll.includes(skinType);
       const next = exists
-        ? prev.targetSkinTypes.filter((s) => s !== skinType)
-        : [...prev.targetSkinTypes, skinType];
+        ? withoutAll.filter((s) => s !== skinType)
+        : [...withoutAll, skinType];
       return { ...prev, targetSkinTypes: next.length > 0 ? next : ['All'] };
     });
+  };
+
+  const handleImageFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const res = await uploadAdminProductImage(file);
+      const uploadedUrl = res.data?.url;
+      if (uploadedUrl) {
+        setForm((prev) => ({ ...prev, imageUrl: uploadedUrl }));
+        toast.success('Product image uploaded successfully.');
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'Image upload failed (max 5MB, JPG/PNG/WEBP).');
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const validate = () => {
     const nextErrors = {};
     if (!form.name.trim()) {
-      nextErrors.name = lang === 'vi' ? 'Tên sản phẩm là bắt buộc.' : 'Product name is required.';
+      nextErrors.name = 'Product name is required.';
     } else if (form.name.trim().length > 255) {
-      nextErrors.name = lang === 'vi' ? 'Tên tối đa 255 ký tự.' : 'Max 255 characters.';
+      nextErrors.name = 'Product name must be 255 characters or fewer.';
     }
 
+    const matchedBrand = brands.find(
+      (b) => b.name?.toLowerCase() === form.brandName.trim().toLowerCase()
+    );
     if (!form.brandName.trim()) {
-      nextErrors.brandName = lang === 'vi' ? 'Vui lòng chọn thương hiệu.' : 'Please select a brand.';
+      nextErrors.brandName = 'Please select a brand.';
+    } else if (brands.length > 0 && !matchedBrand) {
+      nextErrors.brandName = 'Brand not found. Select an existing brand or add it under Brands & Categories first.';
     }
 
+    const matchedCategory = categories.find(
+      (c) => c.name?.toLowerCase() === form.categoryName.trim().toLowerCase()
+    );
     if (!form.categoryName.trim()) {
-      nextErrors.categoryName = lang === 'vi' ? 'Vui lòng chọn danh mục.' : 'Please select a category.';
+      nextErrors.categoryName = 'Please select a category.';
+    } else if (categories.length > 0 && !matchedCategory) {
+      nextErrors.categoryName = 'Category not found. Select an existing category or add it under Brands & Categories first.';
     }
 
     const price = parseFloat(form.priceUsd);
     if (Number.isNaN(price) || price <= 0 || price > 10000) {
-      nextErrors.priceUsd = lang === 'vi' ? 'Giá bán phải lớn hơn 0 và ≤ $10,000.' : 'Price must be > 0 and <= $10,000.';
+      nextErrors.priceUsd = 'Price must be greater than $0 and at most $10,000.';
     }
 
     const stock = parseInt(form.stockQuantity, 10);
     if (Number.isNaN(stock) || stock < 0) {
-      nextErrors.stockQuantity = lang === 'vi' ? 'Tồn kho phải ≥ 0.' : 'Stock quantity must be >= 0.';
+      nextErrors.stockQuantity = 'Stock quantity must be 0 or greater.';
     }
 
     if (form.volumeMl !== '') {
-      const vol = parseInt(form.volumeMl, 10);
+      const vol = parseFloat(form.volumeMl);
       if (Number.isNaN(vol) || vol <= 0) {
-        nextErrors.volumeMl = lang === 'vi' ? 'Dung tích (ml) phải > 0.' : 'Volume (ml) must be > 0.';
+        nextErrors.volumeMl = 'Volume (mL) must be greater than 0.';
       }
     }
 
-    if (!form.ingredientListRaw.trim() || form.ingredientListRaw.trim().length < 3) {
-      nextErrors.ingredientListRaw =
-        lang === 'vi' ? 'Chuỗi thành phần INCI là bắt buộc.' : 'INCI ingredient list is required.';
+    if (!isToolDepartment && (!form.ingredientListRaw.trim() || form.ingredientListRaw.trim().length < 3)) {
+      nextErrors.ingredientListRaw = 'INCI ingredient list is required for cosmetic formulations.';
     }
 
     setErrors(nextErrors);
+
+    const firstErrorKey = Object.keys(nextErrors)[0];
+    if (firstErrorKey && fieldRefs.current[firstErrorKey]) {
+      const el = fieldRefs.current[firstErrorKey];
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.focus();
+    }
+
     return Object.keys(nextErrors).length === 0;
   };
 
@@ -123,13 +193,27 @@ export default function ProductFormModal({
     e.preventDefault();
     if (!validate()) return;
 
+    const matchedBrand = brands.find(
+      (b) => b.name?.toLowerCase() === form.brandName.trim().toLowerCase()
+    );
+    const matchedCategory = categories.find(
+      (c) => c.name?.toLowerCase() === form.categoryName.trim().toLowerCase()
+    );
+    const rawVol = form.volumeMl !== '' ? parseFloat(form.volumeMl) : null;
+    const parsedVolume = rawVol != null && !Number.isNaN(rawVol) ? Math.max(1, Math.round(rawVol)) : null;
+    // Auto-populate Size Display from Volume if left blank so storefront always displays exact size (e.g. 7.5 mL)
+    const resolvedSizeDisplay =
+      form.sizeDisplay.trim() || (rawVol != null && !Number.isNaN(rawVol) ? `${rawVol} mL` : null);
+
     const payload = {
       name: form.name.trim(),
-      brandName: form.brandName.trim(),
-      categoryName: form.categoryName.trim(),
+      brandName: matchedBrand ? matchedBrand.name : form.brandName.trim(),
+      categoryName: matchedCategory ? matchedCategory.name : form.categoryName.trim(),
+      department: form.department,
       priceUsd: parseFloat(form.priceUsd),
       stockQuantity: parseInt(form.stockQuantity, 10),
-      volumeMl: form.volumeMl !== '' ? parseInt(form.volumeMl, 10) : null,
+      volumeMl: parsedVolume,
+      sizeDisplay: resolvedSizeDisplay,
       sellingStatus: form.sellingStatus,
       targetSkinTypes: form.targetSkinTypes,
       ingredientListRaw: form.ingredientListRaw.trim(),
@@ -140,300 +224,350 @@ export default function ProductFormModal({
     onSubmit(payload);
   };
 
+  const departmentOptions = DEPARTMENTS.includes(form.department)
+    ? DEPARTMENTS
+    : [...DEPARTMENTS, form.department];
+
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.55)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '20px',
-      }}
+      className="ad-modal-backdrop"
+      role="presentation"
+      onClick={() => !submitting && onClose?.()}
     >
       <div
-        className="glass-card animate-scaleIn"
-        style={{
-          background: '#FFF',
-          maxWidth: '720px',
-          width: '100%',
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          borderRadius: '16px',
-          padding: '28px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-        }}
+        className="ad-modal-card ad-modal-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="product-modal-title"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '20px',
-            borderBottom: '1px solid #EEE',
-            paddingBottom: '12px',
-          }}
-        >
+        {/* Sticky Header */}
+        <div className="ad-drawer-header">
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#2D2520' }}>
-              {isEdit
-                ? lang === 'vi'
-                  ? `Chỉnh Sửa Sản Phẩm #${initialProduct.code || initialProduct.id}`
-                  : `Edit Product #${initialProduct.code || initialProduct.id}`
-                : lang === 'vi'
-                  ? 'Thêm Mỹ Phẩm Mới & Bảng Thành Phần INCI'
-                  : 'Create New Cosmetic Product & INCI'}
+            <h3 id="product-modal-title" className="ad-drawer-title">
+              {isEdit ? `Edit Product — ${initialProduct.code}` : 'Create New Product'}
             </h3>
-            {isEdit && initialProduct.updatedAtUtc && (
-              <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#888' }}>
-                {lang === 'vi' ? 'Cập nhật lần cuối: ' : 'Last updated: '}
-                {new Date(initialProduct.updatedAtUtc).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US')}
-              </p>
-            )}
+            <p className="ad-cell-meta" style={{ margin: '2px 0 0' }}>
+              {isEdit
+                ? 'Update product attributes, pricing, imagery, and INCI formulation.'
+                : 'Add a new product to the BeautyAI catalog.'}
+            </p>
           </div>
           <button
             type="button"
-            onClick={onClose}
-            className="btn btn-secondary btn-sm"
-            aria-label="Close modal"
+            className="ad-icon-close"
+            onClick={() => !submitting && onClose?.()}
+            aria-label="Close product form"
           >
-            {lang === 'vi' ? 'Đóng' : 'Close'}
+            <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div>
-            <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-              {lang === 'vi' ? 'Tên Sản Phẩm *' : 'Product Name *'}
-            </label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="e.g. Ceramide Barrier Rescue Moisturizer"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-            {errors.name && <p style={{ color: '#DC2626', fontSize: '0.78rem', margin: '4px 0 0' }}>{errors.name}</p>}
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        {/* Scrollable Body + Sticky Footer (noValidate ensures custom scroll-to-error validation always runs) */}
+        <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+          <div className="ad-modal-scroll">
             <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Thương Hiệu *' : 'Brand *'}
-              </label>
-              <select
-                className="form-select"
-                value={form.brandName}
-                onChange={(e) => setForm({ ...form, brandName: e.target.value })}
-              >
-                <option value="">{lang === 'vi' ? '-- Chọn thương hiệu --' : '-- Select brand --'}</option>
-                {brands.map((b) => (
-                  <option key={b.id || b.name} value={b.name}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-              {errors.brandName && (
-                <p style={{ color: '#DC2626', fontSize: '0.78rem', margin: '4px 0 0' }}>{errors.brandName}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Danh Mục *' : 'Category *'}
-              </label>
-              <select
-                className="form-select"
-                value={form.categoryName}
-                onChange={(e) => setForm({ ...form, categoryName: e.target.value })}
-              >
-                <option value="">{lang === 'vi' ? '-- Chọn danh mục --' : '-- Select category --'}</option>
-                {categories.map((c) => (
-                  <option key={c.id || c.name} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-              {errors.categoryName && (
-                <p style={{ color: '#DC2626', fontSize: '0.78rem', margin: '4px 0 0' }}>{errors.categoryName}</p>
-              )}
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
-            <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Giá (USD) *' : 'Price (USD) *'}
+              <label htmlFor="pf-name" className="form-label" style={{ fontWeight: 600 }}>
+                Product Name *
               </label>
               <input
-                type="number"
-                step="0.01"
-                min="0.01"
+                ref={(el) => { fieldRefs.current.name = el; }}
+                id="pf-name"
+                type="text"
                 className="form-input"
-                placeholder="35.00"
-                value={form.priceUsd}
-                onChange={(e) => setForm({ ...form, priceUsd: e.target.value })}
+                placeholder="e.g. Gentle Hydrating Ceramide Cleanser"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
-              {errors.priceUsd && (
-                <p style={{ color: '#DC2626', fontSize: '0.78rem', margin: '4px 0 0' }}>{errors.priceUsd}</p>
-              )}
+              {errors.name && <p className="ad-field-error">{errors.name}</p>}
+            </div>
+
+            <div className="ad-form-grid-3">
+              <div>
+                <label htmlFor="pf-brand" className="form-label" style={{ fontWeight: 600 }}>
+                  Brand *
+                </label>
+                <input
+                  ref={(el) => { fieldRefs.current.brandName = el; }}
+                  id="pf-brand"
+                  type="text"
+                  list="pf-brands-datalist"
+                  className="form-input"
+                  placeholder="Search or select brand..."
+                  value={form.brandName}
+                  onChange={(e) => setForm({ ...form, brandName: e.target.value })}
+                />
+                <datalist id="pf-brands-datalist">
+                  {brands.map((b) => (
+                    <option key={b.id || b.name} value={b.name} />
+                  ))}
+                </datalist>
+                {errors.brandName && <p className="ad-field-error">{errors.brandName}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="pf-category" className="form-label" style={{ fontWeight: 600 }}>
+                  Category *
+                </label>
+                <input
+                  ref={(el) => { fieldRefs.current.categoryName = el; }}
+                  id="pf-category"
+                  type="text"
+                  list="pf-categories-datalist"
+                  className="form-input"
+                  placeholder="Search or select category..."
+                  value={form.categoryName}
+                  onChange={(e) => setForm({ ...form, categoryName: e.target.value })}
+                />
+                <datalist id="pf-categories-datalist">
+                  {categories.map((c) => (
+                    <option key={c.id || c.name} value={c.name} />
+                  ))}
+                </datalist>
+                {errors.categoryName && <p className="ad-field-error">{errors.categoryName}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="pf-department" className="form-label" style={{ fontWeight: 600 }}>
+                  Department *
+                </label>
+                <select
+                  id="pf-department"
+                  className="form-select"
+                  value={form.department}
+                  onChange={(e) => setForm({ ...form, department: e.target.value })}
+                >
+                  {departmentOptions.map((dept) => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="ad-form-grid-3">
+              <div>
+                <label htmlFor="pf-price" className="form-label" style={{ fontWeight: 600 }}>
+                  Price (USD) *
+                </label>
+                <input
+                  ref={(el) => { fieldRefs.current.priceUsd = el; }}
+                  id="pf-price"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  max="10000"
+                  className="form-input"
+                  placeholder="32.00"
+                  value={form.priceUsd}
+                  onChange={(e) => setForm({ ...form, priceUsd: e.target.value })}
+                />
+                {errors.priceUsd && <p className="ad-field-error">{errors.priceUsd}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="pf-stock" className="form-label" style={{ fontWeight: 600 }}>
+                  Stock Quantity *
+                </label>
+                <input
+                  ref={(el) => { fieldRefs.current.stockQuantity = el; }}
+                  id="pf-stock"
+                  type="number"
+                  step="1"
+                  min="0"
+                  className="form-input"
+                  value={form.stockQuantity}
+                  onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
+                />
+                {errors.stockQuantity && <p className="ad-field-error">{errors.stockQuantity}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="pf-status" className="form-label" style={{ fontWeight: 600 }}>
+                  Selling Status
+                </label>
+                <select
+                  id="pf-status"
+                  className="form-select"
+                  value={form.sellingStatus}
+                  onChange={(e) => setForm({ ...form, sellingStatus: e.target.value })}
+                >
+                  {ALLOWED_STATUSES.map((st) => (
+                    <option key={st.value} value={st.value}>{st.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="ad-form-grid-2">
+              <div>
+                <label htmlFor="pf-size-display" className="form-label" style={{ fontWeight: 600 }}>
+                  Size Display Label
+                </label>
+                <input
+                  id="pf-size-display"
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. 1.7 oz / 50 mL"
+                  value={form.sizeDisplay}
+                  onChange={(e) => setForm({ ...form, sizeDisplay: e.target.value })}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="pf-volume" className="form-label" style={{ fontWeight: 600 }}>
+                  Volume (mL)
+                </label>
+                <input
+                  ref={(el) => { fieldRefs.current.volumeMl = el; }}
+                  id="pf-volume"
+                  type="number"
+                  step="any"
+                  min="0.1"
+                  className="form-input"
+                  placeholder="e.g. 50"
+                  value={form.volumeMl}
+                  onChange={(e) => setForm({ ...form, volumeMl: e.target.value })}
+                />
+                {errors.volumeMl && <p className="ad-field-error">{errors.volumeMl}</p>}
+              </div>
             </div>
 
             <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Tồn Kho *' : 'Stock *'}
-              </label>
-              <input
-                type="number"
-                step="1"
-                min="0"
-                className="form-input"
-                value={form.stockQuantity}
-                onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })}
-              />
-              {errors.stockQuantity && (
-                <p style={{ color: '#DC2626', fontSize: '0.78rem', margin: '4px 0 0' }}>{errors.stockQuantity}</p>
-              )}
+              <span className="form-label" style={{ fontWeight: 600, display: 'block', marginBottom: 6 }}>
+                Target Skin Types
+              </span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {ALLOWED_SKIN_TYPES.map((st) => {
+                  const active = form.targetSkinTypes.includes(st);
+                  return (
+                    <button
+                      key={st}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => toggleSkinType(st)}
+                      className={`ad-filter-pill ${active ? 'active' : ''}`}
+                      style={{ height: 32, padding: '0 12px' }}
+                    >
+                      {st}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Dung Tích (ml)' : 'Volume (ml)'}
-              </label>
-              <input
-                type="number"
-                step="1"
-                min="1"
-                className="form-input"
-                placeholder="50"
-                value={form.volumeMl}
-                onChange={(e) => setForm({ ...form, volumeMl: e.target.value })}
-              />
-              {errors.volumeMl && (
-                <p style={{ color: '#DC2626', fontSize: '0.78rem', margin: '4px 0 0' }}>{errors.volumeMl}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Trạng Thái Bán' : 'Selling Status'}
-              </label>
-              <select
-                className="form-select"
-                value={form.sellingStatus}
-                onChange={(e) => setForm({ ...form, sellingStatus: e.target.value })}
-              >
-                {ALLOWED_STATUSES.map((st) => (
-                  <option key={st.value} value={st.value}>
-                    {lang === 'vi' ? st.labelVi : st.labelEn}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-              {lang === 'vi' ? 'Loại Da Phù Hợp' : 'Target Skin Types'}
-            </label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
-              {ALLOWED_SKIN_TYPES.map((st) => {
-                const active = form.targetSkinTypes.includes(st);
-                return (
-                  <button
-                    key={st}
-                    type="button"
-                    onClick={() => toggleSkinType(st)}
+            <div className="ad-form-grid-2" style={{ alignItems: 'start' }}>
+              <div>
+                <label htmlFor="pf-image-url" className="form-label" style={{ fontWeight: 600 }}>
+                  Product Image (Upload or URL)
+                </label>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 4 }}>
+                  <div
                     style={{
-                      padding: '5px 12px',
-                      borderRadius: '16px',
-                      fontSize: '0.8rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      border: active ? '1px solid #8F755F' : '1px solid #DDD',
-                      background: active ? '#8F755F' : '#FAF8F6',
-                      color: active ? '#FFF' : '#4A3F38',
+                      width: 64,
+                      height: 64,
+                      borderRadius: 10,
+                      border: '1px solid rgba(74, 55, 40, 0.16)',
+                      background: '#FFFFFF',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      padding: 3,
                     }}
                   >
-                    {st}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                    {form.imageUrl ? (
+                      <img
+                        src={form.imageUrl}
+                        alt="Product preview"
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
+                        }}
+                      />
+                    ) : (
+                      <ImageIcon size={22} color="#887A70" />
+                    )}
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <input
+                      id="pf-image-url"
+                      type="text"
+                      className="form-input"
+                      placeholder="https://... or /uploads/products/..."
+                      value={form.imageUrl}
+                      onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        style={{ display: 'none' }}
+                        onChange={handleImageFileChange}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm ad-btn-icon"
+                        disabled={uploadingImage}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload size={13} />
+                        <span>{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
+                      </button>
+                      <span className="ad-cell-meta">JPG, PNG, WEBP ≤ 5MB</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <label htmlFor="pf-desc" className="form-label" style={{ fontWeight: 600 }}>
+                  Short Description
+                </label>
+                <textarea
+                  id="pf-desc"
+                  className="form-textarea"
+                  rows={3}
+                  placeholder="Barrier repair daily moisturizer formulated with ceramides..."
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Đường Dẫn Ảnh (URL)' : 'Image URL'}
+              <label htmlFor="pf-inci" className="form-label" style={{ fontWeight: 600, color: isToolDepartment ? 'var(--text-primary)' : '#B91C1C' }}>
+                {isToolDepartment
+                  ? 'Raw Packaging INCI String (Optional for Tools & Brushes)'
+                  : 'Raw Packaging INCI String *'}
               </label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="/images/products/P12345.webp"
-                value={form.imageUrl}
-                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+              <p className="ad-cell-meta" style={{ margin: '0 0 6px' }}>
+                {isToolDepartment
+                  ? 'Tools and brushes do not require an INCI list.'
+                  : 'Saving changes automatically re-syncs linked ingredients for INCI & suitability analysis.'}
+              </p>
+              <textarea
+                ref={(el) => { fieldRefs.current.ingredientListRaw = el; }}
+                id="pf-inci"
+                className="form-textarea"
+                rows={4}
+                placeholder="Water/Aqua/Eau, Glycerin, Niacinamide, Salicylic Acid, Ceramide NP..."
+                value={form.ingredientListRaw}
+                onChange={(e) => setForm({ ...form, ingredientListRaw: e.target.value })}
               />
-            </div>
-
-            <div>
-              <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {lang === 'vi' ? 'Mô Tả Ngắn' : 'Short Description'}
-              </label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder={lang === 'vi' ? 'Công thức phục hồi hàng rào bảo vệ da...' : 'Barrier repair formulation...'}
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-              />
+              {errors.ingredientListRaw && <p className="ad-field-error">{errors.ingredientListRaw}</p>}
             </div>
           </div>
 
-          <div>
-            <label className="form-label" style={{ fontWeight: 600, fontSize: '0.85rem', color: '#B3261E' }}>
-              {lang === 'vi'
-                ? 'Chuỗi Thành Phần INCI Bao Bì (Raw Ingredients Text) *'
-                : 'Raw Packaging INCI String *'}
-            </label>
-            <p style={{ margin: '0 0 6px 0', fontSize: '0.78rem', color: '#666' }}>
-              {lang === 'vi'
-                ? 'Khi thêm mới hoặc chỉnh sửa chuỗi INCI, hệ thống sẽ tự động đồng bộ lại liên kết thành phần để AI phân tích chính xác.'
-                : 'When creating or updating the INCI string, BeautyAI automatically re-syncs ingredient links for accurate suitability analysis.'}
-            </p>
-            <textarea
-              className="form-textarea"
-              rows={4}
-              placeholder="Water/Aqua/Eau, Glycerin, Niacinamide, Salicylic Acid, Ceramide NP, Sodium Hyaluronate..."
-              value={form.ingredientListRaw}
-              onChange={(e) => setForm({ ...form, ingredientListRaw: e.target.value })}
-            />
-            {errors.ingredientListRaw && (
-              <p style={{ color: '#DC2626', fontSize: '0.78rem', margin: '4px 0 0' }}>{errors.ingredientListRaw}</p>
-            )}
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
-              {lang === 'vi' ? 'Hủy' : 'Cancel'}
+          {/* Sticky Footer */}
+          <div className="ad-modal-footer">
+            <button type="button" className="btn btn-secondary btn-sm" onClick={onClose} disabled={submitting}>
+              Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={submitting}>
-              {submitting
-                ? lang === 'vi'
-                  ? 'Đang lưu...'
-                  : 'Saving...'
-                : isEdit
-                  ? lang === 'vi'
-                    ? 'Lưu Thay Đổi'
-                    : 'Update Product'
-                  : lang === 'vi'
-                    ? 'Tạo Sản Phẩm'
-                    : 'Create Product'}
+            <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>
+              {submitting ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Product'}
             </button>
           </div>
         </form>

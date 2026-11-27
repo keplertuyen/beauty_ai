@@ -21,19 +21,19 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '40px 20px', color: '#D25E5E', background: '#F8F6F2', minHeight: '100vh', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{ marginBottom: '20px' }}>⚠️ Phát hiện lỗi Runtime trong React App:</h2>
-          <pre style={{ background: '#FFFFFF', padding: '20px', borderRadius: '12px', overflowX: 'auto', color: '#2D2520', border: '1px solid rgba(143, 117, 95, 0.12)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+        <div style={{ padding: '40px 20px', color: 'var(--accent-red)', background: 'var(--bg-primary)', minHeight: '100vh', fontFamily: 'var(--font-body)', maxWidth: '800px', margin: '0 auto' }}>
+          <h2 style={{ marginBottom: '20px' }}>⚠️ Something went wrong</h2>
+          <pre style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '12px', overflowX: 'auto', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)', fontSize: '0.9rem', lineHeight: '1.5' }}>
             {this.state.error && this.state.error.toString()}
           </pre>
-          <pre style={{ background: '#FFFFFF', padding: '20px', borderRadius: '12px', overflowX: 'auto', color: 'rgba(45, 37, 32, 0.75)', border: '1px solid rgba(143, 117, 95, 0.12)', marginTop: '20px', fontSize: '0.8rem', lineHeight: '1.5' }}>
+          <pre style={{ background: 'var(--bg-card)', padding: '20px', borderRadius: '12px', overflowX: 'auto', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)', marginTop: '20px', fontSize: '0.8rem', lineHeight: '1.5' }}>
             {this.state.errorInfo && this.state.errorInfo.componentStack}
           </pre>
-          <button 
-            onClick={() => window.location.reload()} 
-            style={{ marginTop: '20px', padding: '10px 24px', background: 'linear-gradient(135deg, #8F755F, #B09B8A)', color: 'white', border: 'none', borderRadius: '999px', cursor: 'pointer', fontWeight: 'bold' }}
+          <button
+            onClick={() => window.location.reload()}
+            style={{ marginTop: '20px', padding: '10px 24px', background: 'var(--gradient-primary)', color: 'white', border: 'none', borderRadius: '999px', cursor: 'pointer', fontWeight: 'bold' }}
           >
-            Tải lại trang
+            Reload Page
           </button>
         </div>
       );

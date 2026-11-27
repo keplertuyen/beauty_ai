@@ -1,11 +1,37 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
-  Heart, Share2, ShoppingBag, Star, ChevronRight,
-  Truck, Package, FlaskConical, Info, MessageSquare,
-  ThumbsUp, ThumbsDown, Send, ChevronDown, ChevronUp,
-  CheckCircle, Copy, Check, QrCode, ShieldCheck, ShieldAlert, CheckCircle2,
-  RefreshCw, Plus, Minus, X, ExternalLink, Sun, Moon, Clock, AlertCircle, Sparkles, Lock, Layers
+  Heart,
+  Share2,
+  ShoppingBag,
+  Star,
+  ChevronRight,
+  Truck,
+  FlaskConical,
+  Info,
+  MessageSquare,
+  ThumbsUp,
+  ThumbsDown,
+  Send,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle,
+  Check,
+  QrCode,
+  ShieldCheck,
+  ShieldAlert,
+  CheckCircle2,
+  RefreshCw,
+  Plus,
+  Minus,
+  X,
+  ExternalLink,
+  Sun,
+  Moon,
+  AlertCircle,
+  Sparkles,
+  Lock,
+  Layers,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
@@ -14,7 +40,7 @@ import {
   getSimilarProducts,
   getReviews,
   addReview,
-  getProductQrCode
+  getProductQrCode,
 } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import SkinIdQuickModal from '../components/SkinIdQuickModal';
@@ -24,79 +50,181 @@ import './ProductDetail.css';
 
 /* ── helpers ─────────────────────────────────── */
 function getRoutineInfo(categoryName, department) {
-  // Guardrail: Non-skincare products NEVER get a skincare AM/PM routine step badge
   if (department && department !== 'Skincare') {
     return null;
   }
   const cat = (categoryName || '').toLowerCase();
   if (cat.includes('cleanser') || cat.includes('wash')) {
-    return { step: 'Step 1: Cleanse', time: 'AM & PM', tip: 'Use as the foundational first step to remove impurities without stripping skin barrier.' };
+    return {
+      step: 'Step 1: Cleanse',
+      time: 'AM & PM',
+      tip: 'Use as the foundational first step to remove impurities without stripping skin barrier.',
+    };
   }
   if (cat.includes('toner')) {
-    return { step: 'Step 2: Tone & Balance', time: 'AM & PM', tip: 'Apply directly onto clean skin to restore hydration and prep skin for serums.' };
+    return {
+      step: 'Step 2: Tone & Balance',
+      time: 'AM & PM',
+      tip: 'Apply directly onto clean skin to restore hydration and prep skin for serums.',
+    };
   }
-  if (cat.includes('serum') || cat.includes('essence') || cat.includes('peeling') || cat.includes('treatment')) {
-    const isNightOnly = cat.includes('peel') || cat.includes('retinol') || cat.includes('aha') || cat.includes('bha') || cat.includes('exfoliat');
-    return { step: 'Step 3: Treat & Target', time: isNightOnly ? 'PM Only' : 'AM & PM', tip: 'Dispense 3-4 drops and gently press into skin before heavier moisturizers.' };
+  if (
+    cat.includes('serum') ||
+    cat.includes('essence') ||
+    cat.includes('peeling') ||
+    cat.includes('treatment')
+  ) {
+    const isNightOnly =
+      cat.includes('peel') ||
+      cat.includes('retinol') ||
+      cat.includes('aha') ||
+      cat.includes('bha') ||
+      cat.includes('exfoliat');
+    return {
+      step: 'Step 3: Treat & Target',
+      time: isNightOnly ? 'PM Only' : 'AM & PM',
+      tip: 'Dispense 3-4 drops and gently press into skin before heavier moisturizers.',
+    };
   }
   if (cat.includes('eye')) {
-    return { step: 'Step 4a: Eye Care', time: 'AM & PM', tip: 'Gently pat a rice-grain amount around orbital eye contours with your ring finger.' };
+    return {
+      step: 'Step 4a: Eye Care',
+      time: 'AM & PM',
+      tip: 'Gently pat a rice-grain amount around orbital eye contours with your ring finger.',
+    };
   }
   if (cat.includes('sunscreen') || cat.includes('sun')) {
-    return { step: 'Step 5: Sun Protection', time: 'AM Only', tip: 'Apply generously as the final morning step 15 minutes prior to sun exposure.' };
+    return {
+      step: 'Step 5: Sun Protection',
+      time: 'AM Only',
+      tip: 'Apply generously as the final morning step 15 minutes prior to sun exposure.',
+    };
   }
   if (cat.includes('mask')) {
-    return { step: 'Weekly Special Treatment', time: 'PM (2–3x / week)', tip: 'Apply an even layer on cleansed skin, leaving on according to formula guidance.' };
+    return {
+      step: 'Weekly Special Treatment',
+      time: 'PM (2–3x / week)',
+      tip: 'Apply an even layer on cleansed skin, leaving on according to formula guidance.',
+    };
   }
   if (cat.includes('oil')) {
-    return { step: 'Step 5: Seal & Nourish', time: 'PM', tip: 'Warm 2 drops in palms and press over moisturizer to lock in moisture and nourish lipid barrier.' };
+    return {
+      step: 'Step 5: Seal & Nourish',
+      time: 'PM',
+      tip: 'Warm 2 drops in palms and press over moisturizer to lock in moisture and nourish lipid barrier.',
+    };
   }
   if (cat.includes('moisturiz') || cat.includes('cream') || cat.includes('lotion')) {
-    return { step: 'Step 4: Moisturize & Barrier', time: 'AM & PM', tip: 'Massage evenly onto face and neck to seal in hydration and reinforce skin barrier.' };
+    return {
+      step: 'Step 4: Moisturize & Barrier',
+      time: 'AM & PM',
+      tip: 'Massage evenly onto face and neck to seal in hydration and reinforce skin barrier.',
+    };
   }
-  return { step: 'Skincare Support', time: 'Daily', tip: 'Incorporate into your daily skincare regimen according to instructions.' };
+  return {
+    step: 'Skincare Support',
+    time: 'Daily',
+    tip: 'Incorporate into your daily skincare regimen according to instructions.',
+  };
 }
 
-function getIngredientStats(ingredients) {
-  if (!Array.isArray(ingredients) || ingredients.length === 0) return [];
-  const counts = {};
-  ingredients.forEach(i => {
-    const group = i.functionGroup || 'Other';
-    counts[group] = (counts[group] || 0) + 1;
-  });
-  return Object.entries(counts)
-    .filter(([k]) => k !== 'Other')
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([label, count]) => ({ label, count }));
-}
-
-const CATEGORY_EMOJI = {
-  'Moisturizers': '🧴',
-  'Serums & Essences': '💧',
-  'Face Wash & Cleansers': '🫧',
-  'Face Masks': '🎭',
-  'Eye Creams': '👁️',
-  'Lip Balm & Treatments': '💋',
-  'Face Sunscreen': '☀️',
-  'Face Oils': '💧',
-  'Toners': '💦',
-  'Anti-Aging': '⏳',
-  'Acne & Blemishes': '🌿',
-  'Makeup Removers': '🌸',
-};
-
-function getCategoryEmoji(cat) {
-  if (!cat) return '💄';
-  for (const [key, emoji] of Object.entries(CATEGORY_EMOJI)) {
-    if (cat.includes(key)) return emoji;
+/**
+ * Parenthesis-aware fallback INCI parser that preserves commas inside (...)
+ * (e.g. "Iron Oxides (CI 77491, CI 77492, CI 77499)") and separates
+ * "[+/- May Contain / Peut Contenir: ...]" into { mainList, mayContainList }.
+ */
+function splitInciFallback(raw) {
+  if (!raw) return { mainList: [], mayContainList: [] };
+  if (Array.isArray(raw)) {
+    return {
+      mainList: raw.filter((s) => s && s.toLowerCase() !== 'no ingredients listed'),
+      mayContainList: [],
+    };
   }
-  return '💄';
+  let text = String(raw).trim();
+  try {
+    const arr = JSON.parse(text);
+    if (Array.isArray(arr)) {
+      return {
+        mainList: arr.filter((s) => s && String(s).toLowerCase() !== 'no ingredients listed'),
+        mayContainList: [],
+      };
+    }
+  } catch {
+    /* normal string */
+  }
+
+  let mainPart = text;
+  let mayPart = '';
+  const mayRegex =
+    /(\[\s*\+\/-\s*(?:may\s+contain\s*(?:\/\s*peut\s+contenir)?\s*:?)?|\[\s*may\s+contain\s*(?:\/\s*peut\s+contenir)?\s*:?|may\s+contain\s*(?:\/\s*peut\s+contenir)?\s*(?:\(\+\/-\))?\s*:|\(\+\/-\)\s*may\s+contain\s*:?)/i;
+  const match = text.match(mayRegex);
+  if (match && match.index !== undefined) {
+    mainPart = text.slice(0, match.index).trim().replace(/[,;.]$/, '');
+    mayPart = text
+      .slice(match.index + match[0].length)
+      .trim()
+      .replace(/[\].\s]+$/, '')
+      .replace(/^(?:\/\s*)?peut\s+contenir\s*:?\s*/i, '')
+      .trim();
+  }
+
+  const splitTopLevel = (str) => {
+    if (!str) return [];
+    const tokens = [];
+    let current = '';
+    let parenDepth = 0;
+    let bracketDepth = 0;
+
+    for (let i = 0; i < str.length; i++) {
+      const c = str[i];
+      if (c === '(') {
+        parenDepth++;
+        current += c;
+      } else if (c === ')') {
+        if (parenDepth > 0) parenDepth--;
+        current += c;
+      } else if (c === '[') {
+        bracketDepth++;
+      } else if (c === ']') {
+        if (bracketDepth > 0) bracketDepth--;
+      } else if ((c === ',' || c === ';' || c === '\n') && parenDepth === 0 && bracketDepth === 0) {
+        const cleaned = current
+          .trim()
+          .replace(/^[.[\]\s]+|[.[\]\s]+$/g, '')
+          .replace(/^(?:\+\/-\s*:?\s*|may\s+contain\s*(?:\/\s*peut\s+contenir)?\s*:?\s*)/i, '')
+          .trim();
+        if (cleaned.length > 1 && cleaned.toLowerCase() !== 'no ingredients listed') {
+          tokens.push(cleaned);
+        }
+        current = '';
+      } else {
+        current += c;
+      }
+    }
+
+    if (current.trim()) {
+      const cleaned = current
+        .trim()
+        .replace(/^[.[\]\s]+|[.[\]\s]+$/g, '')
+        .replace(/^(?:\+\/-\s*:?\s*|may\s+contain\s*(?:\/\s*peut\s+contenir)?\s*:?\s*)/i, '')
+        .trim();
+      if (cleaned.length > 1 && cleaned.toLowerCase() !== 'no ingredients listed') {
+        tokens.push(cleaned);
+      }
+    }
+    return [...new Set(tokens)];
+  };
+
+  return {
+    mainList: splitTopLevel(mainPart),
+    mayContainList: splitTopLevel(mayPart),
+  };
 }
 
 function StarRating({ value = 0, size = 16, interactive = false, onChange }) {
   const [hovered, setHovered] = useState(0);
-  const display = interactive ? (hovered || value) : value;
+  const display = interactive ? hovered || value : value;
   return (
     <span className="pd-stars">
       {[1, 2, 3, 4, 5].map((n) => (
@@ -131,31 +259,32 @@ function ReviewCard({ review }) {
       'da dầu': t('skin_type_oily'),
       'da hỗn hợp': t('skin_type_combination'),
       'da nhạy cảm': t('skin_type_sensitive'),
-      'normal': t('skin_type_normal'),
-      'dry': t('skin_type_dry'),
-      'oily': t('skin_type_oily'),
-      'combination': t('skin_type_combination'),
-      'sensitive': t('skin_type_sensitive'),
+      normal: t('skin_type_normal'),
+      dry: t('skin_type_dry'),
+      oily: t('skin_type_oily'),
+      combination: t('skin_type_combination'),
+      sensitive: t('skin_type_sensitive'),
     };
     return map[norm] || skin;
   };
 
-  const author = review.authorName || review.author_name || review.reviewer_name || review.user_name || 'BeautyAI Shopper';
+  const author =
+    review.authorName ||
+    review.author_name ||
+    review.reviewer_name ||
+    review.user_name ||
+    'BeautyAI Shopper';
   const skinType = review.skinType || review.skin_type;
-  const ratingValue = parseInt(review.rating) || review.star_rating || 5;
+  const ratingValue = parseInt(review.rating, 10) || review.star_rating || 5;
   const dateVal = review.createdAt || review.created_at;
   const content = review.content || review.review_text;
 
   return (
     <div className="pd-review-card glass-card">
       <div className="pd-review-header">
-        <div className="pd-review-avatar">
-          {author[0].toUpperCase()}
-        </div>
+        <div className="pd-review-avatar">{author[0].toUpperCase()}</div>
         <div className="pd-review-meta">
-          <span className="pd-review-name">
-            {author}
-          </span>
+          <span className="pd-review-name">{author}</span>
           {skinType && skinType !== 'Unknown' && (
             <span className="pd-review-skin badge badge-secondary">
               {getSkinTypeLabel(skinType)}
@@ -176,15 +305,109 @@ function ReviewCard({ review }) {
           )}
         </div>
       </div>
-      {content && (
-        <p className="pd-review-text">{content}</p>
-      )}
+      {content && <p className="pd-review-text">{content}</p>}
       {review.is_recommended !== undefined && (
         <div className={`pd-review-recommend ${review.is_recommended ? 'yes' : 'no'}`}>
-          {review.is_recommended
-            ? <><ThumbsUp size={13} /> {t('pd_review_recommend')}</>
-            : <><ThumbsDown size={13} /> {t('pd_review_not_recommend')}</>}
+          {review.is_recommended ? (
+            <>
+              <ThumbsUp size={13} /> {t('pd_review_recommend')}
+            </>
+          ) : (
+            <>
+              <ThumbsDown size={13} /> {t('pd_review_not_recommend')}
+            </>
+          )}
         </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Reusable Suitability Banner (No Safety Allergy Alert — that stays at top of BuyBox) ── */
+function SuitabilityBanner({
+  hasAllergyWarning,
+  isNonCosmeticTool,
+  hasIngredients,
+  user,
+  suitabilityVerdict,
+  suitabilityLabel,
+  suitabilityReason,
+  onOpenSkinModal,
+  showEditButton = false,
+}) {
+  if (hasAllergyWarning) return null;
+
+  if (isNonCosmeticTool) {
+    return (
+      <div className="pd-suitability-match-pill pill-tool">
+        <Sparkles size={16} />
+        <span>Accessory / Tool · Contains no chemical cosmetic ingredients</span>
+      </div>
+    );
+  }
+
+  if (!hasIngredients) {
+    return (
+      <div className="pd-suitability-match-pill pill-insufficient">
+        <AlertCircle size={16} />
+        <span>Insufficient INCI Data · Manufacturer ingredient list unavailable</span>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          toast('Sign in to check your personal Skin ID & Allergy match');
+          window.dispatchEvent(new CustomEvent('open-auth-modal'));
+        }}
+        className="pd-suitability-match-pill pill-signin"
+      >
+        <span className="pd-suitability-left">
+          <Lock size={15} />
+          <span>Sign in to check if this formula matches your Skin ID</span>
+        </span>
+        <span className="pd-suitability-cta">Sign In →</span>
+      </button>
+    );
+  }
+
+  if (suitabilityVerdict === 'RequiresSkinId') {
+    return (
+      <button
+        type="button"
+        onClick={onOpenSkinModal}
+        className="pd-suitability-match-pill pill-setup"
+      >
+        <span className="pd-suitability-left">
+          <Sparkles size={16} />
+          <span>Complete your 30-second Skin ID to unlock personalized verdict</span>
+        </span>
+        <span className="pd-suitability-cta">Set Up Now →</span>
+      </button>
+    );
+  }
+
+  const isNotes = suitabilityVerdict === 'MatchWithNotes';
+
+  return (
+    <div className={`pd-suitability-match-pill ${isNotes ? 'pill-notes' : 'pill-good'}`}>
+      <div className="pd-suitability-content">
+        <div className="pd-suitability-title-row">
+          {isNotes ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
+          <span>
+            {suitabilityLabel || (isNotes ? 'Match with Notes' : 'Good Match')}
+            {!isNotes ? ' For Your Skin ID' : ''}
+          </span>
+        </div>
+        {suitabilityReason && <span className="pd-suitability-reason">{suitabilityReason}</span>}
+      </div>
+      {showEditButton && (
+        <button type="button" className="btn btn-secondary btn-sm" onClick={onOpenSkinModal}>
+          Edit Skin ID
+        </button>
       )}
     </div>
   );
@@ -194,17 +417,28 @@ function ReviewCard({ review }) {
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addItemToCart, toggleWishlistItem, isInWishlist, formatPrice, formatDualPrice, lang, t, user } = useApp();
+  const location = useLocation();
+  const { addItemToCart, toggleWishlistItem, isInWishlist, formatPrice, lang, t, user } =
+    useApp();
 
-  const [product, setProduct] = useState(null);
+  const previewFromState = location.state?.productPreview;
+  const isMatchingPreview =
+    previewFromState &&
+    (String(previewFromState.id) === String(id) ||
+      String(previewFromState.product_id) === String(id) ||
+      String(previewFromState.code) === String(id) ||
+      String(previewFromState.slug) === String(id));
+
+  const [product, setProduct] = useState(() => (isMatchingPreview ? previewFromState : null));
   const [similar, setSimilar] = useState([]);
   const [reviews, setReviews] = useState([]);
-  const [loadingProduct, setLoadingProduct] = useState(true);
+  const [loadingProduct, setLoadingProduct] = useState(!isMatchingPreview);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [activeTab, setActiveTab] = useState('info');
   const [copied, setCopied] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [showFullInci, setShowFullInci] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState({});
   const [skinIdModalOpen, setSkinIdModalOpen] = useState(false);
 
   // QR & Barcode modal state
@@ -212,31 +446,39 @@ export default function ProductDetail() {
   const [qrData, setQrData] = useState(null);
   const [loadingQr, setLoadingQr] = useState(false);
 
-  // Helper to map English skin type for review options
+  // Track user identity signature so we only re-fetch verdict when user actually logs in or updates Skin ID
+  const userSignature = user
+    ? `${user.id ?? user.user_id}:${user.skinProfile?.skinType ?? user.skin_type}:${(
+        user.skinProfile?.allergies || []
+      )
+        .map((a) => a.ingredientName || a)
+        .join(',')}`
+    : 'guest';
+  const prevUserSigRef = useRef(userSignature);
+
   const getInitialSkinType = useCallback((userSkinType) => {
     if (!userSkinType) return '';
     const map = {
-      'normal': 'Normal',
-      'dry': 'Dry',
-      'oily': 'Oily',
-      'combination': 'Combination',
-      'sensitive': 'Sensitive'
+      normal: 'Normal',
+      dry: 'Dry',
+      oily: 'Oily',
+      combination: 'Combination',
+      sensitive: 'Sensitive',
     };
     return map[userSkinType.toLowerCase()] || '';
   }, []);
 
   const [initialInWishlist, setInitialInWishlist] = useState(null);
 
-  // Reset initialInWishlist when product id changes
   useEffect(() => {
     setInitialInWishlist(null);
     setQuantity(1);
     setQrData(null);
     setShowFullInci(false);
+    setExpandedGroups({});
     setActiveTab('info');
   }, [id]);
 
-  // Set initial wishlist state once product is loaded
   useEffect(() => {
     if (product && initialInWishlist === null) {
       setInitialInWishlist(isInWishlist(product.id ?? product.product_id ?? id));
@@ -254,92 +496,143 @@ export default function ProductDetail() {
     is_recommended: true,
   });
 
-  // Update skin type in form whenever user loads/changes
   useEffect(() => {
     if (user) {
       setReviewForm((f) => ({
         ...f,
-        skin_type: getInitialSkinType(user.skin_type),
+        skin_type: getInitialSkinType(user.skinProfile?.skinType || user.skin_type),
       }));
     }
   }, [user, getInitialSkinType]);
 
   const inWishlist = isInWishlist(product?.id ?? product?.product_id ?? id);
 
-  /* Reviews pagination & skin filtering (1M+ Reviews Index) */
+  /* Reviews pagination & skin filtering */
   const [selectedReviewSkin, setSelectedReviewSkin] = useState('All');
   const [reviewPage, setReviewPage] = useState(1);
   const [totalReviews, setTotalReviews] = useState(0);
   const [totalReviewPages, setTotalReviewPages] = useState(1);
 
-  /* fetch product detail */
-  const fetchProductDetail = useCallback(() => {
-    getProduct(id)
-      .then((res) => setProduct(res.data))
-      .catch(() => toast.error(t('pd_not_found', 'Product not found')))
-      .finally(() => setLoadingProduct(false));
-  }, [id, t]);
+  /* fetch product detail (Single call on mount/id change!) */
+  const fetchProductDetail = useCallback(
+    (showSkeleton = false) => {
+      if (showSkeleton) setLoadingProduct(true);
+      getProduct(id)
+        .then((res) => setProduct(res.data))
+        .catch(() => toast.error(t('pd_not_found', 'Product not found')))
+        .finally(() => setLoadingProduct(false));
+    },
+    [id, t]
+  );
 
-  /* fetch reviews with b-tree indexed skin filter */
-  const loadReviews = useCallback((skinType = selectedReviewSkin, page = 1) => {
-    if (!id) return;
-    setLoadingReviews(true);
-    const params = {
-      page,
-      per_page: 8
-    };
-    if (skinType && skinType !== 'All') {
-      params.skin_type = skinType;
-    }
-    getReviews(id, params)
-      .then((res) => {
-        const items = res.data?.reviews || res.data || [];
-        setReviews(items);
-        setTotalReviews(res.data?.total || items.length);
-        setTotalReviewPages(res.data?.pages || 1);
-        setReviewPage(page);
-      })
-      .catch(() => {
-        setReviews([]);
-        setTotalReviews(0);
-        setTotalReviewPages(1);
-      })
-      .finally(() => setLoadingReviews(false));
-  }, [id, selectedReviewSkin]);
+  /* fetch reviews */
+  const loadReviews = useCallback(
+    (skinType = selectedReviewSkin, page = 1) => {
+      if (!id) return;
+      setLoadingReviews(true);
+      const params = {
+        page,
+        per_page: 8,
+      };
+      if (skinType && skinType !== 'All') {
+        params.skin_type = skinType;
+      }
+      getReviews(id, params)
+        .then((res) => {
+          const items = res.data?.reviews || res.data || [];
+          setReviews(items);
+          setTotalReviews(res.data?.total ?? items.length);
+          setTotalReviewPages(res.data?.pages || 1);
+          setReviewPage(page);
+        })
+        .catch(() => {
+          setReviews([]);
+          setTotalReviews(0);
+          setTotalReviewPages(1);
+        })
+        .finally(() => setLoadingReviews(false));
+    },
+    [id, selectedReviewSkin]
+  );
 
+  // Initial load on product ID change (Runs ONCE per product ID)
   useEffect(() => {
-    setLoadingProduct(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    fetchProductDetail();
+    const hasPreview =
+      location.state?.productPreview &&
+      (String(location.state.productPreview.id) === String(id) ||
+        String(location.state.productPreview.product_id) === String(id) ||
+        String(location.state.productPreview.code) === String(id));
+
+    if (hasPreview) {
+      setProduct(location.state.productPreview);
+      setLoadingProduct(false);
+    } else {
+      setLoadingProduct(true);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    fetchProductDetail(!hasPreview);
 
     getSimilarProducts(id, 8)
       .then((res) => setSimilar(res.data?.recommendations || res.data || []))
       .catch(() => setSimilar([]));
-  }, [id, t, fetchProductDetail]);
+  }, [id, fetchProductDetail, location.state]);
 
   useEffect(() => {
     loadReviews(selectedReviewSkin, 1);
   }, [id, selectedReviewSkin, loadReviews]);
 
-  // Re-evaluate product verdict whenever user logs in or updates Skin ID
+  // Re-evaluate product verdict ONLY when user actually logs in or updates Skin ID (never on initial mount!)
   useEffect(() => {
-    if (!loadingProduct && id) {
-      getProduct(id)
-        .then((res) => setProduct(res.data))
-        .catch(() => {});
+    if (prevUserSigRef.current !== userSignature) {
+      prevUserSigRef.current = userSignature;
+      if (id) {
+        fetchProductDetail(false);
+      }
     }
-  }, [user, id, loadingProduct]);
+  }, [userSignature, id, fetchProductDetail]);
 
-  /* fetch QR code on modal open */
+  // Update document title dynamically for SEO & browser tab clarity
+  useEffect(() => {
+    if (product) {
+      const pName = product.name ?? product.product_name ?? 'Product';
+      const bName =
+        product.brandName ??
+        product.brand_name ??
+        (typeof product.brand === 'string' ? product.brand : product.brand?.name) ??
+        'BeautyAI';
+      document.title = `${pName} — ${bName} | BeautyAI`;
+    }
+    return () => {
+      document.title = 'BeautyAI — Personalized Clean Beauty & INCI Intelligence';
+    };
+  }, [product]);
+
+  /* Normalized product fields */
+  const productId = product?.id ?? product?.product_id ?? id;
+  const productCode = product?.code ?? product?.product_id ?? String(productId);
+  const productName = product?.name ?? product?.product_name ?? 'Beauty Product';
+  const brandName =
+    product?.brandName ??
+    product?.brand_name ??
+    (typeof product?.brand === 'string' ? product.brand : product?.brand?.name) ??
+    'BeautyAI Brand';
+  const categoryName =
+    product?.categoryName ??
+    product?.primary_category ??
+    (typeof product?.category === 'string' ? product.category : product?.category?.name) ??
+    'Skincare';
+
+  /* fetch QR code on modal open using normalized productCode / productId */
   const handleOpenQrModal = async () => {
     setQrModalOpen(true);
     if (!qrData && product) {
       setLoadingQr(true);
       try {
-        const res = await getProductQrCode(product.product_id);
+        const res = await getProductQrCode(productCode || productId);
         setQrData(res.data);
       } catch (err) {
-        console.error("QR Fetch error:", err);
+        console.error('QR Fetch error:', err);
       } finally {
         setLoadingQr(false);
       }
@@ -366,8 +659,14 @@ export default function ProductDetail() {
       window.dispatchEvent(new CustomEvent('open-auth-modal'));
       return;
     }
-    if (!reviewForm.rating) { toast.error(t('pd_err_stars', 'Please select a star rating')); return; }
-    if (!reviewForm.review_text.trim()) { toast.error(t('pd_err_content', 'Please enter your review text')); return; }
+    if (!reviewForm.rating) {
+      toast.error(t('pd_err_stars', 'Please select a star rating'));
+      return;
+    }
+    if (!reviewForm.review_text.trim()) {
+      toast.error(t('pd_err_content', 'Please enter your review text'));
+      return;
+    }
     if (reviewForm.review_text.trim().length < 10) {
       toast.error(t('pd_err_content_len', 'Review text must be at least 10 characters'));
       return;
@@ -375,13 +674,13 @@ export default function ProductDetail() {
     setSubmitting(true);
     try {
       await addReview({
-        product_id: id,
-        author_id: String(user.user_id),
+        product_id: String(productId),
+        author_id: String(user.id ?? user.user_id),
         author_name: user.name,
         rating: reviewForm.rating,
         review_text: reviewForm.review_text,
         skin_type: reviewForm.skin_type,
-        is_recommended: reviewForm.is_recommended ? 1 : 0
+        is_recommended: reviewForm.is_recommended ? 1 : 0,
       });
       toast.success(t('pd_review_success', 'Review submitted successfully!'));
       setShowReviewForm(false);
@@ -389,10 +688,10 @@ export default function ProductDetail() {
         reviewer_name: '',
         rating: 0,
         review_text: '',
-        skin_type: user ? getInitialSkinType(user.skin_type) : '',
-        is_recommended: true
+        skin_type: user ? getInitialSkinType(user.skinProfile?.skinType || user.skin_type) : '',
+        is_recommended: true,
       });
-      // Refresh reviews
+      fetchProductDetail(false);
       loadReviews(selectedReviewSkin, 1);
     } catch (err) {
       toast.error(err.response?.data?.detail || t('pd_review_failed', 'Failed to submit review'));
@@ -405,33 +704,19 @@ export default function ProductDetail() {
   const parseHighlights = (raw) => {
     if (!raw) return [];
     if (Array.isArray(raw)) return raw;
-    try { return JSON.parse(raw); } catch { /* noop */ }
-    return raw.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
-  };
-
-  /* parse ingredients */
-  const parseIngredients = (raw) => {
-    if (!raw) return [];
-    if (Array.isArray(raw)) return raw;
     try {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) return arr;
-    } catch { /* noop */ }
-    return raw.split(',').map((s) => s.trim()).filter(Boolean);
+      return JSON.parse(raw);
+    } catch {
+      /* noop */
+    }
+    return raw
+      .split(/[,\n]/)
+      .map((s) => s.trim())
+      .filter(Boolean);
   };
-
-  /* rating breakdown */
-  const ratingBreakdown = useCallback(() => {
-    const counts = [0, 0, 0, 0, 0];
-    reviews.forEach((r) => {
-      const s = parseInt(r.rating || r.star_rating || 0);
-      if (s >= 1 && s <= 5) counts[s - 1]++;
-    });
-    return counts.reverse(); // [5→0]
-  }, [reviews]);
 
   /* ── LOADING ── */
-  if (loadingProduct) {
+  if (loadingProduct && !product) {
     return (
       <div className="pd-page">
         <div className="container">
@@ -440,7 +725,11 @@ export default function ProductDetail() {
               <div className="pd-skeleton pd-skeleton-image" />
               <div className="pd-skeleton-info">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="pd-skeleton pd-skeleton-line" style={{ width: `${90 - i * 12}%` }} />
+                  <div
+                    key={i}
+                    className="pd-skeleton pd-skeleton-line"
+                    style={{ width: `${90 - i * 12}%` }}
+                  />
                 ))}
               </div>
             </div>
@@ -465,45 +754,88 @@ export default function ProductDetail() {
     );
   }
 
-  const productId = product.id ?? product.product_id;
-  const productName = product.name ?? product.product_name ?? 'Beauty Product';
-  const brandName = product.brandName ?? product.brand_name ?? (typeof product.brand === 'string' ? product.brand : product.brand?.name) ?? 'BeautyAI Brand';
-  const categoryName = product.categoryName ?? product.primary_category ?? (typeof product.category === 'string' ? product.category : product.category?.name) ?? 'Skincare';
   const price = parseFloat(product.priceUsd ?? product.price_usd ?? product.price) || 0;
-  const salePrice = product.salePriceUsd ? parseFloat(product.salePriceUsd) : (product.sale_price_usd ? parseFloat(product.sale_price_usd) : null);
-  const rating = parseFloat(product.rating) || 5.0;
-  const reviewCount = product.reviewsCount ?? reviews.length;
-  const volumeMl = product.volumeMl ? `${product.volumeMl} ml` : (product.size || null);
+  const salePrice = product.salePriceUsd
+    ? parseFloat(product.salePriceUsd)
+    : product.sale_price_usd
+    ? parseFloat(product.sale_price_usd)
+    : null;
+
+  // Accurate review count & nullable rating (Never fake 5.0 when reviewCount === 0!)
+  const reviewCount = parseInt(product.reviewsCount ?? product.reviews_count ?? totalReviews ?? 0, 10) || 0;
+  const rawRating =
+    product.rating !== null && product.rating !== undefined ? parseFloat(product.rating) : null;
+  const rating = reviewCount > 0 && rawRating && rawRating > 0 ? rawRating : null;
+
+  // Size comes only from size_display (raw CSV string). volumeMl is deprecated (integer, lossy) — do not use.
+  const sizeDisplay =
+    product.sizeDisplay ||
+    product.size_display ||
+    (product.size && String(product.size).toUpperCase() !== 'N/A' ? product.size : null);
+
   const department = product.department || 'Skincare';
-  const suitabilityVerdict = product.suitabilityVerdict ?? product.suitability_verdict ?? 'RequiresSkinId';
-  const suitabilityLabel = product.suitabilityLabel ?? product.suitability_label ?? 'Good Match';
+  const suitabilityVerdict =
+    product.suitabilityVerdict ?? product.suitability_verdict ?? 'RequiresSkinId';
+  const suitabilityLabel =
+    product.suitabilityLabel ?? product.suitability_label ?? 'Good Match';
   const suitabilityReason = product.suitabilityReason ?? product.suitability_reason ?? '';
-  const hasAllergyWarning = product.hasAllergyWarning || product.has_allergy_warning || suitabilityVerdict === 'AllergyConflict';
+  const hasAllergyWarning =
+    product.hasAllergyWarning ||
+    product.has_allergy_warning ||
+    suitabilityVerdict === 'AllergyConflict';
   const matchedAllergen = product.matchedAllergen || product.matched_allergen;
-  const isNonCosmeticTool = Boolean(product.isNonCosmeticTool || department === 'Tools & Brushes' || suitabilityVerdict === 'AccessoryTool');
-  const structuredIngredients = Array.isArray(product.ingredients) && product.ingredients.length > 0 && typeof product.ingredients[0] === 'object'
-    ? product.ingredients
-    : [];
-  const rawIngredients = parseIngredients(
-    product.ingredientListRaw ||
-    (Array.isArray(product.ingredients) && typeof product.ingredients[0] === 'string' ? product.ingredients : null) ||
-    product.ingredients_clean ||
-    ''
-  ).filter((s) => s.toLowerCase() !== 'no ingredients listed');
-  const hasIngredients = !isNonCosmeticTool && (
-    product.hasIngredients !== undefined
-      ? Boolean(product.hasIngredients) && (structuredIngredients.length > 0 || rawIngredients.length > 0)
-      : (structuredIngredients.length > 0 || rawIngredients.length > 0)
+  const isNonCosmeticTool = Boolean(
+    product.isNonCosmeticTool ||
+      department === 'Tools & Brushes' ||
+      suitabilityVerdict === 'AccessoryTool'
   );
+
+  const structuredIngredients =
+    Array.isArray(product.ingredients) &&
+    product.ingredients.length > 0 &&
+    typeof product.ingredients[0] === 'object'
+      ? product.ingredients
+      : [];
+
   const formulaBreakdown = product.formulaBreakdown || null;
-  const totalInciCount = formulaBreakdown?.totalIngredientsCount || rawIngredients.length || structuredIngredients.length;
+
+  // Backend formulaBreakdown.rawInciList is the single source of truth; splitInciFallback is used only if formulaBreakdown isn't loaded yet
+  const fallbackParsed = splitInciFallback(
+    product.ingredientListRaw ||
+      (Array.isArray(product.ingredients) && typeof product.ingredients[0] === 'string'
+        ? product.ingredients
+        : null) ||
+      product.ingredients_clean ||
+      ''
+  );
+
+  const mainInciList =
+    formulaBreakdown?.rawInciList?.length > 0
+      ? formulaBreakdown.rawInciList
+      : fallbackParsed.mainList;
+
+  const mayContainInciList =
+    formulaBreakdown?.mayContainList?.length > 0
+      ? formulaBreakdown.mayContainList
+      : fallbackParsed.mayContainList;
+
+  const hasIngredients =
+    !isNonCosmeticTool &&
+    (product.hasIngredients !== undefined
+      ? Boolean(product.hasIngredients) &&
+        (structuredIngredients.length > 0 || mainInciList.length > 0)
+      : structuredIngredients.length > 0 || mainInciList.length > 0);
+
+  const totalInciCount =
+    formulaBreakdown?.totalIngredientsCount ||
+    mainInciList.length ||
+    structuredIngredients.length;
 
   const handleDeepAnalysisClick = () => {
-    const inciString = (formulaBreakdown?.rawInciList?.length > 0
-      ? formulaBreakdown.rawInciList.join(', ')
-      : rawIngredients.length > 0
-      ? rawIngredients.join(', ')
-      : structuredIngredients.map((i) => i.inciName).join(', '));
+    const inciString =
+      mainInciList.length > 0
+        ? mainInciList.join(', ')
+        : structuredIngredients.map((i) => i.inciName).join(', ');
 
     const targetSkins = Array.isArray(product.targetSkinTypes)
       ? product.targetSkinTypes.join(',')
@@ -511,26 +843,48 @@ export default function ProductDetail() {
       ? product.target_skin_types.join(',')
       : '';
 
-    const targetUrl = `/ingredient-analyzer?ingredients=${encodeURIComponent(inciString)}&product_name=${encodeURIComponent(productName)}&brand_name=${encodeURIComponent(brandName)}&department=${encodeURIComponent(department)}&category=${encodeURIComponent(categoryName)}&target_area=${encodeURIComponent(formulaBreakdown?.targetArea || '')}${targetSkins ? `&target_skin_types=${encodeURIComponent(targetSkins)}` : ''}`;
+    const targetUrl = `/ingredient-analyzer?ingredients=${encodeURIComponent(
+      inciString
+    )}&product_name=${encodeURIComponent(productName)}&brand_name=${encodeURIComponent(
+      brandName
+    )}&department=${encodeURIComponent(department)}&category=${encodeURIComponent(
+      categoryName
+    )}&target_area=${encodeURIComponent(formulaBreakdown?.targetArea || '')}${
+      targetSkins ? `&target_skin_types=${encodeURIComponent(targetSkins)}` : ''
+    }`;
 
     navigate(targetUrl);
   };
-  const routine = getRoutineInfo(categoryName, product?.department);
+
+  const routine = getRoutineInfo(categoryName, department);
   const loves = (() => {
-    const baseLoves = parseInt(product?.loves_count) || 0;
+    const baseLoves = parseInt(product?.lovesCount ?? product?.loves_count ?? 0, 10) || 0;
     if (initialInWishlist === null || !product) return baseLoves;
     const currentIn = isInWishlist(productId);
     if (currentIn && !initialInWishlist) return baseLoves + 1;
     if (!currentIn && initialInWishlist) return Math.max(0, baseLoves - 1);
     return baseLoves;
   })();
+
   const highlights = parseHighlights(product.highlights_clean || product.highlights);
-  const breakdown = ratingBreakdown();
+
+  // Use API ratingDistribution across all reviews of the product (fallback to current page only if missing)
+  const apiDist = product.ratingDistribution || product.rating_distribution;
+  const starDistribution = [5, 4, 3, 2, 1].map((star) => {
+    if (apiDist && (apiDist[star] !== undefined || apiDist[String(star)] !== undefined)) {
+      return Number(apiDist[star] ?? apiDist[String(star)] ?? 0);
+    }
+    return reviews.filter((r) => parseInt(r.rating || r.star_rating || 0, 10) === star).length;
+  });
+  const totalDistCount = starDistribution.reduce((a, b) => a + b, 0) || reviewCount;
+
+  // Similar products: 8 (2 rows of 4) or 4 (1 row of 4) — never 6 (4+2 orphan row)
+  const displayedSimilar =
+    similar.length >= 8 ? similar.slice(0, 8) : similar.slice(0, 4);
 
   return (
     <div className="pd-page animate-fadeIn">
       <div className="container">
-
         {/* ── Breadcrumb Navigation ─────────────────────── */}
         <nav className="pd-breadcrumb" aria-label="Breadcrumb">
           <Link to="/">{t('pd_breadcrumb_home', 'Home')}</Link>
@@ -550,11 +904,10 @@ export default function ProductDetail() {
 
         {/* ── PART 1 & 2: HERO PURCHASE GRID ────────────── */}
         <div className="pd-hero-grid">
-
           {/* ── PART 1: VISUAL & TRUST SHOWCASE (LEFT) ── */}
           <div className="pd-part-visual">
             <div className="pd-visual-card">
-              {/* Main Visual Display */}
+              {/* Main Visual Display (Unified vector placeholder fallback — no emoji) */}
               <div className="pd-visual-box">
                 <img
                   src={getProductImage(product, 800)}
@@ -563,19 +916,18 @@ export default function ProductDetail() {
                   loading="eager"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.parentElement.querySelector('.pd-visual-emoji');
-                    if (fallback) fallback.style.display = 'block';
+                    if (e.currentTarget.src !== DEFAULT_PRODUCT_IMAGE) {
+                      e.currentTarget.src = DEFAULT_PRODUCT_IMAGE;
+                    }
                   }}
                 />
-                <span className="pd-visual-emoji" style={{ display: 'none' }}>
-                  {getCategoryEmoji(categoryName)}
-                </span>
 
                 {/* Badges Stack */}
                 <div className="pd-visual-badges">
                   {product.clean_at_sephora == 1 && (
-                    <span className="badge badge-clean">{t('badge_clean', '🌿 Clean at Sephora')}</span>
+                    <span className="badge badge-clean">
+                      {t('badge_clean', 'Clean at Sephora')}
+                    </span>
                   )}
                   {product.new == 1 && (
                     <span className="badge badge-new">{t('badge_new', 'NEW')}</span>
@@ -604,19 +956,24 @@ export default function ProductDetail() {
                     />
                   </button>
                   <button
+                    type="button"
                     className="pd-action-btn"
                     onClick={handleShare}
                     aria-label={t('pd_share')}
                     title={t('pd_share')}
                   >
-                    {copied ? <Check size={18} color="#2E6F4E" /> : <Share2 size={18} color="#4A3728" />}
+                    {copied ? (
+                      <Check size={18} color="#2E6F4E" />
+                    ) : (
+                      <Share2 size={18} color="#4A3728" />
+                    )}
                   </button>
                 </div>
               </div>
 
               {/* QR & Barcode Lookup Trigger */}
               <div className="pd-qr-trigger-wrap">
-                <button className="pd-qr-trigger-btn" onClick={handleOpenQrModal}>
+                <button type="button" className="pd-qr-trigger-btn" onClick={handleOpenQrModal}>
                   <QrCode size={16} />
                   <span>{t('pd_qr_btn')}</span>
                 </button>
@@ -657,18 +1014,23 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* ── PART 2: PRIMARY BUY BOX (RIGHT) ────────── */}
+          {/* ── PART 2: PRIMARY BUY BOX (RIGHT — STICKY) ── */}
           <div className="pd-part-buybox">
             <div className="pd-buybox-card">
-              {/* Allergy Alert Banner (Core USP) */}
+              {/* 1. CRITICAL SAFETY ALLERGY ALERT (Always stays at top of BuyBox!) */}
               {hasAllergyWarning && (
                 <div className="pd-allergy-warning-box">
                   <div className="pd-allergy-warning-top">
-                    <ShieldAlert size={22} color="#DC2626" style={{ flexShrink: 0, marginTop: 2 }} />
+                    <ShieldAlert
+                      size={22}
+                      color="#DC2626"
+                      style={{ flexShrink: 0, marginTop: 2 }}
+                    />
                     <div>
                       <h4>Safety Allergy Warning</h4>
                       <p>
-                        This product contains <strong>{matchedAllergen}</strong>, which matches your personal <strong>Allergy Blacklist</strong>.
+                        This product contains <strong>{matchedAllergen}</strong>, which matches your
+                        personal <strong>Allergy Blacklist</strong>.
                       </p>
                     </div>
                   </div>
@@ -683,113 +1045,7 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              {/* Suitability Verdict Banner (No numeric % — Strictly Text Verdict) */}
-              {!hasAllergyWarning && isNonCosmeticTool && (
-                <div
-                  className="pd-suitability-match-pill"
-                  style={{ background: 'rgba(59, 130, 246, 0.08)', borderColor: 'rgba(59, 130, 246, 0.25)', color: '#1D4ED8' }}
-                >
-                  <Sparkles size={16} color="#2563EB" />
-                  <span>Accessory / Tool · Contains no chemical cosmetic ingredients</span>
-                </div>
-              )}
-
-              {!hasAllergyWarning && !isNonCosmeticTool && !hasIngredients && (
-                <div
-                  className="pd-suitability-match-pill"
-                  style={{ background: 'rgba(100, 116, 139, 0.08)', borderColor: 'rgba(100, 116, 139, 0.25)', color: '#475569' }}
-                >
-                  <AlertCircle size={16} color="#64748B" />
-                  <span>Insufficient INCI Data · Manufacturer ingredient list unavailable</span>
-                </div>
-              )}
-
-              {!hasAllergyWarning && !isNonCosmeticTool && hasIngredients && !user && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    toast('Sign in to check your personal Skin ID & Allergy match', { icon: '✨' });
-                    window.dispatchEvent(new CustomEvent('open-auth-modal'));
-                  }}
-                  className="pd-suitability-match-pill"
-                  style={{
-                    width: '100%',
-                    cursor: 'pointer',
-                    background: 'rgba(196, 139, 113, 0.1)',
-                    border: '1px solid rgba(196, 139, 113, 0.35)',
-                    color: '#6B442A',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                    <Lock size={15} color="#8F5B42" />
-                    <span>Sign in to check if this formula matches your Skin ID</span>
-                  </span>
-                  <span style={{ fontWeight: 700, fontSize: '0.78rem', textDecoration: 'underline' }}>Sign In →</span>
-                </button>
-              )}
-
-              {!hasAllergyWarning && !isNonCosmeticTool && hasIngredients && user && suitabilityVerdict === 'RequiresSkinId' && (
-                <button
-                  type="button"
-                  onClick={() => setSkinIdModalOpen(true)}
-                  className="pd-suitability-match-pill"
-                  style={{
-                    width: '100%',
-                    cursor: 'pointer',
-                    background: 'rgba(217, 119, 6, 0.1)',
-                    border: '1px solid rgba(217, 119, 6, 0.35)',
-                    color: '#92400E',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                    <Sparkles size={16} color="#D97706" />
-                    <span>Complete your 30-second Skin ID to unlock personalized verdict</span>
-                  </span>
-                  <span style={{ fontWeight: 700, fontSize: '0.78rem', textDecoration: 'underline' }}>Set Up Now →</span>
-                </button>
-              )}
-
-              {!hasAllergyWarning && !isNonCosmeticTool && hasIngredients && user && suitabilityVerdict === 'GoodMatch' && (
-                <div className="pd-suitability-match-pill" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 3 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontWeight: 700, color: '#065F46' }}>
-                    <CheckCircle2 size={16} color="#10B981" />
-                    <span>{suitabilityLabel || 'Good Match'} For Your Skin ID</span>
-                  </div>
-                  {suitabilityReason && (
-                    <span style={{ fontSize: '0.8rem', color: '#047857', fontWeight: 500, paddingLeft: 23 }}>
-                      {suitabilityReason}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {!hasAllergyWarning && !isNonCosmeticTool && hasIngredients && user && suitabilityVerdict === 'MatchWithNotes' && (
-                <div
-                  className="pd-suitability-match-pill"
-                  style={{
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    gap: 3,
-                    background: 'rgba(245, 158, 11, 0.1)',
-                    borderColor: 'rgba(245, 158, 11, 0.35)',
-                    color: '#92400E',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontWeight: 700 }}>
-                    <AlertCircle size={16} color="#D97706" />
-                    <span>{suitabilityLabel || 'Match with Notes'}</span>
-                  </div>
-                  {suitabilityReason && (
-                    <span style={{ fontSize: '0.8rem', color: '#B45309', fontWeight: 500, paddingLeft: 23 }}>
-                      {suitabilityReason}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {/* Brand & Title */}
+              {/* 2. Brand & Product Title */}
               <div className="pd-buybox-header">
                 {brandName && (
                   <Link
@@ -802,25 +1058,41 @@ export default function ProductDetail() {
                 <h1 className="pd-buybox-title">{productName}</h1>
               </div>
 
-              {/* Rating & Social Proof */}
+              {/* 3. Real Rating & Social Proof (Shows "No reviews yet" when reviewCount === 0) */}
               <div className="pd-buybox-rating">
-                <StarRating value={Math.round(rating)} size={17} />
-                <span className="pd-buybox-score">{rating.toFixed(1)}</span>
-                <button
-                  className="pd-buybox-review-link"
-                  onClick={() => setActiveTab('reviews')}
-                >
-                  ({reviewCount.toLocaleString()} {t('pd_rating', 'reviews')})
-                </button>
+                {rating !== null ? (
+                  <>
+                    <StarRating value={Math.round(rating)} size={17} />
+                    <span className="pd-buybox-score">{rating.toFixed(1)}</span>
+                    <button
+                      type="button"
+                      className="pd-buybox-review-link"
+                      onClick={() => setActiveTab('reviews')}
+                    >
+                      ({reviewCount.toLocaleString()} {t('pd_rating', 'reviews')})
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="pd-no-reviews-btn"
+                    onClick={() => setActiveTab('reviews')}
+                  >
+                    {t('pd_no_reviews_short', 'No reviews yet')} ·{' '}
+                    <span>{t('pd_write_first_review', 'Write a review')}</span>
+                  </button>
+                )}
                 {loves > 0 && (
                   <div className="pd-buybox-loves">
                     <Heart size={14} fill="#E11D48" color="#E11D48" />
-                    <span>{loves.toLocaleString()} {t('pd_loves', 'loves')}</span>
+                    <span>
+                      {loves.toLocaleString()} {t('pd_loves', 'loves')}
+                    </span>
                   </div>
                 )}
               </div>
 
-              {/* High Contrast Price Section */}
+              {/* 4. Balanced Price Section (No duplicated price in tax hint) */}
               <div className="pd-buybox-price-block">
                 <div className="pd-buybox-price-row">
                   <span className="pd-buybox-price">{formatPrice(salePrice || price)}</span>
@@ -833,35 +1105,55 @@ export default function ProductDetail() {
                     </>
                   )}
                 </div>
-                <div className="pd-buybox-tax-hint">{formatPrice(salePrice || price)} · {t('pd_tax_included')}</div>
+                <div className="pd-buybox-tax-hint">{t('pd_tax_included', 'VAT included')}</div>
               </div>
 
-              {/* 3-Column Quick Specs Card */}
-              <div className="pd-specs-grid">
+              {/* 5. Quick Specs Card (Hides Size box when sizeDisplay is missing) */}
+              <div className={`pd-specs-grid ${sizeDisplay ? '' : 'pd-specs-grid-2'}`}>
                 <div className="pd-spec-box">
                   <span className="pd-spec-label">{t('prod_category', 'Category')}</span>
                   <span className="pd-spec-val" title={categoryName}>
                     {categoryName}
                   </span>
                 </div>
-                <div className="pd-spec-box">
-                  <span className="pd-spec-label">{t('pd_size', 'Size')}</span>
-                  <span className="pd-spec-val" title={volumeMl || 'Standard Size'}>
-                    {volumeMl || 'Standard Size'}
-                  </span>
-                </div>
+                {sizeDisplay && (
+                  <div className="pd-spec-box">
+                    <span className="pd-spec-label">{t('pd_size', 'Size')}</span>
+                    <span className="pd-spec-val" title={sizeDisplay}>
+                      {sizeDisplay}
+                    </span>
+                  </div>
+                )}
                 <div className="pd-spec-box">
                   <span className="pd-spec-label">{t('pd_skin_type', 'Target Skin')}</span>
-                  <span className="pd-spec-val" title={product.targetSkinTypes?.join(', ') || 'All Skin Types'}>
-                    {product.targetSkinTypes?.length > 0 ? product.targetSkinTypes.join(', ') : 'All Skin Types'}
+                  <span
+                    className="pd-spec-val"
+                    title={product.targetSkinTypes?.join(', ') || 'All Skin Types'}
+                  >
+                    {product.targetSkinTypes?.length > 0
+                      ? product.targetSkinTypes.join(', ')
+                      : 'All Skin Types'}
                   </span>
                 </div>
               </div>
 
-              {/* Purchase Actions (Quantity + Add to Cart) */}
+              {/* 6. Suitability / Sign-In Prompt Banner (Positioned cleanly below Specs & above Add to Bag) */}
+              <SuitabilityBanner
+                hasAllergyWarning={hasAllergyWarning}
+                isNonCosmeticTool={isNonCosmeticTool}
+                hasIngredients={hasIngredients}
+                user={user}
+                suitabilityVerdict={suitabilityVerdict}
+                suitabilityLabel={suitabilityLabel}
+                suitabilityReason={suitabilityReason}
+                onOpenSkinModal={() => setSkinIdModalOpen(true)}
+              />
+
+              {/* 7. Purchase Actions (Quantity + Add to Cart) */}
               <div className="pd-purchase-controls">
                 <div className="pd-qty-selector">
                   <button
+                    type="button"
                     className="pd-qty-btn"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     disabled={quantity <= 1}
@@ -871,6 +1163,7 @@ export default function ProductDetail() {
                   </button>
                   <span className="pd-qty-number">{quantity}</span>
                   <button
+                    type="button"
                     className="pd-qty-btn"
                     onClick={() => setQuantity((q) => q + 1)}
                     aria-label={t('pd_increase_qty')}
@@ -880,11 +1173,15 @@ export default function ProductDetail() {
                 </div>
 
                 <button
+                  type="button"
                   className="btn btn-primary pd-cta-btn"
                   onClick={() => addItemToCart(product, quantity)}
                 >
                   <ShoppingBag size={18} />
-                  <span>{t('prod_add_to_cart', 'Add to Bag')} · {formatPrice((salePrice || price) * quantity)}</span>
+                  <span>
+                    {t('prod_add_to_cart', 'Add to Bag')} ·{' '}
+                    {formatPrice((salePrice || price) * quantity)}
+                  </span>
                 </button>
               </div>
 
@@ -903,10 +1200,13 @@ export default function ProductDetail() {
 
         {/* ── PART 3: SEGMENTED DEEP DIVE TABS (MIDDLE) ────── */}
         <div className="pd-part-tabs">
-          <div className="pd-tab-navigation" role="tablist">
+          <div className="pd-tab-navigation" role="tablist" aria-label="Product Details">
             <button
+              type="button"
+              id="pd-tab-info"
               role="tab"
               aria-selected={activeTab === 'info'}
+              aria-controls="pd-panel-info"
               className={`pd-tab-btn ${activeTab === 'info' ? 'active' : ''}`}
               onClick={() => setActiveTab('info')}
             >
@@ -916,8 +1216,11 @@ export default function ProductDetail() {
 
             {!isNonCosmeticTool && (
               <button
+                type="button"
+                id="pd-tab-ingredients"
                 role="tab"
                 aria-selected={activeTab === 'ingredients'}
+                aria-controls="pd-panel-ingredients"
                 className={`pd-tab-btn ${activeTab === 'ingredients' ? 'active' : ''}`}
                 onClick={() => setActiveTab('ingredients')}
               >
@@ -930,20 +1233,30 @@ export default function ProductDetail() {
             )}
 
             <button
+              type="button"
+              id="pd-tab-reviews"
               role="tab"
               aria-selected={activeTab === 'reviews'}
+              aria-controls="pd-panel-reviews"
               className={`pd-tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
               onClick={() => setActiveTab('reviews')}
             >
               <MessageSquare size={16} />
-              <span>{t('pd_tab_reviews', 'Customer Reviews')} ({reviewCount})</span>
+              <span>
+                {t('pd_tab_reviews', 'Customer Reviews')} ({reviewCount})
+              </span>
             </button>
           </div>
 
           <div className="pd-tab-panel">
-            {/* TAB 1: MÔ TẢ & CÔNG DỤNG & ROUTINE */}
+            {/* TAB 1: DESCRIPTION & ROUTINE */}
             {activeTab === 'info' && (
-              <div className="pd-tab-info-content animate-fadeIn">
+              <div
+                id="pd-panel-info"
+                role="tabpanel"
+                aria-labelledby="pd-tab-info"
+                className="pd-tab-info-content animate-fadeIn"
+              >
                 {highlights.length > 0 && (
                   <div className="pd-highlights-block">
                     <h3 className="pd-block-heading">
@@ -953,7 +1266,11 @@ export default function ProductDetail() {
                     <div className="pd-highlights-grid">
                       {highlights.map((h, i) => (
                         <div key={i} className="pd-highlight-card">
-                          <CheckCircle size={16} color="var(--accent-sage, #2E6F4E)" className="pd-hl-icon" />
+                          <CheckCircle
+                            size={16}
+                            color="var(--accent-sage, #2E6F4E)"
+                            className="pd-hl-icon"
+                          />
                           <span>{translateHighlight(h, lang)}</span>
                         </div>
                       ))}
@@ -967,58 +1284,75 @@ export default function ProductDetail() {
                     <div className="pd-routine-header">
                       <span className="pd-routine-step-badge">{routine.step}</span>
                       <span className="pd-routine-time-badge">
-                        {routine.time.includes('AM') && <Sun size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
-                        {routine.time.includes('PM') && <Moon size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />}
+                        {routine.time.includes('AM') && (
+                          <Sun size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />
+                        )}
+                        {routine.time.includes('PM') && (
+                          <Moon size={13} style={{ marginRight: 3, verticalAlign: 'middle' }} />
+                        )}
                         {routine.time}
                       </span>
                     </div>
                     <p className="pd-routine-tip">{routine.tip}</p>
                   </div>
-                ) : product?.department === 'Tools & Brushes' ? (
-                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                ) : department === 'Tools & Brushes' ? (
+                  <div className="pd-routine-card pd-routine-dept">
                     <div className="pd-routine-header">
-                      <span className="pd-routine-step-badge" style={{ background: '#3B82F6', color: '#FFF' }}>Tool & Accessory Care</span>
-                      <span className="pd-routine-time-badge">Hygiene & Care</span>
+                      <span className="pd-routine-step-badge badge-dept-tool">
+                        Tool &amp; Accessory Care
+                      </span>
+                      <span className="pd-routine-time-badge">Hygiene &amp; Care</span>
                     </div>
                     <p className="pd-routine-tip">
-                      Clean bristles or applicator weekly with a gentle brush cleaner or warm soapy water. Lay flat to dry to preserve shape and prevent bacteria accumulation.
+                      Clean bristles or applicator weekly with a gentle brush cleaner or warm soapy
+                      water. Lay flat to dry to preserve shape and prevent bacteria accumulation.
                     </p>
                   </div>
-                ) : product?.department === 'Fragrance' ? (
-                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                ) : department === 'Fragrance' ? (
+                  <div className="pd-routine-card pd-routine-dept">
                     <div className="pd-routine-header">
-                      <span className="pd-routine-step-badge" style={{ background: '#8B5CF6', color: '#FFF' }}>Scent Application</span>
+                      <span className="pd-routine-step-badge badge-dept-fragrance">
+                        Scent Application
+                      </span>
                       <span className="pd-routine-time-badge">Pulse Points</span>
                     </div>
                     <p className="pd-routine-tip">
-                      Spritz onto pulse points (wrists, neck, behind ears) from 5-7 inches away. Allow to dry naturally without rubbing to preserve the delicate olfactory top and heart notes.
+                      Spritz onto pulse points (wrists, neck, behind ears) from 5-7 inches away.
+                      Allow to dry naturally without rubbing to preserve the delicate olfactory top
+                      and heart notes.
                     </p>
                   </div>
-                ) : product?.department === 'Makeup' ? (
-                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                ) : department === 'Makeup' ? (
+                  <div className="pd-routine-card pd-routine-dept">
                     <div className="pd-routine-header">
-                      <span className="pd-routine-step-badge" style={{ background: '#D97706', color: '#FFF' }}>Makeup Artistry</span>
+                      <span className="pd-routine-step-badge badge-dept-makeup">
+                        Makeup Artistry
+                      </span>
                       <span className="pd-routine-time-badge">Application Tip</span>
                     </div>
                     <p className="pd-routine-tip">
-                      Apply onto hydrated skin. Blend smoothly with appropriate brush, sponge, or fingertips, layering gradually for desired opacity and long-lasting finish.
+                      Apply onto hydrated skin. Blend smoothly with appropriate brush, sponge, or
+                      fingertips, layering gradually for desired opacity and long-lasting finish.
                     </p>
                   </div>
-                ) : product?.department === 'Hair' ? (
-                  <div className="pd-routine-card" style={{ borderColor: 'var(--border-subtle, #E2E8F0)' }}>
+                ) : department === 'Hair' ? (
+                  <div className="pd-routine-card pd-routine-dept">
                     <div className="pd-routine-header">
-                      <span className="pd-routine-step-badge" style={{ background: '#059669', color: '#FFF' }}>Hair Ritual</span>
+                      <span className="pd-routine-step-badge badge-dept-hair">Hair Ritual</span>
                       <span className="pd-routine-time-badge">Hair Care</span>
                     </div>
                     <p className="pd-routine-tip">
-                      Work evenly through damp or dry hair, focusing on mid-lengths and ends. Style or rinse according to formula directions.
+                      Work evenly through damp or dry hair, focusing on mid-lengths and ends. Style
+                      or rinse according to formula directions.
                     </p>
                   </div>
                 ) : null}
 
                 {product.description && (
                   <div className="pd-desc-block">
-                    <h3 className="pd-block-heading">{t('pd_description', 'Product Description')}</h3>
+                    <h3 className="pd-block-heading">
+                      {t('pd_description', 'Product Description')}
+                    </h3>
                     <p className="pd-desc-text">{product.description}</p>
                   </div>
                 )}
@@ -1036,11 +1370,16 @@ export default function ProductDetail() {
 
             {/* TAB 2: 3-TIER PROGRESSIVE DISCLOSURE INCI BREAKDOWN */}
             {activeTab === 'ingredients' && !isNonCosmeticTool && (
-              <div className="pd-tab-ingredients-content animate-fadeIn">
+              <div
+                id="pd-panel-ingredients"
+                role="tabpanel"
+                aria-labelledby="pd-tab-ingredients"
+                className="pd-tab-ingredients-content animate-fadeIn"
+              >
                 <div className="pd-ingredients-top">
                   <div>
                     <h3 className="pd-block-heading" style={{ marginBottom: 4 }}>
-                      Formula Breakdown & INCI Transparency
+                      Formula Breakdown &amp; INCI Transparency
                     </h3>
                     <p className="pd-block-subtext">
                       {hasIngredients
@@ -1049,13 +1388,11 @@ export default function ProductDetail() {
                     </p>
                   </div>
 
-                  {/* Deep Formula Analysis Button — ONLY shown when product actually has ingredients */}
                   {hasIngredients && (
                     <button
                       type="button"
                       onClick={handleDeepAnalysisClick}
                       className="btn btn-secondary btn-sm pd-ai-analyze-btn"
-                      style={{ cursor: 'pointer' }}
                     >
                       <FlaskConical size={15} />
                       <span>Deep Formula Analysis</span>
@@ -1065,306 +1402,202 @@ export default function ProductDetail() {
                 </div>
 
                 {!hasIngredients ? (
-                  /* Group B: Cosmetic product missing manufacturer INCI list */
-                  <div
-                    className="pd-empty-block"
-                    style={{
-                      background: '#F8FAFC',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '16px',
-                      padding: '32px 24px',
-                      textAlign: 'center',
-                    }}
-                  >
+                  <div className="pd-empty-inci-card">
                     <AlertCircle size={36} color="#64748B" style={{ marginBottom: 10 }} />
-                    <h4 style={{ margin: '0 0 6px', color: '#1E293B', fontSize: '1.05rem' }}>
-                      Insufficient INCI Data
-                    </h4>
-                    <p style={{ maxWidth: 540, margin: '0 auto', color: '#475569', fontSize: '0.9rem', lineHeight: 1.55 }}>
-                      The manufacturer has not provided a detailed INCI ingredient list for this product. Because we cannot verify its exact chemical composition, it is excluded from &ldquo;Safe for Me&rdquo; allergy filtering.
+                    <h4 className="pd-empty-inci-title">Insufficient INCI Data</h4>
+                    <p className="pd-empty-inci-desc">
+                      The manufacturer has not provided a detailed INCI ingredient list for this
+                      product. Because we cannot verify its exact chemical composition, it is
+                      excluded from &ldquo;Safe for Me&rdquo; allergy filtering.
                     </p>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-                    {/* ── TIER 1: PERSONALIZED VERDICT & ALLERGY SUMMARY (Authenticated Users Only) ── */}
-                    {user && (
-                      <div
-                        style={{
-                          padding: '16px 20px',
-                          borderRadius: '14px',
-                          background: hasAllergyWarning
-                            ? 'rgba(239, 68, 68, 0.08)'
-                            : suitabilityVerdict === 'MatchWithNotes'
-                            ? 'rgba(245, 158, 11, 0.08)'
-                            : suitabilityVerdict === 'GoodMatch'
-                            ? 'rgba(16, 185, 129, 0.08)'
-                            : 'rgba(196, 139, 113, 0.08)',
-                          border: hasAllergyWarning
-                            ? '1px solid rgba(239, 68, 68, 0.3)'
-                            : suitabilityVerdict === 'MatchWithNotes'
-                            ? '1px solid rgba(245, 158, 11, 0.3)'
-                            : suitabilityVerdict === 'GoodMatch'
-                            ? '1px solid rgba(16, 185, 129, 0.28)'
-                            : '1px solid rgba(196, 139, 113, 0.28)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          flexWrap: 'wrap',
-                          gap: '12px',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                          {hasAllergyWarning ? (
-                            <ShieldAlert size={22} color="#DC2626" style={{ marginTop: 2, flexShrink: 0 }} />
-                          ) : suitabilityVerdict === 'MatchWithNotes' ? (
-                            <AlertCircle size={22} color="#D97706" style={{ marginTop: 2, flexShrink: 0 }} />
-                          ) : suitabilityVerdict === 'GoodMatch' ? (
-                            <CheckCircle2 size={22} color="#059669" style={{ marginTop: 2, flexShrink: 0 }} />
-                          ) : (
-                            <Sparkles size={22} color="#8F5B42" style={{ marginTop: 2, flexShrink: 0 }} />
-                          )}
-                          <div>
-                            <div style={{ fontWeight: 700, fontSize: '0.96rem', color: '#2C2018' }}>
-                              {suitabilityLabel || 'Good Match'}
-                            </div>
-                            <div style={{ fontSize: '0.86rem', color: '#574B42', marginTop: 3, lineHeight: 1.45 }}>
-                              {suitabilityReason}
-                            </div>
-                          </div>
-                        </div>
-
-                        {suitabilityVerdict === 'RequiresSkinId' ? (
-                          <button
-                            type="button"
-                            className="btn btn-primary btn-sm"
-                            onClick={() => setSkinIdModalOpen(true)}
-                          >
-                            Complete Skin ID (30s)
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="btn btn-secondary btn-sm"
-                            onClick={() => setSkinIdModalOpen(true)}
-                          >
-                            Edit Skin ID
-                          </button>
-                        )}
-                      </div>
+                  <div className="pd-inci-tiers-stack">
+                    {/* ── TIER 1: REUSABLE PERSONALIZED VERDICT SUMMARY ── */}
+                    {user && !hasAllergyWarning && (
+                      <SuitabilityBanner
+                        hasAllergyWarning={false}
+                        isNonCosmeticTool={false}
+                        hasIngredients={true}
+                        user={user}
+                        suitabilityVerdict={suitabilityVerdict}
+                        suitabilityLabel={suitabilityLabel}
+                        suitabilityReason={suitabilityReason}
+                        onOpenSkinModal={() => setSkinIdModalOpen(true)}
+                        showEditButton={true}
+                      />
                     )}
 
-                    {/* ── TIER 2A: KEY INGREDIENTS STRIP (3–6 HERO CARDS) ── */}
+                    {/* ── TIER 2A: KEY INGREDIENTS STRIP (AUTO-FIT GRID) ── */}
                     {formulaBreakdown?.keyIngredients?.length > 0 && (
                       <div>
-                        <h4 style={{ margin: '0 0 10px', fontSize: '1rem', fontWeight: 700, color: '#2C2018', display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <Star size={17} color="#C48B71" />
-                          <span>Key Notable Ingredients ({formulaBreakdown.keyIngredients.length})</span>
+                        <h4 className="pd-tier-heading">
+                          <Star size={17} color="var(--accent)" />
+                          <span>
+                            Key Notable Ingredients ({formulaBreakdown.keyIngredients.length})
+                          </span>
                         </h4>
-                        <div
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                            gap: '12px',
-                          }}
-                        >
+                        <div className="pd-key-ingredients-grid">
                           {formulaBreakdown.keyIngredients.map((item, idx) => (
                             <div
                               key={idx}
-                              style={{
-                                background: '#FFFFFF',
-                                border: item.isFeaturedInProductName
-                                  ? '1.5px solid rgba(196, 139, 113, 0.55)'
-                                  : '1px solid #EAE3DC',
-                                borderRadius: '14px',
-                                padding: '14px 16px',
-                                boxShadow: '0 2px 8px rgba(74, 55, 40, 0.04)',
-                              }}
+                              className={`pd-key-card ${
+                                item.isFeaturedInProductName ? 'is-featured' : ''
+                              }`}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
-                                <span
-                                  style={{
-                                    fontSize: '0.72rem',
-                                    fontWeight: 700,
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.03em',
-                                    padding: '2px 8px',
-                                    borderRadius: '999px',
-                                    background: 'rgba(196, 139, 113, 0.12)',
-                                    color: '#8F5B42',
-                                  }}
-                                >
-                                  {item.roleLabel}
-                                </span>
+                              <div className="pd-key-card-top">
+                                <span className="pd-key-role-tag">{item.roleLabel}</span>
                                 {item.isFeaturedInProductName && (
-                                  <span
-                                    style={{
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      padding: '2px 7px',
-                                      borderRadius: '999px',
-                                      background: 'rgba(16, 185, 129, 0.12)',
-                                      color: '#047857',
-                                    }}
-                                  >
-                                    ★ Featured Hero
-                                  </span>
+                                  <span className="pd-key-featured-tag">Featured Hero</span>
                                 )}
                               </div>
-                              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#2C2018' }}>
-                                {item.commonName}
-                              </div>
+                              <div className="pd-key-name">{item.commonName}</div>
                               {item.commonName.toLowerCase() !== item.inciName.toLowerCase() && (
-                                <div style={{ fontSize: '0.76rem', color: '#8C7A6B', fontStyle: 'italic', marginBottom: 6 }}>
-                                  INCI: {item.inciName}
-                                </div>
+                                <div className="pd-key-inci">INCI: {item.inciName}</div>
                               )}
-                              <p style={{ margin: '6px 0 0', fontSize: '0.84rem', color: '#574B42', lineHeight: 1.45 }}>
-                                {item.explanation}
-                              </p>
+                              <p className="pd-key-desc">{item.explanation}</p>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* ── TIER 2B: FUNCTIONAL ROLE GROUPING (BASE, PIGMENTS, SCENT, PRESERVATIVES) ── */}
+                    {/* ── TIER 2B: FUNCTIONAL ROLE GROUPING (AUTO-FIT 3-COL GRID + EXPANDABLE "+N MORE") ── */}
                     {formulaBreakdown?.functionalGroups?.length > 0 && (
                       <div>
-                        <h4 style={{ margin: '0 0 10px', fontSize: '1rem', fontWeight: 700, color: '#2C2018', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <h4 className="pd-tier-heading">
                           <Layers size={17} color="#2E6F4E" />
                           <span>How the Complete Formula Is Built</span>
                         </h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '12px' }}>
-                          {formulaBreakdown.functionalGroups.map((grp, idx) => (
-                            <div
-                              key={idx}
-                              style={{
-                                background: '#FAF8F5',
-                                border: '1px solid #EAE3DC',
-                                borderRadius: '12px',
-                                padding: '14px 16px',
-                              }}
-                            >
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                                <strong style={{ fontSize: '0.9rem', color: '#2C2018' }}>{grp.groupTitle}</strong>
-                                <span
-                                  style={{
-                                    background: '#EAE3DC',
-                                    color: '#4A3728',
-                                    fontSize: '0.74rem',
-                                    fontWeight: 700,
-                                    padding: '2px 8px',
-                                    borderRadius: '999px',
-                                  }}
-                                >
-                                  {grp.count}
-                                </span>
+                        <div className="pd-functional-groups-grid">
+                          {formulaBreakdown.functionalGroups.map((grp, idx) => {
+                            const isExpanded = Boolean(expandedGroups[idx]);
+                            const visibleItems = isExpanded
+                              ? grp.ingredients
+                              : grp.ingredients.slice(0, 5);
+                            const remainingCount = grp.ingredients.length - 5;
+
+                            return (
+                              <div key={idx} className="pd-group-card">
+                                <div className="pd-group-card-header">
+                                  <strong className="pd-group-title">{grp.groupTitle}</strong>
+                                  <span className="pd-group-count">{grp.count}</span>
+                                </div>
+                                <p className="pd-group-desc">{grp.plainExplanation}</p>
+                                <div className="pd-group-includes">
+                                  <strong>Includes:</strong> {visibleItems.join(', ')}
+                                  {remainingCount > 0 && (
+                                    <button
+                                      type="button"
+                                      className="pd-group-expand-btn"
+                                      onClick={() =>
+                                        setExpandedGroups((prev) => ({
+                                          ...prev,
+                                          [idx]: !prev[idx],
+                                        }))
+                                      }
+                                    >
+                                      {isExpanded ? 'Show less' : `+${remainingCount} more`}
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                              <p style={{ margin: '0 0 8px', fontSize: '0.8rem', color: '#6B5E55', lineHeight: 1.4 }}>
-                                {grp.plainExplanation}
-                              </p>
-                              <div style={{ fontSize: '0.76rem', color: '#8C7A6B', lineHeight: 1.4 }}>
-                                <strong>Includes:</strong> {grp.ingredients.slice(0, 5).join(', ')}
-                                {grp.ingredients.length > 5 && ` +${grp.ingredients.length - 5} more`}
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
 
                     {/* ── TIER 2C: CATEGORY-APPROPRIATE NOTES & FRAGRANCE DISCLOSURE ── */}
-                    {(formulaBreakdown?.cautions?.length > 0 || formulaBreakdown?.fragranceDisclosure) && (
-                      <div
-                        style={{
-                          background: '#FFFDF9',
-                          border: '1px solid #F3E5D8',
-                          borderRadius: '12px',
-                          padding: '14px 18px',
-                        }}
-                      >
-                        <h4 style={{ margin: '0 0 8px', fontSize: '0.92rem', fontWeight: 700, color: '#4A3728' }}>
-                          Usage & Sensitivity Notes
-                        </h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {(formulaBreakdown?.cautions?.length > 0 ||
+                      formulaBreakdown?.fragranceDisclosure) && (
+                      <div className="pd-cautions-card">
+                        <h4 className="pd-cautions-heading">Usage &amp; Sensitivity Notes</h4>
+                        <div className="pd-cautions-list">
                           {formulaBreakdown.cautions?.map((c, i) => (
-                            <div key={i} style={{ fontSize: '0.84rem', color: c.type === 'allergy' ? '#DC2626' : '#6B5E55', lineHeight: 1.45 }}>
+                            <div
+                              key={i}
+                              className={`pd-caution-item ${
+                                c.type === 'allergy' ? 'is-allergy' : ''
+                              }`}
+                            >
                               <strong>{c.title}:</strong> {c.message}
                             </div>
                           ))}
                           {formulaBreakdown.fragranceDisclosure && (
-                            <div style={{ fontSize: '0.82rem', color: '#6B5E55', lineHeight: 1.45 }}>
-                              <strong>Scent & Allergen Transparency:</strong> {formulaBreakdown.fragranceDisclosure}
+                            <div className="pd-caution-item">
+                              <strong>Scent &amp; Allergen Transparency:</strong>{' '}
+                              {formulaBreakdown.fragranceDisclosure}
                             </div>
                           )}
                         </div>
                       </div>
                     )}
 
-                    {/* ── TIER 3: COLLAPSIBLE FULL PACKAGING INCI LIST ── */}
-                    <div
-                      style={{
-                        border: '1px solid #EAE3DC',
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        background: '#FFFFFF',
-                      }}
-                    >
+                    {/* ── TIER 3: COLLAPSIBLE FULL PACKAGING INCI LIST + SEPARATE "MAY CONTAIN" ── */}
+                    <div className="pd-full-inci-accordion">
                       <button
                         type="button"
+                        className="pd-full-inci-trigger"
                         onClick={() => setShowFullInci((v) => !v)}
-                        style={{
-                          width: '100%',
-                          padding: '14px 18px',
-                          background: '#FAF8F5',
-                          border: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          cursor: 'pointer',
-                          fontWeight: 700,
-                          fontSize: '0.9rem',
-                          color: '#2C2018',
-                        }}
+                        aria-expanded={showFullInci}
                       >
                         <span>
-                          View Full Packaging INCI List ({totalInciCount} ingredients in concentration order)
+                          View Full Packaging INCI List ({mainInciList.length} base ingredients in
+                          concentration order
+                          {mayContainInciList.length > 0
+                            ? ` + ${mayContainInciList.length} shade pigments`
+                            : ''}
+                          )
                         </span>
                         {showFullInci ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                       </button>
 
                       {showFullInci && (
-                        <div style={{ padding: '16px 18px', borderTop: '1px solid #EAE3DC' }}>
+                        <div className="pd-full-inci-body">
                           <div className="pd-ingredient-tag-cloud">
-                            {(formulaBreakdown?.rawInciList?.length > 0
-                              ? formulaBreakdown.rawInciList
-                              : rawIngredients
-                            ).map((ing, i) => {
-                              const isAllergen = matchedAllergen && ing.toLowerCase().includes(matchedAllergen.toLowerCase());
+                            {mainInciList.map((ing, i) => {
+                              const isAllergen =
+                                matchedAllergen &&
+                                ing.toLowerCase().includes(matchedAllergen.toLowerCase());
                               const isKey = formulaBreakdown?.keyIngredients?.some(
                                 (k) => k.inciName.toLowerCase() === ing.toLowerCase()
                               );
                               return (
                                 <span
                                   key={i}
-                                  className={`pd-ingredient-pill ${isAllergen ? 'pd-allergen-pill' : ''}`}
-                                  style={
-                                    !isAllergen && isKey
-                                      ? {
-                                          borderColor: '#C48B71',
-                                          background: 'rgba(196, 139, 113, 0.12)',
-                                          color: '#6B442A',
-                                          fontWeight: 600,
-                                        }
-                                      : undefined
-                                  }
+                                  className={`pd-ingredient-pill ${
+                                    isAllergen
+                                      ? 'pd-allergen-pill'
+                                      : isKey
+                                      ? 'pd-key-pill'
+                                      : ''
+                                  }`}
                                 >
                                   {ing}
-                                  {isAllergen && ' ⚠️ (Allergy Match)'}
+                                  {isAllergen && ' (Allergy Match)'}
                                 </span>
                               );
                             })}
                           </div>
+
+                          {mayContainInciList.length > 0 && (
+                            <div className="pd-may-contain-block">
+                              <div className="pd-may-contain-title">
+                                May Contain (Varies by Shade — {mayContainInciList.length})
+                              </div>
+                              <div className="pd-ingredient-tag-cloud">
+                                {mayContainInciList.map((ing, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="pd-ingredient-pill pd-may-contain-pill"
+                                  >
+                                    {ing}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1373,21 +1606,32 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* TAB 3: ĐÁNH GIÁ NGƯỜI DÙNG */}
+            {/* TAB 3: CUSTOMER REVIEWS */}
             {activeTab === 'reviews' && (
-              <div className="pd-tab-reviews-content animate-fadeIn">
-                {/* Rating Distribution Overview */}
+              <div
+                id="pd-panel-reviews"
+                role="tabpanel"
+                aria-labelledby="pd-tab-reviews"
+                className="pd-tab-reviews-content animate-fadeIn"
+              >
+                {/* Rating Distribution Overview (Powered by full product RatingDistribution) */}
                 <div className="pd-reviews-overview">
                   <div className="pd-rating-spotlight">
-                    <span className="pd-spotlight-num">{rating.toFixed(1)}</span>
-                    <StarRating value={Math.round(rating)} size={22} />
-                    <span className="pd-spotlight-sub">{reviewCount} {t('pd_real_reviews')}</span>
+                    <span className="pd-spotlight-num">
+                      {rating !== null ? rating.toFixed(1) : '—'}
+                    </span>
+                    <StarRating value={rating !== null ? Math.round(rating) : 0} size={22} />
+                    <span className="pd-spotlight-sub">
+                      {reviewCount > 0
+                        ? `${reviewCount.toLocaleString()} ${t('pd_real_reviews', 'verified reviews')}`
+                        : t('pd_no_reviews_short', 'No reviews yet')}
+                    </span>
                   </div>
 
                   <div className="pd-rating-bars-wrap">
                     {[5, 4, 3, 2, 1].map((star, i) => {
-                      const count = breakdown[i];
-                      const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                      const count = starDistribution[i] || 0;
+                      const pct = totalDistCount > 0 ? (count / totalDistCount) * 100 : 0;
                       return (
                         <div key={star} className="pd-bar-row">
                           <span className="pd-bar-label">{star}★</span>
@@ -1404,6 +1648,7 @@ export default function ProductDetail() {
                 {/* Write Review Toggle Button */}
                 <div className="pd-write-review-toggle">
                   <button
+                    type="button"
                     className="btn btn-primary btn-sm"
                     onClick={() => {
                       if (!user) {
@@ -1423,10 +1668,14 @@ export default function ProductDetail() {
                 {/* Review Form */}
                 {showReviewForm && (
                   <form className="pd-review-form animate-scaleIn" onSubmit={handleSubmitReview}>
-                    <h4 className="pd-review-form-title">{t('pd_write_review_title', 'Share Your Review')}</h4>
+                    <h4 className="pd-review-form-title">
+                      {t('pd_write_review_title', 'Share Your Review')}
+                    </h4>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_satisfaction_prompt', 'Rate this product *')}</label>
+                      <label className="pd-form-label">
+                        {t('pd_satisfaction_prompt', 'Rate this product *')}
+                      </label>
                       <StarRating
                         value={reviewForm.rating}
                         size={28}
@@ -1436,13 +1685,17 @@ export default function ProductDetail() {
                     </div>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_skin_type', 'Your Skin Type')}</label>
+                      <label className="pd-form-label">
+                        {t('pd_skin_type', 'Your Skin Type')}
+                      </label>
                       <select
                         className="form-select"
                         value={reviewForm.skin_type}
-                        onChange={(e) => setReviewForm((f) => ({ ...f, skin_type: e.target.value }))}
+                        onChange={(e) =>
+                          setReviewForm((f) => ({ ...f, skin_type: e.target.value }))
+                        }
                       >
-                        <option value="">{t('pd_select_skintype')}</option>
+                        <option value="">{t('pd_select_skintype', 'Select skin type')}</option>
                         <option value="Normal">Normal</option>
                         <option value="Dry">Dry</option>
                         <option value="Oily">Oily</option>
@@ -1452,18 +1705,30 @@ export default function ProductDetail() {
                     </div>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_review_text_label', 'Your Review *')}</label>
+                      <label className="pd-form-label">
+                        {t('pd_review_text_label', 'Your Review *')}
+                      </label>
                       <textarea
                         className="form-textarea"
-                        placeholder={t('pd_review_text_placeholder', 'Share your honest experience and results with this formula...')}
+                        placeholder={t(
+                          'pd_review_text_placeholder',
+                          'Share your honest experience and results with this formula...'
+                        )}
                         rows={4}
                         value={reviewForm.review_text}
-                        onChange={(e) => setReviewForm((f) => ({ ...f, review_text: e.target.value }))}
+                        onChange={(e) =>
+                          setReviewForm((f) => ({ ...f, review_text: e.target.value }))
+                        }
                       />
                     </div>
 
                     <div className="pd-form-group">
-                      <label className="pd-form-label">{t('pd_review_recommend_ask', 'Would you recommend this product to others?')}</label>
+                      <label className="pd-form-label">
+                        {t(
+                          'pd_review_recommend_ask',
+                          'Would you recommend this product to others?'
+                        )}
+                      </label>
                       <div className="pd-rec-toggle-group">
                         <button
                           type="button"
@@ -1492,88 +1757,68 @@ export default function ProductDetail() {
                       </button>
                       <button type="submit" className="btn btn-primary" disabled={submitting}>
                         <Send size={15} />
-                        {submitting ? t('pd_submitting') : t('pd_submit_review', 'Submit Review')}
+                        {submitting
+                          ? t('pd_submitting', 'Submitting...')
+                          : t('pd_submit_review', 'Submit Review')}
                       </button>
                     </div>
                   </form>
                 )}
 
                 {/* Personalized Skin Match Banner */}
-                {user?.skin_type && (
-                  <div
-                    className="pd-reviews-user-match-banner"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '12px 18px',
-                      background: 'linear-gradient(135deg, rgba(74, 55, 40, 0.06), rgba(212, 163, 115, 0.12))',
-                      borderRadius: '12px',
-                      marginBottom: '16px',
-                      border: '1px solid rgba(74, 55, 40, 0.14)',
-                      flexWrap: 'wrap',
-                      gap: '10px'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {(user?.skinProfile?.skinType || user?.skin_type) && (
+                  <div className="pd-reviews-user-match-banner">
+                    <div className="pd-reviews-match-left">
                       <Sparkles size={18} color="#D4A373" />
-                      <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#4A3728' }}>
-                        {lang === 'vi'
-                          ? `Hồ sơ da của bạn: ${user.skin_type}. Lọc nhận xét từ người dùng có cùng loại da?`
-                          : `Your Skin ID: ${user.skin_type}. Explore verified reviews from ${user.skin_type} skin users?`}
+                      <span>
+                        {t('pd_your_skin_id', 'Your Skin ID')}:{' '}
+                        <strong>{user.skinProfile?.skinType || user.skin_type}</strong>.{' '}
+                        {t(
+                          'pd_filter_same_skin_prompt',
+                          'Explore verified reviews from shoppers with your skin type?'
+                        )}
                       </span>
                     </div>
                     <button
                       type="button"
-                      className={`btn btn-sm ${selectedReviewSkin.toLowerCase() === user.skin_type.toLowerCase() ? 'btn-primary' : 'btn-secondary'}`}
-                      onClick={() => setSelectedReviewSkin(user.skin_type)}
-                      style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                      className={`btn btn-sm ${
+                        selectedReviewSkin.toLowerCase() ===
+                        (user.skinProfile?.skinType || user.skin_type).toLowerCase()
+                          ? 'btn-primary'
+                          : 'btn-secondary'
+                      }`}
+                      onClick={() =>
+                        setSelectedReviewSkin(user.skinProfile?.skinType || user.skin_type)
+                      }
                     >
-                      {lang === 'vi' ? `Xem người có DA ${user.skin_type.toUpperCase()} nói gì` : `See what ${user.skin_type} skin says`}
+                      {t('pd_see_skin_reviews', 'Filter for My Skin Type')}
                     </button>
                   </div>
                 )}
 
                 {/* Skin Type Filter Tabs */}
-                <div
-                  className="pd-review-filters"
-                  style={{
-                    display: 'flex',
-                    gap: '8px',
-                    flexWrap: 'wrap',
-                    marginBottom: '20px',
-                    alignItems: 'center'
-                  }}
-                >
-                  <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#777', marginRight: '4px' }}>
-                    {lang === 'vi' ? 'Lọc theo loại da:' : 'Filter by skin type:'}
+                <div className="pd-review-filters">
+                  <span className="pd-review-filter-label">
+                    {t('pd_filter_by_skin', 'Filter by skin type:')}
                   </span>
-                  {['All', 'Oily', 'Dry', 'Combination', 'Normal'].map((st) => {
+                  {['All', 'Oily', 'Dry', 'Combination', 'Normal', 'Sensitive'].map((st) => {
                     const active = selectedReviewSkin.toLowerCase() === st.toLowerCase();
                     return (
                       <button
                         key={st}
                         type="button"
-                        className={`btn btn-sm ${active ? 'btn-primary' : 'btn-secondary'}`}
+                        className={`btn btn-sm pd-review-skin-pill ${
+                          active ? 'btn-primary' : 'btn-secondary'
+                        }`}
                         onClick={() => setSelectedReviewSkin(st)}
-                        style={{
-                          borderRadius: '20px',
-                          padding: '5px 14px',
-                          fontSize: '0.82rem',
-                          fontWeight: active ? 600 : 500
-                        }}
                       >
-                        {st === 'All'
-                          ? (lang === 'vi' ? 'Tất cả' : 'All')
-                          : (lang === 'vi' ? `Da ${st}` : `${st} Skin`)}
+                        {st === 'All' ? t('prod_rating_all', 'All') : `${st} Skin`}
                       </button>
                     );
                   })}
                   {selectedReviewSkin !== 'All' && (
-                    <span style={{ fontSize: '0.78rem', color: '#888', marginLeft: 'auto' }}>
-                      {lang === 'vi'
-                        ? `Tìm thấy ${totalReviews.toLocaleString()} đánh giá cho da ${selectedReviewSkin}`
-                        : `Showing ${totalReviews.toLocaleString()} reviews for ${selectedReviewSkin} skin`}
+                    <span className="pd-review-filter-count">
+                      Showing {totalReviews.toLocaleString()} reviews for {selectedReviewSkin} skin
                     </span>
                   )}
                 </div>
@@ -1592,32 +1837,19 @@ export default function ProductDetail() {
                       ))}
                     </div>
 
-                    {/* Pagination Controls */}
                     {totalReviewPages > 1 && (
-                      <div
-                        className="pd-reviews-pagination"
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '16px',
-                          marginTop: '28px',
-                          paddingTop: '16px',
-                          borderTop: '1px solid rgba(74, 55, 40, 0.08)'
-                        }}
-                      >
+                      <div className="pd-reviews-pagination">
                         <button
                           type="button"
                           className="btn btn-secondary btn-sm"
                           disabled={reviewPage <= 1 || loadingReviews}
                           onClick={() => loadReviews(selectedReviewSkin, reviewPage - 1)}
                         >
-                          ← {lang === 'vi' ? 'Trang trước' : 'Previous'}
+                          ← {t('pd_prev_page', 'Previous')}
                         </button>
-                        <span style={{ fontSize: '0.84rem', color: '#666', fontWeight: 500 }}>
-                          {lang === 'vi'
-                            ? `Trang ${reviewPage} / ${totalReviewPages} (${totalReviews.toLocaleString()} đánh giá)`
-                            : `Page ${reviewPage} of ${totalReviewPages} (${totalReviews.toLocaleString()} reviews)`}
+                        <span className="pd-reviews-page-info">
+                          Page {reviewPage} of {totalReviewPages} ({totalReviews.toLocaleString()}{' '}
+                          reviews)
                         </span>
                         <button
                           type="button"
@@ -1625,15 +1857,19 @@ export default function ProductDetail() {
                           disabled={reviewPage >= totalReviewPages || loadingReviews}
                           onClick={() => loadReviews(selectedReviewSkin, reviewPage + 1)}
                         >
-                          {lang === 'vi' ? 'Trang sau' : 'Next'} →
+                          {t('pd_next_page', 'Next')} →
                         </button>
                       </div>
                     )}
                   </>
                 ) : (
                   <div className="pd-empty-block">
-                    <span className="pd-empty-icon">💬</span>
-                    <p>{t('pd_no_reviews', 'No reviews yet for this filter. Be the first to share your experience!')}</p>
+                    <p>
+                      {t(
+                        'pd_no_reviews',
+                        'No reviews yet for this filter. Be the first to share your experience!'
+                      )}
+                    </p>
                   </div>
                 )}
               </div>
@@ -1641,9 +1877,8 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* ── PART 4: DISCOVERY RAILS (BOTTOM) ────────────── */}
-        {/* Similar Products in Category */}
-        {similar.length > 0 && (
+        {/* ── PART 4: DISCOVERY RAILS (BOTTOM — 4 OR 8 ITEMS FOR BALANCED 4-COL GRID) ── */}
+        {displayedSimilar.length > 0 && (
           <section className="pd-discovery-section">
             <div className="pd-discovery-header">
               <div className="pd-discovery-title-wrap">
@@ -1652,12 +1887,15 @@ export default function ProductDetail() {
                   {t('pd_similar_title', 'Similar Products You May Like')}
                 </h2>
               </div>
-              <Link to={`/products?category=${encodeURIComponent(categoryName)}`} className="btn btn-secondary btn-sm">
+              <Link
+                to={`/products?category=${encodeURIComponent(categoryName)}`}
+                className="btn btn-secondary btn-sm"
+              >
                 {t('home_view_all', 'View All')}
               </Link>
             </div>
             <div className="pd-discovery-grid">
-              {similar.slice(0, 6).map((prod) => (
+              {displayedSimilar.map((prod) => (
                 <div key={prod.id ?? prod.product_id} className="pd-discovery-card-wrap">
                   <ProductCard product={prod} />
                 </div>
@@ -1665,10 +1903,9 @@ export default function ProductDetail() {
             </div>
           </section>
         )}
-
       </div>
 
-      {/* ── MODAL: QR CODE & BARCODE LOOKUP ─────────────── */}
+      {/* ── MODAL: QR CODE & BARCODE LOOKUP (USING NORMALIZED VARIABLES) ── */}
       {qrModalOpen && (
         <div className="pd-modal-overlay animate-fadeIn" onClick={() => setQrModalOpen(false)}>
           <div className="pd-modal-content animate-scaleIn" onClick={(e) => e.stopPropagation()}>
@@ -1678,6 +1915,7 @@ export default function ProductDetail() {
                 <h3 className="pd-modal-title">{t('pd_qr_modal_title')}</h3>
               </div>
               <button
+                type="button"
                 className="pd-modal-close"
                 onClick={() => setQrModalOpen(false)}
                 aria-label={t('pd_close')}
@@ -1697,7 +1935,7 @@ export default function ProductDetail() {
                   <div className="pd-qr-code-box">
                     <img
                       src={qrData.qr_code_svg}
-                      alt={`QR Code ${product.product_name}`}
+                      alt={`QR Code ${productName}`}
                       className="pd-qr-image"
                     />
                     <span className="pd-qr-hint">{t('pd_qr_hint')}</span>
@@ -1706,15 +1944,15 @@ export default function ProductDetail() {
                   <div className="pd-barcode-box">
                     <img
                       src={qrData.barcode_svg}
-                      alt={`Barcode ${product.product_id}`}
+                      alt={`Barcode ${productCode}`}
                       className="pd-barcode-image"
                     />
-                    <span className="pd-barcode-sku">SKU / ID: {product.product_id}</span>
+                    <span className="pd-barcode-sku">SKU / ID: {productCode}</span>
                   </div>
 
                   <div className="pd-qr-product-info">
-                    <div className="pd-qr-product-brand">{product.brand_name}</div>
-                    <div className="pd-qr-product-name">{product.product_name}</div>
+                    <div className="pd-qr-product-brand">{brandName}</div>
+                    <div className="pd-qr-product-name">{productName}</div>
                   </div>
                 </div>
               ) : (
@@ -1726,12 +1964,13 @@ export default function ProductDetail() {
           </div>
         </div>
       )}
+
       {/* ── MODAL: 30-SECOND DIGITAL SKIN ID SETUP ──────── */}
       <SkinIdQuickModal
         isOpen={skinIdModalOpen}
         onClose={() => setSkinIdModalOpen(false)}
         onSaved={() => {
-          fetchProductDetail();
+          fetchProductDetail(false);
         }}
       />
     </div>

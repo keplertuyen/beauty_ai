@@ -37,12 +37,12 @@ function PageLoader() {
       <div style={{
         width: '40px',
         height: '40px',
-        border: '3px solid rgba(143, 117, 95, 0.2)',
-        borderTop: '3px solid #C48B71',
+        border: '3px solid var(--primary-glow)',
+        borderTop: '3px solid var(--accent)',
         borderRadius: '50%',
         animation: 'beautyaiSpin 0.8s linear infinite',
       }} />
-      <p style={{ color: '#8F755F', fontSize: '14px', margin: 0 }}>{t('prod_loading', 'Đang tải...')}</p>
+      <p style={{ color: 'var(--primary-light)', fontSize: '14px', margin: 0 }}>{t('prod_loading', 'Loading...')}</p>
       <style>{`
         @keyframes beautyaiSpin {
           0% { transform: rotate(0deg); }
@@ -65,11 +65,12 @@ function AppContentLayout() {
     <>
       <Toaster
         position="top-right"
+        containerStyle={{ zIndex: 'var(--z-toast)' }}
         toastOptions={{
           style: {
-            background: '#FFFFFF',
-            border: '1px solid rgba(143, 117, 95, 0.12)',
-            color: '#2D2520',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--text-primary)',
             borderRadius: '12px',
           },
           duration: 3000,

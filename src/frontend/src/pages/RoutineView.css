@@ -22,8 +22,8 @@
   align-items: center;
   gap: 8px;
   padding: 6px 16px;
-  background: rgba(196, 139, 113, 0.12);
-  color: #C48B71;
+  background: var(--accent-soft);
+  color: var(--accent);
   border-radius: 30px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -70,7 +70,7 @@
 .routine-filter-group label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #8F755F;
+  color: var(--primary-light);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -94,13 +94,13 @@
 }
 
 .routine-pill:hover {
-  border-color: #C48B71;
+  border-color: var(--accent);
 }
 
 .routine-pill.active {
-  background: #C48B71;
+  background: var(--accent);
   color: #FFF;
-  border-color: #C48B71;
+  border-color: var(--accent);
   font-weight: 600;
 }
 
@@ -326,7 +326,7 @@
 .step-prod-brand {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #8F755F;
+  color: var(--primary-light);
   text-transform: uppercase;
 }
 
@@ -342,7 +342,7 @@
 .step-prod-price {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #C48B71;
+  color: var(--accent);
 }
 
 .step-cart-btn {

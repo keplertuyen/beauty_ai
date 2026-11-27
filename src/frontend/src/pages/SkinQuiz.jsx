@@ -313,7 +313,7 @@ export default function SkinQuiz() {
                     <div className="quiz-loading-ring" />
                     <div className="quiz-loading-ring quiz-loading-ring--2" />
                     <div className="quiz-loading-ring quiz-loading-ring--3" />
-                    <span className="quiz-loading-emoji"><Award size={32} color="#C48B71" /></span>
+                    <span className="quiz-loading-emoji"><Award size={32} color="var(--accent)" /></span>
                   </div>
                   <h2 className="quiz-loading-title">{t('quiz_loading_title')}</h2>
                   <p className="quiz-loading-msg">{LOADING_MSGS[loadingMsg]}</p>
@@ -337,7 +337,7 @@ export default function SkinQuiz() {
                 <>
                   {/* Results header */}
                   <div className="quiz-results-header">
-                    <div className="quiz-results-sparkle"><Award size={28} color="#C48B71" /></div>
+                    <div className="quiz-results-sparkle"><Award size={28} color="var(--accent)" /></div>
                     <h1 className="quiz-results-title">
                       {t('quiz_results_title')}
                     </h1>

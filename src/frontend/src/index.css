@@ -6,6 +6,7 @@
 :root {
   /* Organic Nature Brand Palette */
   --primary: #4A3728;           /* Deep Mocha / Sandalwood — WCAG AAA contrast */
+  --primary-dark: #36271C;      /* Dark espresso — scrollbars, badges, headings */
   --primary-hover: #36271C;     /* Darker rich espresso */
   --primary-light: #7D634E;    /* Warm medium earth */
   --primary-glow: rgba(74, 55, 40, 0.12);
@@ -15,6 +16,7 @@
   
   /* Nature Accents */
   --accent: #C46D4E;           /* Terracotta warm accent */
+  --accent-soft: rgba(196, 109, 78, 0.12); /* Soft terracotta tint for chips & badges */
   --accent-sage: #2E6F4E;      /* Botanical Clean / Organic Sage */
   --accent-sage-light: #EAF3ED;/* Soft sage pill background */
   --accent-terracotta: #B85D3B;/* Warm earthy red for Sale / Limited */
@@ -86,6 +88,18 @@
   
   /* Navbar */
   --navbar-height: 68px;
+
+  /* Unified Overlay & Z-Index Scale (shared by Storefront & Admin) */
+  --overlay-bg: rgba(30, 23, 18, 0.42);
+  --z-base: 10;
+  --z-sticky: 100;
+  --z-backdrop: 150;
+  --z-sidebar: 200;
+  --z-overlay: 950;
+  --z-drawer: 1000;
+  --z-modal: 1100;
+  --z-confirm: 1200;
+  --z-toast: 1400;
 }
 
 /* ═══════════════════════════════════════════════
@@ -133,7 +147,15 @@ button {
   cursor: pointer;
   font-family: inherit;
   border: none;
-  outline: none;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 input, textarea, select {
@@ -357,7 +379,7 @@ h1, h2, h3, h4, h5, h6 {
 .product-card-image {
   width: 100%;
   aspect-ratio: 1;
-  background: linear-gradient(135deg, #F3EFEA, #EBE6DF);
+  background: #FAF8F5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,7 +391,7 @@ h1, h2, h3, h4, h5, h6 {
 .product-card-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   position: relative;
   z-index: 1;
@@ -537,9 +559,9 @@ h1, h2, h3, h4, h5, h6 {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--overlay-bg);
   backdrop-filter: blur(8px);
-  z-index: 1000;
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -578,6 +600,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
   padding: 8px 16px;
   border-radius: var(--radius-full);
   font-size: 0.875rem;

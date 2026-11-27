@@ -67,3 +67,22 @@
 .auth-tab-btn:hover:not(.active) {
   color: var(--text-primary);
 }
+
+@media (max-width: 480px) {
+  .auth-modal {
+    padding: var(--spacing-lg);
+  }
+
+  .auth-header {
+    margin-bottom: 18px;
+  }
+
+  .auth-title {
+    font-size: 1.3rem;
+  }
+
+  .auth-tab-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}

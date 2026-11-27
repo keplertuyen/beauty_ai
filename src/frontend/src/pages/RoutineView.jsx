@@ -8,12 +8,13 @@ import {
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
 import { generateRoutine, saveRoutine, getMyRoutines, deleteRoutine } from '../services/api';
+import { getProductImage, DEFAULT_PRODUCT_IMAGE } from '../utils/productImages';
 import ProductCard from '../components/ProductCard';
 import './RoutineView.css';
 
 export default function RoutineView() {
   const navigate = useNavigate();
-  const { user, addItemToCart, formatPrice, lang, t } = useApp();
+  const { user, addItemToCart } = useApp();
 
   const [skinType, setSkinType] = useState(user?.skin_type || 'Combination');
   const [budgetLevel, setBudgetLevel] = useState(user?.budget_level || 'Medium');
@@ -37,13 +38,13 @@ export default function RoutineView() {
         budgetLevel
       });
       setRoutineResult(res.data);
-      toast.success(lang === 'vi' ? 'Chu trình skincare đã được tối ưu hóa!' : 'Your skincare routine is ready!');
+      toast.success('Your skincare routine is ready!');
     } catch (err) {
-      toast.error(err.response?.data?.message || (lang === 'vi' ? 'Không thể tạo routine lúc này' : 'Failed to generate routine'));
+      toast.error(err.response?.data?.message || 'Failed to generate routine');
     } finally {
       setLoading(false);
     }
-  }, [skinType, budgetLevel, lang]);
+  }, [skinType, budgetLevel]);
 
   // Load initial routine on mount
   useEffect(() => {
@@ -82,16 +83,12 @@ export default function RoutineView() {
     });
 
     unique.forEach(p => addItemToCart(p, 1));
-    toast.success(
-      lang === 'vi'
-        ? `Đã thêm trọn bộ ${unique.length} sản phẩm Routine vào giỏ hàng!`
-        : `Added all ${unique.length} routine products to your cart!`
-    );
+    toast.success(`Added all ${unique.length} routine products to your cart!`);
   };
 
   const handleSaveRoutine = async () => {
     if (!user) {
-      toast.error(lang === 'vi' ? 'Vui lòng đăng nhập để lưu routine' : 'Please log in to save your routine');
+      toast.error('Please log in to save your routine');
       window.dispatchEvent(new CustomEvent('open-auth-modal'));
       return;
     }
@@ -108,10 +105,10 @@ export default function RoutineView() {
         productIds: ids,
         notes: `Generated from Digital Skin ID. Total $${routineResult.totalCostUsd}`
       });
-      toast.success(lang === 'vi' ? 'Đã lưu routine vào hồ sơ của bạn!' : 'Routine saved to your profile!');
+      toast.success('Routine saved to your profile!');
       loadSaved();
     } catch (err) {
-      toast.error(err.response?.data?.message || (lang === 'vi' ? 'Lỗi khi lưu routine' : 'Failed to save routine'));
+      toast.error(err.response?.data?.message || 'Failed to save routine');
     } finally {
       setSaving(false);
     }
@@ -120,10 +117,10 @@ export default function RoutineView() {
   const handleDeleteSaved = async (id) => {
     try {
       await deleteRoutine(id);
-      toast.success(lang === 'vi' ? 'Đã xóa routine' : 'Routine removed');
+      toast.success('Routine removed');
       loadSaved();
     } catch {
-      toast.error(lang === 'vi' ? 'Không thể xóa routine' : 'Failed to delete routine');
+      toast.error('Failed to delete routine');
     }
   };
 
@@ -137,18 +134,16 @@ export default function RoutineView() {
             <span>AI Routine Builder & Chat-to-Cart</span>
           </div>
           <h1 className="routine-hero-title">
-            {lang === 'vi' ? 'Chu Trình Skincare Khoa Học Cá Nhân Hóa' : 'Personalized Science-Backed Skincare Routine'}
+            Personalized Science-Backed Skincare Routine
           </h1>
           <p className="routine-hero-sub">
-            {lang === 'vi'
-              ? 'Tự động đồng bộ từ Digital Skin ID của bạn. Kiểm định lâm sàng 0 xung đột hoạt chất và cho phép thêm trọn bộ vào giỏ hàng trong 1 lần chạm.'
-              : 'Auto-synthesized from your Digital Skin ID. Clinically screened for 0 active ingredient conflicts, with 1-click Chat-to-Cart checkout.'}
+            Auto-synthesized from your Digital Skin ID. Clinically screened for 0 active ingredient conflicts, with 1-click Chat-to-Cart checkout.
           </p>
 
           {/* Quick Filters */}
           <div className="routine-filter-card glass-card">
             <div className="routine-filter-group">
-              <label>{lang === 'vi' ? 'Loại Da Của Bạn' : 'Your Skin Type'}</label>
+              <label>Your Skin Type</label>
               <div className="routine-pill-group">
                 {['Normal', 'Dry', 'Oily', 'Combination', 'Sensitive'].map(st => (
                   <button
@@ -164,7 +159,7 @@ export default function RoutineView() {
             </div>
 
             <div className="routine-filter-group">
-              <label>{lang === 'vi' ? 'Mức Ngân Sách' : 'Budget Preference'}</label>
+              <label>Budget Preference</label>
               <div className="routine-pill-group">
                 {['Low', 'Medium', 'High'].map(bg => (
                   <button
@@ -185,7 +180,7 @@ export default function RoutineView() {
               disabled={loading}
             >
               <RotateCcw size={16} className={loading ? 'animate-spin' : ''} />
-              <span>{loading ? (lang === 'vi' ? 'Đang phân tích...' : 'Synthesizing...') : (lang === 'vi' ? 'Tạo Routine Mới' : 'Regenerate Routine')}</span>
+              <span>{loading ? 'Synthesizing...' : 'Regenerate Routine'}</span>
             </button>
           </div>
         </div>
@@ -198,15 +193,13 @@ export default function RoutineView() {
               <div>
                 <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: '#065F46' }}>
                   {routineResult.internalConflicts?.length === 0
-                    ? (lang === 'vi' ? 'Kiểm Định An Toàn Tuyệt Đối: 0 Xung Đột Hoạt Chất' : 'Zero Active Ingredient Conflicts Detected')
-                    : (lang === 'vi' ? 'Phát Hiện Cảnh Báo Hoạt Chất Giữa Các Bước' : 'Active Ingredient Interactions Detected')}
+                    ? 'Zero Active Ingredient Conflicts Detected'
+                    : 'Active Ingredient Interactions Detected'}
                 </h4>
                 <p style={{ margin: '2px 0 0', fontSize: '0.84rem', color: '#047857' }}>
                   {routineResult.internalConflicts?.length === 0
-                    ? (lang === 'vi' ? 'Toàn bộ chu trình AM & PM được phân lớp khoa học (Retinol PM / Vitamin C AM), không gây kích ứng hay triệt tiêu hiệu quả.'
-                                     : 'AM & PM steps are scientifically sequenced (Retinoids at night, Vitamin C in morning) for maximum absorption without irritation.')
-                    : (lang === 'vi' ? 'Hệ thống đã tự động phân tách các bước AM/PM để đảm bảo an toàn cho hàng rào da.'
-                                     : 'The system has segregated steps into separate routines to safeguard your skin barrier.')}
+                    ? 'AM & PM steps are scientifically sequenced (Retinoids at night, Vitamin C in morning) for maximum absorption without irritation.'
+                    : 'The system has segregated steps into separate routines to safeguard your skin barrier.'}
                 </p>
               </div>
             </div>
@@ -214,7 +207,7 @@ export default function RoutineView() {
             {/* Chat-to-Cart Action Bar */}
             <div className="routine-cta-wrap">
               <div className="routine-total-price">
-                <span className="price-label">{lang === 'vi' ? 'Trọn bộ Routine:' : 'Complete Regimen:'}</span>
+                <span className="price-label">Complete Regimen:</span>
                 <span className="price-val">${routineResult.totalCostUsd?.toFixed(2)}</span>
               </div>
               <button
@@ -222,7 +215,7 @@ export default function RoutineView() {
                 onClick={handleAddEntireRoutineToCart}
               >
                 <ShoppingBag size={18} />
-                <span>{lang === 'vi' ? 'Thêm Cả Bộ Vào Giỏ Hàng' : 'Add Entire Routine to Cart'}</span>
+                <span>Add Entire Routine to Cart</span>
               </button>
               <button
                 className="btn btn-secondary btn-save-routine"
@@ -230,7 +223,7 @@ export default function RoutineView() {
                 disabled={saving}
               >
                 <Bookmark size={16} />
-                <span>{saving ? '...' : (lang === 'vi' ? 'Lưu Routine' : 'Save')}</span>
+                <span>{saving ? '...' : 'Save'}</span>
               </button>
             </div>
           </div>
@@ -246,10 +239,10 @@ export default function RoutineView() {
                   <Sun size={24} color="#D97706" />
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#92400E' }}>
-                      {lang === 'vi' ? 'Chu Trình Buổi Sáng (AM)' : 'Morning Routine (AM)'}
+                      Morning Routine (AM)
                     </h3>
                     <span style={{ fontSize: '0.8rem', color: '#B45309' }}>
-                      {lang === 'vi' ? 'Làm sạch dịu nhẹ, cấp ẩm & bảo vệ quang phổ rộng' : 'Gentle Cleanse, Antioxidant Defense & Broad-Spectrum UV Protection'}
+                      Gentle Cleanse, Antioxidant Defense & Broad-Spectrum UV Protection
                     </span>
                   </div>
                 </div>
@@ -270,10 +263,10 @@ export default function RoutineView() {
                         <div className="step-product-mini">
                           <Link to={`/products/${step.product.id || step.product.code}`} className="step-prod-link">
                             <img
-                              src={step.product.imageUrl || `/images/products/${step.product.code}.webp`}
+                              src={getProductImage(step.product)}
                               alt={step.product.name}
                               className="step-prod-img"
-                              onError={(e) => { e.currentTarget.src = '/images/products/placeholder.webp'; }}
+                              onError={(e) => { e.currentTarget.src = DEFAULT_PRODUCT_IMAGE; }}
                             />
                             <div className="step-prod-info">
                               <span className="step-prod-brand">{step.product.brandName}</span>
@@ -286,7 +279,7 @@ export default function RoutineView() {
                             className="btn btn-sm btn-secondary step-cart-btn"
                             onClick={() => {
                               addItemToCart(step.product, 1);
-                              toast.success(lang === 'vi' ? `Đã thêm ${step.product.name}` : `Added ${step.product.name}`);
+                              toast.success(`Added ${step.product.name}`);
                             }}
                           >
                             <ShoppingBag size={14} />
@@ -306,10 +299,10 @@ export default function RoutineView() {
                   <Moon size={24} color="#6366F1" />
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#3730A3' }}>
-                      {lang === 'vi' ? 'Chu Trình Buổi Tối (PM)' : 'Night Routine (PM)'}
+                      Night Routine (PM)
                     </h3>
                     <span style={{ fontSize: '0.8rem', color: '#4F46E5' }}>
-                      {lang === 'vi' ? 'Làm sạch sâu, tái tạo chuyên sâu & phục hồi rào cản' : 'Double Cleanse, Targeted Actives & Nighttime Barrier Recovery'}
+                      Double Cleanse, Targeted Actives & Nighttime Barrier Recovery
                     </span>
                   </div>
                 </div>
@@ -330,10 +323,10 @@ export default function RoutineView() {
                         <div className="step-product-mini">
                           <Link to={`/products/${step.product.id || step.product.code}`} className="step-prod-link">
                             <img
-                              src={step.product.imageUrl || `/images/products/${step.product.code}.webp`}
+                              src={getProductImage(step.product)}
                               alt={step.product.name}
                               className="step-prod-img"
-                              onError={(e) => { e.currentTarget.src = '/images/products/placeholder.webp'; }}
+                              onError={(e) => { e.currentTarget.src = DEFAULT_PRODUCT_IMAGE; }}
                             />
                             <div className="step-prod-info">
                               <span className="step-prod-brand">{step.product.brandName}</span>
@@ -346,7 +339,7 @@ export default function RoutineView() {
                             className="btn btn-sm btn-secondary step-cart-btn"
                             onClick={() => {
                               addItemToCart(step.product, 1);
-                              toast.success(lang === 'vi' ? `Đã thêm ${step.product.name}` : `Added ${step.product.name}`);
+                              toast.success(`Added ${step.product.name}`);
                             }}
                           >
                             <ShoppingBag size={14} />
@@ -365,8 +358,8 @@ export default function RoutineView() {
         {user && savedRoutines.length > 0 && (
           <div className="routine-saved-section animate-fadeIn">
             <h3 className="saved-section-title">
-              <Bookmark size={20} color="#C48B71" />
-              <span>{lang === 'vi' ? 'Bộ Sưu Tập Routine Đã Lưu Của Bạn' : 'Your Saved Skincare Routines'}</span>
+              <Bookmark size={20} color="var(--accent)" />
+              <span>Your Saved Skincare Routines</span>
             </h3>
 
             <div className="saved-routines-grid">
@@ -376,7 +369,7 @@ export default function RoutineView() {
                     <div>
                       <h4 className="saved-routine-name">{sr.routineName}</h4>
                       <span className="saved-routine-date">
-                        {new Date(sr.createdAtUtc).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}
+                        {new Date(sr.createdAtUtc).toLocaleDateString('en-US')}
                       </span>
                     </div>
                     <button
@@ -391,11 +384,11 @@ export default function RoutineView() {
                     {sr.products?.slice(0, 5).map(p => (
                       <img
                         key={p.id}
-                        src={p.imageUrl || `/images/products/${p.code}.webp`}
+                        src={getProductImage(p)}
                         alt={p.name}
                         title={p.name}
                         className="saved-thumb-img"
-                        onError={(e) => { e.currentTarget.src = '/images/products/placeholder.webp'; }}
+                        onError={(e) => { e.currentTarget.src = DEFAULT_PRODUCT_IMAGE; }}
                       />
                     ))}
                     {(sr.products?.length || 0) > 5 && (
@@ -407,11 +400,11 @@ export default function RoutineView() {
                     style={{ width: '100%', marginTop: '12px' }}
                     onClick={() => {
                       sr.products?.forEach(p => addItemToCart(p, 1));
-                      toast.success(lang === 'vi' ? `Đã thêm ${sr.products.length} sản phẩm vào giỏ!` : `Added ${sr.products.length} products to cart!`);
+                      toast.success(`Added ${sr.products.length} products to cart!`);
                     }}
                   >
                     <ShoppingBag size={14} />
-                    <span>{lang === 'vi' ? 'Thêm vào giỏ' : 'Add to Cart'}</span>
+                    <span>Add to Cart</span>
                   </button>
                 </div>
               ))}

@@ -3,7 +3,7 @@
 .ec-page {
   padding-top: var(--spacing-xl);
   padding-bottom: var(--spacing-3xl);
-  background: radial-gradient(circle at 50% -20%, rgba(143, 117, 95, 0.12) 0%, transparent 60%);
+  background: radial-gradient(circle at 50% -20%, rgba(74, 55, 40, 0.12) 0%, transparent 60%);
 }
 
 .ec-hero {
@@ -179,7 +179,7 @@
   background: var(--gradient-primary);
   color: white;
   border-bottom-right-radius: 4px;
-  box-shadow: 0 4px 10px rgba(143, 117, 95, 0.2);
+  box-shadow: 0 4px 10px rgba(74, 55, 40, 0.2);
 }
 
 .ec-msg-text strong {
@@ -323,7 +323,7 @@
 }
 
 .ec-faq-item--open {
-  border-color: rgba(143, 117, 95, 0.4);
+  border-color: rgba(74, 55, 40, 0.4);
   box-shadow: var(--shadow-glow);
 }
 
@@ -378,4 +378,62 @@
   line-height: 1.6;
   border-top: 1px solid var(--glass-border);
   padding-top: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .ec-hero {
+    padding: var(--spacing-lg) 0 var(--spacing-md);
+  }
+
+  .ec-hero-title {
+    font-size: 1.85rem;
+  }
+
+  .ec-tab-bar {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .ec-chat-card {
+    height: calc(100vh - 220px);
+    height: calc(100dvh - 220px);
+    min-height: 440px;
+    max-height: 620px;
+    border-radius: var(--radius-lg);
+  }
+
+  .ec-messages {
+    padding: var(--spacing-md);
+  }
+
+  .ec-msg-row {
+    max-width: 94%;
+    gap: var(--spacing-sm);
+  }
+
+  .ec-bubble {
+    padding: 10px 14px;
+    font-size: 0.875rem;
+  }
+
+  .ec-quick-replies {
+    padding: var(--spacing-xs) var(--spacing-md);
+  }
+
+  .ec-input-bar {
+    padding: var(--spacing-sm) var(--spacing-md);
+    gap: var(--spacing-xs);
+  }
+
+  .ec-input {
+    padding: 10px 14px;
+    font-size: 0.875rem;
+  }
+
+  .ec-faq-question {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .ec-faq-answer {
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  }
 }

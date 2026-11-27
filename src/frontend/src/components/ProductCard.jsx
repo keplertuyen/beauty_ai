@@ -28,20 +28,26 @@ export default function ProductCard({ product }) {
     });
   }, [resolvedSrc]);
 
-  const rating = parseFloat(product.rating) || 0;
+  const reviewCount = parseInt(product.reviewsCount ?? product.reviews ?? 0, 10) || 0;
+  const rawRating = product.rating !== null && product.rating !== undefined ? parseFloat(product.rating) : null;
+  const rating = reviewCount > 0 && rawRating && rawRating > 0 ? rawRating : null;
   const price = parseFloat(product.priceUsd ?? product.price_usd ?? product.price) || 0;
   const verdict = product.suitabilityVerdict ?? product.suitability_verdict;
   const verdictLabel = product.suitabilityLabel ?? product.suitability_label;
   const hasAllergyWarning = product.hasAllergyWarning || product.has_allergy_warning || verdict === 'AllergyConflict';
   const allergen = product.matchedAllergen || product.matched_allergen;
 
+  const goToDetail = () => {
+    navigate(`/products/${productId}`, { state: { productPreview: product } });
+  };
+
   return (
     <div className="product-card">
       {/* Image */}
       <div
         className="product-card-image"
-        onClick={() => navigate(`/products/${productId}`)}
-        style={{ cursor: 'pointer', background: 'var(--bg-secondary)', position: 'relative', overflow: 'hidden' }}
+        onClick={goToDetail}
+        style={{ cursor: 'pointer', background: '#FAF8F5', position: 'relative', overflow: 'hidden' }}
       >
         {!imgLoaded && !imgError && (
           <div className="skeleton product-card-skeleton-img" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
@@ -195,20 +201,22 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Body */}
-      <div className="product-card-body" onClick={() => navigate(`/products/${productId}`)} style={{ cursor: 'pointer' }}>
+      <div className="product-card-body" onClick={goToDetail} style={{ cursor: 'pointer' }}>
         <div className="product-card-brand">{brandName}</div>
         <div className="product-card-name" title={productName}>{productName}</div>
         
         {/* Rating */}
-        {rating > 0 && (
+        {rating !== null ? (
           <div className="product-card-rating" style={{ color: 'var(--accent-amber)' }}>
             <Star size={13} fill="currentColor" color="var(--accent-amber)" />
             <span style={{ fontWeight: 700, color: 'var(--text-primary)', marginLeft: 2 }}>{rating.toFixed(1)}</span>
-            {(product.reviewsCount || product.reviews) && (
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginLeft: 2 }}>
-                ({parseInt(product.reviewsCount ?? product.reviews).toLocaleString()})
-              </span>
-            )}
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginLeft: 2 }}>
+              ({reviewCount.toLocaleString()})
+            </span>
+          </div>
+        ) : (
+          <div className="product-card-rating" style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 500 }}>
+            {t('pd_no_reviews_short', 'No reviews yet')}
           </div>
         )}
 
@@ -256,7 +264,7 @@ export default function ProductCard({ product }) {
             background: 'var(--bg-secondary)',
             color: 'var(--text-secondary)',
           }}
-          onClick={() => navigate(`/products/${productId}`)}
+          onClick={goToDetail}
           title={t('prod_view_details')}
         >
           <Eye size={15} />

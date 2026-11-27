@@ -225,9 +225,18 @@
   margin: 0;
   line-height: 1.3;
 }
-/* ── PART 2: PRIMARY BUY BOX (RIGHT) ────────────────────────── */
+/* ── PART 2: PRIMARY BUY BOX (RIGHT — STICKY) ───────────────── */
 .pd-part-buybox {
   width: 100%;
+  position: sticky;
+  top: 92px;
+  align-self: start;
+}
+
+@media (max-width: 960px) {
+  .pd-part-buybox {
+    position: static;
+  }
 }
 
 .pd-buybox-card {
@@ -306,6 +315,26 @@
   color: var(--primary, #4A3728);
 }
 
+.pd-no-reviews-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #887A70);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pd-no-reviews-btn span {
+  color: var(--primary-light, #8C715A);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.pd-no-reviews-btn:hover span {
+  color: var(--primary, #4A3728);
+}
+
 .pd-buybox-loves {
   display: inline-flex;
   align-items: center;
@@ -317,9 +346,9 @@
   border-left: 1px solid var(--border-subtle, rgba(74, 55, 40, 0.12));
 }
 
-/* High Contrast Price Section */
+/* Balanced Price Section */
 .pd-buybox-price-block {
-  padding: 14px 18px;
+  padding: 12px 16px;
   background: var(--bg-primary, #FAF7F2);
   border-radius: 12px;
   border: 1px solid var(--border-subtle, rgba(74, 55, 40, 0.08));
@@ -328,20 +357,20 @@
 .pd-buybox-price-row {
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .pd-buybox-price {
-  font-size: 2.2rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--text-primary, #1E1712);
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .pd-buybox-price-old {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   color: var(--text-muted, #887A70);
   text-decoration: line-through;
 }
@@ -350,23 +379,27 @@
   background: var(--accent-terracotta-light, #F8EDE8);
   color: var(--accent-terracotta, #B85D3B);
   border: 1px solid rgba(184, 93, 59, 0.25);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 2px 9px;
   border-radius: var(--radius-full, 9999px);
 }
 
 .pd-buybox-tax-hint {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-muted, #887A70);
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
-/* 3-Column Quick Specs Card */
+/* Quick Specs Card (3-col or 2-col when Size is omitted) */
 .pd-specs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+}
+
+.pd-specs-grid.pd-specs-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 @media (max-width: 500px) {
@@ -1009,13 +1042,13 @@
 .pd-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(30, 23, 18, 0.65);
+  background: var(--overlay-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: var(--z-modal);
   padding: 20px;
 }
 
@@ -1422,4 +1455,429 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REFINED SUITABILITY BANNER & INGREDIENTS TAB CLASSES
+══════════════════════════════════════════════════════════════ */
+.pd-suitability-match-pill.pill-tool {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #1D4ED8;
+}
+
+.pd-suitability-match-pill.pill-insufficient {
+  background: rgba(100, 116, 139, 0.08);
+  border-color: rgba(100, 116, 139, 0.25);
+  color: #475569;
+}
+
+.pd-suitability-match-pill.pill-signin {
+  width: 100%;
+  cursor: pointer;
+  background: #FAF5EE;
+  border: 1px solid #E5D4BE;
+  color: #6B442A;
+  justify-content: space-between;
+  font-family: inherit;
+}
+
+.pd-suitability-match-pill.pill-setup {
+  width: 100%;
+  cursor: pointer;
+  background: #FAF3EA;
+  border: 1px solid #E5D4BE;
+  color: #7C4D2B;
+  justify-content: space-between;
+  font-family: inherit;
+}
+
+.pd-suitability-match-pill.pill-good {
+  background: #F2F8F4;
+  border: 1px solid #CFE2D6;
+  color: #234B37;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.pd-suitability-match-pill.pill-notes {
+  background: #FAF5EE;
+  border: 1px solid #E6D7C3;
+  color: #704323;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.pd-suitability-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pd-suitability-cta {
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.pd-suitability-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  flex: 1;
+}
+
+.pd-suitability-title-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 700;
+}
+
+.pd-suitability-reason {
+  font-size: 0.81rem;
+  font-weight: 500;
+  padding-left: 23px;
+  line-height: 1.45;
+  opacity: 0.92;
+}
+
+/* Department Routine Badge Variants */
+.pd-routine-dept {
+  border-color: var(--border-subtle, #E2E8F0);
+}
+
+.badge-dept-tool { background: #3B82F6 !important; color: #FFFFFF !important; }
+.badge-dept-fragrance { background: #8B5CF6 !important; color: #FFFFFF !important; }
+.badge-dept-makeup { background: #9C6644 !important; color: #FFFFFF !important; }
+.badge-dept-hair { background: #2D5A43 !important; color: #FFFFFF !important; }
+
+/* Ingredients Tab Layout Classes */
+.pd-empty-inci-card {
+  background: #FAF8F5;
+  border: 1px solid #EAE3DC;
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.pd-empty-inci-title {
+  margin: 0 0 6px;
+  color: #2C2018;
+  font-size: 1.05rem;
+}
+
+.pd-empty-inci-desc {
+  max-width: 540px;
+  margin: 0 auto;
+  color: #574B42;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.pd-inci-tiers-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.pd-tier-heading {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2C2018;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Auto-fit grids so 3 cards stretch evenly across 100% width with no empty right column */
+.pd-key-ingredients-grid,
+.pd-functional-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.pd-key-card {
+  background: #FFFFFF;
+  border: 1px solid #EAE3DC;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(74, 55, 40, 0.03);
+}
+
+.pd-key-card.is-featured {
+  border: 1.5px solid rgba(196, 139, 113, 0.55);
+}
+
+.pd-key-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.pd-key-role-tag {
+  font-size: 0.71rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #F4ECE4;
+  color: #7C4D2B;
+}
+
+.pd-key-featured-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #EEF5F1;
+  color: #2D5A43;
+}
+
+.pd-key-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #2C2018;
+}
+
+.pd-key-inci {
+  font-size: 0.75rem;
+  color: #8C7A6B;
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+.pd-key-desc {
+  margin: 6px 0 0;
+  font-size: 0.84rem;
+  color: #574B42;
+  line-height: 1.48;
+}
+
+/* Functional Group Cards */
+.pd-group-card {
+  background: #FAF8F5;
+  border: 1px solid #EAE3DC;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pd-group-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.pd-group-title {
+  font-size: 0.9rem;
+  color: #2C2018;
+}
+
+.pd-group-count {
+  background: #EAE3DC;
+  color: #4A3728;
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.pd-group-desc {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  color: #6B5E55;
+  line-height: 1.42;
+}
+
+.pd-group-includes {
+  font-size: 0.76rem;
+  color: #6B5E55;
+  line-height: 1.45;
+  margin-top: auto;
+}
+
+.pd-group-expand-btn {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #EFE8E0;
+  border: 1px solid #DDD1C4;
+  color: #4A3728;
+  font-size: 0.71rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.pd-group-expand-btn:hover {
+  background: #E4D9CC;
+}
+
+/* Cautions Card */
+.pd-cautions-card {
+  background: #FFFDF9;
+  border: 1px solid #EFE2D3;
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.pd-cautions-heading {
+  margin: 0 0 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #4A3728;
+}
+
+.pd-cautions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pd-caution-item {
+  font-size: 0.84rem;
+  color: #5C4E43;
+  line-height: 1.48;
+}
+
+.pd-caution-item.is-allergy {
+  color: #8E3B33;
+}
+
+/* Full INCI Accordion & May Contain Block */
+.pd-full-inci-accordion {
+  border: 1px solid #EAE3DC;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #FFFFFF;
+}
+
+.pd-full-inci-trigger {
+  width: 100%;
+  padding: 14px 18px;
+  background: #FAF8F5;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #2C2018;
+  font-family: inherit;
+  text-align: left;
+}
+
+.pd-full-inci-body {
+  padding: 16px 18px;
+  border-top: 1px solid #EAE3DC;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pd-ingredient-pill.pd-key-pill {
+  border-color: #C7B29E;
+  background: #F5EFE8;
+  color: #4A3728;
+  font-weight: 600;
+}
+
+.pd-may-contain-block {
+  padding-top: 12px;
+  border-top: 1px dashed #E5DDD4;
+}
+
+.pd-may-contain-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #6B5E55;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.pd-ingredient-pill.pd-may-contain-pill {
+  background: #FAF7F3;
+  border-style: dashed;
+  color: #6B5E55;
+}
+
+/* Reviews Filter & Banner Classes */
+.pd-reviews-user-match-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, rgba(74, 55, 40, 0.05), rgba(212, 163, 115, 0.11));
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(74, 55, 40, 0.14);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pd-reviews-match-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: #4A3728;
+}
+
+.pd-review-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.pd-review-filter-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #6B5E55;
+  margin-right: 4px;
+}
+
+.pd-review-skin-pill {
+  border-radius: 20px !important;
+  padding: 5px 14px !important;
+  font-size: 0.81rem !important;
+}
+
+.pd-review-filter-count {
+  font-size: 0.78rem;
+  color: #7A6B5E;
+  margin-left: auto;
+}
+
+.pd-reviews-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(74, 55, 40, 0.08);
+}
+
+.pd-reviews-page-info {
+  font-size: 0.84rem;
+  color: #5C4E43;
+  font-weight: 500;
 }

@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, X, ChevronDown, RotateCcw, ShieldCheck, Star, Package, Filter, PackageSearch } from 'lucide-react';
+import {
+  Search,
+  SlidersHorizontal,
+  X,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw,
+  ShieldCheck,
+  Star,
+  Package,
+  PackageSearch,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getProducts, getCategories } from '../services/api';
 import ProductCard from '../components/ProductCard';
@@ -8,6 +19,73 @@ import { useApp } from '../context/AppContext';
 import './Products.css';
 
 const PER_PAGE = 20;
+
+const DEFAULT_CATEGORY_TREE = {
+  Skincare: [
+    'Cleansers',
+    'Moisturizers',
+    'Treatments',
+    'Sunscreen',
+    'Eye Care',
+    'Masks',
+    'Lip Balms & Treatments',
+    'Wellness',
+    'Self Tanners',
+    'High Tech Tools',
+    'Shop by Concern',
+    'Mini Size',
+    'Value & Gift Sets',
+  ],
+  Makeup: [
+    'Face',
+    'Eye',
+    'Lip',
+    'Cheek',
+    'Makeup Palettes',
+    'Brushes & Applicators',
+    'Nail',
+    'Accessories',
+    'Mini Size',
+    'Value & Gift Sets',
+  ],
+  Hair: [
+    'Shampoo & Conditioner',
+    'Hair Styling & Treatments',
+    'Tools',
+    'Shop by Concern',
+    'Mini Size',
+    'Value & Gift Sets',
+  ],
+  'Bath & Body': [
+    'Bath & Shower',
+    'Body Moisturizers',
+    'Body Care',
+    'Sunscreen',
+    'Self Tanners',
+    'Beauty Supplements',
+    'Candles & Home Scents',
+    'Mini Size',
+    'Value & Gift Sets',
+  ],
+  Fragrance: ['Women', 'Men', 'Candles & Home Scents', 'Mini Size', 'Value & Gift Sets'],
+  'Tools & Brushes': ['Brushes & Applicators', 'Beauty Tools', 'Hair Tools', 'Beauty Accessories'],
+  Men: ['Skincare', 'Shaving', 'Hair', 'Other Needs', 'Value & Gift Sets'],
+  'Mini Size': ['Skincare', 'Makeup', 'Hair', 'Bath & Body', 'Fragrance', 'Value & Gift Sets'],
+  Gifts: ['Value & Gift Sets'],
+};
+
+const DEFAULT_CATEGORIES = (() => {
+  const list = [];
+  let idCounter = 1;
+  Object.entries(DEFAULT_CATEGORY_TREE).forEach(([deptName, subs]) => {
+    const parentId = idCounter++;
+    list.push({ id: parentId, name: deptName, parentId: null });
+    subs.forEach((subName) => {
+      list.push({ id: idCounter++, name: subName, parentId });
+    });
+  });
+  return list;
+})();
 
 /* ─── Skeleton Card ──────────────────────────────────────────── */
 function SkeletonCard() {
@@ -30,12 +108,12 @@ function SkeletonCard() {
 /* ─── Main Page ──────────────────────────────────────────────── */
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t, lang, formatPrice, user } = useApp();
+  const { t, formatPrice, user } = useApp();
 
   const CERT_OPTIONS = [
     { value: 'Vegan', label: 'Vegan' },
     { value: 'Cruelty-Free', label: 'Cruelty-Free' },
-    { value: 'Clean at Sephora', label: 'Clean at Sephora' },
+    { value: 'Clean at Sephora', label: 'Clean Formula' },
   ];
 
   const FREE_FROM_OPTIONS = [
@@ -56,56 +134,76 @@ export default function Products() {
 
   const ACTIVE_OPTIONS = [
     { value: 'niacinamide', label: 'Niacinamide' },
-    { value: 'bha', label: 'BHA (Salicylic Acid)' },
+    { value: 'bha', label: 'BHA (Salicylic)' },
     { value: 'aha', label: 'AHA (Glycolic/Lactic)' },
     { value: 'retinol', label: 'Retinol' },
     { value: 'hyaluronic acid', label: 'Hyaluronic Acid' },
     { value: 'vitamin c', label: 'Vitamin C' },
     { value: 'centella', label: 'Centella (Cica)' },
-    { value: 'ceramide', label: 'Ceramide' },
+    { value: 'ceramide', label: 'Ceramides' },
     { value: 'peptide', label: 'Peptides' },
   ];
 
   const SORT_OPTIONS = [
-    { value: 'rating',     label: `⭐ ${t('prod_sort_rating')}` },
-    { value: 'loves',      label: `❤️ ${t('prod_sort_loves')}` },
-    { value: 'reviews',    label: `💬 ${t('prod_sort_reviews')}` },
-    { value: 'price_asc',  label: `💲 ${t('prod_sort_price_asc')}` },
-    { value: 'price_desc', label: `💲 ${t('prod_sort_price_desc')}` },
+    { value: 'rating', label: t('prod_sort_rating', 'Top Rated') },
+    { value: 'loves', label: t('prod_sort_loves', 'Most Loved') },
+    { value: 'reviews', label: t('prod_sort_reviews', 'Most Reviewed') },
+    { value: 'price_asc', label: t('prod_sort_price_asc', 'Price: Low to High') },
+    { value: 'price_desc', label: t('prod_sort_price_desc', 'Price: High to Low') },
   ];
 
   const RATING_OPTIONS = [
-    { value: '',    label: t('prod_rating_all') },
-    { value: '4',   label: '4.0+ ⭐' },
-    { value: '4.5', label: '4.5+ ⭐' },
+    { value: '', label: 'All' },
+    { value: '4', label: '4.0+ ★' },
+    { value: '4.5', label: '4.5+ ★' },
   ];
 
+  const normalizeSortParam = (rawSort) => {
+    if (!rawSort) return 'rating';
+    const s = rawSort.toLowerCase();
+    if (s === 'trending') return 'loves';
+    if (['rating', 'loves', 'reviews', 'price_asc', 'price_desc'].includes(s)) return s;
+    return 'rating';
+  };
+
   /* Filters state — initialised from URL params */
-  const [searchText,         setSearchText]         = useState(searchParams.get('query')    || '');
-  const [selectedCats,       setSelectedCats]       = useState(() => {
+  const [searchText, setSearchText] = useState(searchParams.get('query') || '');
+  const [selectedCats, setSelectedCats] = useState(() => {
     const c = searchParams.get('category');
     return c ? [c] : [];
   });
-  const [selectedSkinType,   setSelectedSkinType]   = useState(searchParams.get('skinType') || '');
-  const [safeForMe,          setSafeForMe]          = useState(false);
-  const [priceRange,         setPriceRange]         = useState([0, 500]);
-  const [minRating,          setMinRating]          = useState('');
-  const [sortBy,             setSortBy]             = useState('rating');
-  const [selectedCerts,      setSelectedCerts]      = useState([]);
-  const [selectedFreeFrom,   setSelectedFreeFrom]   = useState([]);
-  const [selectedActives,    setSelectedActives]    = useState([]);
-  const [sidebarOpen,        setSidebarOpen]        = useState(false);  // mobile toggle
+  const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || '');
+  const [selectedSkinType, setSelectedSkinType] = useState(searchParams.get('skinType') || '');
+  const [safeForMe, setSafeForMe] = useState(searchParams.get('safeForMe') === 'true');
+  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [minRating, setMinRating] = useState('');
+  const [sortBy, setSortBy] = useState(() => normalizeSortParam(searchParams.get('sort')));
+  const [selectedCerts, setSelectedCerts] = useState([]);
+  const [selectedFreeFrom, setSelectedFreeFrom] = useState([]);
+  const [selectedActives, setSelectedActives] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  /* Collapsible Accordion sections in Sidebar (keeps sidebar compact) */
+  const [openSections, setOpenSections] = useState({
+    actives: false,
+    cleanClaims: false,
+  });
+
+  const toggleSection = (key) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   /* Product data */
-  const [products,    setProducts]    = useState([]);
-  const [totalCount,  setTotalCount]  = useState(0);
-  const [page,        setPage]        = useState(1);
-  const [hasMore,     setHasMore]     = useState(false);
-  const [loading,     setLoading]     = useState(true);
+  const [products, setProducts] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [catalogTotalCount, setCatalogTotalCount] = useState(8494);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
   /* Categories */
-  const [categories,  setCategories]  = useState([]);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
 
   /* Debounce ref */
   const searchTimer = useRef(null);
@@ -113,79 +211,110 @@ export default function Products() {
   /* ── Load categories once ─────────────────────────────────── */
   useEffect(() => {
     getCategories()
-      .then(res => {
+      .then((res) => {
         const raw = res?.data?.categories ?? (Array.isArray(res?.data) ? res?.data : []);
-        setCategories(Array.isArray(raw) ? raw : []);
+        if (Array.isArray(raw) && raw.length > 0) {
+          setCategories(raw);
+        }
       })
-      .catch(() => setCategories([]));
+      .catch(() => {});
   }, []);
 
-  /* ── Sync URL query/category params on mount/update ──────── */
+  /* ── Sync URL query/category/brand/sort/safeForMe params on mount/update ── */
   useEffect(() => {
     const q = searchParams.get('query') || '';
     const c = searchParams.get('category');
+    const b = searchParams.get('brand') || '';
+    const s = searchParams.get('sort');
+    const safeParam = searchParams.get('safeForMe') === 'true';
     setSearchText(q);
+    setSelectedBrand(b);
+    if (s) {
+      setSortBy(normalizeSortParam(s));
+    }
     if (c) {
       setSelectedCats([c]);
     } else {
       setSelectedCats([]);
     }
-  }, [searchParams]);
+    if (safeParam && user) {
+      setSafeForMe(true);
+    }
+  }, [searchParams, user]);
 
   /* ── Fetch products ───────────────────────────────────────── */
-  const fetchProducts = useCallback(async (pageNum = 1, append = false) => {
-    if (pageNum === 1) setLoading(true);
-    else setLoadingMore(true);
+  const fetchProducts = useCallback(
+    async (pageNum = 1, append = false) => {
+      if (pageNum === 1) setLoading(true);
+      else setLoadingMore(true);
 
-    try {
-      const params = {
-        page:      pageNum,
-        per_page:  PER_PAGE,
-        sort_by:   sortBy,
-      };
-      if (searchText.trim())    params.query      = searchText.trim();
-      if (selectedCats.length)  params.category   = selectedCats[0];
-      if (selectedSkinType)     params.skinType   = selectedSkinType;
-      if (safeForMe)            params.safe_for_me = true;
-      
-      const minP = priceRange[0] === '' ? 0 : Number(priceRange[0]);
-      const maxP = priceRange[1] === '' ? 500 : Number(priceRange[1]);
-      if (minP > 0)    params.min_price  = minP;
-      if (maxP < 500)  params.max_price  = maxP;
-      if (minRating)            params.min_rating = minRating;
-      if (selectedCerts.length) params.highlights_filter = selectedCerts.join(',');
-      if (selectedFreeFrom.length) params.free_from = selectedFreeFrom.join(',');
-      if (selectedActives.length) params.active_ingredients = selectedActives.join(',');
+      try {
+        const params = {
+          page: pageNum,
+          per_page: PER_PAGE,
+          sort_by: sortBy,
+        };
+        if (searchText.trim()) params.query = searchText.trim();
+        if (selectedCats.length) params.category = selectedCats[0];
+        if (selectedBrand.trim()) params.brand = selectedBrand.trim();
+        if (selectedSkinType) params.skinType = selectedSkinType;
+        if (safeForMe) params.safe_for_me = true;
 
-      const res = await getProducts(params);
-      const data = res?.data;
-      const rawList = data?.products ?? data?.items ?? (Array.isArray(data) ? data : []);
-      const items = Array.isArray(rawList) ? rawList : [];
-      const total = typeof data?.total === 'number' ? data.total : items.length;
-      const pages = typeof data?.pages === 'number' ? data.pages : Math.ceil(total / PER_PAGE);
+        const minP = priceRange[0] === '' ? 0 : Number(priceRange[0]);
+        const maxP = priceRange[1] === '' ? 500 : Number(priceRange[1]);
+        if (minP > 0) params.min_price = minP;
+        if (maxP < 500) params.max_price = maxP;
+        if (minRating) params.min_rating = minRating;
+        if (selectedCerts.length) params.highlights_filter = selectedCerts.join(',');
+        if (selectedFreeFrom.length) params.free_from = selectedFreeFrom.join(',');
+        if (selectedActives.length) params.active_ingredients = selectedActives.join(',');
 
-      if (append) {
-        setProducts(prev => [...(Array.isArray(prev) ? prev : []), ...items]);
-      } else {
-        setProducts(items);
+        const res = await getProducts(params);
+        const data = res?.data;
+        const rawList = data?.products ?? data?.items ?? (Array.isArray(data) ? data : []);
+        const items = Array.isArray(rawList) ? rawList : [];
+        const total = typeof data?.total === 'number' ? data.total : items.length;
+        const pages = typeof data?.pages === 'number' ? data.pages : Math.ceil(total / PER_PAGE);
+
+        if (append) {
+          setProducts((prev) => [...(Array.isArray(prev) ? prev : []), ...items]);
+        } else {
+          setProducts(items);
+        }
+        setTotalCount(total);
+        if (Object.keys(params).length <= 3 && total > 0) {
+          setCatalogTotalCount(total);
+        }
+        setHasMore(pageNum < pages);
+      } catch (err) {
+        console.error('Products fetch error:', err);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
-      setTotalCount(total);
-      setHasMore(pageNum < pages);
-    } catch (err) {
-      console.error('Products fetch error:', err);
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  }, [searchText, selectedCats, selectedSkinType, safeForMe, priceRange, minRating, sortBy, selectedCerts, selectedFreeFrom, selectedActives]);
+    },
+    [
+      searchText,
+      selectedCats,
+      selectedBrand,
+      selectedSkinType,
+      safeForMe,
+      priceRange,
+      minRating,
+      sortBy,
+      selectedCerts,
+      selectedFreeFrom,
+      selectedActives,
+    ]
+  );
 
-  /* ── Re-fetch when filters change (debounce search) ─────────  */
+  /* ── Re-fetch when filters change (debounce search) ───────── */
   useEffect(() => {
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => {
       setPage(1);
       fetchProducts(1, false);
-    }, 500);
+    }, 350);
     return () => clearTimeout(searchTimer.current);
   }, [fetchProducts]);
 
@@ -198,12 +327,10 @@ export default function Products() {
 
   /* ── Toggle category ──────────────────────────────────────── */
   const toggleCategory = (cat) => {
-    setSelectedCats(prev =>
-      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-    );
+    setSelectedCats((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [cat]));
   };
 
-  /* ── Apply filters (button) ───────────────────────────────── */
+  /* ── Apply filters (mobile drawer close) ──────────────────── */
   const applyFilters = () => {
     setSidebarOpen(false);
     setPage(1);
@@ -214,6 +341,7 @@ export default function Products() {
   const resetFilters = () => {
     setSearchText('');
     setSelectedCats([]);
+    setSelectedBrand('');
     setSelectedSkinType('');
     setSafeForMe(false);
     setPriceRange([0, 500]);
@@ -226,18 +354,18 @@ export default function Products() {
   };
 
   const toggleItem = (setter, val) => {
-    setter(prev => prev.includes(val) ? prev.filter(x => x !== val) : [...prev, val]);
+    setter((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]));
   };
-  /* ── Handle price change ──────────────────────────────────── */
+
   const handlePriceChange = (index, val) => {
-    setPriceRange(prev => {
+    const cleaned = val === '' ? '' : String(val).replace(/^0+(?=\d)/, '');
+    setPriceRange((prev) => {
       const next = [...prev];
-      next[index] = val;
+      next[index] = cleaned;
       return next;
     });
   };
 
-  /* ── Handle price blur/normalize ──────────────────────────── */
   const handlePriceBlur = () => {
     let min = priceRange[0] === '' ? 0 : Number(priceRange[0]);
     let max = priceRange[1] === '' ? 500 : Number(priceRange[1]);
@@ -254,7 +382,6 @@ export default function Products() {
     setPriceRange([min, max]);
   };
 
-  /* ── Handle enter key to blur/normalize ───────────────────── */
   const handlePriceKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.target.blur();
@@ -267,6 +394,7 @@ export default function Products() {
   const activeFilterCount =
     (searchText ? 1 : 0) +
     selectedCats.length +
+    (selectedBrand ? 1 : 0) +
     (selectedSkinType ? 1 : 0) +
     (safeForMe ? 1 : 0) +
     selectedCerts.length +
@@ -275,27 +403,50 @@ export default function Products() {
     (minP > 0 || maxP < 500 ? 1 : 0) +
     (minRating ? 1 : 0);
 
-  /* ── Render ───────────────────────────────────────────────── */
+  /* Derive top-level departments & active subcategories */
+  const catList = Array.isArray(categories) ? categories : [];
+  const topDepartments = catList.filter(
+    (c) => c && (c.parentId === null || c.parent_id === null)
+  );
+
+  // Determine which department's subcategories to show in the sidebar
+  const currentSelectedCatObj = catList.find((c) => selectedCats.includes(c.name || c));
+  const activeDeptObj = currentSelectedCatObj
+    ? currentSelectedCatObj.parentId || currentSelectedCatObj.parent_id
+      ? catList.find(
+          (d) => d.id === (currentSelectedCatObj.parentId ?? currentSelectedCatObj.parent_id)
+        )
+      : currentSelectedCatObj
+    : catList.find((c) => c.name === 'Skincare') || topDepartments[0];
+
+  const subCategories = activeDeptObj
+    ? catList.filter(
+        (c) => (c.parentId ?? c.parent_id) === activeDeptObj.id
+      )
+    : [];
+
+  const cleanClaimsCount = selectedFreeFrom.length + selectedCerts.length;
+
   return (
     <div className="products-page">
-      {/* ── Page Header ── */}
+      {/* ── Compact Page Header ── */}
       <div className="products-header">
         <div className="container">
           <div className="products-header-inner">
             <div>
               <h1 className="products-title display-font">
-                <Package size={26} className="products-title-icon" />
+                <Package size={24} className="products-title-icon" />
                 {t('prod_title')}
               </h1>
               <p className="products-subtitle">
-                {t('prod_subtitle_format').replace('{count}', totalCount.toLocaleString())}
+                {t('prod_subtitle_format').replace('{count}', catalogTotalCount.toLocaleString())}
               </p>
             </div>
 
             {/* Mobile filter toggle */}
             <button
               className="btn btn-secondary mobile-filter-toggle"
-              onClick={() => setSidebarOpen(prev => !prev)}
+              onClick={() => setSidebarOpen((prev) => !prev)}
             >
               <SlidersHorizontal size={16} />
               {t('prod_filter_title')}
@@ -309,109 +460,139 @@ export default function Products() {
 
       {/* ── Main layout ── */}
       <div className="container">
-        <div className="products-layout">
+        {/* ══ TOP HORIZONTAL DISCOVERY BAR (Main Departments + Sort) ══ */}
+        <div className="products-top-discovery-bar">
+          {/* Horizontal Department Pills */}
+          <div className="discovery-dept-pills" role="tablist" aria-label="Product departments">
+            <button
+              type="button"
+              className={`dept-pill ${selectedCats.length === 0 ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedCats([]);
+                setSearchParams({});
+              }}
+            >
+              {t('cat_all', 'All Categories')}
+            </button>
 
-          {/* ══ Filter Sidebar ══════════════════════════════════ */}
+            {topDepartments.map((dept) => {
+              const deptName = dept.name || dept;
+              const isDeptActive =
+                selectedCats.includes(deptName) ||
+                (currentSelectedCatObj &&
+                  (currentSelectedCatObj.parentId ?? currentSelectedCatObj.parent_id) === dept.id);
+              return (
+                <button
+                  key={deptName}
+                  type="button"
+                  className={`dept-pill ${isDeptActive ? 'active' : ''}`}
+                  onClick={() => {
+                    if (selectedCats.includes(deptName)) {
+                      setSelectedCats([]);
+                    } else {
+                      setSelectedCats([deptName]);
+                    }
+                  }}
+                >
+                  {deptName}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Clean Sort Dropdown */}
+          <div className="discovery-sort-box">
+            <span className="discovery-sort-label">{t('prod_sort_by', 'Sort')}:</span>
+            <div className="select-wrapper discovery-select-wrap">
+              <select
+                className="form-select discovery-sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                aria-label="Sort products"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="select-icon" />
+            </div>
+          </div>
+        </div>
+
+        <div className="products-layout">
+          {/* ══ COMPACT SELF-SCROLLING FILTER SIDEBAR ══════════════════════ */}
           <aside className={`filter-sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
             {/* Sidebar header */}
             <div className="sidebar-header">
               <h2 className="sidebar-title">
-                <SlidersHorizontal size={16} />
-                {t('prod_filter_title')}
+                <SlidersHorizontal size={15} />
+                <span>{t('prod_filter_title', 'Filters')}</span>
+                {activeFilterCount > 0 && (
+                  <span className="sidebar-active-badge">{activeFilterCount}</span>
+                )}
               </h2>
               <div className="sidebar-header-actions">
-                {activeFilterCount > 0 && (
-                  <button className="sidebar-reset-btn" onClick={resetFilters}>
-                    <RotateCcw size={13} />
-                    {t('prod_clear_filters')}
-                  </button>
-                )}
                 <button
                   className="sidebar-close-btn"
                   onClick={() => setSidebarOpen(false)}
+                  type="button"
+                  aria-label="Close filters"
                 >
                   <X size={18} />
                 </button>
               </div>
             </div>
 
-            {/* ─ USP Core: Safe For My Skin (Allergy Exclusion Toggle) ─ */}
-            <div
-              className="filter-section"
-              style={{
-                background: safeForMe ? 'rgba(16, 185, 129, 0.08)' : 'var(--bg-secondary)',
-                border: safeForMe ? '1.5px solid #10B981' : '1px solid var(--glass-border)',
-                borderRadius: '12px',
-                padding: '12px 14px',
-                marginBottom: '16px',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
-                    <ShieldCheck size={16} color="#10B981" /> Safe For My Skin
+            {/* 1. Safe For My Skin (Allergy Exclusion Toggle) */}
+            <div className={`safe-skin-toggle-card ${safeForMe ? 'active' : ''}`}>
+              <div className="safe-skin-toggle-row">
+                <div className="safe-skin-toggle-info">
+                  <div className="safe-skin-toggle-title">
+                    <ShieldCheck size={15} className="safe-skin-icon" />
+                    <span>Safe For My Skin</span>
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                    Auto-hides your allergens
-                  </div>
+                  <div className="safe-skin-toggle-sub">Auto-hides your personal allergens</div>
                 </div>
-                <label style={{ position: 'relative', display: 'inline-block', width: '42px', height: '24px', cursor: 'pointer', margin: 0 }}>
+                <label className="safe-switch">
                   <input
                     type="checkbox"
                     checked={safeForMe}
                     onChange={(e) => {
                       if (!user) {
-                        toast.error('Please log in with your Digital Skin ID to enable allergy filtering');
+                        toast.error('Please sign in with your Digital Skin ID to filter by personal allergies');
                         return;
                       }
                       setSafeForMe(e.target.checked);
                     }}
-                    style={{ opacity: 0, width: 0, height: 0 }}
                   />
-                  <span style={{
-                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: safeForMe ? '#10B981' : '#D1D5DB',
-                    borderRadius: '24px', transition: '.25s'
-                  }}>
-                    <span style={{
-                      position: 'absolute', content: '""', height: '18px', width: '18px',
-                      left: safeForMe ? '21px' : '3px', bottom: '3px',
-                      backgroundColor: 'white', borderRadius: '50%', transition: '.25s',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-                    }} />
-                  </span>
+                  <span className="safe-switch-slider" />
                 </label>
               </div>
               {safeForMe && (
-                <div style={{ marginTop: '8px', fontSize: '0.72rem', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <ShieldCheck size={13} /> Active: Products with allergens are hidden
+                <div className="safe-skin-active-note">
+                  Allergen-containing formulas are hidden
                 </div>
               )}
             </div>
 
-            {/* ─ Skin Type Filter ─ */}
+            {/* 2. Skin Type (Uniform 2-Column Balanced Grid) */}
             <div className="filter-section">
               <div className="filter-title">Skin Type</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {SKIN_TYPE_OPTIONS.map(opt => {
+              <div className="skin-type-grid">
+                {SKIN_TYPE_OPTIONS.map((opt) => {
                   const active = selectedSkinType === opt.value;
                   return (
                     <button
                       key={opt.value}
                       type="button"
-                      onClick={() => setSelectedSkinType(opt.value)}
-                      style={{
-                        padding: '5px 11px',
-                        borderRadius: '999px',
-                        fontSize: '0.78rem',
-                        fontWeight: active ? 600 : 500,
-                        border: active ? '1.5px solid var(--primary)' : '1px solid var(--glass-border)',
-                        background: active ? 'var(--primary)' : 'var(--bg-secondary)',
-                        color: active ? '#FFFFFF' : 'var(--text-primary)',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease'
-                      }}
+                      className={`skin-type-btn ${active ? 'active' : ''}`}
+                      onClick={() =>
+                        setSelectedSkinType((prev) =>
+                          prev === opt.value ? '' : opt.value
+                        )
+                      }
                     >
                       {opt.label}
                     </button>
@@ -420,146 +601,64 @@ export default function Products() {
               </div>
             </div>
 
-            {/* ─ Search ─ */}
-            <div className="filter-section">
-              <div className="filter-title">{t('prod_search')}</div>
-              <div className="search-bar filter-search">
-                <Search size={15} color="var(--text-muted)" />
-                <input
-                  type="text"
-                  placeholder={t('prod_search_placeholder_short')}
-                  value={searchText}
-                  onChange={e => setSearchText(e.target.value)}
-                />
-                {searchText && (
-                  <button
-                    className="search-clear-btn"
-                    onClick={() => setSearchText('')}
-                  >
-                    <X size={13} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* ─ Sort ─ */}
-            <div className="filter-section">
-              <div className="filter-title">{t('prod_sort_by')}</div>
-              <div className="select-wrapper">
-                <select
-                  className="form-select"
-                  value={sortBy}
-                  onChange={e => setSortBy(e.target.value)}
-                >
-                  {SORT_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-                <ChevronDown size={14} className="select-icon" />
-              </div>
-            </div>
-
-            {/* ─ Categories (Department & Subcategory Hierarchy) ─ */}
-            <div className="filter-section">
-              <div className="filter-title">{t('prod_category', 'Category')}</div>
-              <div className="category-nav-list">
-                <button
-                  type="button"
-                  className={`category-nav-btn ${selectedCats.length === 0 ? 'active' : ''}`}
-                  onClick={() => {
-                    setSelectedCats([]);
-                    setSearchParams({});
-                  }}
-                >
-                  <span className="category-nav-label">{t('cat_all', 'All Categories')}</span>
-                  {selectedCats.length === 0 && <span className="category-active-dot" />}
-                </button>
-
-                {/* Primary Departments first */}
-                {(Array.isArray(categories) ? categories : [])
-                  .filter(c => c && (c.parentId === null || c.parent_id === null))
-                  .map(cat => {
-                    const catName = cat.name || cat;
-                    const isSelected = selectedCats.includes(catName);
-
+            {/* 3. Subcategory Quick Chips (Context-aware to current department) */}
+            {subCategories.length > 0 && (
+              <div className="filter-section">
+                <div className="filter-title-row">
+                  <span className="filter-title" style={{ marginBottom: 0 }}>
+                    {activeDeptObj?.name || 'Skincare'} Type
+                  </span>
+                  {selectedCats.length > 0 && (
+                    <button
+                      type="button"
+                      className="filter-inline-clear"
+                      onClick={() => setSelectedCats([])}
+                    >
+                      All
+                    </button>
+                  )}
+                </div>
+                <div className="filter-pill-grid" style={{ marginTop: '8px' }}>
+                  {subCategories.map((sub) => {
+                    const isSubSelected = selectedCats.includes(sub.name);
                     return (
                       <button
-                        key={catName}
+                        key={sub.id || sub.name}
                         type="button"
-                        className={`category-nav-btn ${isSelected ? 'active' : ''}`}
+                        className={`sidebar-pill ${isSubSelected ? 'active' : ''}`}
                         onClick={() => {
-                          if (isSelected) {
-                            setSelectedCats([]);
+                          if (isSubSelected) {
+                            setSelectedCats(activeDeptObj ? [activeDeptObj.name] : []);
                           } else {
-                            setSelectedCats([catName]);
+                            setSelectedCats([sub.name]);
                           }
                         }}
                       >
-                        <span className="category-nav-label">{catName}</span>
-                        {isSelected && <span className="category-active-dot" />}
+                        {sub.name}
                       </button>
                     );
                   })}
+                </div>
+              </div>
+            )}
+
+            {/* 4. Price Range (Clean Min - Max Inputs Only) */}
+            <div className="filter-section">
+              <div className="filter-title-row" style={{ marginBottom: '8px' }}>
+                <span className="filter-title" style={{ marginBottom: 0 }}>
+                  {t('prod_price_usd', 'Price Range')}
+                </span>
+                {(minP > 0 || maxP < 500) && (
+                  <button
+                    type="button"
+                    className="filter-inline-clear"
+                    onClick={() => setPriceRange([0, 500])}
+                  >
+                    Reset
+                  </button>
+                )}
               </div>
 
-              {/* Subcategories (if a department or subcategory is selected, or expand popular) */}
-              {(() => {
-                const catList = Array.isArray(categories) ? categories : [];
-                const activeDeptName = selectedCats.find(c =>
-                  catList.some(cat => (cat.parentId === null || cat.parent_id === null) && cat.name === c)
-                ) || (selectedCats.length === 0 ? 'Skincare' : null);
-
-                const activeDept = catList.find(c => c.name === activeDeptName);
-                const subCats = activeDept
-                  ? catList.filter(c => (c.parentId === activeDept.id || c.parent_id === activeDept.id))
-                  : [];
-
-                if (subCats.length === 0) return null;
-
-                return (
-                  <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--border-subtle, #E2E8F0)' }}>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {activeDeptName} Subcategories
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                      {subCats.map(sub => {
-                        const isSubSelected = selectedCats.includes(sub.name);
-                        return (
-                          <button
-                            key={sub.id || sub.name}
-                            type="button"
-                            onClick={() => {
-                              if (isSubSelected) {
-                                setSelectedCats(activeDeptName ? [activeDeptName] : []);
-                              } else {
-                                setSelectedCats([sub.name]);
-                              }
-                            }}
-                            style={{
-                              padding: '3px 9px',
-                              borderRadius: '999px',
-                              fontSize: '0.74rem',
-                              fontWeight: isSubSelected ? 600 : 500,
-                              border: isSubSelected ? '1.5px solid var(--primary)' : '1px solid var(--glass-border, #CBD5E1)',
-                              background: isSubSelected ? 'var(--primary)' : 'var(--bg-secondary, #F8FAFC)',
-                              color: isSubSelected ? '#FFFFFF' : 'var(--text-primary)',
-                              cursor: 'pointer',
-                              transition: 'all 0.15s ease'
-                            }}
-                          >
-                            {sub.name}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-
-            {/* ─ Price Range ─ */}
-            <div className="filter-section">
-              <div className="filter-title">{t('prod_price_usd')}</div>
               <div className="price-range-inputs-container">
                 <div className="price-input-wrapper">
                   <span className="price-input-prefix">$</span>
@@ -567,12 +666,13 @@ export default function Products() {
                     type="number"
                     className="form-input price-input"
                     value={priceRange[0]}
-                    onChange={e => handlePriceChange(0, e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => handlePriceChange(0, e.target.value)}
                     onBlur={handlePriceBlur}
                     onKeyDown={handlePriceKeyDown}
                     min={0}
                     max={500}
-                    placeholder="Min"
+                    placeholder="0"
                   />
                 </div>
                 <div className="price-range-sep" />
@@ -582,58 +682,30 @@ export default function Products() {
                     type="number"
                     className="form-input price-input"
                     value={priceRange[1]}
-                    onChange={e => handlePriceChange(1, e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => handlePriceChange(1, e.target.value)}
                     onBlur={handlePriceBlur}
                     onKeyDown={handlePriceKeyDown}
                     min={0}
                     max={500}
-                    placeholder="Max"
+                    placeholder="500"
                   />
                 </div>
               </div>
             </div>
 
-            {/* ─ Min Rating ─ */}
+            {/* 5. Minimum Rating (Single Horizontal Row instead of 3 vertical rows) */}
             <div className="filter-section">
-              <div className="filter-title">{t('prod_min_rating_label')}</div>
-              <div className="rating-options">
-                {RATING_OPTIONS.map(opt => (
-                  <label key={opt.value} className="filter-option rating-option">
-                    <input
-                      type="radio"
-                      name="minRating"
-                      value={opt.value}
-                      checked={minRating === opt.value}
-                      onChange={() => setMinRating(opt.value)}
-                    />
-                    <span className="filter-option-label">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* ─ Smart Filter: Active Ingredients (FR-04.3) ─ */}
-            <div className="filter-section">
-              <div className="filter-title">{t('filter_active_ingredients', 'Active Ingredients')}</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {ACTIVE_OPTIONS.map(opt => {
-                  const active = selectedActives.includes(opt.value);
+              <div className="filter-title">{t('prod_min_rating_label', 'Minimum Rating')}</div>
+              <div className="rating-pill-row">
+                {RATING_OPTIONS.map((opt) => {
+                  const active = minRating === opt.value;
                   return (
                     <button
                       key={opt.value}
                       type="button"
-                      onClick={() => toggleItem(setSelectedActives, opt.value)}
-                      style={{
-                        padding: '5px 10px',
-                        borderRadius: '999px',
-                        fontSize: '0.78rem',
-                        fontWeight: active ? 600 : 500,
-                        border: active ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
-                        background: active ? 'var(--primary)' : 'var(--bg-secondary)',
-                        color: active ? '#FFFFFF' : 'var(--text-primary)',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
+                      className={`rating-segment-btn ${active ? 'active' : ''}`}
+                      onClick={() => setMinRating(opt.value)}
                     >
                       {opt.label}
                     </button>
@@ -642,52 +714,119 @@ export default function Products() {
               </div>
             </div>
 
-            {/* ─ Smart Filter: Certifications (FR-04.1) ─ */}
-            <div className="filter-section">
-              <div className="filter-title">{t('filter_certifications', 'Certifications')}</div>
-              <div className="rating-options">
-                {CERT_OPTIONS.map(opt => (
-                  <label key={opt.value} className="filter-option rating-option">
-                    <input
-                      type="checkbox"
-                      checked={selectedCerts.includes(opt.value)}
-                      onChange={() => toggleItem(setSelectedCerts, opt.value)}
-                    />
-                    <span className="filter-option-label">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
+            {/* 6. ACCORDION: Active Ingredients */}
+            <div className="filter-section filter-accordion">
+              <button
+                type="button"
+                className="accordion-trigger"
+                onClick={() => toggleSection('actives')}
+                aria-expanded={openSections.actives || selectedActives.length > 0}
+              >
+                <span className="filter-title" style={{ marginBottom: 0 }}>
+                  {t('filter_active_ingredients', 'Active Ingredients')}
+                  {selectedActives.length > 0 && (
+                    <span className="accordion-count">{selectedActives.length}</span>
+                  )}
+                </span>
+                {openSections.actives || selectedActives.length > 0 ? (
+                  <ChevronUp size={15} />
+                ) : (
+                  <ChevronDown size={15} />
+                )}
+              </button>
+
+              {(openSections.actives || selectedActives.length > 0) && (
+                <div className="filter-pill-grid" style={{ marginTop: '10px' }}>
+                  {ACTIVE_OPTIONS.map((opt) => {
+                    const active = selectedActives.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`sidebar-pill ${active ? 'active' : ''}`}
+                        onClick={() => toggleItem(setSelectedActives, opt.value)}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* ─ Smart Filter: Free-From Exclusions (FR-04.2) ─ */}
-            <div className="filter-section">
-              <div className="filter-title">Free From (Safe Filter)</div>
-              <div className="rating-options">
-                {FREE_FROM_OPTIONS.map(opt => (
-                  <label key={opt.value} className="filter-option rating-option">
-                    <input
-                      type="checkbox"
-                      checked={selectedFreeFrom.includes(opt.value)}
-                      onChange={() => toggleItem(setSelectedFreeFrom, opt.value)}
-                    />
-                    <span className="filter-option-label">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
+            {/* 7. ACCORDION: Free From & Certifications */}
+            <div className="filter-section filter-accordion">
+              <button
+                type="button"
+                className="accordion-trigger"
+                onClick={() => toggleSection('cleanClaims')}
+                aria-expanded={openSections.cleanClaims || cleanClaimsCount > 0}
+              >
+                <span className="filter-title" style={{ marginBottom: 0 }}>
+                  Free From &amp; Clean Claims
+                  {cleanClaimsCount > 0 && (
+                    <span className="accordion-count">{cleanClaimsCount}</span>
+                  )}
+                </span>
+                {openSections.cleanClaims || cleanClaimsCount > 0 ? (
+                  <ChevronUp size={15} />
+                ) : (
+                  <ChevronDown size={15} />
+                )}
+              </button>
+
+              {(openSections.cleanClaims || cleanClaimsCount > 0) && (
+                <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div>
+                    <div className="accordion-sub-label">Free From</div>
+                    <div className="filter-pill-grid">
+                      {FREE_FROM_OPTIONS.map((opt) => {
+                        const active = selectedFreeFrom.includes(opt.value);
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            className={`sidebar-pill ${active ? 'active' : ''}`}
+                            onClick={() => toggleItem(setSelectedFreeFrom, opt.value)}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="accordion-sub-label">Certifications</div>
+                    <div className="filter-pill-grid">
+                      {CERT_OPTIONS.map((opt) => {
+                        const active = selectedCerts.includes(opt.value);
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            className={`sidebar-pill ${active ? 'active' : ''}`}
+                            onClick={() => toggleItem(setSelectedCerts, opt.value)}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* ─ Apply button ─ */}
-            <button className="btn btn-primary apply-filters-btn" onClick={applyFilters}>
-              {t('prod_apply_filters')}
+            {/* Mobile-only close/apply button */}
+            <button className="btn btn-primary apply-filters-btn mobile-only-apply" onClick={applyFilters}>
+              {t('prod_apply_filters', 'Show Results')}
             </button>
           </aside>
 
           {/* Sidebar overlay (mobile) */}
           {sidebarOpen && (
-            <div
-              className="sidebar-overlay"
-              onClick={() => setSidebarOpen(false)}
-            />
+            <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
           )}
 
           {/* ══ Products Area ════════════════════════════════════ */}
@@ -699,12 +838,14 @@ export default function Products() {
                   <span className="skeleton skeleton-count" />
                 ) : (
                   <span>
-                    {t('prod_found_format').split('{count}').map((part, i) => (
-                      <React.Fragment key={i}>
-                        {i > 0 && <strong>{totalCount.toLocaleString()}</strong>}
-                        {part}
-                      </React.Fragment>
-                    ))}
+                    {t('prod_found_format')
+                      .split('{count}')
+                      .map((part, i) => (
+                        <React.Fragment key={i}>
+                          {i > 0 && <strong>{totalCount.toLocaleString()}</strong>}
+                          {part}
+                        </React.Fragment>
+                      ))}
                   </span>
                 )}
               </div>
@@ -713,59 +854,98 @@ export default function Products() {
               {activeFilterCount > 0 && (
                 <div className="active-filters">
                   {safeForMe && (
-                    <span className="filter-chip" style={{ background: '#10B981', color: '#FFFFFF', fontWeight: 600 }}>
-                      <ShieldCheck size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} /> Safe For My Skin
-                      <button onClick={() => setSafeForMe(false)}><X size={11} color="#FFFFFF" /></button>
+                    <span className="filter-chip chip-safe">
+                      <ShieldCheck size={12} />
+                      <span>Safe For My Skin</span>
+                      <button type="button" onClick={() => setSafeForMe(false)}>
+                        <X size={11} />
+                      </button>
                     </span>
                   )}
                   {selectedSkinType && (
                     <span className="filter-chip">
-                      Skin: {selectedSkinType}
-                      <button onClick={() => setSelectedSkinType('')}><X size={11} /></button>
+                      <span>Skin: {selectedSkinType}</span>
+                      <button type="button" onClick={() => setSelectedSkinType('')}>
+                        <X size={11} />
+                      </button>
                     </span>
                   )}
                   {searchText && (
                     <span className="filter-chip">
-                      <Search size={11} style={{ marginRight: 4, verticalAlign: 'middle' }} /> {searchText}
-                      <button onClick={() => setSearchText('')}><X size={11} /></button>
+                      <Search size={11} />
+                      <span>{searchText}</span>
+                      <button type="button" onClick={() => setSearchText('')}>
+                        <X size={11} />
+                      </button>
                     </span>
                   )}
-                  {selectedCats.map(cat => (
+                  {selectedBrand && (
+                    <span className="filter-chip">
+                      <span>Brand: {selectedBrand}</span>
+                      <button type="button" onClick={() => setSelectedBrand('')}>
+                        <X size={11} />
+                      </button>
+                    </span>
+                  )}
+                  {selectedCats.map((cat) => (
                     <span key={cat} className="filter-chip">
-                      {t('cat_' + cat) === 'cat_' + cat ? cat : t('cat_' + cat)}
-                      <button onClick={() => toggleCategory(cat)}><X size={11} /></button>
+                      <span>{t('cat_' + cat) === 'cat_' + cat ? cat : t('cat_' + cat)}</span>
+                      <button type="button" onClick={() => toggleCategory(cat)}>
+                        <X size={11} />
+                      </button>
                     </span>
                   ))}
                   {(minP > 0 || maxP < 500) && (
                     <span className="filter-chip">
-                      {formatPrice(minP)}–{formatPrice(maxP)}
-                      <button onClick={() => setPriceRange([0, 500])}><X size={11} /></button>
+                      <span>
+                        {formatPrice(minP)}–{formatPrice(maxP)}
+                      </span>
+                      <button type="button" onClick={() => setPriceRange([0, 500])}>
+                        <X size={11} />
+                      </button>
                     </span>
                   )}
                   {minRating && (
                     <span className="filter-chip">
-                      <Star size={11} fill="currentColor" style={{ marginRight: 4, verticalAlign: 'middle' }} /> {minRating}+
-                      <button onClick={() => setMinRating('')}><X size={11} /></button>
+                      <Star size={11} fill="currentColor" />
+                      <span>{minRating}+</span>
+                      <button type="button" onClick={() => setMinRating('')}>
+                        <X size={11} />
+                      </button>
                     </span>
                   )}
-                  {selectedActives.map(act => (
+                  {selectedActives.map((act) => (
                     <span key={act} className="filter-chip">
-                      {ACTIVE_OPTIONS.find(o => o.value === act)?.label || act}
-                      <button onClick={() => toggleItem(setSelectedActives, act)}><X size={11} /></button>
+                      <span>{ACTIVE_OPTIONS.find((o) => o.value === act)?.label || act}</span>
+                      <button type="button" onClick={() => toggleItem(setSelectedActives, act)}>
+                        <X size={11} />
+                      </button>
                     </span>
                   ))}
-                  {selectedCerts.map(cert => (
+                  {selectedCerts.map((cert) => (
                     <span key={cert} className="filter-chip">
-                      {CERT_OPTIONS.find(o => o.value === cert)?.label || cert}
-                      <button onClick={() => toggleItem(setSelectedCerts, cert)}><X size={11} /></button>
+                      <span>{CERT_OPTIONS.find((o) => o.value === cert)?.label || cert}</span>
+                      <button type="button" onClick={() => toggleItem(setSelectedCerts, cert)}>
+                        <X size={11} />
+                      </button>
                     </span>
                   ))}
-                  {selectedFreeFrom.map(ff => (
+                  {selectedFreeFrom.map((ff) => (
                     <span key={ff} className="filter-chip">
-                      {FREE_FROM_OPTIONS.find(o => o.value === ff)?.label || ff}
-                      <button onClick={() => toggleItem(setSelectedFreeFrom, ff)}><X size={11} /></button>
+                      <span>{FREE_FROM_OPTIONS.find((o) => o.value === ff)?.label || ff}</span>
+                      <button type="button" onClick={() => toggleItem(setSelectedFreeFrom, ff)}>
+                        <X size={11} />
+                      </button>
                     </span>
                   ))}
+                  <button
+                    type="button"
+                    className="sidebar-reset-btn"
+                    onClick={resetFilters}
+                  >
+                    <RotateCcw size={12} />
+                    <span>{t('prod_clear_filters', 'Clear Filters')}</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -773,17 +953,25 @@ export default function Products() {
             {/* ─ Loading skeletons ─ */}
             {loading && (
               <div className="product-grid">
-                {Array.from({ length: 12 }, (_, i) => <SkeletonCard key={i} />)}
+                {Array.from({ length: 12 }, (_, i) => (
+                  <SkeletonCard key={i} />
+                ))}
               </div>
             )}
 
             {/* ─ Empty state ─ */}
             {!loading && products.length === 0 && (
               <div className="empty-state products-empty">
-                <div className="empty-state-icon"><PackageSearch size={48} strokeWidth={1.5} color="#94A3B8" /></div>
+                <div className="empty-state-icon">
+                  <PackageSearch size={48} strokeWidth={1.5} color="#94A3B8" />
+                </div>
                 <h3>{t('prod_no_products')}</h3>
                 <p>{t('prod_empty_desc')}</p>
-                <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={resetFilters}>
+                <button
+                  className="btn btn-primary"
+                  style={{ marginTop: 16 }}
+                  onClick={resetFilters}
+                >
                   <RotateCcw size={15} />
                   {t('prod_clear_filters')}
                 </button>
@@ -795,7 +983,10 @@ export default function Products() {
               <>
                 <div className="product-grid">
                   {products.map((product, idx) => (
-                    <ProductCard key={product.id ?? product.product_id ?? idx} product={product} />
+                    <ProductCard
+                      key={product.id ?? product.product_id ?? idx}
+                      product={product}
+                    />
                   ))}
                 </div>
 
@@ -813,9 +1004,7 @@ export default function Products() {
                           {t('prod_loading')}
                         </>
                       ) : (
-                        <>
-                          {t('prod_load_more')}
-                        </>
+                        <>{t('prod_load_more')}</>
                       )}
                     </button>
                   </div>
@@ -824,7 +1013,9 @@ export default function Products() {
                 {/* Loading more skeletons */}
                 {loadingMore && (
                   <div className="product-grid load-more-grid">
-                    {Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
+                    {Array.from({ length: 4 }, (_, i) => (
+                      <SkeletonCard key={i} />
+                    ))}
                   </div>
                 )}
               </>

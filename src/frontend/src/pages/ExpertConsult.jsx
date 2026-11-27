@@ -3,6 +3,7 @@ import { Bot, User, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
 import { chatWithBot, getFAQ } from '../services/api';
+import { getProductImage, DEFAULT_PRODUCT_IMAGE } from '../utils/productImages';
 import './ExpertConsult.css';
 
 /* parse **bold** → <strong> */
@@ -62,14 +63,14 @@ function ChatMessage({ msg }) {
           maxWidth: '85%'
         }}>
           <div style={{ fontWeight: 800, fontSize: '1.05rem', color: '#C53030', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>⚠️</span> PHÁT HIỆN DẤU HIỆU BỆNH LÝ DA LIỄU PHỨC TẠP
+            <span>⚠️</span> COMPLEX DERMATOLOGICAL SYMPTOMS DETECTED
           </div>
           <div style={{ color: '#4A5568', lineHeight: '1.6', fontSize: '0.95rem', marginBottom: '12px' }}>
             <MessageText text={msg.text} />
           </div>
           {msg.suggestedAction && (
             <div style={{ background: '#FFF', padding: '12px 16px', borderRadius: '10px', border: '1px solid #FEB2B2', marginBottom: '14px', fontSize: '0.9rem', color: '#2D3748' }}>
-              <strong>Hướng dẫn an toàn khẩn cấp:</strong> {msg.suggestedAction}
+              <strong>Urgent Safety Guidance:</strong> {msg.suggestedAction}
             </div>
           )}
           <a
@@ -89,10 +90,10 @@ function ChatMessage({ msg }) {
               boxShadow: '0 4px 12px rgba(0, 104, 255, 0.25)'
             }}
           >
-            <span>💬</span> Mở Zalo Chat 1-1 Với Bác Sĩ Da Liễu Ngay
+            <span>💬</span> Start 1-on-1 Dermatologist Consultation
           </a>
           <div style={{ fontSize: '0.75rem', color: '#718096', marginTop: '8px' }}>
-            Bác sĩ chuyên khoa trực tuyến 8:00 - 22:00 hằng ngày • Hoàn toàn bảo mật
+            Board-certified specialists online 8:00 AM – 10:00 PM daily • Strictly confidential
           </div>
         </div>
       </div>
@@ -126,15 +127,15 @@ function ChatMessage({ msg }) {
               }}>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <img
-                    src={p.imageUrl || `/images/products/${p.code}.webp`}
+                    src={getProductImage(p)}
                     alt={p.name}
                     style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', background: '#F9F6F0' }}
-                    onError={(e) => { e.currentTarget.src = '/images/products/placeholder.webp'; }}
+                    onError={(e) => { e.currentTarget.src = DEFAULT_PRODUCT_IMAGE; }}
                   />
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <div style={{ fontSize: '0.72rem', color: '#888', fontWeight: 600 }}>{p.brandName}</div>
                     <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#2D2520', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-                    <div style={{ fontSize: '0.78rem', color: '#C48B71', fontWeight: 700 }}>${p.priceUsd?.toFixed(2)}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--accent)', fontWeight: 700 }}>${p.priceUsd?.toFixed(2)}</div>
                   </div>
                 </div>
                 <button

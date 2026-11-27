@@ -134,7 +134,7 @@ export default function SkinIdQuickModal({ isOpen, onClose, onSaved }) {
           overflowY: 'auto',
           padding: '28px',
           boxShadow: '0 24px 60px rgba(74, 55, 40, 0.22)',
-          border: '1px solid rgba(196, 139, 113, 0.25)',
+          border: '1px solid var(--border-subtle)',
         }}
       >
         {/* Header */}
@@ -145,7 +145,7 @@ export default function SkinIdQuickModal({ isOpen, onClose, onSaved }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'rgba(196, 139, 113, 0.14)',
+                background: 'var(--accent-soft)',
                 color: '#8F5B42',
                 padding: '4px 10px',
                 borderRadius: '999px',
@@ -202,7 +202,7 @@ export default function SkinIdQuickModal({ isOpen, onClose, onSaved }) {
                       padding: '10px 12px',
                       borderRadius: '12px',
                       border: active ? '2px solid #8F5B42' : '1px solid #E6DFD9',
-                      background: active ? 'rgba(196, 139, 113, 0.1)' : '#FAF8F6',
+                      background: active ? 'var(--accent-soft)' : 'var(--bg-primary)',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}

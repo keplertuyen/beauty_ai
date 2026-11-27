@@ -1,9 +1,9 @@
 .cart-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--overlay-bg);
   backdrop-filter: blur(4px);
-  z-index: 200;
+  z-index: var(--z-overlay);
 }
 
 .cart-drawer {
@@ -15,12 +15,12 @@
   max-width: 100vw;
   background: var(--bg-card);
   border-left: 1px solid var(--glass-border);
-  z-index: 201;
+  z-index: var(--z-drawer);
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: -4px 0 40px rgba(0, 0, 0, 0.4);
+  box-shadow: -8px 0 32px rgba(30, 23, 18, 0.2);
 }
 
 .cart-drawer.open { transform: translateX(0); }

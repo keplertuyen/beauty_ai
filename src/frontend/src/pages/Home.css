@@ -13,7 +13,8 @@
 ══════════════════════════════════════════════ */
 .home-hero {
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--navbar-height));
+  min-height: calc(100svh - var(--navbar-height));
   display: flex;
   align-items: center;
   background: var(--gradient-hero);
@@ -32,7 +33,7 @@
 .home-hero-orb--1 {
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(143, 117, 95, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(74, 55, 40, 0.08) 0%, transparent 70%);
   top: -150px;
   right: -100px;
   animation-delay: 0s;
@@ -96,7 +97,7 @@
   gap: 6px;
   padding: 6px 16px;
   background: var(--primary-glow);
-  border: 1px solid rgba(143, 117, 95, 0.35);
+  border: 1px solid rgba(74, 55, 40, 0.35);
   border-radius: var(--radius-full);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -215,7 +216,7 @@
 .home-feature-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-glow);
-  border-color: rgba(143, 117, 95, 0.25);
+  border-color: rgba(74, 55, 40, 0.25);
 }
 
 .home-feature-icon {
@@ -223,7 +224,7 @@
   height: 64px;
   border-radius: var(--radius-lg);
   background: var(--primary-glow);
-  border: 1px solid rgba(143, 117, 95, 0.2);
+  border: 1px solid rgba(74, 55, 40, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -328,7 +329,7 @@
    CATEGORY CARDS
 ══════════════════════════════════════════════ */
 .home-categories-section {
-  background: linear-gradient(180deg, transparent, rgba(143, 117, 95, 0.04), transparent);
+  background: linear-gradient(180deg, transparent, rgba(74, 55, 40, 0.04), transparent);
 }
 
 .home-categories-grid {
@@ -366,7 +367,7 @@
 
 .home-category-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(143, 117, 95, 0.4);
+  border-color: rgba(74, 55, 40, 0.4);
   box-shadow: var(--shadow-glow);
   color: var(--text-primary);
 }
@@ -419,7 +420,7 @@
    STATS SECTION
 ══════════════════════════════════════════════ */
 .home-stats-section {
-  background: linear-gradient(135deg, rgba(143, 117, 95, 0.04), rgba(163, 145, 130, 0.04));
+  background: linear-gradient(135deg, rgba(74, 55, 40, 0.04), rgba(163, 145, 130, 0.04));
   border-top:    1px solid var(--glass-border);
   border-bottom: 1px solid var(--glass-border);
 }
@@ -481,7 +482,7 @@
 .home-cta-orb--1 {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(143, 117, 95, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(74, 55, 40, 0.08) 0%, transparent 70%);
   top: -120px;
   left: -100px;
 }
@@ -506,7 +507,7 @@
   display: inline-block;
   padding: 6px 18px;
   background: var(--primary-glow);
-  border: 1px solid rgba(143, 117, 95, 0.3);
+  border: 1px solid rgba(74, 55, 40, 0.3);
   border-radius: var(--radius-full);
   font-size: 0.8rem;
   font-weight: 600;
