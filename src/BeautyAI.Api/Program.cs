@@ -124,7 +124,23 @@ else
 }
 
 // 5. JWT Authentication
-var jwtSecret = builder.Configuration["JWT_SECRET"] ?? "BeautyAI_SuperSecret_Dermatology_Key_2026_AtLeast32Chars!";
+var isOpenApiDocGen = string.Equals(
+    System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name,
+    "GetDocument.Insider",
+    StringComparison.OrdinalIgnoreCase);
+var jwtSecret = builder.Configuration["JWT_SECRET"] ?? Environment.GetEnvironmentVariable("JWT_SECRET");
+if (string.IsNullOrWhiteSpace(jwtSecret) || jwtSecret.Length < 32)
+{
+    if (!builder.Environment.IsDevelopment() && !isOpenApiDocGen)
+    {
+        throw new InvalidOperationException(
+            "JWT_SECRET must be set via environment/secret store and be at least 32 characters long in Production.");
+    }
+
+    // Ephemeral per-process key for local Development (when not set in .env / user-secrets) or build-time OpenAPI generation
+    jwtSecret = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+    builder.Configuration["JWT_SECRET"] = jwtSecret;
+}
 var jwtIssuer = builder.Configuration["JWT_ISSUER"] ?? "beautyai-api";
 var jwtAudience = builder.Configuration["JWT_AUDIENCE"] ?? "beautyai-clients";
 
@@ -154,7 +170,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Ensure schema migration & optional env-driven Admin account bootstrap
+// Ensure schema migration & optional env-driven Admin account bootstrap (skip during build-time OpenAPI doc generation)
+if (!isOpenApiDocGen)
 using (var scope = app.Services.CreateScope())
 {
     var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("AdminBootstrap");

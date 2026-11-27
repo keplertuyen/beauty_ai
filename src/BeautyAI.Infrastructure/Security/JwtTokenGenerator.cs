@@ -17,7 +17,14 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
     public JwtTokenGenerator(IConfiguration configuration)
     {
-        _secret = configuration["JWT_SECRET"] ?? "BeautyAI_SuperSecret_Dermatology_Key_2026_AtLeast32Chars!";
+        var configuredSecret = configuration["JWT_SECRET"] ?? Environment.GetEnvironmentVariable("JWT_SECRET");
+        if (string.IsNullOrWhiteSpace(configuredSecret) || configuredSecret.Length < 32)
+        {
+            throw new InvalidOperationException(
+                "JWT_SECRET must be configured (at least 32 characters) via environment variables, .env, or user-secrets.");
+        }
+
+        _secret = configuredSecret;
         _issuer = configuration["JWT_ISSUER"] ?? "beautyai-api";
         _audience = configuration["JWT_AUDIENCE"] ?? "beautyai-clients";
         _expirationDays = int.TryParse(configuration["JWT_EXPIRATION_DAYS"], out int days) ? days : 7;

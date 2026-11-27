@@ -25,6 +25,7 @@ desktop.ini
 bin/
 obj/
 .aspnet/
+.nuget/
 *.suo
 *.user
 *.userosscache
@@ -58,6 +59,7 @@ logs/
 
 # agent local-only state
 .worktrees/
+.syntheprise/locks/
 CLAUDE.local.md
 .claude/settings.local.json
 .codex/local.toml
@@ -65,3 +67,6 @@ CLAUDE.local.md
 .local/
 Library/
 .neon
+
+# runtime uploaded product images
+src/BeautyAI.Api/wwwroot/uploads/
