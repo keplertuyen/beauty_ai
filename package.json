@@ -17,5 +17,8 @@
   "dependencies": {
     "@neon/config": "^1.14.6",
     "@neon/env": "^2.1.9"
+  },
+  "overrides": {
+    "vite": "^8.4.0"
   }
 }

@@ -22,7 +22,8 @@ services:
       dockerfile: src/BeautyAI.Api/Dockerfile
     environment:
       ASPNETCORE_URLS: http://+:5000
-      ConnectionStrings__Default: Host=postgres;Port=5432;Database=beautyai;Username=beautyai;Password=${POSTGRES_PASSWORD:-beautyai_dev_secret}
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=beautyai;Username=beautyai;Password=${POSTGRES_PASSWORD:-beautyai_dev_secret}
+      JWT_SECRET: ${JWT_SECRET:-}
       CORS_ORIGINS: http://localhost:5000,http://localhost:5173
     ports:
       - "5000:5000"

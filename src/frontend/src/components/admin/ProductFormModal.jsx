@@ -495,29 +495,35 @@ export default function ProductFormModal({
                       id="pf-image-url"
                       type="text"
                       className="form-input"
-                      placeholder="https://... or /uploads/products/..."
+                      placeholder="https://... or /images/products/P466123.webp"
                       value={form.imageUrl}
                       onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                     />
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        style={{ display: 'none' }}
-                        onChange={handleImageFileChange}
-                      />
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm ad-btn-icon"
-                        disabled={uploadingImage}
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Upload size={13} />
-                        <span>{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
-                      </button>
-                      <span className="ad-cell-meta">JPG, PNG, WEBP ≤ 5MB</span>
-                    </div>
+                    {(!import.meta.env.PROD || import.meta.env.VITE_ENABLE_IMAGE_UPLOAD === 'true') ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          style={{ display: 'none' }}
+                          onChange={handleImageFileChange}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm ad-btn-icon"
+                          disabled={uploadingImage}
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload size={13} />
+                          <span>{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
+                        </button>
+                        <span className="ad-cell-meta">JPG, PNG, WEBP ≤ 5MB</span>
+                      </div>
+                    ) : (
+                      <span className="ad-cell-meta">
+                        Phase 1 production: enter an external HTTPS image URL or local asset path (e.g. /images/products/P466123.webp).
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

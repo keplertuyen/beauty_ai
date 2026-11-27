@@ -11,9 +11,9 @@ const API = axios.create({
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('beautyai_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
-  
+
   config.headers['Accept-Language'] = 'en';
-  
+
   return config;
 });
 
@@ -55,18 +55,14 @@ export const getProduct = (id) => API.get(`/products/${id}`);
 export const getProductQrCode = (id) => API.get(`/products/${id}/qrcode`);
 export const getCategories = () => API.get('/products/categories');
 export const getBrands = () => API.get('/products/brands');
-export const getCurrencySettings = () => API.get('/products/settings/currency');
-export const updateCurrencySettings = (data) => API.put('/products/settings/currency', data);
 
 // ==========================================
 // 4. RECOMMENDATIONS & ROUTINE
 // ==========================================
 export const getSimilarProducts = (id, limit = 6) => API.get(`/products/${id}/similar`, { params: { limit } });
-export const getFrequentlyBoughtTogether = (id, top_k = 4) => API.get(`/recommendations/frequently-bought-together/${id}`, { params: { top_k } });
 export const getTrending = (top_k = 12) => API.get('/recommendations/trending', { params: { top_k } });
 export const getFeatured = (top_k = 8) => API.get('/recommendations/featured', { params: { top_k } });
 export const getSkinQuizRecs = (data) => API.post('/recommendations/skinquiz', data);
-export const getUserRecs = (user_id) => API.post('/recommendations/user', { user_id });
 export const generateRoutine = (data) => API.post('/routines/generate', data);
 export const saveRoutine = (data) => API.post('/routines/save', data);
 export const getMyRoutines = () => API.get('/routines/my-routines');
@@ -76,7 +72,6 @@ export const deleteRoutine = (id) => API.delete(`/routines/${id}`);
 // 5. INGREDIENTS & CONFLICT ANALYSIS
 // ==========================================
 export const analyzeIngredients = (data) => API.post('/tools/analyze-inci', data);
-export const getIngredientDB = () => API.get('/ingredients/database');
 export const getSkintypeGuide = (area = 'face') => API.get('/tools/skintype-guide', { params: { area } });
 export const checkProductConflicts = (productIds) =>
   API.post('/tools/check-conflict', {
@@ -90,33 +85,19 @@ export const getReviews = (productId, params) => API.get(`/products/${productId}
 export const addReview = (data) => API.post('/reviews', data);
 
 // ==========================================
-// 7. CART & ORDERS
+// 7. ORDERS (Cart & Wishlist are stored in localStorage in Phase 1)
 // ==========================================
-export const getCart = () => API.get('/cart');
-export const addToCart = (data) => API.post('/cart/add', data);
-export const updateCart = (productId, quantity) => API.put(`/cart/update/${productId}`, null, { params: { quantity } });
-export const removeFromCart = (productId) => API.delete(`/cart/remove/${productId}`);
-export const clearCart = () => API.delete('/cart/clear');
-export const checkout = (data) => API.post('/orders', data);
 export const createOrder = (data) => API.post('/orders', data);
 
 // ==========================================
-// 8. WISHLIST
-// ==========================================
-export const getWishlist = () => API.get('/wishlist');
-export const toggleWishlist = (productId) => API.post(`/wishlist/toggle/${productId}`);
-export const checkWishlist = (productId) => API.get(`/wishlist/check/${productId}`);
-
-// ==========================================
-// 9. AI CONSULTATION & SUPPORT
+// 8. AI CONSULTATION & SUPPORT
 // ==========================================
 export const chatWithBot = (data) => API.post('/ai/consult', data);
-export const chatWithAiAdvisor = (data) => API.post('/ai/consult', data);
 export const getFAQ = () => API.get('/consultation/faq');
 export const submitContact = (data) => API.post('/consultation/contact', data);
 
 // ==========================================
-// 10. ADMIN
+// 9. ADMIN
 // ==========================================
 export const getDashboard = () => API.get('/admin/dashboard');
 export const getAdminOrders = (params = { limit: 100 }) =>
@@ -125,7 +106,6 @@ export const updateAdminOrderStatus = (id, status, extra = {}) =>
   API.patch(`/admin/orders/${id}/status`, { status, ...extra });
 
 export const getAdminProducts = (params) => API.get('/admin/products', { params });
-export const getAdminProduct = (id) => API.get(`/admin/products/${id}`);
 export const createAdminProduct = (data) => API.post('/admin/products', data);
 export const updateAdminProduct = (id, data) => API.put(`/admin/products/${id}`, data);
 export const deleteAdminProduct = (id) => API.delete(`/admin/products/${id}`);
