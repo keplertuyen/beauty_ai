@@ -399,7 +399,14 @@ var webRootDir = string.IsNullOrWhiteSpace(app.Environment.WebRootPath)
     ? Path.Combine(app.Environment.ContentRootPath, "wwwroot")
     : app.Environment.WebRootPath;
 var uploadsRoot = Path.Combine(webRootDir, "uploads", "products");
-Directory.CreateDirectory(uploadsRoot);
+try
+{
+    Directory.CreateDirectory(uploadsRoot);
+}
+catch (UnauthorizedAccessException ex)
+{
+    app.Logger.LogWarning(ex, "Unable to create uploads directory at {UploadsRoot}; static uploads will be disabled.", uploadsRoot);
+}
 
 app.UseForwardedHeaders();
 

@@ -12,6 +12,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
 RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=build /app .
+RUN mkdir -p /app/wwwroot/uploads/products && chown -R app:app /app/wwwroot
 ENV ASPNETCORE_URLS=http://+:5000
 EXPOSE 5000
 USER app
