@@ -3,11 +3,13 @@ using BeautyAI.Application.DTOs;
 using BeautyAI.Application.Interfaces.Repositories;
 using BeautyAI.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BeautyAI.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/ai")]
+[EnableRateLimiting("ai")]
 public class AiController : ControllerBase
 {
     private readonly IAiSkincareProvider _aiProvider;
